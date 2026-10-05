@@ -1,19 +1,24 @@
-/* 색상 모음: 여기 값만 바꾸면 전체 분위기가 바뀝니다 */
+/* 색상 모음 (어두운 테마): 여기 값만 바꾸면 전체 분위기가 바뀝니다 */
 :root {
-  --bg: #f4f5f7;
-  --panel: #ffffff;
-  --sidebar: #1f2430;
-  --sidebar-text: #c9cdd6;
+  --bg: #0f131b;
+  --panel: #181e2b;
+  --panel-2: #20283a;
+  --sidebar: #0a0d14;
+  --sidebar-text: #9aa3b5;
   --sidebar-active: #3b82f6;
-  --text: #1f2430;
-  --muted: #6b7280;
-  --border: #e3e5ea;
+  --text: #e6e9ef;
+  --muted: #8b93a7;
+  --border: #2a3245;
   --accent: #3b82f6;
-  --good: #16a34a;
-  --bad: #dc2626;
+  --gold: #fbbf24;
+  --good: #34d399;
+  --bad: #f87171;
+  --notice-bg: #3a2f12;
+  --notice-border: #8a6d1f;
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -103,10 +108,12 @@ button {
   padding: 8px 16px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--panel);
+  background: var(--panel-2);
+  color: var(--text);
   cursor: pointer;
   white-space: nowrap;
 }
+button:disabled { opacity: 0.4; cursor: default; }
 
 button.primary {
   background: var(--accent);
@@ -115,7 +122,7 @@ button.primary {
   font-weight: bold;
 }
 
-button:hover { filter: brightness(0.95); }
+button:hover:not(:disabled) { filter: brightness(1.2); }
 
 /* 카드 여러 개를 나란히 (화면이 좁으면 자동 줄바꿈) */
 .grid {
@@ -130,7 +137,7 @@ button:hover { filter: brightness(0.95); }
 /* 스탯 막대 */
 .stat {
   display: grid;
-  grid-template-columns: 64px 1fr 36px;
+  grid-template-columns: 112px 1fr 52px;
   align-items: center;
   gap: 10px;
   margin: 8px 0;
@@ -146,8 +153,8 @@ button:hover { filter: brightness(0.95); }
 
 /* 안내 문구 */
 .notice {
-  background: #fff7e0;
-  border: 1px solid #f5d27a;
+  background: var(--notice-bg);
+  border: 1px solid var(--notice-border);
   border-radius: 8px;
   padding: 10px 16px;
   margin-bottom: 16px;
@@ -170,10 +177,78 @@ button:hover { filter: brightness(0.95); }
   gap: 8px;
   margin: 10px 0;
 }
-.setting-row input[type="text"] {
+input[type="text"] {
   font: inherit;
   padding: 7px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
 }
 button.danger { color: var(--bad); border-color: var(--bad); }
+
+/* 공통 작은 글씨 */
+.muted { color: var(--muted); }
+.small { font-size: 13px; font-weight: normal; }
+
+/* 포지션 가산점 ★ */
+.bonus, .stat-label.bonus { color: var(--gold); }
+.bar-fill.gold { background: var(--gold); }
+
+/* 스탯 12개를 두 줄로 */
+.stat-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  column-gap: 32px;
+}
+
+/* 프로필 */
+.profile-name { font-size: 20px; font-weight: bold; margin: 0 0 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  cursor: help;
+}
+.chip.good { border-color: var(--good); color: var(--good); }
+.chip.bad { border-color: var(--bad); color: var(--bad); }
+
+/* ===== 캐릭터 생성 화면 ===== */
+.creation {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+.creation-title { margin: 0 0 4px; }
+.creation input[type="text"] { width: 100%; max-width: 360px; }
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+.choice {
+  background: var(--panel-2);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+.choice:hover { border-color: #4b5873; }
+.choice.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
+.choice h3 { margin: 0 0 6px; font-size: 16px; }
+.choice p { margin: 6px 0; font-size: 14px; }
+.choice ul { margin: 6px 0; padding-left: 18px; font-size: 14px; }
+.bonus-line { color: var(--gold); }
+
+.trait { padding: 6px 0; }
+.trait.good b { color: var(--good); }
+
+.stat-edit { grid-template-columns: 112px 1fr 60px 76px; }
+.pm { display: flex; gap: 4px; }
+.pm button { padding: 2px 10px; }
+
+.start-card .buttons { justify-content: flex-start; }
+button.big { padding: 12px 28px; font-size: 17px; }

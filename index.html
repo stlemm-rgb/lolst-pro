@@ -7,7 +7,10 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="layout">
+  <!-- 캐릭터 생성 화면 (캐릭터가 없을 때만 보임) -->
+  <div class="creation" id="creation" hidden></div>
+
+  <div class="layout" id="layout" hidden>
     <!-- 좌측 메뉴 -->
     <nav class="sidebar">
       <div class="logo">프로게이머 커리어</div>
@@ -24,9 +27,14 @@
   <!-- 데이터 파일 (코드와 분리) -->
   <script src="data/menus.js"></script>
   <script src="data/stats.js"></script>
+  <script src="data/positions.js"></script>
+  <script src="data/archetypes.js"></script>
+  <script src="data/traits.js"></script>
   <script src="data/training.js"></script>
 
   <!-- 게임 코드 -->
+  <script src="js/player.js"></script>
+  <script src="js/creation.js"></script>
   <script src="js/save.js"></script>
   <script src="js/main.js"></script>
 </body>

@@ -1,23 +1,25 @@
 // ===== 게임 상태 =====
 // 게임의 모든 정보는 state 안에 모아 둡니다.
 // 새 게임을 시작할 때의 기본값
+// player가 null이면 아직 캐릭터를 만들지 않은 상태 → 캐릭터 생성 화면이 나옵니다.
 function createNewState() {
-  const fresh = {
-    name: "신인 선수",
+  return {
+    player: null,                 // { name, position, archetype, age, traits } (캐릭터 생성 때 채워짐)
     team: "무소속",
     money: 0,
     season: 1,
     week: 1,
-    stats: {},                    // 스탯 값 (data/stats.js에서 시작값을 가져옴)
+    stats: {},                    // 실력 스탯 12개 (캐릭터 생성 때 채워짐)
+    stamina: 0,                   // 체력
+    staminaMax: 0,                // 체력 최대치
     condition: CONDITION_START,   // 컨디션
+    popularity: POPULARITY_START, // 인기도
     plan: null,                   // 이번 주에 고른 훈련 id
     log: [],                      // 최근 주간 결과 (최신이 맨 앞)
     settings: { autoSave: true }, // 게임 설정
     notice: "",                   // 화면에 잠깐 띄울 안내 문구
     currentMenu: "dashboard",
   };
-  STATS.forEach(function (s) { fresh.stats[s.id] = s.start; });
-  return fresh;
 }
 
 // 게임 시작 때 채워집니다 (맨 아래 참고)
@@ -53,19 +55,22 @@ function findTraining(id) {
 }
 
 // 스탯 id 또는 "condition"을 화면용 이름으로
+// 스탯 id 또는 체력·컨디션·인기도 id를 화면용 이름으로
 function statName(id) {
-  if (id === "condition") return "컨디션";
-  const stat = STATS.find(function (s) { return s.id === id; });
-  return stat ? stat.name : id;
+  const found = STATS.concat(GAUGES).find(function (s) { return s.id === id; });
+  return found ? found.name : id;
 }
 
-// 숫자 막대 하나 (스탯, 컨디션 표시에 사용)
-function barHTML(label, value, desc) {
+// 숫자 막대 하나 (스탯, 체력, 컨디션 표시에 사용)
+// - bonus: true면 ★ 표시 (포지션 가산점)
+// - max: 최대치가 100이 아닐 때 (예: 체력 72 / 80)
+function barHTML(label, value, desc, bonus, max) {
+  const valueText = max ? value + '<span class="muted small">/' + max + "</span>" : value;
   return (
     '<div class="stat">' +
-      '<div class="stat-label" title="' + (desc || "") + '">' + label + "</div>" +
-      '<div class="bar"><div class="bar-fill" style="width:' + value + '%"></div></div>' +
-      '<div class="stat-value">' + value + "</div>" +
+      '<div class="stat-label' + (bonus ? " bonus" : "") + '" title="' + (desc || "") + '">' + (bonus ? "★ " : "") + label + "</div>" +
+      '<div class="bar"><div class="bar-fill' + (bonus ? " gold" : "") + '" style="width:' + value + '%"></div></div>' +
+      '<div class="stat-value">' + valueText + "</div>" +
     "</div>"
   );
 }
@@ -85,9 +90,18 @@ function changesText(changes) {
 const pages = {};
 
 pages.dashboard = function () {
+  const p = state.player;
+  const pos = findPosition(p.position);
+  const arch = findArchetype(p.archetype);
+
+  const traitsHTML = p.traits.map(function (id) {
+    const t = findTrait(id);
+    return t ? '<span class="chip ' + t.type + '" title="' + t.desc + '">' + t.name + "</span>" : "";
+  }).join("") || '<span class="muted">없음</span>';
+
   let statsHTML = "";
   STATS.forEach(function (s) {
-    statsHTML += barHTML(s.name, state.stats[s.id], s.desc);
+    statsHTML += barHTML(s.name, state.stats[s.id], s.desc, isBonusStat(s.id));
   });
 
   const plan = state.plan ? findTraining(state.plan).name : "아직 안 정함";
@@ -108,10 +122,20 @@ pages.dashboard = function () {
   return (
     "<h1>대시보드</h1>" +
     '<div class="grid">' +
-      '<div class="card"><h2>내 스탯</h2>' + statsHTML + "</div>" +
-      '<div class="card"><h2>컨디션</h2>' + barHTML("컨디션", state.condition) +
+      '<div class="card"><h2>프로필</h2>' +
+        '<p class="profile-name">' + escapeHTML(p.name) + "</p>" +
+        '<p class="muted">' + p.age + "세 · " + pos.name + " · " + arch.name + "</p>" +
+        '<h2 class="sub">특성</h2><div class="chips">' + traitsHTML + "</div>" +
+      "</div>" +
+      '<div class="card"><h2>상태</h2>' +
+        barHTML("체력", state.stamina, "훈련·경기로 줄고 휴식으로 회복", false, state.staminaMax) +
+        barHTML("컨디션", state.condition, "이번 주의 몸과 마음 상태") +
+        barHTML("인기도", state.popularity, "팬과 업계의 관심") +
         '<h2 class="sub">이번 주 할 일</h2><p>훈련: <b>' + plan + "</b></p>" +
       "</div>" +
+    "</div>" +
+    '<div class="card"><h2>내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점</span></h2>' +
+      '<div class="stat-columns">' + statsHTML + "</div>" +
     "</div>" +
     '<div class="card"><h2>최근 기록</h2>' + logHTML + "</div>"
   );
@@ -121,11 +145,18 @@ pages.training = function () {
   let cards = "";
   TRAININGS.forEach(function (t) {
     const selected = state.plan === t.id;
+    const sign = function (n) { return (n > 0 ? "+" : "") + n; };
     const effects = Object.keys(t.effects).map(function (id) {
       const r = t.effects[id];
-      const sign = function (n) { return (n > 0 ? "+" : "") + n; };
-      return statName(id) + " " + sign(r[0]) + " ~ " + sign(r[1]);
-    }).join(", ");
+      let text = (isBonusStat(id) ? '<span class="bonus">★</span>' : "") + statName(id) + " " + sign(r[0]) + " ~ " + sign(r[1]);
+      // 내 보너스 표시
+      let extra = 0;
+      if (state.stats[id] !== undefined && r[1] > 0) extra = trainingBonusFor(id);
+      if (id === "stamina" && r[1] < 0) extra = staminaCostMultiplier() - 1;
+      if (id === "popularity" && r[1] > 0) extra = popularityMultiplier() - 1;
+      if (Math.abs(extra) > 0.001) text += ' <span class="' + (extra > 0 === (id !== "stamina") ? "up" : "down") + '">(' + percentText(extra) + ")</span>";
+      return text;
+    }).join("<br>");
 
     cards +=
       '<div class="card training' + (selected ? " selected" : "") + '">' +
@@ -138,9 +169,12 @@ pages.training = function () {
       "</div>";
   });
 
+  const tired = state.stamina < TIRED_LIMIT
+    ? '<div class="notice">체력이 ' + state.stamina + "밖에 남지 않았어요. 체력이 " + TIRED_LIMIT + " 미만이면 훈련 효과가 절반이 돼요. 휴식을 고려해 보세요.</div>"
+    : "";
   return (
-    "<h1>훈련</h1>" +
-    '<p class="placeholder">이번 주에 할 훈련을 고른 뒤, 위의 [다음 주로 진행]을 누르세요.</p>' +
+    "<h1>훈련</h1>" + tired +
+    '<p class="placeholder">이번 주에 할 훈련을 고른 뒤, 위의 [다음 주로 진행]을 누르세요. 괄호 안은 포지션 가산점·유형·특성으로 받는 내 보너스예요.</p>' +
     '<div class="grid">' + cards + "</div>"
   );
 };
@@ -167,7 +201,7 @@ pages.settings = function () {
     '<div class="card"><h2>게임 설정</h2>' +
       '<div class="setting-row">' +
         '<label for="player-name">선수 이름</label>' +
-        '<input type="text" id="player-name" maxlength="20" value="' + escapeHTML(state.name) + '">' +
+        '<input type="text" id="player-name" maxlength="20" value="' + escapeHTML(state.player.name) + '">' +
         '<button data-action="rename">이름 바꾸기</button>' +
       "</div>" +
       '<div class="setting-row">' +
@@ -175,7 +209,7 @@ pages.settings = function () {
       "</div>" +
     "</div>" +
     '<div class="card"><h2>새 게임</h2>' +
-      '<p class="placeholder">처음부터 다시 시작합니다. 브라우저에 저장된 진행도 지워집니다.</p>' +
+      '<p class="placeholder">캐릭터 생성부터 다시 시작합니다. 커리어를 시작하기 전까지는 기존 저장이 남아 있어요.</p>' +
       '<button class="danger" data-action="new-game">새 게임 시작</button>' +
     "</div>"
   );
@@ -202,17 +236,16 @@ const settingsActions = {
   rename: function () {
     const name = document.getElementById("player-name").value.trim();
     if (!name) return showNotice("이름을 한 글자 이상 입력해 주세요.");
-    state.name = name.slice(0, 20);
+    state.player.name = name.slice(0, 20);
     if (state.settings.autoSave) saveGame();
     renderTopbar();
-    showNotice("이름을 '" + escapeHTML(state.name) + "'(으)로 바꿨어요.");
+    showNotice("이름을 '" + escapeHTML(state.player.name) + "'(으)로 바꿨어요.");
   },
   "new-game": function () {
-    if (!confirm("새 게임을 시작할까요?\n지금 진행과 브라우저에 저장된 게임이 모두 사라집니다.\n(내보내기한 세이브 파일은 남아 있어요)")) return;
+    if (!confirm("새 게임을 시작할까요?\n캐릭터 생성 화면으로 이동합니다.\n새 캐릭터로 [커리어 시작]을 누르면 브라우저에 저장된 게임이 새 게임으로 바뀝니다.")) return;
     const fresh = createNewState();
     fresh.settings.autoSave = state.settings.autoSave;
-    replaceState(fresh, "dashboard", "새 게임을 시작했어요.");
-    saveGame();
+    replaceState(fresh, "dashboard", "");
   },
 };
 
@@ -282,8 +315,8 @@ function selectMenu(id) {
 function renderTopbar() {
   document.getElementById("topbar").innerHTML =
     '<span class="item">시즌 <b>' + state.season + "</b> · <b>" + state.week + "</b>주차</span>" +
-    '<span class="item">선수 <b>' + escapeHTML(state.name) + "</b></span>" +
-    '<span class="item">소속 <b>' + state.team + "</b></span>" +
+    '<span class="item">선수 <b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
+    '<span class="item">소속 <b>' + escapeHTML(state.team) + "</b></span>" +
     '<span class="item">자금 <b>' + state.money.toLocaleString() + "</b>원</span>" +
     '<span class="spacer"></span>' +
     '<button class="primary" id="next-week">다음 주로 진행 ▶</button>';
@@ -330,26 +363,49 @@ function nextWeek() {
 
   // 훈련 효과 적용
   const training = findTraining(state.plan);
+  const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
   const changes = {};
   Object.keys(training.effects).forEach(function (id) {
     const range = training.effects[id];
-    const amount = randInt(range[0], range[1]);
-    if (id === "condition") {
-      const before = state.condition;
+    let amount = randInt(range[0], range[1]);
+    let before;
+
+    if (id === "stamina") {
+      if (amount < 0) amount = -roundRandom(-amount * staminaCostMultiplier());
+      before = state.stamina;
+      state.stamina = Math.max(0, Math.min(state.staminaMax, state.stamina + amount));
+      changes[id] = state.stamina - before;
+    } else if (id === "condition") {
+      before = state.condition;
       state.condition = clamp(state.condition + amount);
       changes[id] = state.condition - before;
-    } else {
-      const before = state.stats[id];
+    } else if (id === "popularity") {
+      if (amount > 0) amount = roundRandom(amount * popularityMultiplier());
+      before = state.popularity;
+      state.popularity = clamp(state.popularity + amount);
+      changes[id] = state.popularity - before;
+    } else if (state.stats[id] !== undefined) {
+      // 실력 스탯: 오를 때만 보너스(가산점·유형·특성)를 붙임
+      if (amount > 0) {
+        let boosted = amount * (1 + trainingBonusFor(id));
+        if (tired) boosted *= 0.5;
+        amount = roundRandom(Math.max(0, boosted));
+      }
+      before = state.stats[id];
       state.stats[id] = clamp(state.stats[id] + amount);
       changes[id] = state.stats[id] - before;
     }
   });
 
+  let message = pick(training.messages);
+  const gainsStats = Object.keys(training.effects).some(function (id) { return state.stats[id] !== undefined; });
+  if (tired && gainsStats) message += " (너무 지쳐서 훈련 효과가 절반이었다.)";
+
   // 결과 기록 (최근 10개만 보관)
   state.log.unshift({
     when: "시즌 " + state.season + " · " + state.week + "주차",
     training: training.name,
-    message: pick(training.messages),
+    message: message,
     changes: changes,
   });
   state.log = state.log.slice(0, 10);
@@ -363,11 +419,19 @@ function nextWeek() {
 }
 
 function renderAll() {
+  const creating = !state.player; // 캐릭터가 없으면 캐릭터 생성 화면
+  document.getElementById("layout").hidden = creating;
+  document.getElementById("creation").hidden = !creating;
+  if (creating) {
+    renderCreation();
+    return;
+  }
+  document.getElementById("creation").innerHTML = "";
   renderMenu();
   renderTopbar();
   renderPage();
 }
 
-// 게임 시작: 저장된 게임이 있으면 이어서, 없으면 새 게임
+// 게임 시작: 저장된 게임이 있으면 이어서, 없으면 캐릭터 생성 화면
 state = loadGame() || createNewState();
 renderAll();
