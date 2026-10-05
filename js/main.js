@@ -595,6 +595,7 @@ function renderPage() {
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
+  bindMatchDetail(page); // 경기 상세 펼치기 (js/match_detail.js)
   page.querySelectorAll("[data-retire]").forEach(function (btn) {
     btn.onclick = function () {
       if (btn.getAttribute("data-retire") === "now") return retireNowButton();

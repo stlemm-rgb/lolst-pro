@@ -21,15 +21,18 @@ function matchRowHTML(m, showWeek) {
       result = score;
     }
   }
+  const key = m.detail ? matchKey(m) : "";
+  const open = key && openMatchKey === key;
   return (
-    "<tr>" +
+    "<tr" + (key ? ' class="click' + (open ? " sel" : "") + '" data-mdetail="' + key + '" title="눌러서 경기 상세 보기"' : "") + ">" +
       (showWeek ? '<td class="muted">' + m.week + "주</td>" : "") +
       '<td class="muted">' + escapeHTML(m.label) + "</td>" +
       '<td class="r">' + teamLabel(m.a) + "</td>" +
       '<td class="c">' + result + "</td>" +
       "<td>" + teamLabel(m.b) + "</td>" +
-      '<td class="muted small">' + (m.pogName ? "POG " + escapeHTML(m.pogName) : "") + "</td>" +
-    "</tr>"
+      '<td class="muted small">' + (m.pogName ? "POG " + escapeHTML(m.pogName) : "") + (key ? ' <span class="detail-mark">' + (open ? "▲" : "상세 ▼") + "</span>" : "") + "</td>" +
+    "</tr>" +
+    (open ? '<tr class="detail-row"><td colspan="' + (showWeek ? 6 : 5) + '">' + matchDetailHTML(m) + "</td></tr>" : "")
   );
 }
 

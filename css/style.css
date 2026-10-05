@@ -452,3 +452,19 @@ tr.sel { outline: 1px solid var(--accent); }
 .chip.s { border-color: var(--gold); color: var(--gold); font-weight: bold; background: rgba(251, 191, 36, 0.12); }
 .mini-chips { display: inline-flex; flex-wrap: wrap; gap: 3px; margin-left: 4px; vertical-align: middle; }
 .mini-chips .chip { font-size: 11px; padding: 1px 6px; }
+
+/* ===== 경기 상세 ===== */
+.detail-mark { color: var(--accent); margin-left: 4px; }
+tr.detail-row > td { background: rgba(0, 0, 0, 0.2); padding: 12px; }
+.rep-detail { margin: 6px 0 12px; padding: 12px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; }
+.match-detail .md-head { margin-bottom: 10px; }
+.set-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+.set-head { margin-bottom: 6px; }
+table.lane-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 6px; }
+table.lane-table td, table.lane-table th { padding: 4px 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+table.lane-table th { color: var(--muted, #8b95a7); font-weight: normal; text-align: left; }
+.lane-win { background: rgba(34, 197, 94, 0.08); }
+.lane-mid { font-size: 12px; line-height: 1.2; white-space: nowrap; }
+.solo { color: var(--gold); }
+.md-ratings { margin-top: 8px; }
+.md-ratings h3 { margin: 0 0 4px; }

@@ -69,7 +69,7 @@ function finishWeekReport(playedWeek, seasonMatches) {
     const opp = m.a === mine.id ? m.b : m.a;
     const my = m.a === mine.id ? m.score[0] : m.score[1];
     const their = m.a === mine.id ? m.score[1] : m.score[0];
-    return { won: won, text: m.label + " · vs " + teamName(opp) + " " + my + ":" + their };
+    return { won: won, matchKey: matchKey(m), text: m.label + " · vs " + teamName(opp) + " " + my + ":" + their };
   });
 }
 
@@ -84,12 +84,14 @@ function weekReportHTML() {
   if (r.userLines.length) {
     html += r.userLines.map(function (l) {
       return '<div class="rep-row"><span class="rep-tag ' + (l.won ? "win" : "lose") + '">' + (l.won ? "승" : "패") + "</span>" +
-        escapeHTML(l.text) + (l.changes ? ' <span class="log-changes">' + changesText(l.changes) + "</span>" : "") + "</div>";
+        escapeHTML(l.text) + (l.changes ? ' <span class="log-changes">' + changesText(l.changes) + "</span>" : "") + detailButtonHTML(l.matchKey) + "</div>" +
+        openDetailHTML(l.matchKey);
     }).join("");
   } else if (r.teamLines.length) {
     html += r.teamLines.map(function (l) {
       return '<div class="rep-row"><span class="rep-tag ' + (l.won ? "win" : "lose") + '">' + (l.won ? "승" : "패") + "</span>" +
-        escapeHTML(l.text) + ' <span class="muted small">(후보라서 출전하지 않음)</span></div>';
+        escapeHTML(l.text) + ' <span class="muted small">(후보라서 출전하지 않음)</span>' + detailButtonHTML(l.matchKey) + "</div>" +
+        openDetailHTML(l.matchKey);
     }).join("");
   } else {
     html += '<div class="rep-row muted">이번 주는 경기가 없었어요.</div>';
