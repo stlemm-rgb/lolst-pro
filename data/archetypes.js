@@ -47,7 +47,6 @@ const ARCHETYPES = [
 const CREATION = {
   randomSpread: 5,   // 스탯마다 평균에서 ±5 무작위
   bonusPoints: 10,   // 직접 나눠 줄 보너스 포인트
-  traitRerolls: 3,   // 특성 다시 뽑기 횟수
   minStat: 1,        // 시작 스탯 최소
   maxStat: 90,       // 시작 스탯 최대
   // 시작 연도: 늦게 시작할수록 훈련할 시간이 짧으니 모든 스탯에 보정을 더해 줌

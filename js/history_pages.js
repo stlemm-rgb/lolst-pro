@@ -55,7 +55,7 @@ pages.history = function () {
              : '<p class="muted">상을 받았거나 뛰어났던 선수가 은퇴하면 기록돼요.</p>') + "</div>";
 
   return (
-    "<h1>역사관</h1>" + timelineCard + championsHistoryHTML() + mvpCard + retCard +
+    "<h1>역사관</h1>" + timelineCard + sTraitLogHTML() + championsHistoryHTML() + mvpCard + retCard +
     '<div class="card"><h2>🏛 명예의 전당 <span class="muted small">은퇴한 내 선수들 · 새 게임을 해도 남아요</span></h2>' + hallOfFameHTML() + "</div>"
   );
 };

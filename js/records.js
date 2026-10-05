@@ -73,6 +73,7 @@ function giveAward(key, id, value, extraTitle) {
   };
   if (!state.league.awards) state.league.awards = [];
   state.league.awards.push(entry);
+  sTraitsOnAward(id, key); // 불사대마왕·철의 의지 (js/straits.js)
   if (id === USER_ID) {
     if (!state.career.awards) state.career.awards = [];
     state.career.awards.push({ year: state.year, title: title, key: key });

@@ -95,9 +95,32 @@ function makeNpc(pos, level, ageRange) {
     age: randInt(ageRange[0], ageRange[1]),
     stats: stats,
     teamId: null,
+    traits: randomNpcTraits(),
   };
   state.league.players[p.id] = p;
   return p;
+}
+
+// 다른 선수(NPC) 특성 무작위로 (data/traits.js의 NPC_TRAITS)
+function randomNpcTraits() {
+  let r = Math.random(), count = 0;
+  for (let i = 0; i < NPC_TRAITS.goodCount.length; i++) {
+    r -= NPC_TRAITS.goodCount[i][1];
+    if (r < 0) { count = NPC_TRAITS.goodCount[i][0]; break; }
+  }
+  const goods = shuffled(TRAITS.filter(function (t) { return t.npc && t.type === "good"; })).slice(0, count);
+  const list = goods.map(function (t) { return t.id; });
+  if (Math.random() < NPC_TRAITS.badChance) list.push(pick(TRAITS.filter(function (t) { return t.npc && t.type === "bad"; })).id);
+  return list;
+}
+
+// 예전 세이브: 특성이 없는 선수에게 특성 붙이기
+function ensureNpcTraits() {
+  Object.keys(state.league.players).forEach(function (id) {
+    const p = state.league.players[id];
+    if (!Array.isArray(p.traits)) p.traits = randomNpcTraits();
+    else p.traits = p.traits.filter(function (t) { return !!findTrait(t); });
+  });
 }
 
 // ----- 구단 이름 정하기 -----
@@ -281,17 +304,22 @@ function newSeasonLeague() {
     }
   });
 
-  // NPC 성장·노화·은퇴
+  // NPC 성장·노화·은퇴 (특성: 훈련 효과 = 성장, 늦게 피는 꽃 = 노화 늦게, 철의 의지 = 노화 절반, 상한선)
   Object.keys(state.league.players).forEach(function (id) {
     const p = state.league.players[id];
+    const tr = p.traits || [];
     p.age += 1;
-    const rule = LEAGUE.npcGrowth.find(function (g) { return p.age <= g.maxAge; });
+    const bodyAge = p.age - traitSumOf(tr, "agingDelay");
+    const rule = LEAGUE.npcGrowth.find(function (g) { return bodyAge <= g.maxAge; });
     STATS.forEach(function (s) {
       let d = randInt(rule.change[0], rule.change[1]);
-      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id])); // 높은 스탯일수록 덜 오름
-      p.stats[s.id] = Math.max(1, Math.min(99, p.stats[s.id] + d));
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id]) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id)));
+      else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
+      const before = p.stats[s.id];
+      p.stats[s.id] = Math.max(1, capRise(before, Math.min(99, before + d), statCapOf(tr, s.id)));
     });
-    if (p.age >= LEAGUE.retireFromAge && Math.random() < (p.age - LEAGUE.retireFromAge + 1) * LEAGUE.retireChancePerYear) {
+    const retireAge = LEAGUE.retireFromAge + traitSumOf(tr, "agingDelay") + traitSumOf(tr, "maxAgeBonus");
+    if (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear) {
       retirePlayer(p);
     }
   });

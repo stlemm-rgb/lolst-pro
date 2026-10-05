@@ -94,6 +94,7 @@ function checkBench() {
     const protectedByContract = state.career.seasonGames < (state.contract.guarantee || 0);
     if (rival && playerScore(rival) >= me + CONTRACT.benchGap && !protectedByContract) {
       state.benched = true;
+      state.career.benchedYear = state.year; // 잡초 (S급 특성) 조건
       state.benchWeeks = 0;
       postMessage("inbox", CONTRACT_TEXTS.benchTitle, contractText(CONTRACT_TEXTS.bench, { rival: playerName(rival) }), {
         notes: ["후보일 때는 경기에 나가지 못해요. 스탯 점수가 " + playerName(rival) + "(" + playerScore(rival).toFixed(1) + ")보다 높아지면 주전으로 돌아가요."],

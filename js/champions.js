@@ -197,6 +197,7 @@ function metaPenaltyInfo() {
     stubborn = Math.max(0, traitEffectSum("metaPenalty"));
     penalty += stubborn;
   }
+  if (traitEffectSum("noMetaPenalty")) penalty = 0; // 챔피언 마스터
   return { avg: avg, penalty: penalty, adapting: adapting, adaptCut: adaptCut, stubborn: stubborn };
 }
 

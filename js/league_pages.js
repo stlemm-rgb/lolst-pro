@@ -71,7 +71,7 @@ pages.team = function () {
     return (
       '<tr class="' + (me ? "me" : "") + '">' +
         "<td>" + findPosition(playerPos(id)).name + "</td>" +
-        "<td>" + escapeHTML(playerName(id)) + (me ? ' <span class="now-tag">나</span>' : "") + "</td>" +
+        "<td>" + escapeHTML(playerName(id)) + (me ? ' <span class="now-tag">나</span>' : "") + traitChipsMini(id) + "</td>" +
         "<td>" + playerAge(id) + "세</td>" +
         '<td class="r"><b>' + playerScore(id).toFixed(1) + "</b></td>" +
         "<td>" + (isStarter ? "주전" : '<span class="muted">후보</span>') + "</td>" +

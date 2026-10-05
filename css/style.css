@@ -440,3 +440,15 @@ tr.sel { outline: 1px solid var(--accent); }
 .ending-grade { text-align: center; padding: 24px 16px; margin-top: 16px; }
 .grade-stars { font-size: 32px; color: var(--gold); letter-spacing: 4px; }
 .grade-name { font-size: 28px; font-weight: bold; margin: 6px 0; }
+
+/* 캐릭터 생성: 특성 고르기 */
+.trait-choices { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.trait-pick h3 { font-size: 15px; }
+.trait-pick p { font-size: 13px; }
+.trait-pick.selected h3 { color: var(--good); }
+.trait-pick.full { opacity: 0.45; }
+
+/* S급 특성 · 이름 옆 작은 특성 칩 */
+.chip.s { border-color: var(--gold); color: var(--gold); font-weight: bold; background: rgba(251, 191, 36, 0.12); }
+.mini-chips { display: inline-flex; flex-wrap: wrap; gap: 3px; margin-left: 4px; vertical-align: middle; }
+.mini-chips .chip { font-size: 11px; padding: 1px 6px; }

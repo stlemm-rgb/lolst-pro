@@ -67,7 +67,7 @@ function applyEffects(eff, ctx) {
     let before;
     if (state.stats[key] !== undefined) {
       before = state.stats[key];
-      state.stats[key] = clamp(state.stats[key] + v);
+      state.stats[key] = capRise(before, clamp(before + v), userStatCap(key)); // 상한선에서 멈춤
       add(key, state.stats[key] - before);
     } else if (key === "stamina") {
       before = state.stamina;
@@ -120,7 +120,7 @@ function applyEffects(eff, ctx) {
 
 // 나쁜 특성 위험 / 극복 / 좋은 특성 얻기
 function rollTraitEffects(choice, notes) {
-  if (choice.risk && !hasTrait(choice.risk.trait)) {
+  if (choice.risk && !hasTrait(choice.risk.trait) && !traitEffectSum("badImmune")) { // 잡초: 나쁜 특성 안 생김
     const chance = Math.min(EVENT_RULES.maxRisk, choice.risk.chance);
     if (Math.random() < chance) {
       state.player.traits.push(choice.risk.trait);
@@ -252,6 +252,7 @@ function checkTraitGains() {
     addMoment("✨", "특성 '" + findTrait(g.trait).name + "' 획득");
     postMessage("news", "✨ 새 특성: " + findTrait(g.trait).name, g.text, { notes: ["좋은 특성 '" + findTrait(g.trait).name + "'을(를) 얻었다!"] });
   });
+  sTraitsWeeklyUser(); // 내 선수만 얻는 S급 특성 (js/straits.js)
 }
 
 // 선수 SNS (분위기용 글)

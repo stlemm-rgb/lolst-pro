@@ -135,7 +135,7 @@ pages.dashboard = function () {
 
   let statsHTML = "";
   STATS.forEach(function (s) {
-    statsHTML += barHTML(s.name, state.stats[s.id], s.desc, isBonusStat(s.id));
+    statsHTML += barHTML(s.name, state.stats[s.id], s.desc + " (상한선 " + userStatCap(s.id) + ")", isBonusStat(s.id), userStatCap(s.id)); // 값/상한선
   });
 
   const plan = state.plan ? findTraining(state.plan).name : "아직 안 정함";
@@ -319,13 +319,13 @@ function retireCardHTML() {
   let planLine = "";
   if (state.retirePlanned) {
     planLine = '<p class="notice-inline">이번 시즌(52주)이 끝나면 은퇴해요.</p>' +
-      (age < CAREER.maxAge ? '<button data-retire="cancel">은퇴 취소 (한 시즌 더 뛰기)</button> ' : "");
+      (age < userMaxAge() ? '<button data-retire="cancel">은퇴 취소 (한 시즌 더 뛰기)</button> ' : "");
   }
   return (
     '<div class="card"><h2>나이와 은퇴</h2>' +
       "<p>" + age + "세 · 프로 " + careerYears() + "년차</p>" +
       '<p class="muted small">' + agingLine + "</p>" +
-      '<p class="muted small">평균 은퇴 나이 ' + CAREER.avgRetireAge + "세. " + CAREER.retireAskAge + "세부터 비시즌마다 감독이 은퇴를 물어봐요. 최대 " + CAREER.maxAge + "세까지 뛸 수 있어요.</p>" +
+      '<p class="muted small">평균 은퇴 나이 ' + CAREER.avgRetireAge + "세. " + CAREER.retireAskAge + "세부터 비시즌마다 감독이 은퇴를 물어봐요. 최대 " + userMaxAge() + "세까지 뛸 수 있어요.</p>" +
       planLine +
       '<div class="buttons"><button class="danger" data-retire="now">지금 은퇴하기</button></div>' +
     "</div>"
@@ -683,7 +683,7 @@ function nextWeek(restWeek) {
         amount = roundRandom(Math.max(0, boosted));
       }
       before = state.stats[id];
-      state.stats[id] = clamp(state.stats[id] + amount);
+      state.stats[id] = capRise(before, clamp(before + amount), userStatCap(id)); // 상한선에서 멈춤
       changes[id] = state.stats[id] - before;
     }
   });
@@ -777,6 +777,7 @@ function nextWeek(restWeek) {
 
 // 지난 시즌 우승 기록 남기기 (7단계 역사관에서 사용)
 function saveSeasonHistory() {
+  sTraitsOnSeasonEnd(); // 원클럽맨·라인 지배자·한계 돌파 (js/straits.js)
   saveCareerSeason(); // 내 시즌 기록 (js/records.js)
   const season = state.league.season;
   if (!state.league.history) state.league.history = [];
@@ -816,6 +817,7 @@ function renderAll() {
   }
   document.getElementById("creation").innerHTML = "";
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
+  ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
   if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦
   ensureCareerRecords(); // 데뷔 기록 등
   renderMenu();

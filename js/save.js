@@ -4,7 +4,7 @@
 
 const SAVE_KEY = "progamer-career-save";
 const SAVE_GAME_ID = "progamer-career";
-const SAVE_VERSION = 9; // 9: 노화·은퇴·역사관 / 8: 메타 S급·퀘스트 / 7: 솔로 랭크·지난주 결과 / 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
+const SAVE_VERSION = 10; // 10: NPC 특성·S급 특성·스탯 상한선 / 9: 노화·은퇴·역사관 / 8: 메타 S급·퀘스트 / 7: 솔로 랭크·지난주 결과 / 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
 const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp", "retirePlanned", "retired"];
@@ -88,6 +88,8 @@ function stateFromSave(save) {
     else delete fresh.career.moments; // 예전 세이브: 우승·수상 기록으로 채움 (ensureMoments)
     fresh.career.agingStarted = s.career.agingStarted === true;
     fresh.career.challenger = s.career.challenger === true;
+    if (s.career.rec && typeof s.career.rec === "object") fresh.career.rec = s.career.rec;
+    if (Number.isFinite(s.career.benchedYear)) fresh.career.benchedYear = s.career.benchedYear;
   }
   fresh.skipTraining = s.skipTraining === true;
   // 계약

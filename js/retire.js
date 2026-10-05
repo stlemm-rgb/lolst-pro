@@ -36,18 +36,24 @@ function agingTrainingMultiplier(statId) {
   return Math.max(CAREER.agingTrainingMin, 1 - years * CAREER.agingTrainingCut);
 }
 
+// 최대 은퇴 나이 (철의 의지 +3)
+function userMaxAge() {
+  return CAREER.maxAge + traitEffectSum("maxAgeBonus");
+}
+
 function applyAging() {
   const age = state.player.age;
+  const keep = Math.max(0, 1 - traitEffectSum("agingCut")); // 철의 의지: 절반
   if (age < agingStartAge()) return null;
   const rule = CAREER.aging.find(function (r) { return age <= r.maxAge; });
   const changes = {};
   ["reaction", "accuracy"].forEach(function (id) {
     const before = state.stats[id];
-    state.stats[id] = clamp(before - randInt(rule[id][0], rule[id][1]));
+    state.stats[id] = clamp(before - roundRandom(randInt(rule[id][0], rule[id][1]) * keep));
     changes[id] = state.stats[id] - before;
   });
   const beforeMax = state.staminaMax;
-  state.staminaMax = Math.max(CAREER.minStaminaMax, state.staminaMax - rule.staminaMax);
+  state.staminaMax = Math.max(CAREER.minStaminaMax, state.staminaMax - roundRandom(rule.staminaMax * keep));
   state.stamina = Math.min(state.stamina, state.staminaMax);
   changes.staminaMax = state.staminaMax - beforeMax;
   if (!state.career.agingStarted) {
@@ -71,7 +77,7 @@ function retireText(text) {
 function askRetirement() {
   if (state.retirePlanned) return;
   const age = state.player.age;
-  if (age >= CAREER.maxAge) {
+  if (age >= userMaxAge()) {
     state.retirePlanned = true;
     postMessage("inbox", RETIRE_TEXTS.maxAgeTitle, retireText(RETIRE_TEXTS.maxAge), {});
     return;
@@ -126,7 +132,7 @@ function noTeamWantsMe() {
 
 // 시즌이 끝날 때 은퇴할지 (main.js nextWeek에서 새해 직전에 부름). 은퇴 이유 또는 ""
 function seasonEndRetireReason() {
-  if (state.player.age >= CAREER.maxAge) return "나이";
+  if (state.player.age >= userMaxAge()) return "나이";
   if (state.retirePlanned) return "선택";
   if (noTeamWantsMe()) return "계약";
   return "";

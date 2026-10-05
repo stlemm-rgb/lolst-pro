@@ -90,14 +90,18 @@ function playerDetailHTML(id) {
   const p = playerInfo(id);
   const bonus = findPosition(p.pos).bonus;
   const bars = STATS.map(function (s) {
-    return barHTML(s.name, p.stats[s.id], s.desc, bonus.indexOf(s.id) !== -1);
+    const cap = statCapOf(traitsOf(id), s.id);
+    return barHTML(s.name, p.stats[s.id], s.desc + " (상한선 " + cap + ")", bonus.indexOf(s.id) !== -1, cap);
   }).join("");
   const team = p.teamId ? findTeam(p.teamId) : null;
+  const traits = traitsOf(id);
   return (
     '<div class="card detail">' +
       "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.pos).name + " · " + p.age + "세 · " +
         (team ? escapeHTML(team.name) : "FA") + " · 스탯 점수 " + playerScore(id).toFixed(1) + "</span></h2>" +
+      '<div class="chips">' + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
       '<div class="stat-columns">' + bars + "</div>" +
+      '<p class="muted small">숫자 옆 /값은 스탯 상한선이에요.</p>' +
     "</div>"
   );
 }
@@ -137,7 +141,7 @@ function clubRosterHTML(teamId) {
     return (starterIds.indexOf(b) !== -1) - (starterIds.indexOf(a) !== -1) || POSITION_IDS.indexOf(playerPos(a)) - POSITION_IDS.indexOf(playerPos(b));
   }).map(function (id) {
     const p = playerInfo(id);
-    return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + "</td><td>" + p.age + '세</td><td class="r"><b>' +
+    return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + traitChipsMini(id) + "</td><td>" + p.age + '세</td><td class="r"><b>' +
       playerScore(id).toFixed(1) + '</b></td><td class="r">' + moneyText(p.salary || 0) + "</td><td>" + (starterIds.indexOf(id) !== -1 ? "주전" : '<span class="muted">후보</span>') + "</td></tr>";
   }).join("");
   return '<table class="roster club-roster">' + rows + "</table>";

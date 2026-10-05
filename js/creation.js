@@ -20,7 +20,6 @@ function newDraft() {
   STATS.forEach(function (s) {
     offsets[s.id] = randInt(-CREATION.randomSpread, CREATION.randomSpread);
   });
-  const goodIds = TRAITS.filter(function (t) { return t.type === "good"; }).map(function (t) { return t.id; });
   return {
     name: "",
     position: POSITIONS[0].id,
@@ -28,17 +27,28 @@ function newDraft() {
     startYear: CREATION.startYears[0].year,
     offsets: offsets,
     alloc: {},                          // 보너스 포인트를 어디에 몇 점 줬는지
-    traitOrder: shuffled(goodIds),      // 특성 뽑기 순서 (앞에서부터 개수만큼 받음)
+    traits: [],                         // 직접 고른 좋은 특성 (유형별 개수까지)
     teams: makeTeamDefs(),              // 이번 판 구단 이름 (1부 10 + 2부 8)
     teamChoice: -1,                     // 고른 구단 번호 (-1 = 무작위)
-    rerollsLeft: CREATION.traitRerolls,
     error: "",
   };
 }
 
-// 지금 유형에서 받는 특성 id 목록
+// 지금 유형에서 고를 수 있는 특성 개수
+function traitSlots() {
+  return findArchetype(draft.archetype).goodTraits;
+}
+
+// 고른 특성 (유형을 바꿔서 칸이 줄면 뒤에 고른 것부터 빠짐)
 function draftTraits() {
-  return draft.traitOrder.slice(0, findArchetype(draft.archetype).goodTraits);
+  return draft.traits.slice(0, traitSlots());
+}
+
+// 시작할 때: 덜 고른 칸은 무작위로 채움
+function finalTraits() {
+  const chosen = draftTraits();
+  const rest = shuffled(TRAITS.filter(function (t) { return t.type === "good" && chosen.indexOf(t.id) === -1; }).map(function (t) { return t.id; }));
+  return chosen.concat(rest.slice(0, traitSlots() - chosen.length));
 }
 
 function findStartYear(year) {
@@ -129,14 +139,25 @@ function creationHTML() {
     '<div class="card"><h2>4. 시작 유형</h2><div class="choices">' + archCards + "</div></div>";
 
   // 5. 특성
-  const traitList = draftTraits().map(traitChipHTML).join("");
+  const pickedTraits = draftTraits();
+  const slots = traitSlots();
+  const groups = [];
+  TRAITS.forEach(function (t) { if (t.type === "good" && groups.indexOf(t.group) === -1) groups.push(t.group); });
+  const traitGroups = groups.map(function (g) {
+    const cards = TRAITS.filter(function (t) { return t.type === "good" && t.group === g; }).map(function (t) {
+      const on = pickedTraits.indexOf(t.id) !== -1;
+      const full = !on && pickedTraits.length >= slots;
+      return '<div class="choice trait-pick' + (on ? " selected" : "") + (full ? " full" : "") + '" data-ctrait="' + t.id + '">' +
+        "<h3>" + (on ? "✔ " : "") + t.name + "</h3><p class=\"muted\">" + escapeHTML(t.desc) + "</p></div>";
+    }).join("");
+    return '<h2 class="sub">' + g + '</h2><div class="choices trait-choices">' + cards + "</div>";
+  }).join("");
   const traitCard =
-    '<div class="card"><h2>5. 특성</h2>' +
-      '<p class="muted small">특성 위에 마우스를 올리면 설명이 나와요.</p>' +
-      '<div class="chips">' + traitList + "</div>" +
-      '<div class="buttons" style="margin-top:12px">' +
-        '<button data-reroll="1"' + (draft.rerollsLeft > 0 ? "" : " disabled") + ">다시 뽑기 (남은 횟수 " + draft.rerollsLeft + ")</button>" +
-      "</div>" +
+    '<div class="card"><h2>5. 특성 <span class="muted small">' + pickedTraits.length + " / " + slots + "개 선택</span></h2>" +
+      '<p class="muted small">' + findArchetype(draft.archetype).name + " 유형은 좋은 특성을 " + slots + "개 고를 수 있어요. 눌러서 고르고, 다시 누르면 빠져요. " +
+        "덜 고르고 시작하면 남은 칸은 무작위로 채워져요. 나쁜 특성은 게임 중 이벤트로만 생겨요.</p>" +
+      (pickedTraits.length ? '<div class="chips">' + pickedTraits.map(traitChipHTML).join("") + "</div>" : "") +
+      traitGroups +
     "</div>";
 
   // 5. 스탯
@@ -252,16 +273,17 @@ function renderCreation() {
     };
   });
 
-  const reroll = box.querySelector("[data-reroll]");
-  reroll.onclick = function () {
-    if (draft.rerollsLeft <= 0) return;
-    draft.rerollsLeft -= 1;
-    // 지금 보이는 특성은 맨 뒤로 보내서, 다시 뽑으면 반드시 다른 특성이 나오게
-    const current = draftTraits();
-    const others = draft.traitOrder.filter(function (id) { return current.indexOf(id) === -1; });
-    draft.traitOrder = shuffled(others).concat(shuffled(current));
-    renderCreation();
-  };
+  box.querySelectorAll("[data-ctrait]").forEach(function (el) {
+    el.onclick = function () {
+      const id = el.getAttribute("data-ctrait");
+      draft.traits = draftTraits(); // 유형을 바꿔 넘친 것은 정리
+      const i = draft.traits.indexOf(id);
+      if (i !== -1) draft.traits.splice(i, 1);
+      else if (draft.traits.length < traitSlots()) draft.traits.push(id);
+      else if (traitSlots() === 1) draft.traits = [id]; // 1개짜리 유형은 바로 바꿔 끼움
+      renderCreation();
+    };
+  });
 
   box.querySelector("[data-start]").onclick = startCareer;
 
@@ -294,7 +316,7 @@ function startCareer() {
     position: draft.position,
     archetype: draft.archetype,
     age: arch.age,
-    traits: draftTraits(),
+    traits: finalTraits(),
   };
   STATS.forEach(function (s) { fresh.stats[s.id] = draftStat(s.id); });
   fresh.staminaMax = arch.staminaMax;

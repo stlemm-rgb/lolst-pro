@@ -86,16 +86,25 @@ function userMatchContext(match) {
   let mult = TEAM_MATCH.conditionBase + state.condition / TEAM_MATCH.conditionDiv;
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
-  if (match && isBigMatch(match)) mult *= 1 + traitEffectSum("bigMatch"); // 큰 무대 체질 / 무대 공포증
-  if (state.week <= 12) mult *= 1 - traitEffectSum("earlyPenalty");       // 슬로 스타터
-  return {
-    power: m.power * mult, pick: m.pick, banned: m.banned,
-    clutch: traitEffectSum("clutch"), variance: traitEffectSum("variance"), teamMood: traitEffectSum("teamMood"),
-  };
+  // 특성(큰 무대·클러치·역전 등)은 다른 선수와 똑같이 traitPowerMult에서 계산
+  return { power: m.power * mult, pick: m.pick, banned: m.banned };
+}
+
+// 특성에 따른 이번 세트 경기력 배율 (나와 다른 선수 모두)
+// setCtx: { match, deciding(풀세트), behind(세트 스코어에서 지고 있는 팀 id) }
+function traitPowerMult(traits, teamId, setCtx) {
+  if (!traits.length) return 1;
+  let mult = 1 + traitSumOf(traits, "power");                                         // 황제·GOAT
+  if (setCtx.match && isBigMatch(setCtx.match)) mult *= 1 + traitSumOf(traits, "bigMatch"); // 큰 무대 체질 / 무대 공포증 / 불사대마왕
+  if (state.week <= 12) mult *= 1 - traitSumOf(traits, "earlyPenalty");                // 슬로 스타터
+  if (setCtx.deciding) mult *= 1 + traitSumOf(traits, "clutch");                      // 클러치
+  if (setCtx.behind === teamId) mult *= 1 + traitSumOf(traits, "comeback");           // 역전의 명수
+  return mult;
 }
 
 // 한 팀의 이번 세트 라인업과 경기력
-function lineup(teamId, userCtx) {
+function lineup(teamId, userCtx, setCtx) {
+  setCtx = setCtx || {};
   const overseas = findOverseas(teamId);
   if (overseas) {
     return POSITION_IDS.map(function (pos) {
@@ -105,13 +114,12 @@ function lineup(teamId, userCtx) {
   const s = starters(teamId);
   return POSITION_IDS.map(function (pos) {
     const id = s[pos];
+    const tr = traitsOf(id);
+    const v = traitSumOf(tr, "variance"); // 기복: 더 흔들림
     let power;
-    if (id === USER_ID) {
-      const v = 0.05 + (userCtx.variance || 0);        // 기복 특성이면 더 흔들림
-      power = userCtx.power * randFloat(1 - v, 1 + v);
-      if (userCtx.deciding) power *= 1 + (userCtx.clutch || 0); // 클러치: 마지막 세트
-    }
-    else power = playerScore(id) * randFloat(MATCH.npcMultiplier[0], MATCH.npcMultiplier[1]);
+    if (id === USER_ID) power = userCtx.power * randFloat(1 - 0.05 - v, 1 + 0.05 + v);
+    else power = playerScore(id) * randFloat(MATCH.npcMultiplier[0] - v, MATCH.npcMultiplier[1] + v);
+    power *= traitPowerMult(tr, teamId, setCtx);
     return { pos: pos, id: id, power: power };
   });
 }
@@ -123,26 +131,24 @@ function average(list) {
 }
 
 // 한 세트: 라인전 → 한타
-function playSet(a, b, userCtx) {
-  const la = lineup(a, userCtx), lb = lineup(b, userCtx);
+function playSet(a, b, userCtx, setCtx) {
+  const la = lineup(a, userCtx, setCtx), lb = lineup(b, userCtx, setCtx);
   let bonusA = 0, bonusB = 0, userLane = null;
   POSITION_IDS.forEach(function (pos, i) {
     const pa = la[i], pb = lb[i];
     const diff = pa.power - pb.power;
-    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap;
-    const add = TEAM_MATCH.laneWinBonus + (solo ? TEAM_MATCH.soloKillBonus : 0);
+    const winnerTraits = pa.id || pb.id ? traitsOf(diff >= 0 ? pa.id : pb.id) : [];
+    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy"); // 라인 지배자
+    const add = TEAM_MATCH.laneWinBonus + traitSumOf(winnerTraits, "laneBonus") + (solo ? TEAM_MATCH.soloKillBonus : 0);
     if (diff >= 0) bonusA += add; else bonusB += add;
     if (pa.id === USER_ID) userLane = { won: diff >= 0, solo: solo, opp: pb.id };
     if (pb.id === USER_ID) userLane = { won: diff < 0, solo: solo, opp: pa.id };
   });
   const powerA = average(la.map(function (p) { return p.power; })) + bonusA + randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
   const powerB = average(lb.map(function (p) { return p.power; })) + bonusB + randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
-  // 타고난 리더: 내 팀 한타 전력 보너스
-  let moodA = 0, moodB = 0;
-  if (userCtx && userCtx.teamMood) {
-    if (la.some(function (p) { return p.id === USER_ID; })) moodA = userCtx.teamMood;
-    if (lb.some(function (p) { return p.id === USER_ID; })) moodB = userCtx.teamMood;
-  }
+  // 타고난 리더·원클럽맨: 그 선수가 있는 팀 한타 전력 보너스
+  const mood = function (list) { return list.reduce(function (sum, p) { return sum + (p.id ? traitSumOf(traitsOf(p.id), "teamMood") : 0); }, 0); };
+  const moodA = mood(la), moodB = mood(lb);
   return { winner: powerA + moodA >= powerB + moodB ? a : b, userLane: userLane, la: la, lb: lb };
 }
 
@@ -154,10 +160,17 @@ function playMatch(m) {
   const need = Math.ceil(m.bo / 2);
   const lanes = [];
   const perf = {}; // 이 경기 선수별 기록 (js/records.js)
+  const downTwo = []; // 0:2로 몰렸던 팀 (역전의 명수)
   m.score = [0, 0];
   while (m.score[0] < need && m.score[1] < need) {
-    if (userCtx) userCtx.deciding = m.score[0] === need - 1 && m.score[1] === need - 1; // 풀세트
-    const set = playSet(m.a, m.b, userCtx);
+    if (m.score[0] === 0 && m.score[1] === 2) downTwo.push(m.a);
+    if (m.score[1] === 0 && m.score[0] === 2) downTwo.push(m.b);
+    const setCtx = {
+      match: m,
+      deciding: m.score[0] === need - 1 && m.score[1] === need - 1, // 풀세트
+      behind: m.score[0] < m.score[1] ? m.a : m.score[1] < m.score[0] ? m.b : null,
+    };
+    const set = playSet(m.a, m.b, userCtx, setCtx);
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
     recordSet(set, m, perf);
@@ -165,6 +178,7 @@ function playMatch(m) {
   m.winner = m.score[0] > m.score[1] ? m.a : m.b;
   m.loser = m.winner === m.a ? m.b : m.a;
   finishSeriesRecord(m, perf);
+  sTraitsOnMatch(m, perf, downTwo); // 0:2 역전승 기록 (역전의 명수, js/straits.js)
   if (userIn) afterUserMatch(m, userCtx, lanes, perf[USER_ID]);
   return m;
 }
@@ -354,6 +368,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   playMatch(f);
   seasonOf().champions[champKey] = f.winner;
   finalsMvp(champKey, f); // 결승 MVP (js/records.js)
+  sTraitsOnTitle(f.winner, champKey); // 황제·잡초 (js/straits.js)
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
     state.career.finalsWon = (state.career.finalsWon || 0) + 1;

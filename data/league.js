@@ -19,14 +19,14 @@ const LEAGUE = {
 
   // 시즌이 바뀔 때 NPC 성장/노화 (스탯마다 [최소, 최대] 변화)
   npcGrowth: [
-    { maxAge: 21, change: [1, 5] },
-    { maxAge: 25, change: [-1, 3] },
-    { maxAge: 28, change: [-3, 1] },
-    { maxAge: 99, change: [-5, -1] },
+    { maxAge: 21, change: [2, 8] },
+    { maxAge: 25, change: [0, 5] },
+    { maxAge: 28, change: [-2, 2] },
+    { maxAge: 99, change: [-4, 0] },
   ],
   retireFromAge: 29,       // 이 나이부터 은퇴 가능
   retireChancePerYear: 0.25, // 29세 25%, 30세 50%, 31세 75%...
-  rookie: { avg: 40, spread: 6, ageRange: [17, 19] }, // 은퇴한 자리를 채우는 신인
+  rookie: { avg: 46, spread: 8, ageRange: [17, 19] }, // 은퇴한 자리를 채우는 신인
 
   // 대회별 경기 방식 (bestOf: 3 = 3판 2선승, 5 = 5판 3선승, 1 = 단판)
   bestOf: {
