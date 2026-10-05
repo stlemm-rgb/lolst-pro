@@ -129,7 +129,7 @@ function playSet(a, b, userCtx) {
 // 한 경기(시리즈) 진행
 function playMatch(m) {
   const mine = myTeam();
-  const userIn = mine && (m.a === mine.id || m.b === mine.id);
+  const userIn = mine && (m.a === mine.id || m.b === mine.id) && !state.benched; // 후보면 출전 안 함
   const userCtx = userIn ? userMatchContext() : null;
   const need = Math.ceil(m.bo / 2);
   const lanes = [];
@@ -161,6 +161,9 @@ function afterUserMatch(m, ctx, lanes) {
   const oppScore = m.a === mine ? m.score[1] : m.score[0];
   const changes = {};
   state.matchBoost = 0;
+  state.career.seasonGames = (state.career.seasonGames || 0) + 1;
+  state.career.games = (state.career.games || 0) + 1;
+  if (won) state.career.wins = (state.career.wins || 0) + 1;
 
   // 이벤트 조건용 기록
   const w = state.weekCtx;

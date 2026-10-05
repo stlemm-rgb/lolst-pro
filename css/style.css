@@ -372,3 +372,17 @@ table td.c { text-align: center; }
 .msg-notes { font-size: 14px; color: var(--gold); }
 .post { padding: 10px 4px; border-bottom: 1px solid var(--border); }
 .post-author { font-weight: bold; color: var(--accent); }
+
+/* 선수 검색·구단 탐색 */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+tr.click { cursor: pointer; }
+tr.click:hover { background: rgba(255, 255, 255, 0.04); }
+tr.sel { outline: 1px solid var(--accent); }
+.card.detail { background: var(--panel-2); }
+.club { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin-bottom: 8px; background: var(--panel-2); }
+.club.mine { border-color: var(--accent); }
+.club-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; cursor: pointer; }
+.club-rank { color: var(--muted); width: 20px; }
+.club-name { font-weight: bold; flex: 1; min-width: 160px; }
+.club-lineup { margin-top: 4px; }
+.club-roster { margin-top: 8px; }

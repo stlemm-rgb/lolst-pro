@@ -51,7 +51,8 @@ function leagueDashboardHTML() {
     : '<p class="muted">아직 경기를 하지 않았어요.</p>';
   return (
     '<div class="card"><h2>경기 <span class="muted small">' + escapeHTML(mine.name) + " (" + tierName(mine.tier) + ")</span></h2>" +
-      '<h2 class="sub">다음 경기</h2>' + nextHTML +
+      contractSummaryHTML() +
+      '<h2 class="sub">다음 경기</h2>' + nextHTML + (state.benched && next ? '<p class="down small">후보라서 이 경기에는 나가지 않아요.</p>' : "") +
       '<h2 class="sub">최근 결과</h2>' + recent +
     "</div>"
   );

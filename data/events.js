@@ -16,6 +16,7 @@
 //     "patch"        패치 주           "patchNerf" 패치로 내 숙련도 1위 챔피언이 메타에서 빠졌을 때
 //     "lowCondition" 컨디션 30 이하     "highCondition" 컨디션 90 이상
 //     "lowStamina"   체력 20 이하
+//     "benchLong"    후보로 8주 이상
 // - chance: 조건이 맞을 때 실제로 올 확률 (0.3 = 30%). 없으면 100%
 // - need: 추가 조건 { minPopularity, minAge, trait(이 특성이 있어야), noTrait(이 특성이 없어야) }
 // - cooldown: 같은 이벤트가 다시 오기까지 쉬는 주 (없으면 EVENT_RULES.cooldown)
@@ -30,6 +31,7 @@
 //   masteryChamp:   이벤트에 나온 챔피언({champ}) 숙련도 +n
 //   skipTraining: true  → 다음 주 훈련 없음 (쉼)
 //   matchBoost: 0.05    → 다음 경기 경기력 +5%
+//   transferListed: true → 비시즌 이적 제안이 늘어남
 // risk: { trait, chance }  나쁜 특성이 생길 확률 (⚠️ 최대 0.05)
 // cure: { trait, chance }  나쁜 특성이 없어질 확률 (💚)
 // gain: { trait, chance }  좋은 특성을 얻을 확률
@@ -218,6 +220,17 @@ const EVENTS = [
     title: "컨디션 최고조",
     text: "요즘 {name}의 몸 상태가 최고다. 손이 가볍다.",
     effects: { matchBoost: 0.05 },
+  },
+
+  // ===== 후보 생활 =====
+  {
+    id: "bench_long", tab: "inbox", trigger: "benchLong", cooldown: 12,
+    title: "길어지는 후보 생활",
+    text: "후보로 지낸 지 꽤 됐다. 이대로 괜찮을까?",
+    choices: [
+      { label: "비시즌에 이적하고 싶다고 말한다", effects: { transferListed: true }, note: "비시즌 이적 제안이 늘어남" },
+      { label: "주전을 되찾을 때까지 버틴다", effects: { mental: 1, condition: -2 } },
+    ],
   },
 
   // ===== F. 나쁜 특성 극복 (그 특성이 있을 때만) =====

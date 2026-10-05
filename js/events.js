@@ -107,6 +107,9 @@ function applyEffects(eff, ctx) {
     } else if (key === "skipTraining") {
       state.skipTraining = true;
       notes.push("다음 주는 훈련 대신 쉰다");
+    } else if (key === "transferListed") {
+      state.transferListed = true;
+      notes.push("비시즌에 이적 제안이 늘어난다");
     } else if (key === "matchBoost") {
       state.matchBoost = v;
       notes.push("다음 경기 경기력 +" + Math.round(v * 100) + "%");
@@ -194,6 +197,7 @@ function triggerContext(trigger) {
     case "lowCondition": return state.condition <= 30 ? {} : null;
     case "highCondition": return state.condition >= 90 ? {} : null;
     case "lowStamina": return state.stamina <= 20 ? {} : null;
+    case "benchLong": return state.benched && state.benchWeeks >= CONTRACT.benchTalkWeeks ? {} : null;
     default: return null;
   }
 }
@@ -283,6 +287,7 @@ function choiceTooExpensive(msg, index) {
 function answerMessage(msgId, index) {
   const msg = state.inbox.find(function (m) { return m.id === msgId; });
   if (!msg || msg.answered !== null) return;
+  if (msg.kind === "offer") { answerOffer(msg, index); return; } // 계약 제안 (js/contracts.js)
   const ev = findEvent(msg.eventId);
   const choice = ev && ev.choices[index];
   if (!choice || choiceTooExpensive(msg, index)) return;

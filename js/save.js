@@ -4,10 +4,10 @@
 
 const SAVE_KEY = "progamer-career-save";
 const SAVE_GAME_ID = "progamer-career";
-const SAVE_VERSION = 5; // 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
+const SAVE_VERSION = 6; // 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
-const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost"];
+const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft"];
 
 // 현재 게임 상태를 세이브 모양으로 만들기
 function makeSaveData() {
@@ -79,8 +79,16 @@ function stateFromSave(save) {
   if (s.career && typeof s.career === "object") {
     fresh.career.finalsWon = Number(s.career.finalsWon) || 0;
     fresh.career.gainTried = s.career.gainTried || {};
+    ["seasonGames", "games", "wins"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
   }
   fresh.skipTraining = s.skipTraining === true;
+  // 계약
+  if (s.contract && typeof s.contract === "object" && Number.isFinite(s.contract.salary)) fresh.contract = s.contract;
+  if (s.pendingMove && typeof s.pendingMove === "object") fresh.pendingMove = s.pendingMove;
+  fresh.benched = s.benched === true;
+  if (Number.isFinite(s.benchWeeks)) fresh.benchWeeks = s.benchWeeks;
+  fresh.transferListed = s.transferListed === true;
+  if (Number.isFinite(s.transferRequestsLeft)) fresh.transferRequestsLeft = s.transferRequestsLeft;
   if (Number.isFinite(s.matchBoost)) fresh.matchBoost = s.matchBoost;
 
   // 리그: 기본 모양이 맞으면 그대로, 아니면 화면을 그릴 때 새로 만듦

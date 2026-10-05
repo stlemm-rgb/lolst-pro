@@ -145,6 +145,7 @@ function makeLeague(defs, chosenIndex) {
   });
   placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
   startSeason();
+  initContracts(); // 선수들 연봉·계약 기간, 내 첫 계약 (2년)
 }
 
 // 내 선수를 구단에 넣기. 그 팀의 같은 포지션 주전은 자유 계약으로
@@ -175,7 +176,8 @@ function placeUser(chosenId) {
 // 그 팀 그 포지션의 주전 (내 선수는 항상 주전, 아니면 스탯 점수가 가장 높은 선수)
 function starterAt(teamId, pos) {
   const team = findTeam(teamId);
-  if (team.roster.indexOf(USER_ID) !== -1 && state.player.position === pos) return USER_ID;
+  // 내 선수는 후보(2군행)가 아니면 주전
+  if (team.roster.indexOf(USER_ID) !== -1 && state.player.position === pos && !state.benched) return USER_ID;
   let best = null, bestScore = -1;
   team.roster.forEach(function (id) {
     if (id === USER_ID || playerPos(id) !== pos) return;

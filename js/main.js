@@ -22,7 +22,13 @@ function createNewState() {
     inbox: [],                    // SNS 메시지 (js/events.js)
     msgSeq: 0,                    // 메시지 번호
     eventCooldown: {},            // 이벤트별 마지막으로 온 주
-    career: { finalsWon: 0, gainTried: {} }, // 커리어 기록 (결승 승리 수 등)
+    career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0 }, // 커리어 기록
+    contract: null,               // 내 계약 { teamId, salary, endYear, guarantee } (js/contracts.js)
+    pendingMove: null,            // 새 시즌에 옮길 팀 (이적 합의)
+    benched: false,               // true면 후보 (2군행) — 경기에 못 나감
+    benchWeeks: 0,                // 후보로 지낸 주
+    transferListed: false,        // 이적 희망 (비시즌 제안 늘어남)
+    transferRequestsLeft: 0,      // 이번 비시즌 이적 요청 남은 횟수
     skipTraining: false,          // true면 다음 주 훈련 대신 휴식 (이벤트 효과)
     matchBoost: 0,                // 다음 경기 경기력 보너스 (이벤트 효과)
     plan: null,                   // 이번 주에 고른 훈련 id
@@ -524,6 +530,7 @@ function renderPage() {
 
   if (state.currentMenu === "settings") bindSettings(page);
   if (state.currentMenu === "sns") bindSns(page);
+  bindMarket(page); // 선수 검색·구단 탐색·이적 시장
 
   // 챔피언 연습: 연습할 챔피언 고르기
   const practice = document.getElementById("practice-champ");
@@ -606,8 +613,9 @@ function nextWeek() {
     message: message,
     changes: changes,
   });
-  // 이번 주 리그 경기 (훈련 다음에 진행)
+  // 이번 주 리그 경기 (훈련 다음에 진행), 연봉 1주치
   playLeagueWeek(state.week);
+  paySalary();
 
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
   state.week += 1;
@@ -617,7 +625,8 @@ function nextWeek() {
     state.year += 1;
     state.week = 1;
     state.player.age += 1;
-    const leagueNews = newSeasonLeague();
+    const leagueNews = newSeasonLeague().concat(contractsNewSeason());
+    initContracts(); // 새로 들어온 신인들 계약
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
     leagueNews.forEach(function (text) { addNews("승강", text); });
   }
@@ -641,6 +650,10 @@ function nextWeek() {
     const top = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
     if (top && !isMeta(top)) state.weekCtx.nerfChamp = top;
   }
+
+  // 2군행/승격 판정, 비시즌 시작이면 재계약·영입 제안
+  checkBench();
+  if (state.week === CONTRACT.windowStart) startTransferWindow();
 
   // 이번 주 이벤트 (SNS)
   runWeeklyEvents();
@@ -681,6 +694,7 @@ function renderAll() {
   }
   document.getElementById("creation").innerHTML = "";
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
+  if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦
   renderMenu();
   renderTopbar();
   renderPage();
