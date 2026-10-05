@@ -28,6 +28,7 @@ function matchRowHTML(m, showWeek) {
       '<td class="r">' + teamLabel(m.a) + "</td>" +
       '<td class="c">' + result + "</td>" +
       "<td>" + teamLabel(m.b) + "</td>" +
+      '<td class="muted small">' + (m.pogName ? "POG " + escapeHTML(m.pogName) : "") + "</td>" +
     "</tr>"
   );
 }
@@ -193,7 +194,7 @@ pages.tournament = function () {
   return (
     "<h1>대회 일정</h1>" +
     '<div class="card"><h2>' + state.year + '년 우승</h2><table class="mini">' + champHTML + "</table></div>" +
-    body
+    body + competitionGuideHTML() + championsHistoryHTML()
   );
 };
 

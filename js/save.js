@@ -79,7 +79,11 @@ function stateFromSave(save) {
   if (s.career && typeof s.career === "object") {
     fresh.career.finalsWon = Number(s.career.finalsWon) || 0;
     fresh.career.gainTried = s.career.gainTried || {};
-    ["seasonGames", "games", "wins"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
+    ["seasonGames", "games", "wins", "seasonWins"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
+    if (Array.isArray(s.career.seasons)) fresh.career.seasons = s.career.seasons;
+    if (Array.isArray(s.career.awards)) fresh.career.awards = s.career.awards;
+    if (s.career.debut) fresh.career.debut = s.career.debut;
+    if (s.career.statStart) fresh.career.statStart = s.career.statStart;
   }
   fresh.skipTraining = s.skipTraining === true;
   // 계약

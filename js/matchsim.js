@@ -123,7 +123,7 @@ function playSet(a, b, userCtx) {
   });
   const powerA = average(la.map(function (p) { return p.power; })) + bonusA + randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
   const powerB = average(lb.map(function (p) { return p.power; })) + bonusB + randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
-  return { winner: powerA >= powerB ? a : b, userLane: userLane };
+  return { winner: powerA >= powerB ? a : b, userLane: userLane, la: la, lb: lb };
 }
 
 // 한 경기(시리즈) 진행
@@ -133,15 +133,18 @@ function playMatch(m) {
   const userCtx = userIn ? userMatchContext() : null;
   const need = Math.ceil(m.bo / 2);
   const lanes = [];
+  const perf = {}; // 이 경기 선수별 기록 (js/records.js)
   m.score = [0, 0];
   while (m.score[0] < need && m.score[1] < need) {
     const set = playSet(m.a, m.b, userCtx);
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
+    recordSet(set, m, perf);
   }
   m.winner = m.score[0] > m.score[1] ? m.a : m.b;
   m.loser = m.winner === m.a ? m.b : m.a;
-  if (userIn) afterUserMatch(m, userCtx, lanes);
+  finishSeriesRecord(m, perf);
+  if (userIn) afterUserMatch(m, userCtx, lanes, perf[USER_ID]);
   return m;
 }
 
@@ -153,7 +156,7 @@ function playDue(week) {
 }
 
 // 내 팀 경기 후: 체력·컨디션·인기도 변화와 기록
-function afterUserMatch(m, ctx, lanes) {
+function afterUserMatch(m, ctx, lanes, myPerf) {
   const mine = myTeam().id;
   const won = m.winner === mine;
   const oppId = m.a === mine ? m.b : m.a;
@@ -164,6 +167,13 @@ function afterUserMatch(m, ctx, lanes) {
   state.career.seasonGames = (state.career.seasonGames || 0) + 1;
   state.career.games = (state.career.games || 0) + 1;
   if (won) state.career.wins = (state.career.wins || 0) + 1;
+  if (won) state.career.seasonWins = (state.career.seasonWins || 0) + 1;
+  // 평점·POG 문장
+  let perfText = "";
+  if (myPerf) {
+    perfText = " · 평점 " + (myPerf.r / myPerf.g).toFixed(1);
+    if (m.pog === USER_ID) perfText += " · 🏅 POG!";
+  }
 
   // 이벤트 조건용 기록
   const w = state.weekCtx;
@@ -204,14 +214,14 @@ function afterUserMatch(m, ctx, lanes) {
   if (state.weekReport) {
     state.weekReport.userLines.push({
       won: won, changes: changes,
-      text: m.label + " · vs " + teamName(oppId) + " " + myScore + ":" + oppScore + (won ? " 승리!" : " 패배") + " · " + ctx.pick + " 픽 · " + laneText,
+      text: m.label + " · vs " + teamName(oppId) + " " + myScore + ":" + oppScore + (won ? " 승리!" : " 패배") + " · " + ctx.pick + " 픽 · " + laneText + perfText,
     });
   }
   state.log.unshift({
     when: state.year + "년 " + state.week + "주차",
     training: "경기 · " + m.label,
     message: "vs " + teamName(oppId) + " " + myScore + ":" + oppScore + (won ? " 승리!" : " 패배") +
-      " · " + ctx.pick + " 픽 · " + laneText,
+      " · " + ctx.pick + " 픽 · " + laneText + perfText,
     changes: changes,
     match: true,
   });
@@ -322,6 +332,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const f = schedule(week, comp, label, semis[0].winner, semis[1].winner, bo);
   playMatch(f);
   seasonOf().champions[champKey] = f.winner;
+  finalsMvp(champKey, f); // 결승 MVP (js/records.js)
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
     state.career.finalsWon = (state.career.finalsWon || 0) + 1;

@@ -291,14 +291,14 @@ pages.career = function () {
     "</div>";
 
   return (
-    "<h1>나의 커리어</h1>" + preview +
+    "<h1>나의 커리어</h1>" + careerRecordHTML() + preview +
     '<div class="card"><h2>챔피언 숙련도 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
       '<p class="muted small">1 = 한 번도 안 해 본 챔피언, 100 = 완벽하게 다룸. 금색 막대 = 이번 패치 메타 챔피언. ' +
         "지금까지 출시된 챔피언 " + Object.keys(state.mastery).length + "명 · " + next + "</p>" +
       '<div class="buttons">' + tabs + "</div>" +
       '<div class="stat-columns mastery-list">' + rows + "</div>" +
     "</div>" +
-    '<div class="card placeholder">스탯 변화 기록, 시즌별 성적, 수상 내역은 6단계에서 추가돼요.</div>'
+    ""
   );
 };
 
@@ -540,6 +540,7 @@ function renderPage() {
   if (state.currentMenu === "settings") bindSettings(page);
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
+  bindRecords(page); // 개인 시상
 
   // 챔피언 연습: 연습할 챔피언 고르기
   const practice = document.getElementById("practice-champ");
@@ -685,6 +686,7 @@ function nextWeek(restWeek) {
 
 // 지난 시즌 우승 기록 남기기 (7단계 역사관에서 사용)
 function saveSeasonHistory() {
+  saveCareerSeason(); // 내 시즌 기록 (js/records.js)
   const season = state.league.season;
   if (!state.league.history) state.league.history = [];
   const names = {};
@@ -715,6 +717,7 @@ function renderAll() {
   document.getElementById("creation").innerHTML = "";
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦
+  ensureCareerRecords(); // 데뷔 기록 등
   renderMenu();
   renderTopbar();
   renderPage();
