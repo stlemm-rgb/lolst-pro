@@ -158,6 +158,7 @@ function eventReady(ev) {
   const need = ev.need || {};
   if (need.minPopularity && state.popularity < need.minPopularity) return false;
   if (need.minAge && state.player.age < need.minAge) return false;
+  if (need.minWeek && state.week < need.minWeek) return false;
   if (need.trait && !hasTrait(need.trait)) return false;
   if (need.noTrait && hasTrait(need.noTrait)) return false;
   return true;
@@ -241,6 +242,9 @@ function checkTraitGains() {
     if (g.when === "finalsWon2") ok = state.career.finalsWon >= 2;
     if (g.when === "mastery100") ok = Object.keys(state.mastery).some(function (n) { return state.mastery[n] >= MASTERY.max; });
     if (g.when === "popularity80") ok = state.popularity >= 80;
+    if (g.when === "popularity60") ok = state.popularity >= 60;
+    if (g.when === "finalsWon3") ok = state.career.finalsWon >= 3;
+    if (g.when === "challenger") ok = !!state.soloRank && state.soloRank.peak >= 3200;
     if (!ok) return;
     state.career.gainTried[g.id] = true;
     if (hasTrait(g.trait) || Math.random() >= g.chance) return;

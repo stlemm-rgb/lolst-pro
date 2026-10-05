@@ -77,3 +77,14 @@ function growthMultiplier(value) {
   const row = GROWTH_CURVE.find(function (g) { return value < g.upTo; });
   return row ? row.mult : GROWTH_CURVE[GROWTH_CURVE.length - 1].mult;
 }
+
+// 특성 효과 중 { 키: 값 } 모양(예: typeMastery: { carry: 0.3 })에서 한 키의 합
+function traitEffectKey(effect, key) {
+  let sum = 0;
+  state.player.traits.forEach(function (id) {
+    const t = findTrait(id);
+    const obj = t && t.effects[effect];
+    if (obj && typeof obj[key] === "number") sum += obj[key];
+  });
+  return sum;
+}

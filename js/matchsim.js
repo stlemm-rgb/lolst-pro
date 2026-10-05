@@ -76,12 +76,22 @@ function scheduleRounds(rounds, startWeek, perWeek, comp, labelPrefix) {
 // ----- 경기 판정 (라인 맞대결) -----
 
 // 내 선수 경기력 (밴픽·숙련도·메타 페널티 × 컨디션·체력)
-function userMatchContext() {
+// 큰 경기: 결승·플레이오프·월드 토너먼트·승강전
+function isBigMatch(match) {
+  return ["playoffs", "worlds_ko", "promotion"].indexOf(match.comp) !== -1 || match.label.indexOf("결승") !== -1;
+}
+
+function userMatchContext(match) {
   const m = matchPower();
   let mult = TEAM_MATCH.conditionBase + state.condition / TEAM_MATCH.conditionDiv;
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
-  return { power: m.power * mult, pick: m.pick, banned: m.banned };
+  if (match && isBigMatch(match)) mult *= 1 + traitEffectSum("bigMatch"); // 큰 무대 체질 / 무대 공포증
+  if (state.week <= 12) mult *= 1 - traitEffectSum("earlyPenalty");       // 슬로 스타터
+  return {
+    power: m.power * mult, pick: m.pick, banned: m.banned,
+    clutch: traitEffectSum("clutch"), variance: traitEffectSum("variance"), teamMood: traitEffectSum("teamMood"),
+  };
 }
 
 // 한 팀의 이번 세트 라인업과 경기력
@@ -96,7 +106,11 @@ function lineup(teamId, userCtx) {
   return POSITION_IDS.map(function (pos) {
     const id = s[pos];
     let power;
-    if (id === USER_ID) power = userCtx.power * randFloat(0.95, 1.05);
+    if (id === USER_ID) {
+      const v = 0.05 + (userCtx.variance || 0);        // 기복 특성이면 더 흔들림
+      power = userCtx.power * randFloat(1 - v, 1 + v);
+      if (userCtx.deciding) power *= 1 + (userCtx.clutch || 0); // 클러치: 마지막 세트
+    }
     else power = playerScore(id) * randFloat(MATCH.npcMultiplier[0], MATCH.npcMultiplier[1]);
     return { pos: pos, id: id, power: power };
   });
@@ -123,19 +137,26 @@ function playSet(a, b, userCtx) {
   });
   const powerA = average(la.map(function (p) { return p.power; })) + bonusA + randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
   const powerB = average(lb.map(function (p) { return p.power; })) + bonusB + randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
-  return { winner: powerA >= powerB ? a : b, userLane: userLane, la: la, lb: lb };
+  // 타고난 리더: 내 팀 한타 전력 보너스
+  let moodA = 0, moodB = 0;
+  if (userCtx && userCtx.teamMood) {
+    if (la.some(function (p) { return p.id === USER_ID; })) moodA = userCtx.teamMood;
+    if (lb.some(function (p) { return p.id === USER_ID; })) moodB = userCtx.teamMood;
+  }
+  return { winner: powerA + moodA >= powerB + moodB ? a : b, userLane: userLane, la: la, lb: lb };
 }
 
 // 한 경기(시리즈) 진행
 function playMatch(m) {
   const mine = myTeam();
   const userIn = mine && (m.a === mine.id || m.b === mine.id) && !state.benched; // 후보면 출전 안 함
-  const userCtx = userIn ? userMatchContext() : null;
+  const userCtx = userIn ? userMatchContext(m) : null;
   const need = Math.ceil(m.bo / 2);
   const lanes = [];
   const perf = {}; // 이 경기 선수별 기록 (js/records.js)
   m.score = [0, 0];
   while (m.score[0] < need && m.score[1] < need) {
+    if (userCtx) userCtx.deciding = m.score[0] === need - 1 && m.score[1] === need - 1; // 풀세트
     const set = playSet(m.a, m.b, userCtx);
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
@@ -196,7 +217,7 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
   state.condition = clamp(state.condition + cond);
   changes.condition = state.condition - before;
 
-  const pop = roundRandom(randInt(rule.popularity[0], rule.popularity[1]) * popularityMultiplier());
+  const pop = roundRandom((randInt(rule.popularity[0], rule.popularity[1]) + (won ? traitEffectSum("winPopularity") : 0)) * popularityMultiplier());
   before = state.popularity;
   state.popularity = clamp(state.popularity + pop);
   changes.popularity = state.popularity - before;

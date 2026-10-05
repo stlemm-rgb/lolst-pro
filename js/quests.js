@@ -44,7 +44,11 @@ function progressQuests(training, changes) {
   });
   done.forEach(function (q) {
     const tpl = findQuest(q.id);
-    const r = applyEffects(tpl.reward, { champ: q.champ });
+    // 모범생: 보상 +50%
+    const bonus = 1 + traitEffectSum("questBonus");
+    const reward = {};
+    Object.keys(tpl.reward).forEach(function (k) { reward[k] = roundRandom(tpl.reward[k] * bonus); });
+    const r = applyEffects(reward, { champ: q.champ });
     state.quests.splice(state.quests.indexOf(q), 1);
     state.career.questsDone = (state.career.questsDone || 0) + 1;
     const line = "✅ 퀘스트 완료: " + tpl.title + " → " + rewardText(q);

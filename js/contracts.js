@@ -11,7 +11,8 @@ function salaryFor(score, tier, popularity) {
 }
 
 function userSalaryFor(tier) {
-  return salaryFor(playerScore(USER_ID), tier, state.popularity);
+  const base = salaryFor(playerScore(USER_ID), tier, state.popularity);
+  return Math.round(base * (1 + traitEffectSum("salaryBonus")) / 1000000) * 1000000; // 협상가
 }
 
 function moneyText(won) {
@@ -56,7 +57,8 @@ function initContracts() {
 // 매주 연봉 1/52
 function paySalary() {
   if (!state.contract) return;
-  state.money += Math.round(state.contract.salary / CREATION.weeksPerSeason);
+  const weekly = Math.round(state.contract.salary / CREATION.weeksPerSeason);
+  state.money += Math.round(weekly * (1 - traitEffectSum("spend"))); // 낭비벽
 }
 
 function isTransferWindow() {
@@ -138,7 +140,7 @@ function offerChoices(o) {
 }
 
 function negotiateChance() {
-  return Math.max(0.05, Math.min(0.95, CONTRACT.negotiateBase + state.reputation / 200));
+  return Math.max(0.05, Math.min(0.95, CONTRACT.negotiateBase + state.reputation / 200 + traitEffectSum("negotiate")));
 }
 
 function sendOffer(o) {

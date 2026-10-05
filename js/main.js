@@ -349,6 +349,7 @@ pages.training = function () {
       let extra = 0;
       if (state.stats[id] !== undefined && r[1] > 0) extra = trainingBonusFor(id);
       if (id === "stamina" && r[1] < 0) extra = staminaCostMultiplier() - 1;
+      if (id === "stamina" && r[1] > 0) extra = traitEffectSum("restBonus");
       if (id === "popularity" && r[1] > 0) extra = popularityMultiplier() - 1;
       if (id === "mastery") extra = masteryGrowthMultiplier() - 1;
       if (id === "masteryFocus") extra = masteryGrowthMultiplier(focusChamp()) - 1;
@@ -610,6 +611,7 @@ function nextWeek(restWeek) {
 
     if (id === "stamina") {
       if (amount < 0) amount = -roundRandom(-amount * staminaCostMultiplier());
+      else amount = roundRandom(amount * Math.max(0, 1 + traitEffectSum("restBonus"))); // 회복력 / 올빼미
       before = state.stamina;
       state.stamina = Math.max(0, Math.min(state.staminaMax, state.stamina + amount));
       changes[id] = state.stamina - before;
@@ -671,6 +673,9 @@ function nextWeek(restWeek) {
   playLeagueWeek(state.week);
   finishWeekReport(playedWeek, state.league.season.matches);
   paySalary();
+  // 회복력: 매주 체력 자연 회복
+  const regen = traitEffectSum("staminaRegen");
+  if (regen) state.stamina = Math.min(state.staminaMax, state.stamina + regen);
 
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
   state.week += 1;

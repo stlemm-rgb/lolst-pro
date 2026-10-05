@@ -18,7 +18,7 @@
 //     "lowStamina"   체력 20 이하
 //     "benchLong"    후보로 8주 이상
 // - chance: 조건이 맞을 때 실제로 올 확률 (0.3 = 30%). 없으면 100%
-// - need: 추가 조건 { minPopularity, minAge, trait(이 특성이 있어야), noTrait(이 특성이 없어야) }
+// - need: 추가 조건 { minPopularity, minAge, minWeek(이 주차 이후), trait(이 특성이 있어야), noTrait(이 특성이 없어야) }
 // - cooldown: 같은 이벤트가 다시 오기까지 쉬는 주 (없으면 EVENT_RULES.cooldown)
 // - effects: (소식) 읽으면 바로 적용되는 효과
 // - choices: (받은 연락) 선택지 [{ label, effects, risk, cure, note }]
@@ -128,7 +128,7 @@ const EVENTS = [
     text: "스크림 도중 콜 문제로 팀원과 언성이 높아졌다.",
     choices: [
       { label: "먼저 사과한다", effects: { reputation: 3, condition: -3 } },
-      { label: "내 의견을 끝까지 주장한다", effects: { shotcall: 2, reputation: -3 } },
+      { label: "내 의견을 끝까지 주장한다", effects: { shotcall: 2, reputation: -3 }, risk: { trait: "stubborn", chance: 0.03 } },
       { label: "감독에게 맡긴다", effects: {} },
     ],
   },
@@ -147,6 +147,7 @@ const EVENTS = [
     text: "오늘 저녁 팀 회식이 있다고 한다.",
     choices: [
       { label: "참석한다", effects: { condition: 6 } },
+      { label: "2차, 3차까지 달린다", effects: { condition: 12, stamina: -10 }, risk: { trait: "lazy", chance: 0.03 } },
       { label: "빠지고 연습한다", effects: { laning: 1, condition: -2 } },
     ],
   },
@@ -166,7 +167,7 @@ const EVENTS = [
     title: "광고 모델 제안",
     text: "게이밍 기어 브랜드에서 {name}에게 광고 모델을 제안했다.",
     choices: [
-      { label: "수락한다", effects: { money: 3000000, popularity: 3, stamina: -10 } },
+      { label: "수락한다", effects: { money: 3000000, popularity: 3, stamina: -10 }, risk: { trait: "spender", chance: 0.03 } },
       { label: "거절하고 연습에 집중한다", effects: { reputation: 2 } },
     ],
   },
@@ -220,6 +221,44 @@ const EVENTS = [
     title: "컨디션 최고조",
     text: "요즘 {name}의 몸 상태가 최고다. 손이 가볍다.",
     effects: { matchBoost: 0.05 },
+  },
+
+  // ===== 생활 습관 (나쁜 특성이 낮은 확률로 생길 수 있음) =====
+  {
+    id: "rank_grind", tab: "inbox", trigger: "random",
+    title: "랭크 연패",
+    text: "오늘 솔로 랭크에서 연패 중이다. 화면을 보니 열이 오른다.",
+    choices: [
+      { label: "이길 때까지 돌린다", effects: { reaction: 1, condition: -3 }, risk: { trait: "tilt", chance: 0.03 } },
+      { label: "오늘은 접는다", effects: { condition: 2 } },
+    ],
+  },
+  {
+    id: "late_night", tab: "inbox", trigger: "random",
+    title: "무너진 생활 패턴",
+    text: "새벽까지 영상을 보다 잠드는 날이 이어지고 있다.",
+    choices: [
+      { label: "알람을 맞추고 패턴을 고친다", effects: { condition: -2 } },
+      { label: "그냥 이대로 지낸다", effects: { stamina: 5 }, risk: { trait: "night_owl", chance: 0.04 } },
+    ],
+  },
+  {
+    id: "offseason_trip", tab: "inbox", trigger: "random", need: { minWeek: 47 },
+    title: "비시즌 여행",
+    text: "친구들이 비시즌에 해외 여행을 가자고 한다.",
+    choices: [
+      { label: "다녀온다", effects: { condition: 10, stamina: 10 }, risk: { trait: "slow_starter", chance: 0.04 } },
+      { label: "연습실에 남는다", effects: { laning: 1, condition: -2 } },
+    ],
+  },
+  {
+    id: "form_swing", tab: "inbox", trigger: "afterWin", chance: 0.15,
+    title: "들쭉날쭉한 손감",
+    text: "이긴 경기에서도 잘 될 때와 안 될 때가 크게 갈렸다.",
+    choices: [
+      { label: "감에 맡기고 그대로 간다", effects: { matchBoost: 0.03 }, risk: { trait: "inconsistent", chance: 0.03 } },
+      { label: "기본기 연습으로 다진다", effects: { focus: 1, stamina: -3 } },
+    ],
   },
 
   // ===== 후보 생활 =====
@@ -280,6 +319,51 @@ const EVENTS = [
     ],
   },
   {
+    id: "fix_inconsistent", tab: "inbox", trigger: "random", need: { trait: "inconsistent" },
+    title: "경기 루틴 만들기",
+    text: "코치가 경기 전 루틴을 같이 만들어 보자고 한다.",
+    choices: [
+      { label: "루틴을 만든다", effects: { focus: 1 }, cure: { trait: "inconsistent", chance: 0.4 } },
+      { label: "괜찮다", effects: {} },
+    ],
+  },
+  {
+    id: "fix_slow", tab: "inbox", trigger: "random", need: { trait: "slow_starter" },
+    title: "비시즌 개인 훈련 캠프",
+    text: "시즌 초에 몸이 늦게 풀리는 문제를 잡아 주는 캠프가 있다.",
+    choices: [
+      { label: "참가한다 (자금 −100만)", effects: { money: -1000000, stamina: -5 }, cure: { trait: "slow_starter", chance: 0.4 } },
+      { label: "괜찮다", effects: {} },
+    ],
+  },
+  {
+    id: "fix_tilt", tab: "inbox", trigger: "random", need: { trait: "tilt" },
+    title: "랭크 휴식 선언",
+    text: "한동안 랭크를 쉬며 마음을 다잡아 보면 어떨까?",
+    choices: [
+      { label: "일주일 랭크를 끊는다", effects: { condition: 3 }, cure: { trait: "tilt", chance: 0.4 } },
+      { label: "괜찮다", effects: {} },
+    ],
+  },
+  {
+    id: "fix_spender", tab: "inbox", trigger: "random", need: { trait: "spender" },
+    title: "재무 상담",
+    text: "구단이 선수들을 위한 재무 상담을 연다고 한다.",
+    choices: [
+      { label: "상담을 받는다", effects: {}, cure: { trait: "spender", chance: 0.5 } },
+      { label: "괜찮다", effects: {} },
+    ],
+  },
+  {
+    id: "fix_night", tab: "inbox", trigger: "random", need: { trait: "night_owl" },
+    title: "수면 클리닉",
+    text: "수면 패턴을 바로잡아 주는 클리닉을 소개받았다.",
+    choices: [
+      { label: "다닌다 (자금 −50만)", effects: { money: -500000 }, cure: { trait: "night_owl", chance: 0.4 } },
+      { label: "괜찮다", effects: {} },
+    ],
+  },
+  {
     id: "fix_stage", tab: "news", trigger: "champion", need: { trait: "stage_fright" }, cooldown: 1,
     title: "큰 무대를 이겨냈다",
     text: "결승 무대를 겪고 나니 긴장이 한결 덜하다.",
@@ -292,6 +376,9 @@ const TRAIT_GAINS = [
   { id: "gain_big_stage", trait: "big_stage",  when: "finalsWon2",  chance: 0.5, text: "결승을 두 번이나 이겼다. 큰 무대가 오히려 편하다." },
   { id: "gain_champ_lab", trait: "champ_lab",  when: "mastery100",  chance: 0.3, text: "한 챔피언을 완벽하게 다루게 되면서 챔피언을 보는 눈이 달라졌다." },
   { id: "gain_fan",       trait: "fan_service", when: "popularity80", chance: 0.3, text: "팬들과의 소통이 즐거워졌다." },
+  { id: "gain_ladder",    trait: "ladder_addict", when: "challenger", chance: 0.4, text: "챌린저를 찍고 나니 랭크가 더 재밌어졌다." },
+  { id: "gain_clutch",    trait: "clutch",      when: "finalsWon3",  chance: 0.3, text: "결승을 세 번이나 이기며 마지막 한 판에 강해졌다." },
+  { id: "gain_star",      trait: "star_power",  when: "popularity60", chance: 0.25, text: "카메라가 켜지면 더 힘이 난다." },
 ];
 
 // 선수 SNS 글 (분위기용). {name} 내 선수, {team} 내 팀, {opp} 상대 팀

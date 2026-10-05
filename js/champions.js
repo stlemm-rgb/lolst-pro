@@ -117,7 +117,10 @@ function typeMasteryBonus(typeId) {
 function masteryGrowthMultiplier(champName) {
   const c = champName && findChampion(champName);
   const typeBonus = c ? typeMasteryBonus(c.type) : 0;
-  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitEffectSum("masteryGrowth") + typeBonus);
+  let traitBonus = traitEffectSum("masteryGrowth");
+  if (c) traitBonus += traitEffectKey("typeMastery", c.type);          // 유형별 특성 (캐리 본능 등)
+  if (champName && isMeta(champName)) traitBonus += traitEffectSum("metaMastery"); // 메타 리더
+  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitBonus + typeBonus);
 }
 
 // 챔피언 연습: 숙련도 올리기. 바뀐 값을 { 이름: +n } 으로 돌려줌
@@ -213,6 +216,14 @@ function matchPower(bans) {
     pick: pick,
     multiplier: mult,
     meta: meta,
-    power: score * mult - meta.penalty,
+    power: score * mult * (1 + signatureBonus(pick)) - meta.penalty,
   };
+}
+
+// 장인 특성: 숙련도 1위 챔피언을 고르면 경기력 보너스
+function signatureBonus(pick) {
+  const bonus = traitEffectSum("signature");
+  if (!bonus) return 0;
+  const top = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
+  return top === pick ? bonus : 0;
 }

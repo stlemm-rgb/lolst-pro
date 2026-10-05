@@ -11,7 +11,7 @@ function ladderTier(points) {
 function playLadder(training) {
   if (!state.soloRank) state.soloRank = { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints };
   const r = state.soloRank;
-  const games = training.ladderGames || 0;
+  const games = Math.round((training.ladderGames || 0) * (1 + traitEffectSum("ladderGames"))); // 솔랭 중독자
   const before = r.points;
   let wins = 0;
   const me = playerScore(USER_ID);
@@ -20,12 +20,16 @@ function playLadder(training) {
     const skillHere = LADDER.skillBase + r.points / LADDER.skillPer;
     let chance = Math.max(LADDER.minChance, Math.min(LADDER.maxChance, 0.5 + (me - skillHere) / LADDER.winSpread));
     if (fast) chance = Math.max(chance, LADDER.fastWinChance);
+    chance = Math.min(0.97, chance + traitEffectSum("ladderWin"));
     const winRange = fast ? LADDER.fastPointsWin : LADDER.pointsPerGame;
     const lossRange = fast ? LADDER.fastPointsLoss : LADDER.pointsPerGame;
     if (Math.random() < chance) { r.points += randInt(winRange[0], winRange[1]); wins++; }
     else r.points = Math.max(0, r.points - randInt(lossRange[0], lossRange[1]));
   }
   r.patchPeak = Math.max(r.patchPeak || 0, r.points);
+  // 랭크 틸트: 진 판이 더 많으면 컨디션 하락
+  const tilt = traitEffectSum("tilt");
+  if (tilt && games - wins > wins) state.condition = clamp(state.condition - tilt);
   r.wins += wins;
   r.losses += games - wins;
   r.peak = Math.max(r.peak, r.points);
