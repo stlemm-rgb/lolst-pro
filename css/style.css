@@ -1,0 +1,118 @@
+/* 색상 모음: 여기 값만 바꾸면 전체 분위기가 바뀝니다 */
+:root {
+  --bg: #f4f5f7;
+  --panel: #ffffff;
+  --sidebar: #1f2430;
+  --sidebar-text: #c9cdd6;
+  --sidebar-active: #3b82f6;
+  --text: #1f2430;
+  --muted: #6b7280;
+  --border: #e3e5ea;
+  --accent: #3b82f6;
+  --good: #16a34a;
+  --bad: #dc2626;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* 2:8 레이아웃 — 왼쪽 20% (최소 200px), 오른쪽 나머지 */
+.layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 20%) 1fr;
+  min-height: 100vh;
+}
+
+/* 좌측 메뉴: 스크롤해도 항상 보이게 고정 */
+.sidebar {
+  background: var(--sidebar);
+  color: var(--sidebar-text);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.logo {
+  padding: 20px 16px;
+  font-weight: bold;
+  font-size: 18px;
+  color: #fff;
+}
+
+#menu { list-style: none; margin: 0; padding: 0; }
+
+#menu li {
+  padding: 11px 16px;
+  cursor: pointer;
+  white-space: nowrap;
+  border-left: 4px solid transparent;
+}
+
+#menu li:hover { background: rgba(255, 255, 255, 0.06); }
+
+#menu li.active {
+  background: rgba(59, 130, 246, 0.18);
+  border-left-color: var(--sidebar-active);
+  color: #fff;
+  font-weight: bold;
+}
+
+/* 우측 본문 */
+.content { min-width: 0; }
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  padding: 14px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+
+.topbar .item { color: var(--muted); }
+.topbar .item b { color: var(--text); }
+.topbar .spacer { flex: 1; }
+
+.page { padding: 24px; }
+.page h1 { margin-top: 0; font-size: 22px; }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.card h2 { margin: 0 0 12px; font-size: 16px; }
+
+.placeholder { color: var(--muted); }
+
+button {
+  font: inherit;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: bold;
+}
+
+button:hover { filter: brightness(0.95); }

@@ -12,5 +12,6 @@ A text career simulation game. Double-clicking `index.html` in the browser runs 
 
 - Opening `index.html` directly (`file://`) must work, so `fetch()` cannot load JSON files.
   → Write data files as `.js` files such as `data/events.js` (e.g., `const EVENTS = [...]`) and load them with a `<script>` tag.
+- No `<script type="module">` / `import` either (also blocked on `file://`). Load files in order with plain `<script src>`.
 - No external libraries, CDNs, or web fonts (no internet use).
 - No build tools (npm, etc.). Plain HTML, CSS, and JavaScript only.
