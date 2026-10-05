@@ -221,13 +221,14 @@ function reputationBarHTML() {
 }
 
 // 챔피언 숙련도 한 줄
-function masteryRowHTML(name) {
+// pos: 그 포지션 기준 메타 표시 (기본은 내 포지션)
+function masteryRowHTML(name, pos) {
   const v = state.mastery[name];
   return (
     '<div class="stat mastery-row">' +
       '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
-        metaTagHTML(name) + champCompsHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도 ' + MATCH.jokerMinMastery + ' 이상: 고르면 경기력 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%">🃏 조커</span>' : "") + "</div>" +
-      '<div class="bar"><div class="bar-fill' + (isMeta(name) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
+        metaTagHTML(name, pos) + champCompsHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도 ' + MATCH.jokerMinMastery + ' 이상: 고르면 경기력 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%">🃏 조커</span>' : "") + "</div>" +
+      '<div class="bar"><div class="bar-fill' + (isMeta(name, pos) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
     "</div>"
   );
@@ -276,7 +277,7 @@ pages.career = function () {
   const names = Object.keys(state.mastery)
     .filter(function (name) { return findChampion(name).positions.indexOf(championTab) !== -1; })
     .sort(function (a, b) { return state.mastery[b] - state.mastery[a] || a.localeCompare(b); });
-  const rows = names.map(masteryRowHTML).join("");
+  const rows = names.map(function (n) { return masteryRowHTML(n, championTab); }).join("");
 
   const upcoming = CHAMPIONS.filter(function (c) { return state.mastery[c.name] === undefined; });
   const next = upcoming.length

@@ -62,16 +62,27 @@ function makePatch(year, week) {
   return { label: year + "년 " + (number > 0 ? number + "차" : "") + " 패치", champs: champs, s: s, comp: comp };
 }
 
-function isMeta(name) {
-  if (!state.meta) return false;
-  return POSITION_IDS.some(function (pos) { return state.meta.champs[pos].indexOf(name) !== -1; });
+// 메타 챔피언인가? pos를 안 주면 "내 포지션" 기준
+// (다른 포지션에서만 메타인 챔피언은 내 메타가 아님 — 예: 서포트 메타 판테온은 탑 판테온에게 메타 보너스 없음)
+function metaPos(pos) {
+  if (typeof pos === "string" && state.meta.champs[pos]) return pos; // filter(isMeta)처럼 숫자가 들어와도 무시
+  return (state.player && state.player.position) || null;
 }
 
-// 메타 등급: "S", "A" 또는 null
-function metaTier(name) {
-  if (!isMeta(name)) return null;
+function isMeta(name, pos) {
+  if (!state.meta) return false;
+  const p = metaPos(pos);
+  if (!p) return POSITION_IDS.some(function (x) { return state.meta.champs[x].indexOf(name) !== -1; });
+  return state.meta.champs[p].indexOf(name) !== -1;
+}
+
+// 메타 등급: "S", "A" 또는 null (pos 기준, 기본은 내 포지션)
+function metaTier(name, pos) {
+  if (!isMeta(name, pos)) return null;
+  const p = metaPos(pos);
   const s = state.meta.s || {};
-  return POSITION_IDS.some(function (pos) { return (s[pos] || state.meta.champs[pos][0]) === name; }) ? "S" : "A";
+  if (!p) return POSITION_IDS.some(function (x) { return (s[x] || state.meta.champs[x][0]) === name; }) ? "S" : "A";
+  return (s[p] || state.meta.champs[p][0]) === name ? "S" : "A";
 }
 
 // 내 포지션 S급 메타 챔피언
@@ -81,8 +92,8 @@ function mySMeta() {
 }
 
 // 화면용 등급 표시
-function metaTagHTML(name) {
-  const t = metaTier(name);
+function metaTagHTML(name, pos) {
+  const t = metaTier(name, pos);
   return t ? ' <span class="meta-tag tier-' + t + '">' + t + "</span>" : "";
 }
 
@@ -182,7 +193,8 @@ function banValue(name) {
 
 // 조커픽: 메타가 아닌데 숙련도가 높은 챔피언 (data/match.js)
 function isJoker(name) {
-  return !isMeta(name) && state.mastery[name] >= MATCH.jokerMinMastery;
+  const c = findChampion(name);
+  return !!c && c.positions.indexOf(state.player.position) !== -1 && !isMeta(name) && state.mastery[name] >= MATCH.jokerMinMastery;
 }
 
 // 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스 (+ 우리 팀이 노리는 조합 성향이면 보너스)
