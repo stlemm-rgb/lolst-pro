@@ -487,3 +487,11 @@ table.lane-table th { color: var(--muted, #8b95a7); font-weight: normal; text-al
 .table-wrap { overflow-x: auto; }
 table.box td, table.box th { white-space: nowrap; font-size: 13px; }
 @media (max-width: 900px) { .results-layout { grid-template-columns: 1fr; } .res-list { position: static; max-height: 240px; } }
+
+/* 조합 성향 */
+.comp-tag { font-size: 11px; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--border); margin-left: 4px; white-space: nowrap; }
+.comp-dive  { border-color: #f87171; color: #f87171; }
+.comp-poke  { border-color: #60a5fa; color: #60a5fa; }
+.comp-peel  { border-color: #34d399; color: #34d399; }
+.comp-brawl { border-color: #fb923c; color: #fb923c; }
+.comp-burst { border-color: #c084fc; color: #c084fc; }

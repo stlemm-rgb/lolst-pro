@@ -81,8 +81,8 @@ function isBigMatch(match) {
   return ["playoffs", "worlds_ko", "promotion"].indexOf(match.comp) !== -1 || match.label.indexOf("결승") !== -1;
 }
 
-function userMatchContext(match) {
-  const m = matchPower(rollBans()); // 경기마다 밴 수·대상이 달라짐
+function userMatchContext(match, target) {
+  const m = matchPower(rollBans(), target); // 경기마다 밴 수·대상이 달라짐, 조합 성향 반영
   let mult = TEAM_MATCH.conditionBase + state.condition / TEAM_MATCH.conditionDiv;
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
@@ -143,14 +143,17 @@ function teamplayScore(list) {
 // 한 세트: 라인전 → 운영·한타
 function playSet(a, b, userCtx, setCtx) {
   const la = lineup(a, userCtx, setCtx), lb = lineup(b, userCtx, setCtx);
+  // 밴픽 조합: 상성·시너지 (js/comps.js)
+  const comps = setComps(la, lb, Object.assign({}, setCtx, { teamA: a, teamB: b }), userCtx ? userCtx.pick : null);
   let bonusA = 0, bonusB = 0, userLane = null;
   const laneResults = []; // 경기 상세용: 라인마다 { aWon, solo }
   POSITION_IDS.forEach(function (pos, i) {
     const pa = la[i], pb = lb[i];
     const diff = pa.power - pb.power;
     const winnerTraits = pa.id || pb.id ? traitsOf(diff >= 0 ? pa.id : pb.id) : [];
-    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy"); // 라인 지배자
-    const add = TEAM_MATCH.laneWinBonus + traitSumOf(winnerTraits, "laneBonus") + (solo ? TEAM_MATCH.soloKillBonus : 0);
+    const winComp = diff >= 0 ? comps.a : comps.b; // 이긴 쪽 팀 조합 (돌진·누커 시너지)
+    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy") - winComp.soloEasy; // 라인 지배자·돌진
+    const add = TEAM_MATCH.laneWinBonus + traitSumOf(winnerTraits, "laneBonus") + winComp.laneExtra + (solo ? TEAM_MATCH.soloKillBonus : 0);
     if (diff >= 0) bonusA += add; else bonusB += add;
     laneResults.push({ aWon: diff >= 0, solo: solo });
     if (pa.id === USER_ID) userLane = { won: diff >= 0, solo: solo, opp: pb.id };
@@ -159,15 +162,16 @@ function playSet(a, b, userCtx, setCtx) {
   const luckA = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom), luckB = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
   const avgA = average(la.map(function (p) { return p.power; })), avgB = average(lb.map(function (p) { return p.power; }));
   const playA = teamplayScore(la), playB = teamplayScore(lb);
-  const powerA = avgA + bonusA + playA + luckA;
-  const powerB = avgB + bonusB + playB + luckB;
+  const compA = comps.a.bonus, compB = comps.b.bonus;
+  const powerA = avgA + bonusA + playA + compA + luckA;
+  const powerB = avgB + bonusB + playB + compB + luckB;
   // 타고난 리더·원클럽맨: 그 선수가 있는 팀 한타 전력 보너스
   const mood = function (list) { return list.reduce(function (sum, p) { return sum + (p.id ? traitSumOf(traitsOf(p.id), "teamMood") : 0); }, 0); };
   const moodA = mood(la), moodB = mood(lb);
   return {
     winner: powerA + moodA >= powerB + moodB ? a : b, userLane: userLane, la: la, lb: lb,
-    lanes: laneResults,
-    teamA: { avg: avgA, lane: bonusA, play: playA, luck: luckA, mood: moodA }, teamB: { avg: avgB, lane: bonusB, play: playB, luck: luckB, mood: moodB },
+    lanes: laneResults, comps: comps,
+    teamA: { avg: avgA, lane: bonusA, play: playA, comp: compA, luck: luckA, mood: moodA }, teamB: { avg: avgB, lane: bonusB, play: playB, comp: compB, luck: luckB, mood: moodB },
   };
 }
 
@@ -175,7 +179,9 @@ function playSet(a, b, userCtx, setCtx) {
 function playMatch(m) {
   const mine = myTeam();
   const userIn = mine && (m.a === mine.id || m.b === mine.id) && !state.benched; // 후보면 출전 안 함
-  const userCtx = userIn ? userMatchContext(m) : null;
+  // 조합 전략 (경기마다): 메타 따라가기 / 메타 카운터 / 자유 (js/comps.js)
+  const plans = { a: teamCompPlan(m.a), b: teamCompPlan(m.b) };
+  const userCtx = userIn ? userMatchContext(m, (m.a === mine.id ? plans.a : plans.b).target) : null;
   const need = Math.ceil(m.bo / 2);
   const lanes = [];
   const perf = {}; // 이 경기 선수별 기록 (js/records.js)
@@ -191,6 +197,7 @@ function playMatch(m) {
       match: m,
       deciding: m.score[0] === need - 1 && m.score[1] === need - 1, // 풀세트
       behind: m.score[0] < m.score[1] ? m.a : m.score[1] < m.score[0] ? m.b : null,
+      plans: plans,
     };
     const set = playSet(m.a, m.b, userCtx, setCtx);
     m.score[set.winner === m.a ? 0 : 1]++;

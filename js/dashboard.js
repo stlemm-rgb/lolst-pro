@@ -200,7 +200,7 @@ function upcomingHTML() {
   const myMeta = state.meta.champs[myPos].slice().sort(function (a, b) { return (metaTier(b) === "S") - (metaTier(a) === "S"); }).map(function (name) {
     const v = state.mastery[name] || 1;
     const t = metaTier(name);
-    return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + t + "</span> " + name + " <b>" + v + "</b></span>";
+    return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + t + "</span> " + name + " <b>" + v + "</b>" + champComps(name).map(function (id) { return " " + findComp(id).icon; }).join("") + "</span>";
   }).join("");
   const others = POSITION_IDS.filter(function (p) { return p !== myPos; }).map(function (p) {
     const sName = (state.meta.s && state.meta.s[p]) || state.meta.champs[p][0];
@@ -214,6 +214,7 @@ function upcomingHTML() {
       '<div class="chips">' + myMeta + "</div>" +
       '<div class="other-meta">' + others + "</div>" +
       '<p class="muted small">S급: 픽 우선 +' + MATCH.metaPickBonus.S + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.S * 100) + "% · A급: 픽 우선 +" + MATCH.metaPickBonus.A + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.A * 100) + "%</p>" +
+      compPlanHTML() + // 조합 전략 (js/comps.js)
       questsHTML(true) +
     "</div>"
   );

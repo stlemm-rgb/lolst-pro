@@ -35,18 +35,19 @@ function npcPick(pos, used) {
 // set: playSet 결과, userPick: 내 선수가 고른 챔피언
 function makeBoxScore(set, m, userPick) {
   const aWon = set.winner === m.a;
-  const total = function (t) { return t.avg + t.lane + (t.play || 0) + t.luck + t.mood; };
+  const total = function (t) { return t.avg + t.lane + (t.play || 0) + (t.comp || 0) + t.luck + t.mood; };
   const gap = Math.abs(total(set.teamA) - total(set.teamB));
   const minutes = Math.max(BOXSCORE.minutesMin, randFloat(BOXSCORE.minutes[0], BOXSCORE.minutes[1]) - gap * BOXSCORE.minutesPerGap);
   const winK = randInt(BOXSCORE.winnerKills[0], BOXSCORE.winnerKills[1]) + Math.round(gap * BOXSCORE.killsPerGap);
   const loseK = Math.max(1, randInt(BOXSCORE.loserKills[0], BOXSCORE.loserKills[1]) - Math.round(gap * BOXSCORE.killsPerGap));
   const kills = aWon ? [winK, loseK] : [loseK, winK];
 
-  // 픽 (같은 세트에 같은 챔피언 없음)
+  // 픽: 세트 판정 때 정한 밴픽 그대로 (js/comps.js). 없으면 새로 고름
   const used = userPick ? [userPick] : [];
-  const sides = [set.la, set.lb].map(function (list) {
-    return list.map(function (p) {
-      const champ = p.id === USER_ID && userPick ? userPick : npcPick(p.pos, used);
+  const sides = [set.la, set.lb].map(function (list, s) {
+    const picks = set.comps ? set.comps[s === 0 ? "a" : "b"].picks : null;
+    return list.map(function (p, i) {
+      const champ = picks ? picks[i] : p.id === USER_ID && userPick ? userPick : npcPick(p.pos, used);
       used.push(champ);
       return { id: p.id, pos: p.pos, power: p.power, c: champ, k: 0, d: 0, a: 0 };
     });

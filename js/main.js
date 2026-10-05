@@ -24,6 +24,7 @@ function createNewState() {
     eventCooldown: {},            // 이벤트별 마지막으로 온 주
     career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0, earned: 0, moments: [] }, // 커리어 기록
     retirePlanned: false,         // true면 이번 시즌이 끝날 때 은퇴 (js/retire.js)
+    compPlan: "auto",             // 조합 전략: meta / counter / auto (js/comps.js)
     retired: null,                // 은퇴 후 엔딩 요약 (있으면 엔딩 화면)
     contract: null,               // 내 계약 { teamId, salary, endYear, guarantee } (js/contracts.js)
     pendingMove: null,            // 새 시즌에 옮길 팀 (이적 합의)
@@ -224,7 +225,7 @@ function masteryRowHTML(name) {
   return (
     '<div class="stat mastery-row">' +
       '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
-        metaTagHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도 ' + MATCH.jokerMinMastery + ' 이상: 고르면 경기력 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%">🃏 조커</span>' : "") + "</div>" +
+        metaTagHTML(name) + champCompsHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도 ' + MATCH.jokerMinMastery + ' 이상: 고르면 경기력 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%">🃏 조커</span>' : "") + "</div>" +
       '<div class="bar"><div class="bar-fill' + (isMeta(name) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
     "</div>"
@@ -608,7 +609,8 @@ function renderPage() {
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
-  bindMatchDetail(page); // 경기 상세 펼치기 (js/match_detail.js)
+  bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
+  bindCompPlan(page); // 조합 전략 (js/comps.js)
   page.querySelectorAll("[data-retire]").forEach(function (btn) {
     btn.onclick = function () {
       if (btn.getAttribute("data-retire") === "now") return retireNowButton();
@@ -762,7 +764,7 @@ function nextWeek(restWeek) {
   if (MASTERY.patchWeeks.indexOf(state.week) !== -1) {
     state.meta = makePatch(state.year, state.week);
     const mine = state.meta.champs[state.player.position].join(", ");
-    addNews("패치", state.meta.label + " 적용! " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
+    addNews("패치", state.meta.label + " 적용! 메타 조합: " + findComp(metaComp()).icon + " " + findComp(metaComp()).name + " · " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
     state.weekCtx.patch = true;
     // 패치마다 솔로 랭크 초기화
     const oldPoints = resetLadder();

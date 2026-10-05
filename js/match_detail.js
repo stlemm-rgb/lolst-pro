@@ -42,11 +42,13 @@ function activeTraits(id, teamId, setCtx, laneWon) {
 
 // 한 세트 기록 만들기 (playMatch에서 부름)
 function setDetail(set, setCtx, m, userPick) {
-  const team = function (t) { return { avg: round1(t.avg), lane: round1(t.lane), play: round1(t.play), luck: round1(t.luck), mood: round1(t.mood) }; };
+  const team = function (t) { return { avg: round1(t.avg), lane: round1(t.lane), play: round1(t.play), comp: round1(t.comp || 0), luck: round1(t.luck), mood: round1(t.mood) }; };
+  const comp = function (c) { return c ? { main: c.main, n: c.n, plan: c.plan, target: c.target, match: c.match, syn: c.syn, bonus: round1(c.bonus) } : null; };
   return {
     w: set.winner === m.a ? 0 : 1,
     deciding: !!setCtx.deciding,
     ta: team(set.teamA), tb: team(set.teamB),
+    ca: comp(set.comps && set.comps.a), cb: comp(set.comps && set.comps.b), // 조합 (js/comps.js)
     lanes: set.la.map(function (pa, i) {
       const pb = set.lb[i], ln = set.lanes[i];
       return {
@@ -76,10 +78,12 @@ function miniChips(ids) {
 // 팀 점수 내역 한 줄
 function teamScoreText(t) {
   const play = t.play || 0; // 예전 기록에는 없음
-  const total = t.avg + t.lane + play + t.luck + t.mood;
+  const comp = t.comp || 0;
+  const total = t.avg + t.lane + play + comp + t.luck + t.mood;
   return "<b>" + total.toFixed(1) + "</b> " +
     '<span class="muted small">= 선수 평균 ' + t.avg.toFixed(1) + " + 라인전 " + t.lane.toFixed(1) +
     (t.play !== undefined ? " " + (play >= 0 ? "+ " : "− ") + "운영·한타 " + Math.abs(play).toFixed(1) : "") +
+    (comp ? " " + (comp >= 0 ? "+ " : "− ") + "조합 " + Math.abs(comp).toFixed(1) : "") +
     (t.mood ? " + 한타 특성 " + t.mood.toFixed(1) : "") + " " + (t.luck >= 0 ? "+ " : "− ") + "운 " + Math.abs(t.luck).toFixed(1) + "</span>";
 }
 
@@ -152,7 +156,8 @@ function matchHeaderHTML(m) {
   const d = m.detail;
   const sets = d.sets.map(function (s, i) {
     const w = s.w === 0 ? m.a : m.b;
-    return '<span class="chip">' + (i + 1) + "세트 " + escapeHTML(teamShort(w)) + (s.box ? " · " + s.box.kills[0] + ":" + s.box.kills[1] + " · " + Math.round(s.box.min) + "분" : "") + "</span>";
+    const comps = s.ca ? " · " + (s.ca.main ? findComp(s.ca.main).icon : "") + " vs " + (s.cb.main ? findComp(s.cb.main).icon : "") : "";
+    return '<span class="chip">' + (i + 1) + "세트 " + escapeHTML(teamShort(w)) + (s.box ? " · " + s.box.kills[0] + ":" + s.box.kills[1] + " · " + Math.round(s.box.min) + "분" : "") + comps + "</span>";
   }).join("");
   return (
     '<div class="card res-head">' +
@@ -234,7 +239,7 @@ function setAnalysisHTML(m, idx) {
       return '<tr class="' + (id === USER_ID ? "me" : "") + '">' +
         "<td>" + findPosition(POSITION_IDS[i]).name + "</td>" +
         "<td>" + detailName(id, teamId, POSITION_IDS[i]) + (id && id === m.pog ? "" : "") + "</td>" +
-        "<td>" + escapeHTML(p.c) + "</td>" +
+        "<td>" + escapeHTML(p.c) + " " + champComps(p.c).map(function (id) { return '<span class="muted small">' + findComp(id).icon + "</span>"; }).join("") + "</td>" +
         '<td class="r">' + kdaText(p.k, p.d, p.a) + '</td><td class="r muted small">' + kdaRatio(p.k, p.d, p.a) + "</td>" +
         '<td class="r">' + p.cs + ' <span class="muted small">(' + p.cspm.toFixed(1) + ")</span></td>" +
         '<td class="r">' + p.dmg.toLocaleString() + ' <span class="muted small">' + p.share.toFixed(0) + "%</span></td>" +
@@ -256,6 +261,8 @@ function setAnalysisHTML(m, idx) {
       (box ? ' <span class="muted small">' + Math.floor(box.min) + "분 " + Math.round((box.min % 1) * 60) + "초 · 킬 " + box.kills[0] + " : " + box.kills[1] + "</span>" : "") + "</h2>" +
       '<h2 class="sub">라인 맞대결 <span class="muted small">숫자 = 경기력, ◀ ▶ = 라인전 이긴 쪽, 💥 = 솔로킬</span></h2>' +
       '<table class="lane-table">' + lanes + "</table>" +
+      (s.ca ? '<h2 class="sub">밴픽 조합 <span class="muted small">주력 성향 = 가장 많은 성향</span></h2>' +
+        '<div class="small">' + compSummaryHTML(s.ca, m.a) + "</div>" + '<div class="small">' + compSummaryHTML(s.cb, m.b) + "</div>" : "") +
       '<h2 class="sub">팀 점수 <span class="muted small">높은 쪽이 승리</span></h2>' +
       '<div class="small">' + teamLabel(m.a) + " " + teamScoreText(s.ta) + "</div>" +
       '<div class="small">' + teamLabel(m.b) + " " + teamScoreText(s.tb) + "</div>" +

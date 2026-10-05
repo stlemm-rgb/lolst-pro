@@ -46,15 +46,20 @@ function startMastery(stats, position, year, week) {
 function makePatch(year, week) {
   const pool = releasedChampions(year, week);
   const champs = {};
+  const theme = pick(COMPS).id; // 이번 패치 테마 성향 (js/comps.js) → 메타 챔피언을 그 성향 위주로
   POSITION_IDS.forEach(function (pos) {
     const list = pool.filter(function (c) { return c.positions.indexOf(pos) !== -1; });
-    champs[pos] = shuffled(list).slice(0, MASTERY.metaPerPosition).map(function (c) { return c.name; });
+    champs[pos] = pickThemedMeta(list, theme, MASTERY.metaPerPosition).map(function (c) { return c.name; });
   });
+  // 메타 조합 = 메타 챔피언들 성향 중 가장 많은 것
+  const all = [];
+  POSITION_IDS.forEach(function (pos) { champs[pos].forEach(function (n) { all.push(n); }); });
+  const comp = countComps(all, theme).main || theme;
   // 포지션마다 메타 중 1명은 S급 (맨 앞)
   const s = {};
   POSITION_IDS.forEach(function (pos) { s[pos] = champs[pos][0]; });
   const number = MASTERY.patchWeeks.indexOf(week) + 1;
-  return { label: year + "년 " + (number > 0 ? number + "차" : "") + " 패치", champs: champs, s: s };
+  return { label: year + "년 " + (number > 0 ? number + "차" : "") + " 패치", champs: champs, s: s, comp: comp };
 }
 
 function isMeta(name) {
@@ -180,9 +185,10 @@ function isJoker(name) {
   return !isMeta(name) && state.mastery[name] >= MATCH.jokerMinMastery;
 }
 
-// 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스
-function myPickValue(name) {
-  return pickValue(name) + (isJoker(name) ? MATCH.jokerPickBonus : 0);
+// 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스 (+ 우리 팀이 노리는 조합 성향이면 보너스)
+function myPickValue(name, target) {
+  return pickValue(name) + (isJoker(name) ? MATCH.jokerPickBonus : 0) +
+    (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
 // 패치 후 몇 주째인지 (1 = 패치 주)
@@ -237,12 +243,13 @@ function rollBans() {
 }
 
 // bans: 밴 당하는 수(숫자, 미리보기용 — 상대가 가장 경계하는 챔피언부터) 또는 밴 당한 챔피언 목록(실제 경기)
-function matchPower(bans) {
+// target: 우리 팀이 이번 경기에 노리는 조합 성향 (있으면 그 성향 챔피언을 더 잘 고름)
+function matchPower(bans, target) {
   const ranked = myPositionChampions().slice().sort(function (a, b) { return banValue(b) - banValue(a); });
   const banned = Array.isArray(bans) ? bans : ranked.slice(0, bans === undefined ? MATCH.bansAgainstMe : bans);
   // 남은 챔피언 중 내 가치(조커픽 보너스 포함)가 가장 높은 챔피언
   const left = ranked.filter(function (n) { return banned.indexOf(n) === -1; });
-  const pick = left.slice().sort(function (a, b) { return myPickValue(b) - myPickValue(a); })[0] || ranked[0];
+  const pick = left.slice().sort(function (a, b) { return myPickValue(b, target) - myPickValue(a, target); })[0] || ranked[0];
   const joker = isJoker(pick);
   const score = statScore();
   const tier = metaTier(pick);
