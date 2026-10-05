@@ -386,3 +386,31 @@ tr.sel { outline: 1px solid var(--accent); }
 .club-name { font-weight: bold; flex: 1; min-width: 160px; }
 .club-lineup { margin-top: 4px; }
 .club-roster { margin-top: 8px; }
+
+/* 대시보드: 지난주 결과 */
+.card.report { border-color: var(--accent); }
+.rep-row { padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.rep-row:last-child { border-bottom: none; }
+.rep-tag { display: inline-block; min-width: 38px; text-align: center; font-size: 12px; font-weight: bold;
+  border-radius: 4px; padding: 1px 6px; margin-right: 8px; background: var(--panel-2); color: var(--muted); }
+.rep-tag.win { background: rgba(52, 211, 153, 0.18); color: var(--good); }
+.rep-tag.lose { background: rgba(248, 113, 113, 0.18); color: var(--bad); }
+.rep-tag.train { color: var(--accent); }
+.rep-tag.rank { color: var(--gold); }
+.rep-tag.msg { color: var(--gold); }
+.small-btn { padding: 2px 10px; font-size: 13px; margin-left: 6px; }
+
+/* 대시보드: 요약 3칸 */
+.summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.summary-row .card { margin-bottom: 0; }
+.sum-label { color: var(--muted); font-size: 13px; margin-bottom: 6px; display: inline-block; }
+.sum-main { font-size: 20px; font-weight: bold; }
+.sum-main.big { font-size: 32px; color: var(--accent); }
+.sum-points { font-size: 15px; color: var(--muted); font-weight: normal; }
+.sum-sub { font-size: 13px; margin-top: 4px; }
+#rest-week { white-space: nowrap; }
+.topbar { gap: 14px; }
+.topbar-actions { display: flex; gap: 8px; flex: none; }
+.topbar-actions .tip:hover::after { left: auto; right: 0; transform: none; bottom: auto; top: calc(100% + 8px); }
+.topbar { font-size: 14px; padding: 12px 20px; }
+.topbar .item { white-space: nowrap; }

@@ -6,17 +6,19 @@
 //     stamina(체력), condition(컨디션), popularity(인기도), reputation(평판),
 //     mastery(챔피언 숙련도)를 쓸 수 있어요.
 //     스탯 상승에는 포지션 가산점·시작 유형·특성 보너스가 붙습니다.
+// - ladderGames: 그 주에 솔로 랭크(가상 래더)를 몇 판 하는지. 승패에 따라 래더 점수가 오르내려요.
 // - messages: 결과 문장 후보. 이 중 하나가 무작위로 나옵니다.
 const TRAININGS = [
   {
     id: "solo_rank",
+    ladderGames: 12,  // 이번 주 솔로 랭크 판 수 (가상 래더)
     name: "솔로 랭크",
     desc: "랭크 게임을 쉬지 않고 돌리며 손을 단련한다.",
     effects: {
       accuracy: [1, 2],
       reaction: [1, 2],
       laning:   [1, 2],
-      stamina:  [-15, -10],
+      stamina:  [-8, -5],
     },
     messages: [
       "하루 열 시간씩 랭크를 돌렸다. 손이 조금 더 빨라진 느낌이다.",
@@ -26,13 +28,14 @@ const TRAININGS = [
   },
   {
     id: "scrim",
+    ladderGames: 3,  // 이번 주 솔로 랭크 판 수 (가상 래더)
     name: "팀 스크림",
     desc: "다른 팀과 연습 경기를 하며 팀플레이를 맞춘다.",
     effects: {
       teamfight: [1, 2],
       macro:     [1, 2],
       shotcall:  [1, 2],
-      stamina:   [-15, -10],
+      stamina:   [-8, -5],
     },
     messages: [
       "스크림에서 한타 호흡이 잘 맞았다.",
@@ -42,13 +45,14 @@ const TRAININGS = [
   },
   {
     id: "replay",
+    ladderGames: 2,  // 이번 주 솔로 랭크 판 수 (가상 래더)
     name: "리플레이 분석",
     desc: "지난 경기와 상대 경기를 돌려 보며 공부한다.",
     effects: {
       vision:  [1, 2],
       spacing: [1, 2],
       focus:   [1, 2],
-      stamina: [-8, -5],
+      stamina: [-4, -3],
     },
     messages: [
       "리플레이를 돌려 보며 실수를 하나씩 고쳤다.",
@@ -58,13 +62,14 @@ const TRAININGS = [
   },
   {
     id: "champion",
+    ladderGames: 5,  // 이번 주 솔로 랭크 판 수 (가상 래더)
     name: "챔피언 연습",
     desc: "챔피언을 집중적으로 연습해 숙련도를 올린다. 연습할 챔피언을 고를 수 있다.",
     effects: {
       pool:     [1, 3],
       adapt:    [1, 2],
       mastery:  [6, 10],
-      stamina:  [-12, -8],
+      stamina:  [-6, -4],
     },
     messages: [
       "처음 써 보는 챔피언으로 열 판을 했다. 이제 좀 손에 익는다.",
@@ -74,6 +79,7 @@ const TRAININGS = [
   },
   {
     id: "rest",
+    ladderGames: 0,  // 이번 주 솔로 랭크 판 수 (가상 래더)
     name: "휴식",
     desc: "푹 쉬면서 체력과 컨디션을 회복한다.",
     effects: {

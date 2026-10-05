@@ -201,6 +201,12 @@ function afterUserMatch(m, ctx, lanes) {
   if (soloLosses) laneText += ", 솔로킬 " + soloLosses + "회 허용";
   if (lanes.length && lanes[0].opp) laneText += " (상대 " + playerName(lanes[0].opp) + ")";
 
+  if (state.weekReport) {
+    state.weekReport.userLines.push({
+      won: won, changes: changes,
+      text: m.label + " · vs " + teamName(oppId) + " " + myScore + ":" + oppScore + (won ? " 승리!" : " 패배") + " · " + ctx.pick + " 픽 · " + laneText,
+    });
+  }
   state.log.unshift({
     when: state.year + "년 " + state.week + "주차",
     training: "경기 · " + m.label,

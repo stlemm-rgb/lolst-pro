@@ -29,6 +29,8 @@ function createNewState() {
     benchWeeks: 0,                // 후보로 지낸 주
     transferListed: false,        // 이적 희망 (비시즌 제안 늘어남)
     transferRequestsLeft: 0,      // 이번 비시즌 이적 요청 남은 횟수
+    soloRank: { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints }, // 솔로 랭크 (가상 래더)
+    weekReport: null,             // 대시보드 "지난주 결과" (js/dashboard.js)
     skipTraining: false,          // true면 다음 주 훈련 대신 휴식 (이벤트 효과)
     matchBoost: 0,                // 다음 경기 경기력 보너스 (이벤트 효과)
     plan: null,                   // 이번 주에 고른 훈련 id
@@ -146,6 +148,8 @@ pages.dashboard = function () {
 
   return (
     "<h1>대시보드</h1>" +
+    weekReportHTML() +
+    summaryRowHTML() +
     '<div class="grid">' +
       '<div class="card"><h2>프로필</h2>' +
         '<p class="profile-name">' + escapeHTML(p.name) + "</p>" +
@@ -495,12 +499,16 @@ function selectMenu(id) {
 function renderTopbar() {
   document.getElementById("topbar").innerHTML =
     '<span class="item"><b>' + state.year + "</b>년 <b>" + state.week + "</b>주차 · " + scheduleOfWeek(state.week).name + "</span>" +
-    '<span class="item">선수 <b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
-    '<span class="item">소속 <b>' + escapeHTML(myTeam().name) + "</b> (" + tierName(myTeam().tier) + ")</span>" +
-    '<span class="item">자금 <b>' + state.money.toLocaleString() + "</b>원</span>" +
+    '<span class="item"><b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
+    '<span class="item"><b>' + escapeHTML(myTeam().name) + "</b> (" + tierName(myTeam().tier) + ")</span>" +
+    '<span class="item tip" tabindex="0" data-tip="자금 ' + state.money.toLocaleString() + '원">💰 <b>' + moneyText(state.money) + "</b></span>" +
     '<span class="spacer"></span>' +
-    '<button class="primary" id="next-week">다음 주로 진행 ▶</button>';
-  document.getElementById("next-week").onclick = nextWeek;
+    '<span class="topbar-actions">' +
+      '<button id="rest-week" class="tip" data-tip="고른 훈련은 그대로 두고 이번 주만 쉬어요 (체력·컨디션 회복)">휴식 주 💤</button>' +
+      '<button class="primary" id="next-week">다음 주로 진행 ▶</button>' +
+    "</span>";
+  document.getElementById("next-week").onclick = function () { nextWeek(false); };
+  document.getElementById("rest-week").onclick = function () { nextWeek(true); };
 }
 
 // ===== 우측 본문 =====
@@ -546,9 +554,11 @@ function renderPage() {
 }
 
 // ===== 다음 주로 진행 =====
-function nextWeek() {
+// restWeek: true면 고른 훈련과 상관없이 이번 주만 휴식 ([휴식 주] 버튼)
+function nextWeek(restWeek) {
+  restWeek = restWeek === true;
   // 훈련을 안 골랐으면 훈련 화면으로 안내
-  if (!state.plan && !state.skipTraining) {
+  if (!state.plan && !state.skipTraining && !restWeek) {
     state.currentMenu = "training";
     state.notice = "이번 주 훈련을 먼저 골라 주세요.";
     renderAll();
@@ -558,7 +568,7 @@ function nextWeek() {
   resetWeekCtx(); // 이번 주에 일어난 일 기록 시작 (이벤트 조건용)
 
   // 훈련 효과 적용 (이벤트로 "쉰다"를 골랐으면 이번 주는 휴식)
-  const training = state.skipTraining ? findTraining("rest") : findTraining(state.plan);
+  const training = (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
   state.skipTraining = false;
   const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
   const changes = {};
@@ -613,8 +623,13 @@ function nextWeek() {
     message: message,
     changes: changes,
   });
+  // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
+  startWeekReport(training, message, changes, playLadder(training));
+
   // 이번 주 리그 경기 (훈련 다음에 진행), 연봉 1주치
+  const playedWeek = state.week;
   playLeagueWeek(state.week);
+  finishWeekReport(playedWeek, state.league.season.matches);
   paySalary();
 
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
@@ -682,6 +697,7 @@ function addNews(title, message) {
     changes: {},
   });
   if (state.inbox) postMessage("news", "[" + title + "] " + message, message); // SNS 소식 탭에도
+  if (state.weekReport) state.weekReport.news.push(message); // 대시보드 지난주 결과에도
 }
 
 function renderAll() {
