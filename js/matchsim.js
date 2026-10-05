@@ -102,6 +102,22 @@ function traitPowerMult(traits, teamId, setCtx) {
   return mult;
 }
 
+// 스탯 고유 역할: 멘탈(지고 있을 때)·집중력(3세트부터) 경기력 배율 (data/match.js STAT_ROLES)
+function statPowerMult(st, teamId, setCtx) {
+  if (!st) return 1;
+  const R = STAT_ROLES;
+  let mult = 1;
+  if (setCtx.behind === teamId) mult *= 1 - Math.max(0, R.pivot - st.mental) * R.mentalPer;
+  if ((setCtx.setNo || 1) >= R.focusFromSet) mult *= 1 + (st.focus - R.pivot) * R.focusPer;
+  return mult;
+}
+
+// 라인 맞대결 경기력 = 경기력 + 라인전 스탯 보정
+function lanePower(p) {
+  const st = p.id ? statsOfId(p.id) : null;
+  return p.power + (st ? (st.laning - STAT_ROLES.pivot) * STAT_ROLES.lanePer : 0);
+}
+
 // 한 팀의 이번 세트 라인업과 경기력
 function lineup(teamId, userCtx, setCtx) {
   setCtx = setCtx || {};
@@ -115,11 +131,19 @@ function lineup(teamId, userCtx, setCtx) {
   return POSITION_IDS.map(function (pos) {
     const id = s[pos];
     const tr = traitsOf(id);
+    const st = statsOfId(id);
     const v = traitSumOf(tr, "variance"); // 기복: 더 흔들림
+    // 입력 정확도: 못하는 쪽 흔들림을 줄임
+    const steady = st ? Math.max(0, Math.min(STAT_ROLES.accuracyMax, (st.accuracy - 40) / 100)) : 0;
     let power;
-    if (id === USER_ID) power = userCtx.power * randFloat(1 - 0.05 - v, 1 + 0.05 + v);
-    else power = playerScore(id) * randFloat(MATCH.npcMultiplier[0] - v, MATCH.npcMultiplier[1] + v);
-    power *= traitPowerMult(tr, teamId, setCtx);
+    if (id === USER_ID) {
+      const down = 0.05 + v;
+      power = userCtx.power * randFloat(1 - down * (1 - steady), 1 + 0.05 + v);
+    } else {
+      const down = 1 - (MATCH.npcMultiplier[0] - v);
+      power = playerScore(id) * randFloat(1 - down * (1 - steady), MATCH.npcMultiplier[1] + v);
+    }
+    power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx);
     return { pos: pos, id: id, power: power };
   });
 }
@@ -149,10 +173,13 @@ function playSet(a, b, userCtx, setCtx) {
   const laneResults = []; // 경기 상세용: 라인마다 { aWon, solo }
   POSITION_IDS.forEach(function (pos, i) {
     const pa = la[i], pb = lb[i];
-    const diff = pa.power - pb.power;
+    const diff = lanePower(pa) - lanePower(pb); // 라인전 스탯 반영
+    const loser = diff >= 0 ? pb : pa;
+    const loserSt = loser.id ? statsOfId(loser.id) : null;
+    const dodge = loserSt ? (loserSt.reaction - STAT_ROLES.pivot) * STAT_ROLES.reactionPer : 0; // 반응속도: 솔로킬 피하기
     const winnerTraits = pa.id || pb.id ? traitsOf(diff >= 0 ? pa.id : pb.id) : [];
     const winComp = diff >= 0 ? comps.a : comps.b; // 이긴 쪽 팀 조합 (돌진·누커 시너지)
-    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy") - winComp.soloEasy; // 라인 지배자·돌진
+    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy") - winComp.soloEasy + dodge; // 라인 지배자·돌진·반응속도
     const add = TEAM_MATCH.laneWinBonus + traitSumOf(winnerTraits, "laneBonus") + winComp.laneExtra + (solo ? TEAM_MATCH.soloKillBonus : 0);
     if (diff >= 0) bonusA += add; else bonusB += add;
     laneResults.push({ aWon: diff >= 0, solo: solo });
@@ -197,6 +224,7 @@ function playMatch(m) {
       match: m,
       deciding: m.score[0] === need - 1 && m.score[1] === need - 1, // 풀세트
       behind: m.score[0] < m.score[1] ? m.a : m.score[1] < m.score[0] ? m.b : null,
+      setNo: m.score[0] + m.score[1] + 1,
       plans: plans,
     };
     const set = playSet(m.a, m.b, userCtx, setCtx);
@@ -257,7 +285,10 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
 
   const rule = won ? LEAGUE.afterWin : LEAGUE.afterLoss;
   let cond = randInt(rule.condition[0], rule.condition[1]);
-  if (cond < 0) cond = Math.round(cond * Math.max(0, 1 + traitEffectSum("lossMental")));
+  if (cond < 0) {
+    const mentalCut = Math.max(STAT_ROLES.mentalLossMin, Math.min(1, 1 - (state.stats.mental - 50) / 100)); // 멘탈: 패배 후 컨디션 하락 감소
+    cond = Math.round(cond * Math.max(0, 1 + traitEffectSum("lossMental")) * mentalCut);
+  }
   before = state.condition;
   state.condition = clamp(state.condition + cond);
   changes.condition = state.condition - before;

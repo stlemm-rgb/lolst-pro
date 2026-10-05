@@ -52,7 +52,7 @@ function setDetail(set, setCtx, m, userPick) {
     lanes: set.la.map(function (pa, i) {
       const pb = set.lb[i], ln = set.lanes[i];
       return {
-        a: pa.id, b: pb.id, pa: round1(pa.power), pb: round1(pb.power), aWon: ln.aWon, solo: ln.solo,
+        a: pa.id, b: pb.id, pa: round1(lanePower(pa)), pb: round1(lanePower(pb)), aWon: ln.aWon, solo: ln.solo,
         ra: round1(setRating(pa.power, pb.power, set.winner === m.a)),
         rb: round1(setRating(pb.power, pa.power, set.winner === m.b)),
         xa: activeTraits(pa.id, m.a, setCtx, ln.aWon), xb: activeTraits(pb.id, m.b, setCtx, !ln.aWon),
@@ -259,7 +259,7 @@ function setAnalysisHTML(m, idx) {
   return (
     '<div class="card"><h2>' + (idx + 1) + "세트" + (s.deciding ? ' <span class="chip meta">풀세트</span>' : "") + " · 승리 " + teamLabel(winner) +
       (box ? ' <span class="muted small">' + Math.floor(box.min) + "분 " + Math.round((box.min % 1) * 60) + "초 · 킬 " + box.kills[0] + " : " + box.kills[1] + "</span>" : "") + "</h2>" +
-      '<h2 class="sub">라인 맞대결 <span class="muted small">숫자 = 경기력, ◀ ▶ = 라인전 이긴 쪽, 💥 = 솔로킬</span></h2>' +
+      '<h2 class="sub">라인 맞대결 <span class="muted small">숫자 = 라인 경기력(경기력 + 라인전 스탯), ◀ ▶ = 라인전 이긴 쪽, 💥 = 솔로킬</span></h2>' +
       '<table class="lane-table">' + lanes + "</table>" +
       (s.ca ? '<h2 class="sub">밴픽 조합 <span class="muted small">주력 성향 = 가장 많은 성향</span></h2>' +
         '<div class="small">' + compSummaryHTML(s.ca, m.a) + "</div>" + '<div class="small">' + compSummaryHTML(s.cb, m.b) + "</div>" : "") +

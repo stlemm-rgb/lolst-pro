@@ -52,6 +52,24 @@ const MATCH = {
 //    경기력 × (conditionBase + 컨디션 ÷ conditionDiv)   (컨디션 0 → 0.9배, 50 → 1.0배, 100 → 1.1배)
 //    체력이 lowStaminaLimit 미만이면 경기력 × (1 − lowStaminaCut)
 //    경기마다 체력 소모: 3판 2선승 staminaCostBo3, 5판 3선승 staminaCostBo5
+// 스탯별 고유 역할 (경기 판정, 나와 다른 선수 모두) — 기준값(pivot)보다 높으면 좋고 낮으면 나쁨
+// - 라인전: 라인 맞대결에서만 경기력 + (라인전 − pivot) × lanePer
+// - 반응속도: 솔로킬 당하는 기준이 (반응속도 − pivot) × reactionPer 만큼 어려워짐 (낮으면 쉬워짐)
+// - 입력 정확도: 경기력 흔들림 중 "못하는 쪽"을 줄임. (정확도 − 40) ÷ 100 비율만큼 (최대 accuracyMax)
+// - 멘탈: 세트 스코어에서 지고 있을 때 경기력 −(pivot − 멘탈) × mentalPer (멘탈이 기준보다 높으면 영향 없음)
+//         내 선수는 패배 후 컨디션 하락도 줄어듦: 멘탈 50 → 그대로, 90 → 60%만 (최소 mentalLossMin)
+// - 집중력: 3세트부터 경기력 + (집중력 − pivot) × focusPer
+const STAT_ROLES = {
+  pivot: 60,
+  lanePer: 0.15,
+  reactionPer: 0.1,
+  accuracyMax: 0.5,
+  mentalPer: 0.002,
+  mentalLossMin: 0.4,
+  focusPer: 0.002,
+  focusFromSet: 3,
+};
+
 const TEAM_MATCH = {
   laneWinBonus: 1.5,
   soloKillGap: 15,
