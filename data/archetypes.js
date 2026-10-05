@@ -7,6 +7,7 @@
 // - goodTraits: 받는 좋은 특성 개수
 // - masteryGrowth: 챔피언 숙련도 성장 배율 (0.5 = 절반, 3단계에서 사용)
 // - strength / weakness: 화면에 보이는 장점·약점 설명
+// - difficulty: 화면에 보이는 난이도 표시 (선택)
 const ARCHETYPES = [
   {
     id: "prospect", name: "유망주",
@@ -31,6 +32,14 @@ const ARCHETYPES = [
     trainingBonus: 0, goodTraits: 1, masteryGrowth: 0.5,
     strength: "처음부터 높은 스탯",
     weakness: "메타 변화에 취약 (챔피언 숙련도 성장 절반), 짧은 커리어",
+  },
+  {
+    id: "living_legend", name: "리빙 레전드", difficulty: "쉬움",
+    desc: "어린 나이에 이미 완성된 괴물 신인.",
+    age: 17, statAvg: 62, statBonus: {}, staminaMax: 80,
+    trainingBonus: 0, goodTraits: 3, masteryGrowth: 1,
+    strength: "레전드급 스탯 + 유망주 나이 + 좋은 특성 3개",
+    weakness: "없음 (쉬운 난이도)",
   },
 ];
 

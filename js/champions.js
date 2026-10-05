@@ -71,9 +71,30 @@ function myPositionChampions() {
     });
 }
 
-// 숙련도 성장 배율 = 시작 유형(레전드 0.5) × (1 + 특성 보너스)
-function masteryGrowthMultiplier() {
-  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitEffectSum("masteryGrowth"));
+function findChampionType(id) {
+  return CHAMPION_TYPES.find(function (t) { return t.id === id; });
+}
+
+// 유형 스탯 (예: 캐리형 = 입력 정확도·거리 조절·집중력 평균)
+function typeScore(typeId, stats) {
+  const t = findChampionType(typeId);
+  const s = stats || state.stats;
+  let sum = 0;
+  t.stats.forEach(function (id) { sum += s[id]; });
+  return Math.round(sum / t.stats.length);
+}
+
+// 유형 스탯이 높으면 그 유형 챔피언 숙련도 성장 보너스 (0.3 = +30%)
+function typeMasteryBonus(typeId) {
+  return Math.max(0, (typeScore(typeId) - MASTERY.typeBonusPivot) / MASTERY.typeBonusScale);
+}
+
+// 숙련도 성장 배율 = 시작 유형(레전드 0.5) × (1 + 특성 보너스 + 챔피언 유형 보너스)
+// champName을 안 주면 유형 보너스는 빼고 계산
+function masteryGrowthMultiplier(champName) {
+  const c = champName && findChampion(champName);
+  const typeBonus = c ? typeMasteryBonus(c.type) : 0;
+  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitEffectSum("masteryGrowth") + typeBonus);
 }
 
 // 챔피언 연습: 숙련도 올리기. 바뀐 값을 { 이름: +n } 으로 돌려줌
@@ -95,11 +116,74 @@ function practiceChampions(range, tired) {
   targets.forEach(function (name) {
     const now = state.mastery[name];
     // 숙련도가 높을수록 조금씩 덜 오름
-    let gain = randInt(range[0], range[1]) * share * masteryGrowthMultiplier() * Math.max(0.3, 1 - now / 125);
+    let gain = randInt(range[0], range[1]) * share * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
     if (tired) gain *= 0.5;
     gain = roundRandom(gain);
     state.mastery[name] = Math.min(MASTERY.max, now + gain);
     result[name] = state.mastery[name] - now;
   });
   return result;
+}
+
+// ===== 경기력 계산 (밴픽 + 메타 페널티, 규칙은 data/match.js) =====
+
+// 스탯 점수: 12개 평균, 포지션 가산점 스탯은 1.5배
+function statScore() {
+  let sum = 0, weight = 0;
+  STATS.forEach(function (s) {
+    const w = isBonusStat(s.id) ? POSITION_BONUS.matchMultiplier : 1;
+    sum += state.stats[s.id] * w;
+    weight += w;
+  });
+  return sum / weight;
+}
+
+// 밴픽에서 챔피언 가치 = 숙련도 + (메타면 보너스)
+function pickValue(name) {
+  return state.mastery[name] + (isMeta(name) ? MATCH.metaPickBonus : 0);
+}
+
+// 패치 후 몇 주째인지 (1 = 패치 주)
+function weeksSincePatch() {
+  let last = 1;
+  MASTERY.patchWeeks.forEach(function (w) { if (w <= state.week) last = w; });
+  return state.week - last + 1;
+}
+
+// 메타 페널티와 그 계산 과정
+function metaPenaltyInfo() {
+  const names = state.meta.champs[state.player.position];
+  let sum = 0;
+  names.forEach(function (n) { sum += state.mastery[n] || MASTERY.min; });
+  const avg = names.length ? sum / names.length : MASTERY.max;
+  let penalty = Math.max(0, (MATCH.metaPenaltyBase - avg) / MATCH.metaPenaltyDiv);
+  const adapting = weeksSincePatch() <= MATCH.adaptWeeks;
+  let adaptCut = 0, stubborn = 0;
+  if (adapting) {
+    // 적응력이 높을수록 줄어듦 (최대 절반)
+    adaptCut = Math.min(0.5, Math.max(0, (state.stats.adapt - MATCH.adaptFrom) / MATCH.adaptRange * 0.5));
+    penalty *= 1 - adaptCut;
+    stubborn = Math.max(0, traitEffectSum("metaPenalty"));
+    penalty += stubborn;
+  }
+  return { avg: avg, penalty: penalty, adapting: adapting, adaptCut: adaptCut, stubborn: stubborn };
+}
+
+// 한 경기 경기력 계산. bans = 밴 당하는 수 (기본 data/match.js)
+function matchPower(bans) {
+  const count = bans === undefined ? MATCH.bansAgainstMe : bans;
+  const ranked = myPositionChampions().slice().sort(function (a, b) { return pickValue(b) - pickValue(a); });
+  const banned = ranked.slice(0, count);
+  const pick = ranked[count] || ranked[0];
+  const score = statScore();
+  const mult = MATCH.masteryBase + state.mastery[pick] / MATCH.masteryScale;
+  const meta = metaPenaltyInfo();
+  return {
+    score: score,
+    banned: banned,
+    pick: pick,
+    multiplier: mult,
+    meta: meta,
+    power: score * mult - meta.penalty,
+  };
 }

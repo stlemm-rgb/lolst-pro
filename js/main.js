@@ -149,6 +149,8 @@ pages.dashboard = function () {
     "</div>" +
     '<div class="card"><h2>내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점</span></h2>' +
       '<div class="stat-columns">' + statsHTML + "</div>" +
+      '<h2 class="sub">유형 스탯 <span class="muted small">높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)</span></h2>' +
+      '<div class="stat-columns type-stats">' + typeScoresHTML() + "</div>" +
     "</div>" +
     '<div class="card"><h2>챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
       '<p class="muted small">이번 패치 ' + pos.name + " 메타 챔피언 (숫자는 내 숙련도)</p>" +
@@ -159,6 +161,22 @@ pages.dashboard = function () {
     '<div class="card"><h2>최근 기록</h2>' + logHTML + "</div>"
   );
 };
+
+// 유형 스탯 4개 막대
+function typeScoresHTML() {
+  return CHAMPION_TYPES.map(function (t) {
+    const v = typeScore(t.id);
+    const names = t.stats.map(statName).join("·");
+    const bonus = typeMasteryBonus(t.id);
+    return (
+      '<div class="stat">' +
+        '<div class="stat-label tip" tabindex="0" data-tip="' + t.desc + " / " + names + ' 평균">' + t.name + "</div>" +
+        '<div class="bar"><div class="bar-fill type-' + t.id + '" style="width:' + v + '%"></div></div>' +
+        '<div class="stat-value">' + v + (bonus > 0 ? ' <span class="up small">(' + percentText(bonus) + ")</span>" : "") + "</div>" +
+      "</div>"
+    );
+  }).join("");
+}
 
 // 평판 막대 (-100 ~ +100, 가운데가 0)
 function reputationBarHTML() {
@@ -178,13 +196,43 @@ function reputationBarHTML() {
 function masteryRowHTML(name) {
   const v = state.mastery[name];
   return (
-    '<div class="stat">' +
-      '<div class="stat-label">' + name + (isMeta(name) ? ' <span class="meta-tag">META</span>' : "") + "</div>" +
+    '<div class="stat mastery-row">' +
+      '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
+        (isMeta(name) ? ' <span class="meta-tag">META</span>' : "") + "</div>" +
       '<div class="bar"><div class="bar-fill' + (isMeta(name) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
     "</div>"
   );
 }
+
+// ===== 시즌 일정 (52주 달력) =====
+pages.schedule = function () {
+  const rows = SCHEDULE.map(function (s) {
+    const now = state.week >= s.from && state.week <= s.to;
+    const weeks = s.from === s.to ? s.from + "주" : s.from + " ~ " + s.to + "주";
+    const tag = s.international ? ' <span class="meta-tag">국제</span>' : s.empty ? ' <span class="muted small">(비어 있음)</span>' : "";
+    const patch = MASTERY.patchWeeks.filter(function (w) { return w >= s.from && w <= s.to; }).length ? ' <span class="chip meta">패치</span>' : "";
+    return (
+      '<tr class="' + (now ? "now" : "") + (state.week > s.to ? " past" : "") + '">' +
+        "<td>" + weeks + "</td>" +
+        "<td><b>" + s.name + "</b>" + tag + patch + (now ? ' <span class="now-tag">지금</span>' : "") + "</td>" +
+        '<td class="muted">' + s.desc + "</td>" +
+      "</tr>"
+    );
+  }).join("");
+  return (
+    "<h1>시즌 일정</h1>" +
+    '<div class="card"><h2>' + state.year + "년 시즌 · " + state.week + "주차</h2>" +
+      '<p class="muted small">2026년 실제 리그 일정을 바탕으로 한 52주 달력이에요. 경기는 3단계에서 추가돼요.</p>' +
+      '<table class="schedule">' + rows + "</table>" +
+    "</div>" +
+    '<div class="card"><h2>월드 챔피언십</h2>' +
+      "<p>우리 리그 상위 <b>" + WORLDS.myRegionSlots + "팀</b> + 해외 가상 지역 " +
+        WORLDS.regions.map(function (r) { return r.name + " " + r.teams + "팀"; }).join(", ") + "</p>" +
+      '<p class="muted">' + WORLDS.format + "</p>" +
+    "</div>"
+  );
+};
 
 // ===== 나의 커리어: 챔피언 숙련도 =====
 let championTab = ""; // 보고 있는 포지션 탭 (저장 안 함)
@@ -206,8 +254,24 @@ pages.career = function () {
     ? "다음 출시 예정: <b>" + upcoming[0].name + "</b> (" + upcoming[0].released + ")"
     : "모든 챔피언이 출시됐어요.";
 
+  // 경기력 미리보기 (밴 2명 기준)
+  const m = matchPower();
+  const mp = m.meta;
+  const preview =
+    '<div class="card"><h2>경기력 미리보기 <span class="muted small">상대가 내 챔피언 ' + MATCH.bansAgainstMe + "명을 밴했을 때 (3단계 경기 판정에 쓰여요)</span></h2>" +
+      '<table class="calc">' +
+        "<tr><td>스탯 점수</td><td>12개 평균, ★가산점 " + POSITION_BONUS.matchMultiplier + "배</td><td><b>" + m.score.toFixed(1) + "</b></td></tr>" +
+        "<tr><td>밴 당한 챔피언</td><td colspan=\"2\">" + (m.banned.join(", ") || "없음") + "</td></tr>" +
+        "<tr><td>고른 챔피언</td><td>" + m.pick + " (숙련도 " + state.mastery[m.pick] + (isMeta(m.pick) ? ", 메타" : "") + ")</td><td>× <b>" + m.multiplier.toFixed(2) + "</b></td></tr>" +
+        "<tr><td>메타 페널티</td><td>메타 챔피언 평균 숙련도 " + mp.avg.toFixed(0) +
+          (mp.adapting ? " · 패치 적응 기간 (적응력 −" + Math.round(mp.adaptCut * 100) + "%" + (mp.stubborn ? ", 고집 +" + mp.stubborn : "") + ")" : "") +
+          "</td><td>− <b>" + mp.penalty.toFixed(1) + "</b></td></tr>" +
+        '<tr class="total"><td>경기력</td><td>스탯 점수 × 숙련도 배율 − 메타 페널티</td><td><b>' + m.power.toFixed(1) + "</b></td></tr>" +
+      "</table>" +
+    "</div>";
+
   return (
-    "<h1>나의 커리어</h1>" +
+    "<h1>나의 커리어</h1>" + preview +
     '<div class="card"><h2>챔피언 숙련도 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
       '<p class="muted small">1 = 한 번도 안 해 본 챔피언, 100 = 완벽하게 다룸. 금색 막대 = 이번 패치 메타 챔피언. ' +
         "지금까지 출시된 챔피언 " + Object.keys(state.mastery).length + "명 · " + next + "</p>" +
@@ -222,7 +286,8 @@ pages.career = function () {
 function practiceSelectHTML() {
   const options = myPositionChampions().map(function (name) {
     return '<option value="' + name + '"' + (state.practiceChamp === name ? " selected" : "") + ">" +
-      name + (isMeta(name) ? " ★메타" : "") + " (" + state.mastery[name] + ")</option>";
+      name + (isMeta(name) ? " ★메타" : "") + " · " + findChampionType(findChampion(name).type).name +
+      " (숙련도 " + state.mastery[name] + ", 성장 " + percentText(masteryGrowthMultiplier(name) - 1) + ")</option>";
   }).join("");
   return (
     '<p class="effects"><label>연습할 챔피언 ' +
@@ -406,7 +471,7 @@ function selectMenu(id) {
 // ===== 상단바 =====
 function renderTopbar() {
   document.getElementById("topbar").innerHTML =
-    '<span class="item"><b>' + state.year + "</b>년 <b>" + state.week + "</b>주차</span>" +
+    '<span class="item"><b>' + state.year + "</b>년 <b>" + state.week + "</b>주차 · " + scheduleOfWeek(state.week).name + "</span>" +
     '<span class="item">선수 <b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
     '<span class="item">소속 <b>' + escapeHTML(state.team) + "</b></span>" +
     '<span class="item">자금 <b>' + state.money.toLocaleString() + "</b>원</span>" +

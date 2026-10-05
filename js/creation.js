@@ -111,7 +111,7 @@ function creationHTML() {
   ARCHETYPES.forEach(function (a) {
     archCards +=
       '<div class="choice' + (draft.archetype === a.id ? " selected" : "") + '" data-carch="' + a.id + '">' +
-        "<h3>" + a.name + "</h3>" +
+        "<h3>" + a.name + (a.difficulty ? ' <span class="badge-easy">' + a.difficulty + "</span>" : "") + "</h3>" +
         '<p class="muted">' + a.desc + "</p>" +
         "<ul>" +
           "<li>시작 나이 <b>" + a.age + "세</b></li>" +

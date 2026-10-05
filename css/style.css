@@ -295,3 +295,34 @@ select {
   color: var(--text);
   max-width: 100%;
 }
+
+/* 쉬운 난이도 표시 */
+.badge-easy { font-size: 11px; color: var(--good); border: 1px solid var(--good); border-radius: 4px; padding: 1px 5px; vertical-align: middle; }
+
+/* 챔피언 유형 */
+.type-tag { font-size: 10px; border-radius: 4px; padding: 0 3px; border: 1px solid var(--border); color: var(--muted); }
+.type-tag.carry, .bar-fill.type-carry { border-color: #f472b6; color: #f472b6; }
+.type-tag.utility, .bar-fill.type-utility { border-color: #34d399; color: #34d399; }
+.type-tag.aggro, .bar-fill.type-aggro { border-color: #f87171; color: #f87171; }
+.type-tag.macro, .bar-fill.type-macro { border-color: #60a5fa; color: #60a5fa; }
+.bar-fill.type-carry { background: #f472b6; }
+.bar-fill.type-utility { background: #34d399; }
+.bar-fill.type-aggro { background: #f87171; }
+.bar-fill.type-macro { background: #60a5fa; }
+
+/* 경기력 계산표 */
+table.calc { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.calc td { padding: 8px 6px; border-bottom: 1px solid var(--border); }
+table.calc td:first-child { color: var(--muted); white-space: nowrap; width: 110px; }
+table.calc td:last-child { text-align: right; white-space: nowrap; }
+table.calc tr.total td { border-bottom: none; font-size: 16px; color: var(--text); }
+.stat.mastery-row { grid-template-columns: 170px 1fr 40px; }
+.type-stats .stat { grid-template-columns: 112px 1fr 96px; }
+
+/* 시즌 일정표 */
+table.schedule { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.schedule td { padding: 9px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+table.schedule td:first-child { white-space: nowrap; color: var(--muted); width: 90px; }
+table.schedule tr.past { opacity: 0.45; }
+table.schedule tr.now { background: rgba(59, 130, 246, 0.15); }
+.now-tag { font-size: 11px; color: #fff; background: var(--accent); border-radius: 4px; padding: 1px 5px; }
