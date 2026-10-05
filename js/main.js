@@ -1,22 +1,38 @@
 // ===== 게임 상태 =====
-// 게임의 모든 정보는 이 state 안에 모아 둡니다.
-const state = {
-  name: "신인 선수",
-  team: "무소속",
-  money: 0,
-  season: 1,
-  week: 1,
-  stats: {},                    // 스탯 값 (data/stats.js에서 시작값을 가져옴)
-  condition: CONDITION_START,   // 컨디션
-  plan: null,                   // 이번 주에 고른 훈련 id
-  log: [],                      // 최근 주간 결과 (최신이 맨 앞)
-  notice: "",                   // 화면에 잠깐 띄울 안내 문구
-  currentMenu: "dashboard",
-};
+// 게임의 모든 정보는 state 안에 모아 둡니다.
+// 새 게임을 시작할 때의 기본값
+function createNewState() {
+  const fresh = {
+    name: "신인 선수",
+    team: "무소속",
+    money: 0,
+    season: 1,
+    week: 1,
+    stats: {},                    // 스탯 값 (data/stats.js에서 시작값을 가져옴)
+    condition: CONDITION_START,   // 컨디션
+    plan: null,                   // 이번 주에 고른 훈련 id
+    log: [],                      // 최근 주간 결과 (최신이 맨 앞)
+    settings: { autoSave: true }, // 게임 설정
+    notice: "",                   // 화면에 잠깐 띄울 안내 문구
+    currentMenu: "dashboard",
+  };
+  STATS.forEach(function (s) { fresh.stats[s.id] = s.start; });
+  return fresh;
+}
 
-STATS.forEach(function (s) { state.stats[s.id] = s.start; });
+// 게임 시작 때 채워집니다 (맨 아래 참고)
+let state;
 
 // ===== 작은 도우미 함수 =====
+// 글자 속 <, > 같은 기호가 화면을 망가뜨리지 않게 바꾸기
+function escapeHTML(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 // min ~ max 사이 정수 하나를 무작위로 뽑기
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -39,7 +55,8 @@ function findTraining(id) {
 // 스탯 id 또는 "condition"을 화면용 이름으로
 function statName(id) {
   if (id === "condition") return "컨디션";
-  return STATS.find(function (s) { return s.id === id; }).name;
+  const stat = STATS.find(function (s) { return s.id === id; });
+  return stat ? stat.name : id;
 }
 
 // 숫자 막대 하나 (스탯, 컨디션 표시에 사용)
@@ -55,8 +72,8 @@ function barHTML(label, value, desc) {
 
 // "피지컬 +2, 컨디션 -15" 같은 변화 문장 만들기
 function changesText(changes) {
-  return Object.keys(changes).map(function (id) {
-    const n = changes[id];
+  return Object.keys(changes || {}).map(function (id) {
+    const n = Number(changes[id]) || 0;
     const cls = n >= 0 ? "up" : "down";
     return '<span class="' + cls + '">' + statName(id) + " " + (n >= 0 ? "+" : "") + n + "</span>";
   }).join(", ");
@@ -80,9 +97,9 @@ pages.dashboard = function () {
     logHTML = state.log.map(function (entry) {
       return (
         '<div class="log-entry">' +
-          '<div class="log-head">' + entry.when + " · " + entry.training + "</div>" +
-          "<div>" + entry.message + "</div>" +
-          '<div class="log-changes">' + entry.changes + "</div>" +
+          '<div class="log-head">' + escapeHTML(entry.when) + " · " + escapeHTML(entry.training) + "</div>" +
+          "<div>" + escapeHTML(entry.message) + "</div>" +
+          '<div class="log-changes">' + changesText(entry.changes) + "</div>" +
         "</div>"
       );
     }).join("");
@@ -128,6 +145,119 @@ pages.training = function () {
   );
 };
 
+pages.settings = function () {
+  const last = lastSavedText();
+  return (
+    "<h1>설정 및 저장</h1>" +
+    '<div class="card"><h2>저장</h2>' +
+      '<p class="placeholder">마지막 저장: ' + (last || "없음") + "</p>" +
+      '<div class="buttons">' +
+        '<button class="primary" data-action="save">저장하기</button>' +
+        '<button data-action="load">불러오기</button>' +
+      "</div>" +
+    "</div>" +
+    '<div class="card"><h2>세이브 파일</h2>' +
+      '<p class="placeholder">세이브를 파일로 내려받아 보관하거나, 보관한 파일을 다시 가져올 수 있어요.</p>' +
+      '<div class="buttons">' +
+        '<button data-action="export">세이브 내보내기</button>' +
+        '<button data-action="import">세이브 가져오기</button>' +
+        '<input type="file" id="import-file" accept=".json,application/json" hidden>' +
+      "</div>" +
+    "</div>" +
+    '<div class="card"><h2>게임 설정</h2>' +
+      '<div class="setting-row">' +
+        '<label for="player-name">선수 이름</label>' +
+        '<input type="text" id="player-name" maxlength="20" value="' + escapeHTML(state.name) + '">' +
+        '<button data-action="rename">이름 바꾸기</button>' +
+      "</div>" +
+      '<div class="setting-row">' +
+        '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
+      "</div>" +
+    "</div>" +
+    '<div class="card"><h2>새 게임</h2>' +
+      '<p class="placeholder">처음부터 다시 시작합니다. 브라우저에 저장된 진행도 지워집니다.</p>' +
+      '<button class="danger" data-action="new-game">새 게임 시작</button>' +
+    "</div>"
+  );
+};
+
+// 설정 화면의 버튼 동작
+const settingsActions = {
+  save: function () {
+    showNotice(saveGame() ? "저장했어요." : "저장하지 못했어요. 브라우저 설정에서 저장소가 막혀 있는지 확인해 주세요.");
+  },
+  load: function () {
+    const loaded = loadGame();
+    if (!loaded) return showNotice("저장된 게임이 없어요.");
+    if (!confirm("마지막으로 저장한 때로 되돌릴까요?\n저장하지 않은 진행은 사라집니다.")) return;
+    replaceState(loaded, "settings", "불러왔어요.");
+  },
+  export: function () {
+    exportSave();
+    showNotice("세이브 파일을 내려받았어요. 보통 '다운로드' 폴더에 있어요.");
+  },
+  import: function () {
+    document.getElementById("import-file").click();
+  },
+  rename: function () {
+    const name = document.getElementById("player-name").value.trim();
+    if (!name) return showNotice("이름을 한 글자 이상 입력해 주세요.");
+    state.name = name.slice(0, 20);
+    if (state.settings.autoSave) saveGame();
+    renderTopbar();
+    showNotice("이름을 '" + escapeHTML(state.name) + "'(으)로 바꿨어요.");
+  },
+  "new-game": function () {
+    if (!confirm("새 게임을 시작할까요?\n지금 진행과 브라우저에 저장된 게임이 모두 사라집니다.\n(내보내기한 세이브 파일은 남아 있어요)")) return;
+    const fresh = createNewState();
+    fresh.settings.autoSave = state.settings.autoSave;
+    replaceState(fresh, "dashboard", "새 게임을 시작했어요.");
+    saveGame();
+  },
+};
+
+// 설정 화면이 그려진 뒤 버튼·입력칸 연결
+function bindSettings(page) {
+  page.querySelectorAll("[data-action]").forEach(function (btn) {
+    btn.onclick = settingsActions[btn.getAttribute("data-action")];
+  });
+
+  document.getElementById("auto-save").onchange = function () {
+    state.settings.autoSave = this.checked;
+    showNotice(this.checked ? "자동 저장을 켰어요." : "자동 저장을 껐어요. 진행 후에는 직접 [저장하기]를 눌러 주세요.");
+  };
+
+  document.getElementById("player-name").onkeydown = function (e) {
+    if (e.key === "Enter") settingsActions.rename();
+  };
+
+  document.getElementById("import-file").onchange = function () {
+    const file = this.files[0];
+    this.value = ""; // 같은 파일을 다시 골라도 동작하게
+    if (!file) return;
+    importSave(file, function (loaded, error) {
+      if (!loaded) return showNotice("가져오지 못했어요: " + escapeHTML(error));
+      if (!confirm("이 세이브 파일로 바꿀까요?\n지금 진행은 사라집니다.")) return;
+      replaceState(loaded, "settings", "세이브 파일을 가져왔어요.");
+      saveGame();
+    });
+  };
+}
+
+// 안내 문구를 띄우고 화면 다시 그리기
+function showNotice(text) {
+  state.notice = text;
+  renderPage();
+}
+
+// 게임 상태를 통째로 바꾸기 (불러오기, 새 게임 등)
+function replaceState(newState, menu, message) {
+  state = newState;
+  state.currentMenu = menu;
+  state.notice = message;
+  renderAll();
+}
+
 // ===== 좌측 메뉴 =====
 function renderMenu() {
   const menu = document.getElementById("menu");
@@ -152,7 +282,7 @@ function selectMenu(id) {
 function renderTopbar() {
   document.getElementById("topbar").innerHTML =
     '<span class="item">시즌 <b>' + state.season + "</b> · <b>" + state.week + "</b>주차</span>" +
-    '<span class="item">선수 <b>' + state.name + "</b></span>" +
+    '<span class="item">선수 <b>' + escapeHTML(state.name) + "</b></span>" +
     '<span class="item">소속 <b>' + state.team + "</b></span>" +
     '<span class="item">자금 <b>' + state.money.toLocaleString() + "</b>원</span>" +
     '<span class="spacer"></span>' +
@@ -184,6 +314,8 @@ function renderPage() {
       renderPage();
     };
   });
+
+  if (state.currentMenu === "settings") bindSettings(page);
 }
 
 // ===== 다음 주로 진행 =====
@@ -218,7 +350,7 @@ function nextWeek() {
     when: "시즌 " + state.season + " · " + state.week + "주차",
     training: training.name,
     message: pick(training.messages),
-    changes: changesText(changes),
+    changes: changes,
   });
   state.log = state.log.slice(0, 10);
 
@@ -226,6 +358,7 @@ function nextWeek() {
   state.week += 1;
   state.currentMenu = "dashboard";
   state.notice = "";
+  if (state.settings.autoSave) saveGame();
   renderAll();
 }
 
@@ -235,5 +368,6 @@ function renderAll() {
   renderPage();
 }
 
-// 게임 시작
+// 게임 시작: 저장된 게임이 있으면 이어서, 없으면 새 게임
+state = loadGame() || createNewState();
 renderAll();
