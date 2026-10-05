@@ -4,10 +4,10 @@
 
 const SAVE_KEY = "progamer-career-save";
 const SAVE_GAME_ID = "progamer-career";
-const SAVE_VERSION = 2; // 2: 캐릭터 생성·스탯 12개 도입
+const SAVE_VERSION = 3; // 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
-const SAVED_FIELDS = ["player", "team", "money", "season", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "plan", "log", "settings"];
+const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings"];
 
 // 현재 게임 상태를 세이브 모양으로 만들기
 function makeSaveData() {
@@ -46,19 +46,32 @@ function stateFromSave(save) {
   };
 
   if (typeof s.team === "string") fresh.team = s.team;
-  ["money", "season", "week"].forEach(function (key) {
-    if (Number.isFinite(s[key])) fresh[key] = s[key];
-  });
+  if (Number.isFinite(s.money)) fresh.money = s.money;
+  if (Number.isFinite(s.year)) fresh.year = s.year;
+  else if (Number.isFinite(s.season)) fresh.year = 2012 + s.season - 1; // 예전(버전 2) 세이브
+  if (Number.isFinite(s.week)) fresh.week = Math.max(1, Math.min(CREATION.weeksPerSeason, s.week));
   fresh.staminaMax = Number.isFinite(s.staminaMax) ? clamp(s.staminaMax) : arch.staminaMax;
   fresh.stamina = Number.isFinite(s.stamina) ? Math.max(0, Math.min(fresh.staminaMax, s.stamina)) : fresh.staminaMax;
   if (Number.isFinite(s.condition)) fresh.condition = clamp(s.condition);
   if (Number.isFinite(s.popularity)) fresh.popularity = clamp(s.popularity);
+  if (Number.isFinite(s.reputation)) fresh.reputation = Math.max(-100, Math.min(100, s.reputation));
   STATS.forEach(function (stat) {
     const v = s.stats && s.stats[stat.id];
     fresh.stats[stat.id] = Number.isFinite(v) ? clamp(v) : arch.statAvg; // 빠진 스탯은 유형 평균으로
   });
   if (findTraining(s.plan)) fresh.plan = s.plan;
-  if (Array.isArray(s.log)) fresh.log = s.log.slice(0, 10);
+
+  // 챔피언 숙련도: 출시된 챔피언만, 빠진 것은 새로 정함
+  const startM = startMastery(fresh.stats, fresh.player.position, fresh.year, fresh.week);
+  Object.keys(startM).forEach(function (name) {
+    const v = s.mastery && s.mastery[name];
+    fresh.mastery[name] = Number.isFinite(v) ? Math.max(MASTERY.min, Math.min(MASTERY.max, v)) : startM[name];
+  });
+  const metaOk = s.meta && typeof s.meta.label === "string" && s.meta.champs &&
+    POSITION_IDS.every(function (id) { return Array.isArray(s.meta.champs[id]); });
+  fresh.meta = metaOk ? s.meta : makePatch(fresh.year, fresh.week);
+  if (typeof s.practiceChamp === "string" && fresh.mastery[s.practiceChamp] !== undefined) fresh.practiceChamp = s.practiceChamp;
+  if (Array.isArray(s.log)) fresh.log = s.log.slice(0, 15);
   if (s.settings && typeof s.settings.autoSave === "boolean") fresh.settings.autoSave = s.settings.autoSave;
 
   return fresh;
@@ -108,7 +121,7 @@ function exportSave() {
   const blob = new Blob([text], { type: "application/json" });
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "progamer-save_시즌" + state.season + "_" + state.week + "주차.json";
+  link.download = "progamer-save_" + state.year + "년_" + state.week + "주차.json";
   link.click();
   URL.revokeObjectURL(link.href);
 }

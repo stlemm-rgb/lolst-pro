@@ -3,7 +3,8 @@
 // - name / desc: 화면에 보이는 이름과 설명
 // - effects: 일주일 뒤 바뀌는 값. [최소, 최대] 사이에서 무작위로 정해집니다.
 //     스탯 id(accuracy, laning, ... data/stats.js 참고) 또는
-//     stamina(체력), condition(컨디션), popularity(인기도)를 쓸 수 있어요.
+//     stamina(체력), condition(컨디션), popularity(인기도), reputation(평판),
+//     mastery(챔피언 숙련도)를 쓸 수 있어요.
 //     스탯 상승에는 포지션 가산점·시작 유형·특성 보너스가 붙습니다.
 // - messages: 결과 문장 후보. 이 중 하나가 무작위로 나옵니다.
 const TRAININGS = [
@@ -58,11 +59,11 @@ const TRAININGS = [
   {
     id: "champion",
     name: "챔피언 연습",
-    desc: "새 챔피언과 비주류 챔피언을 집중적으로 연습한다.",
+    desc: "챔피언을 집중적으로 연습해 숙련도를 올린다. 연습할 챔피언을 고를 수 있다.",
     effects: {
       pool:     [1, 3],
       adapt:    [1, 2],
-      accuracy: [0, 1],
+      mastery:  [6, 10],
       stamina:  [-12, -8],
     },
     messages: [

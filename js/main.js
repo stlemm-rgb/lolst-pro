@@ -7,13 +7,17 @@ function createNewState() {
     player: null,                 // { name, position, archetype, age, traits } (캐릭터 생성 때 채워짐)
     team: "무소속",
     money: 0,
-    season: 1,
-    week: 1,
+    year: 2012,                   // 현재 연도 (= 시즌). 캐릭터 생성 때 고른 시작 연도
+    week: 1,                      // 1 ~ 52주차
     stats: {},                    // 실력 스탯 12개 (캐릭터 생성 때 채워짐)
     stamina: 0,                   // 체력
     staminaMax: 0,                // 체력 최대치
     condition: CONDITION_START,   // 컨디션
     popularity: POPULARITY_START, // 인기도
+    reputation: REPUTATION_START, // 평판 (-100 ~ +100)
+    mastery: {},                  // 챔피언 숙련도 { 챔피언 이름: 1 ~ 100 }
+    meta: null,                   // 지금 패치 { label, champs: { top: [...], ... } }
+    practiceChamp: "",            // 챔피언 연습에서 고른 챔피언 ("" = 자동)
     plan: null,                   // 이번 주에 고른 훈련 id
     log: [],                      // 최근 주간 결과 (최신이 맨 앞)
     settings: { autoSave: true }, // 게임 설정
@@ -57,6 +61,8 @@ function findTraining(id) {
 // 스탯 id 또는 "condition"을 화면용 이름으로
 // 스탯 id 또는 체력·컨디션·인기도 id를 화면용 이름으로
 function statName(id) {
+  if (id === "mastery") return "챔피언 숙련도";
+  if (id.indexOf("m:") === 0) return id.slice(2) + " 숙련도";
   const found = STATS.concat(GAUGES).find(function (s) { return s.id === id; });
   return found ? found.name : id;
 }
@@ -77,7 +83,9 @@ function barHTML(label, value, desc, bonus, max) {
 
 // "피지컬 +2, 컨디션 -15" 같은 변화 문장 만들기
 function changesText(changes) {
-  return Object.keys(changes || {}).map(function (id) {
+  return Object.keys(changes || {}).filter(function (id) {
+    return Number(changes[id]) !== 0; // 변화 없는 것은 숨김
+  }).map(function (id) {
     const n = Number(changes[id]) || 0;
     const cls = n >= 0 ? "up" : "down";
     return '<span class="' + cls + '">' + statName(id) + " " + (n >= 0 ? "+" : "") + n + "</span>";
@@ -94,10 +102,14 @@ pages.dashboard = function () {
   const pos = findPosition(p.position);
   const arch = findArchetype(p.archetype);
 
-  const traitsHTML = p.traits.map(function (id) {
-    const t = findTrait(id);
-    return t ? '<span class="chip ' + t.type + '" title="' + t.desc + '">' + t.name + "</span>" : "";
-  }).join("") || '<span class="muted">없음</span>';
+  const traitsHTML = p.traits.map(traitChipHTML).join("") || '<span class="muted">없음</span>';
+
+  // 챔피언: 내 포지션 메타 + 숙련도 상위 5
+  const metaMine = state.meta.champs[p.position].map(function (name) {
+    return '<span class="chip meta">' + name + " " + (state.mastery[name] || 1) + "</span>";
+  }).join("");
+  const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
+  const topHTML = top5.map(function (name) { return masteryRowHTML(name); }).join("");
 
   let statsHTML = "";
   STATS.forEach(function (s) {
@@ -131,15 +143,93 @@ pages.dashboard = function () {
         barHTML("체력", state.stamina, "훈련·경기로 줄고 휴식으로 회복", false, state.staminaMax) +
         barHTML("컨디션", state.condition, "이번 주의 몸과 마음 상태") +
         barHTML("인기도", state.popularity, "팬과 업계의 관심") +
+        reputationBarHTML() +
         '<h2 class="sub">이번 주 할 일</h2><p>훈련: <b>' + plan + "</b></p>" +
       "</div>" +
     "</div>" +
     '<div class="card"><h2>내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점</span></h2>' +
       '<div class="stat-columns">' + statsHTML + "</div>" +
     "</div>" +
+    '<div class="card"><h2>챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
+      '<p class="muted small">이번 패치 ' + pos.name + " 메타 챔피언 (숫자는 내 숙련도)</p>" +
+      '<div class="chips">' + metaMine + "</div>" +
+      '<h2 class="sub">내 숙련도 상위 5</h2>' + topHTML +
+      '<p class="muted small">전체 목록은 [나의 커리어]에서 볼 수 있어요.</p>' +
+    "</div>" +
     '<div class="card"><h2>최근 기록</h2>' + logHTML + "</div>"
   );
 };
+
+// 평판 막대 (-100 ~ +100, 가운데가 0)
+function reputationBarHTML() {
+  const v = state.reputation;
+  const left = v < 0 ? 50 + v / 2 : 50;
+  const width = Math.abs(v) / 2;
+  return (
+    '<div class="stat">' +
+      '<div class="stat-label tip" tabindex="0" data-tip="-100 ~ +100. 좋은 이미지인지 나쁜 이미지인지. 구단 제안·이적에 영향">평판</div>' +
+      '<div class="bar rep-bar"><div class="rep-mid"></div><div class="bar-fill ' + (v < 0 ? "neg" : "pos") + '" style="margin-left:' + left + "%;width:" + width + '%"></div></div>' +
+      '<div class="stat-value ' + (v < 0 ? "down" : v > 0 ? "up" : "") + '">' + (v > 0 ? "+" : "") + v + "</div>" +
+    "</div>"
+  );
+}
+
+// 챔피언 숙련도 한 줄
+function masteryRowHTML(name) {
+  const v = state.mastery[name];
+  return (
+    '<div class="stat">' +
+      '<div class="stat-label">' + name + (isMeta(name) ? ' <span class="meta-tag">META</span>' : "") + "</div>" +
+      '<div class="bar"><div class="bar-fill' + (isMeta(name) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
+      '<div class="stat-value">' + v + "</div>" +
+    "</div>"
+  );
+}
+
+// ===== 나의 커리어: 챔피언 숙련도 =====
+let championTab = ""; // 보고 있는 포지션 탭 (저장 안 함)
+
+pages.career = function () {
+  if (!championTab) championTab = state.player.position;
+  const tabs = POSITION_IDS.map(function (id) {
+    const pos = findPosition(id);
+    return '<button data-ctab="' + id + '"' + (championTab === id ? ' class="primary"' : "") + ">" + pos.name + "</button>";
+  }).join("");
+
+  const names = Object.keys(state.mastery)
+    .filter(function (name) { return findChampion(name).positions.indexOf(championTab) !== -1; })
+    .sort(function (a, b) { return state.mastery[b] - state.mastery[a] || a.localeCompare(b); });
+  const rows = names.map(masteryRowHTML).join("");
+
+  const upcoming = CHAMPIONS.filter(function (c) { return state.mastery[c.name] === undefined; });
+  const next = upcoming.length
+    ? "다음 출시 예정: <b>" + upcoming[0].name + "</b> (" + upcoming[0].released + ")"
+    : "모든 챔피언이 출시됐어요.";
+
+  return (
+    "<h1>나의 커리어</h1>" +
+    '<div class="card"><h2>챔피언 숙련도 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
+      '<p class="muted small">1 = 한 번도 안 해 본 챔피언, 100 = 완벽하게 다룸. 금색 막대 = 이번 패치 메타 챔피언. ' +
+        "지금까지 출시된 챔피언 " + Object.keys(state.mastery).length + "명 · " + next + "</p>" +
+      '<div class="buttons">' + tabs + "</div>" +
+      '<div class="stat-columns mastery-list">' + rows + "</div>" +
+    "</div>" +
+    '<div class="card placeholder">스탯 변화 기록, 시즌별 성적, 수상 내역은 6단계에서 추가돼요.</div>'
+  );
+};
+
+// 챔피언 연습에서 연습할 챔피언 고르기
+function practiceSelectHTML() {
+  const options = myPositionChampions().map(function (name) {
+    return '<option value="' + name + '"' + (state.practiceChamp === name ? " selected" : "") + ">" +
+      name + (isMeta(name) ? " ★메타" : "") + " (" + state.mastery[name] + ")</option>";
+  }).join("");
+  return (
+    '<p class="effects"><label>연습할 챔피언 ' +
+      '<select id="practice-champ"><option value="">자동 (메타·낮은 숙련도 3명에게 나눠서)</option>' + options + "</select>" +
+    "</label></p>"
+  );
+}
 
 pages.training = function () {
   let cards = "";
@@ -154,6 +244,7 @@ pages.training = function () {
       if (state.stats[id] !== undefined && r[1] > 0) extra = trainingBonusFor(id);
       if (id === "stamina" && r[1] < 0) extra = staminaCostMultiplier() - 1;
       if (id === "popularity" && r[1] > 0) extra = popularityMultiplier() - 1;
+      if (id === "mastery") extra = masteryGrowthMultiplier() - 1;
       if (Math.abs(extra) > 0.001) text += ' <span class="' + (extra > 0 === (id !== "stamina") ? "up" : "down") + '">(' + percentText(extra) + ")</span>";
       return text;
     }).join("<br>");
@@ -163,6 +254,7 @@ pages.training = function () {
         "<h2>" + t.name + "</h2>" +
         "<p>" + t.desc + "</p>" +
         '<p class="effects">' + effects + "</p>" +
+        (t.effects.mastery ? practiceSelectHTML() : "") +
         '<button data-plan="' + t.id + '"' + (selected ? ' class="primary"' : "") + ">" +
           (selected ? "✔ 선택됨" : "이번 주 훈련으로 선택") +
         "</button>" +
@@ -314,7 +406,7 @@ function selectMenu(id) {
 // ===== 상단바 =====
 function renderTopbar() {
   document.getElementById("topbar").innerHTML =
-    '<span class="item">시즌 <b>' + state.season + "</b> · <b>" + state.week + "</b>주차</span>" +
+    '<span class="item"><b>' + state.year + "</b>년 <b>" + state.week + "</b>주차</span>" +
     '<span class="item">선수 <b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
     '<span class="item">소속 <b>' + escapeHTML(state.team) + "</b></span>" +
     '<span class="item">자금 <b>' + state.money.toLocaleString() + "</b>원</span>" +
@@ -349,6 +441,15 @@ function renderPage() {
   });
 
   if (state.currentMenu === "settings") bindSettings(page);
+
+  // 챔피언 연습: 연습할 챔피언 고르기
+  const practice = document.getElementById("practice-champ");
+  if (practice) practice.onchange = function () { state.practiceChamp = this.value; };
+
+  // 나의 커리어: 포지션 탭
+  page.querySelectorAll("[data-ctab]").forEach(function (btn) {
+    btn.onclick = function () { championTab = btn.getAttribute("data-ctab"); renderPage(); };
+  });
 }
 
 // ===== 다음 주로 진행 =====
@@ -384,6 +485,14 @@ function nextWeek() {
       before = state.popularity;
       state.popularity = clamp(state.popularity + amount);
       changes[id] = state.popularity - before;
+    } else if (id === "reputation") {
+      before = state.reputation;
+      state.reputation = Math.max(-100, Math.min(100, state.reputation + amount));
+      changes[id] = state.reputation - before;
+    } else if (id === "mastery") {
+      // 챔피언 숙련도: 고른 챔피언(또는 자동으로 고른 챔피언)들에게
+      const gained = practiceChampions(range, tired);
+      Object.keys(gained).forEach(function (name) { changes["m:" + name] = gained[name]; });
     } else if (state.stats[id] !== undefined) {
       // 실력 스탯: 오를 때만 보너스(가산점·유형·특성)를 붙임
       if (amount > 0) {
@@ -398,24 +507,55 @@ function nextWeek() {
   });
 
   let message = pick(training.messages);
-  const gainsStats = Object.keys(training.effects).some(function (id) { return state.stats[id] !== undefined; });
+  const gainsStats = Object.keys(training.effects).some(function (id) { return state.stats[id] !== undefined || id === "mastery"; });
   if (tired && gainsStats) message += " (너무 지쳐서 훈련 효과가 절반이었다.)";
 
   // 결과 기록 (최근 10개만 보관)
   state.log.unshift({
-    when: "시즌 " + state.season + " · " + state.week + "주차",
+    when: state.year + "년 " + state.week + "주차",
     training: training.name,
     message: message,
     changes: changes,
   });
-  state.log = state.log.slice(0, 10);
-
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
   state.week += 1;
+  if (state.week > CREATION.weeksPerSeason) {
+    // 새해 = 새 시즌. 나이 +1
+    state.year += 1;
+    state.week = 1;
+    state.player.age += 1;
+    addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세.");
+  }
+
+  // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
+  newlyReleased(state.year, state.week).forEach(function (c) {
+    if (state.mastery[c.name] !== undefined) return;
+    state.mastery[c.name] = MASTERY.min;
+    const posNames = c.positions.map(function (id) { return findPosition(id).name; }).join("·");
+    addNews("새 챔피언", "새 챔피언 '" + c.name + "'(" + posNames + ")이(가) 출시됐다!");
+  });
+
+  // 패치 주차면 메타가 바뀜
+  if (MASTERY.patchWeeks.indexOf(state.week) !== -1) {
+    state.meta = makePatch(state.year, state.week);
+    const mine = state.meta.champs[state.player.position].join(", ");
+    addNews("패치", state.meta.label + " 적용! " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
+  }
+  state.log = state.log.slice(0, 15);
   state.currentMenu = "dashboard";
   state.notice = "";
   if (state.settings.autoSave) saveGame();
   renderAll();
+}
+
+// 소식 기록 (새 시즌, 새 챔피언, 패치 등)
+function addNews(title, message) {
+  state.log.unshift({
+    when: state.year + "년 " + state.week + "주차",
+    training: title,
+    message: message,
+    changes: {},
+  });
 }
 
 function renderAll() {

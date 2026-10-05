@@ -252,3 +252,46 @@ button.danger { color: var(--bad); border-color: var(--bad); }
 
 .start-card .buttons { justify-content: flex-start; }
 button.big { padding: 12px 28px; font-size: 17px; }
+
+/* 말풍선: data-tip이 있는 요소에 마우스를 올리면 설명이 바로 나옴 */
+.tip { position: relative; cursor: help; }
+.tip:hover::after, .tip:focus::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 260px;
+  white-space: normal;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #000;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.4;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* 평판 막대 (가운데 0) */
+.rep-bar { position: relative; display: flex; }
+.rep-mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--muted); }
+.bar-fill.pos { background: var(--good); }
+.bar-fill.neg { background: var(--bad); }
+
+/* 챔피언 */
+.chip.meta { border-color: var(--gold); color: var(--gold); cursor: default; }
+.meta-tag { font-size: 10px; color: var(--gold); border: 1px solid var(--gold); border-radius: 4px; padding: 0 3px; }
+.mastery-list { margin-top: 12px; }
+select {
+  font: inherit;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  max-width: 100%;
+}

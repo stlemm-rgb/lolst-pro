@@ -41,11 +41,17 @@ const CREATION = {
   traitRerolls: 3,   // 특성 다시 뽑기 횟수
   minStat: 1,        // 시작 스탯 최소
   maxStat: 90,       // 시작 스탯 최대
+  // 시작 연도: 늦게 시작할수록 훈련할 시간이 짧으니 모든 스탯에 보정을 더해 줌
+  startYears: [
+    { year: 2012, statBonus: 0,  desc: "리그 원년. 가장 긴 커리어" },
+    { year: 2017, statBonus: 10, desc: "모든 스탯 +10" },
+    { year: 2022, statBonus: 20, desc: "모든 스탯 +20" },
+  ],
+  weeksPerSeason: 52, // 한 시즌 = 52주 (1년)
 };
 
 // 나이와 은퇴 (7단계에서 사용)
 const CAREER = {
   agingStartAge: 27,   // 이 나이부터 노화 시작
   avgRetireAge: 31,    // 평균 은퇴 나이
-  patchesPerSeason: 2, // 시즌당 패치(메타 변화) 횟수
 };

@@ -64,3 +64,10 @@ function percentText(ratio) {
   const n = Math.round(ratio * 100);
   return (n >= 0 ? "+" : "") + n + "%";
 }
+
+// 특성 하나를 작은 칩으로 (마우스를 올리면 설명 말풍선)
+function traitChipHTML(id) {
+  const t = findTrait(id);
+  if (!t) return "";
+  return '<span class="chip tip ' + t.type + '" tabindex="0" data-tip="' + escapeHTML(t.desc) + '">' + t.name + "</span>";
+}

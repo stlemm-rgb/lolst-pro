@@ -25,6 +25,7 @@ function newDraft() {
     name: "",
     position: POSITIONS[0].id,
     archetype: ARCHETYPES[0].id,
+    startYear: CREATION.startYears[0].year,
     offsets: offsets,
     alloc: {},                          // 보너스 포인트를 어디에 몇 점 줬는지
     traitOrder: shuffled(goodIds),      // 특성 뽑기 순서 (앞에서부터 개수만큼 받음)
@@ -38,10 +39,14 @@ function draftTraits() {
   return draft.traitOrder.slice(0, findArchetype(draft.archetype).goodTraits);
 }
 
+function findStartYear(year) {
+  return CREATION.startYears.find(function (y) { return y.year === year; });
+}
+
 // 보너스 포인트를 넣기 전 스탯
 function draftBaseStat(id) {
   const arch = findArchetype(draft.archetype);
-  let value = arch.statAvg + draft.offsets[id] + (arch.statBonus[id] || 0);
+  let value = arch.statAvg + draft.offsets[id] + (arch.statBonus[id] || 0) + findStartYear(draft.startYear).statBonus;
   if (isBonusStat(id, draft.position)) value += POSITION_BONUS.startBonus;
   return Math.max(CREATION.minStat, Math.min(CREATION.maxStat, value));
 }
@@ -64,7 +69,25 @@ function creationHTML() {
       '<input type="text" id="c-name" maxlength="20" placeholder="선수 이름 (닉네임)" value="' + escapeHTML(draft.name) + '">' +
     "</div>";
 
-  // 2. 포지션
+  // 2. 시작 연도
+  let yearCards = "";
+  CREATION.startYears.forEach(function (y) {
+    const seasons = 2026 - y.year + 1;
+    yearCards +=
+      '<div class="choice' + (draft.startYear === y.year ? " selected" : "") + '" data-cyear="' + y.year + '">' +
+        "<h3>" + y.year + "년</h3>" +
+        '<p class="muted">' + y.desc + "</p>" +
+        "<p>2026년까지 <b>" + seasons + "시즌</b></p>" +
+        "<p>그때까지 나온 챔피언 <b>" + releasedChampions(y.year, 1).length + "명</b></p>" +
+      "</div>";
+  });
+  const yearCard =
+    '<div class="card"><h2>2. 시작 연도</h2>' +
+      '<p class="muted">늦게 시작할수록 훈련할 시간이 짧아서 시작 스탯에 보정을 받아요. 한 시즌은 52주예요.</p>' +
+      '<div class="choices">' + yearCards + "</div>" +
+    "</div>";
+
+  // 3. 포지션
   let posCards = "";
   POSITIONS.forEach(function (p) {
     const bonusNames = p.bonus.map(function (id) { return statName(id); }).join(" · ");
@@ -76,7 +99,7 @@ function creationHTML() {
       "</div>";
   });
   const posCard =
-    '<div class="card"><h2>2. 포지션</h2>' +
+    '<div class="card"><h2>3. 포지션</h2>' +
       '<p class="muted">★ 가산점 스탯은 시작값 +' + POSITION_BONUS.startBonus +
       ", 훈련 효과 " + percentText(POSITION_BONUS.trainingBonus) +
       ", 경기에서 " + POSITION_BONUS.matchMultiplier + "배로 계산돼요.</p>" +
@@ -101,16 +124,14 @@ function creationHTML() {
       "</div>";
   });
   const archCard =
-    '<div class="card"><h2>3. 시작 유형</h2><div class="choices">' + archCards + "</div></div>";
+    '<div class="card"><h2>4. 시작 유형</h2><div class="choices">' + archCards + "</div></div>";
 
-  // 4. 특성
-  const traitList = draftTraits().map(function (id) {
-    const t = findTrait(id);
-    return '<div class="trait good"><b>' + t.name + "</b> <span class=\"muted\">— " + t.desc + "</span></div>";
-  }).join("");
+  // 5. 특성
+  const traitList = draftTraits().map(traitChipHTML).join("");
   const traitCard =
-    '<div class="card"><h2>4. 특성</h2>' +
-      traitList +
+    '<div class="card"><h2>5. 특성</h2>' +
+      '<p class="muted small">특성 위에 마우스를 올리면 설명이 나와요.</p>' +
+      '<div class="chips">' + traitList + "</div>" +
       '<div class="buttons" style="margin-top:12px">' +
         '<button data-reroll="1"' + (draft.rerollsLeft > 0 ? "" : " disabled") + ">다시 뽑기 (남은 횟수 " + draft.rerollsLeft + ")</button>" +
       "</div>" +
@@ -134,7 +155,7 @@ function creationHTML() {
       "</div>";
   });
   const statCard =
-    '<div class="card"><h2>5. 스탯 <span class="muted small">보너스 포인트 남음: <b>' + pointsLeft() + "</b> / " + CREATION.bonusPoints + "</span></h2>" +
+    '<div class="card"><h2>6. 스탯 <span class="muted small">보너스 포인트 남음: <b>' + pointsLeft() + "</b> / " + CREATION.bonusPoints + "</span></h2>" +
       '<p class="muted small"><span class="bonus">★</span> = 포지션 가산점 스탯. 스탯 이름에 마우스를 올리면 설명이 나와요.</p>' +
       statRows +
     "</div>";
@@ -153,7 +174,7 @@ function creationHTML() {
   return (
     '<h1 class="creation-title">캐릭터 생성</h1>' +
     '<p class="muted">프로게이머로서의 첫걸음. 어떤 선수가 될지 정해 주세요.</p>' +
-    nameCard + posCard + archCard + traitCard + statCard + startCard
+    nameCard + yearCard + posCard + archCard + traitCard + statCard + startCard
   );
 }
 
@@ -176,6 +197,9 @@ function renderCreation() {
     if (e.key === "Enter") startCareer();
   };
 
+  box.querySelectorAll("[data-cyear]").forEach(function (el) {
+    el.onclick = function () { draft.startYear = Number(el.getAttribute("data-cyear")); renderCreation(); };
+  });
   box.querySelectorAll("[data-cpos]").forEach(function (el) {
     el.onclick = function () { draft.position = el.getAttribute("data-cpos"); renderCreation(); };
   });
@@ -244,8 +268,13 @@ function startCareer() {
   STATS.forEach(function (s) { fresh.stats[s.id] = draftStat(s.id); });
   fresh.staminaMax = arch.staminaMax;
   fresh.stamina = arch.staminaMax;
+  fresh.year = draft.startYear;
+  fresh.week = 1;
+  fresh.mastery = startMastery(fresh.stats, fresh.player.position, fresh.year, fresh.week);
+  fresh.meta = makePatch(fresh.year, fresh.week);
 
   draft = null;
+  window.scrollTo(0, 0); // 생성 화면에서 내려간 스크롤을 맨 위로
   replaceState(fresh, "dashboard", escapeHTML(fresh.player.name) + " 선수의 커리어가 시작됐어요! 훈련을 고르고 [다음 주로 진행]을 눌러 보세요.");
   saveGame();
 }
