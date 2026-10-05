@@ -468,3 +468,9 @@ table.lane-table th { color: var(--muted, #8b95a7); font-weight: normal; text-al
 .solo { color: var(--gold); }
 .md-ratings { margin-top: 8px; }
 .md-ratings h3 { margin: 0 0 4px; }
+
+/* 상단바 체력 · 조커픽 */
+.stamina-badge { display: inline-block; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; white-space: nowrap; }
+.stamina-badge.warn { border-color: var(--gold); color: var(--gold); }
+.stamina-badge.down { border-color: var(--bad); color: var(--bad); }
+.joker-tag { font-size: 11px; padding: 1px 6px; border-radius: 999px; border: 1px solid #c084fc; color: #c084fc; margin-left: 4px; }

@@ -20,6 +20,13 @@ const MATCH = {
   metaPickBonus: { S: 25, A: 15 },      // 밴픽 때 "숙련도 + 이 값"으로 가치를 매김
   metaPowerBonus: { S: 0.08, A: 0.03 }, // 고른 챔피언이 메타면 경기력 +8% / +3%
   metaSWeight: 2,                        // 메타 페널티 계산 때 S급 숙련도는 2배로 셈
+  // 조커픽: 메타가 아닌 챔피언인데 숙련도가 jokerMinMastery 이상이면
+  //   - 상대가 예상 못 해서 밴에서 빠지기 쉬움 (밴할 때 메타가 아닌 챔피언은 숙련도 −jokerBanDiscount로 봄)
+  //   - 고를 때는 가치 +jokerPickBonus, 고르면 경기력 +jokerPowerBonus
+  jokerMinMastery: 70,
+  jokerPickBonus: 15,
+  jokerBanDiscount: 30,
+  jokerPowerBonus: 0.05,
   masteryBase: 0.8,
   masteryScale: 250,
   metaPenaltyBase: 60,

@@ -87,7 +87,7 @@ function userMatchContext(match) {
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
   // 특성(큰 무대·클러치·역전 등)은 다른 선수와 똑같이 traitPowerMult에서 계산
-  return { power: m.power * mult, pick: m.pick, banned: m.banned };
+  return { power: m.power * mult, pick: m.pick, banned: m.banned, joker: m.joker };
 }
 
 // 특성에 따른 이번 세트 경기력 배율 (나와 다른 선수 모두)
@@ -171,7 +171,7 @@ function playMatch(m) {
   const downTwo = []; // 0:2로 몰렸던 팀 (역전의 명수)
   // 경기 상세: 우리 팀 경기와 결승전만 저장 (js/match_detail.js)
   const keepDetail = (mine && (m.a === mine.id || m.b === mine.id)) || m.label.indexOf("결승") !== -1;
-  const detail = keepDetail ? { sets: [], pick: userCtx ? userCtx.pick : null, banned: userCtx ? userCtx.banned : [] } : null;
+  const detail = keepDetail ? { sets: [], pick: userCtx ? userCtx.pick : null, joker: !!(userCtx && userCtx.joker), banned: userCtx ? userCtx.banned : [] } : null;
   m.score = [0, 0];
   while (m.score[0] < need && m.score[1] < need) {
     if (m.score[0] === 0 && m.score[1] === 2) downTwo.push(m.a);
@@ -262,14 +262,14 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
   if (state.weekReport) {
     state.weekReport.userLines.push({
       won: won, changes: changes, matchKey: matchKey(m), // 경기 상세 열기용
-      text: m.label + " · vs " + teamName(oppId) + " " + myScore + ":" + oppScore + (won ? " 승리!" : " 패배") + " · " + ctx.pick + " 픽 · " + laneText + perfText,
+      text: m.label + " · vs " + teamName(oppId) + " " + myScore + ":" + oppScore + (won ? " 승리!" : " 패배") + " · " + (ctx.joker ? "🃏 조커픽 " : "") + ctx.pick + " 픽 · " + laneText + perfText,
     });
   }
   state.log.unshift({
     when: state.year + "년 " + state.week + "주차",
     training: "경기 · " + m.label,
     message: "vs " + teamName(oppId) + " " + myScore + ":" + oppScore + (won ? " 승리!" : " 패배") +
-      " · " + ctx.pick + " 픽 · " + laneText + perfText,
+      " · " + (ctx.joker ? "🃏 조커픽 " : "") + ctx.pick + " 픽 · " + laneText + perfText,
     changes: changes,
     match: true,
   });

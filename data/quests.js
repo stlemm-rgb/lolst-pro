@@ -11,6 +11,7 @@ const QUEST_RULES = {
   newChance: 0.5,     // 자리가 비었을 때 매주 새 퀘스트가 올 확률
   deadlineWeeks: 10,  // 기한 (주)
   need: [3, 5],       // 기본 횟수
+  masteryDone: 90,    // 챔피언 숙련도가 이 값 이상이면 그 챔피언 연습 퀘스트는 안 나옴
 };
 
 const QUEST_GIVERS = { coach: "🧑‍🏫 코치", manager: "👔 감독" };

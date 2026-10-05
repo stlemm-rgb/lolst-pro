@@ -224,7 +224,7 @@ function masteryRowHTML(name) {
   return (
     '<div class="stat mastery-row">' +
       '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
-        metaTagHTML(name) + "</div>" +
+        metaTagHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도 ' + MATCH.jokerMinMastery + ' 이상: 고르면 경기력 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%">🃏 조커</span>' : "") + "</div>" +
       '<div class="bar"><div class="bar-fill' + (isMeta(name) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
     "</div>"
@@ -290,10 +290,11 @@ pages.career = function () {
         "<tr><td>스탯 점수</td><td>12개 평균, ★가산점 " + POSITION_BONUS.matchMultiplier + "배</td><td><b>" + m.score.toFixed(1) + "</b></td></tr>" +
         "<tr><td>밴 당한 챔피언</td><td colspan=\"2\">" + (m.banned.join(", ") || "없음") + "</td></tr>" +
         "<tr><td>고른 챔피언</td><td>" + m.pick + " (숙련도 " + state.mastery[m.pick] + (metaTier(m.pick) ? ", 메타 " + metaTier(m.pick) + "급 +" + Math.round(MATCH.metaPowerBonus[metaTier(m.pick)] * 100) + "%" : "") + ")</td><td>× <b>" + m.multiplier.toFixed(2) + "</b></td></tr>" +
+        (m.joker ? "<tr><td>🃏 조커픽</td><td>메타가 아닌데 숙련도 " + MATCH.jokerMinMastery + " 이상 · 상대가 예상 못 함</td><td>× <b>" + (1 + MATCH.jokerPowerBonus).toFixed(2) + "</b></td></tr>" : "") +
         "<tr><td>메타 페널티</td><td>메타 챔피언 평균 숙련도 " + mp.avg.toFixed(0) +
           (mp.adapting ? " · 패치 적응 기간 (적응력 −" + Math.round(mp.adaptCut * 100) + "%" + (mp.stubborn ? ", 고집 +" + mp.stubborn : "") + ")" : "") +
           "</td><td>− <b>" + mp.penalty.toFixed(1) + "</b></td></tr>" +
-        '<tr class="total"><td>경기력</td><td>스탯 점수 × 숙련도 배율(메타 등급 보너스 포함) − 메타 페널티</td><td><b>' + m.power.toFixed(1) + "</b></td></tr>" +
+        '<tr class="total"><td>경기력</td><td>스탯 점수 × 숙련도 배율(메타 등급 보너스 포함) × 조커픽 − 메타 페널티</td><td><b>' + m.power.toFixed(1) + "</b></td></tr>" +
       "</table>" +
     "</div>";
 
@@ -559,11 +560,23 @@ function renderTopbar() {
     '<span class="item tip" tabindex="0" data-tip="자금 ' + state.money.toLocaleString() + '원">💰 <b>' + moneyText(state.money) + "</b></span>" +
     '<span class="spacer"></span>' +
     '<span class="topbar-actions">' +
+      staminaBadgeHTML() +
       '<button id="rest-week" class="tip" data-tip="고른 훈련은 그대로 두고 이번 주만 쉬어요 (체력·컨디션 회복)">휴식 주 💤</button>' +
       '<button class="primary" id="next-week">다음 주로 진행 ▶</button>' +
     "</span>";
   document.getElementById("next-week").onclick = function () { nextWeek(false); };
   document.getElementById("rest-week").onclick = function () { nextWeek(true); };
+}
+
+// 상단바 체력 표시 (낮으면 빨간색)
+function staminaBadgeHTML() {
+  const low = state.stamina < TIRED_LIMIT;
+  const warn = state.stamina < TEAM_MATCH.lowStaminaLimit;
+  const cls = low ? "down" : warn ? "warn" : "";
+  const tip = low ? "체력이 너무 낮아요! 훈련 효과가 절반이에요. 휴식을 추천해요."
+    : warn ? "체력이 " + TEAM_MATCH.lowStaminaLimit + " 미만이면 경기력이 떨어져요."
+    : "훈련·경기로 줄고 휴식으로 회복";
+  return '<span class="stamina-badge tip ' + cls + '" tabindex="0" data-tip="' + tip + '">💪 체력 <b>' + state.stamina + "</b>/" + state.staminaMax + "</span>";
 }
 
 // ===== 우측 본문 =====

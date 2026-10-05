@@ -58,6 +58,14 @@ function progressQuests(training, changes) {
   });
 }
 
+// 이미 충분히 익힌 챔피언이라 의미 없는 퀘스트인가? (숙련도 masteryDone 이상)
+function questMastered(tpl) {
+  const done = function (name) { return (state.mastery[name] || 0) >= QUEST_RULES.masteryDone; };
+  if (tpl.kind === "metaS") return done(mySMeta());
+  if (tpl.kind === "metaAny") return state.meta.champs[state.player.position].every(done);
+  return false;
+}
+
 // 기한 지난 퀘스트 정리, 새 퀘스트 주기 (주가 넘어간 뒤 부름)
 function updateQuests() {
   if (!state.quests) state.quests = [];
@@ -72,7 +80,7 @@ function updateQuests() {
   if (state.quests.length >= QUEST_RULES.maxActive) return;
   if (!first && Math.random() >= QUEST_RULES.newChance) return;
   const active = state.quests.map(function (q) { return q.id; });
-  const pool = QUESTS.filter(function (t) { return active.indexOf(t.id) === -1; });
+  const pool = QUESTS.filter(function (t) { return active.indexOf(t.id) === -1 && !questMastered(t); });
   if (!pool.length) return;
   const tpl = pick(pool);
   const range = tpl.need || QUEST_RULES.need;

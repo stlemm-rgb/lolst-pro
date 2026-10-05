@@ -82,7 +82,7 @@ function matchDetailHTML(m) {
   const head =
     '<div class="md-head">' + escapeHTML(m.label) + " · " + teamLabel(m.a) + " <b>" + m.score[0] + " : " + m.score[1] + "</b> " + teamLabel(m.b) +
       (m.pogName ? " · 🏅 POG " + escapeHTML(m.pogName) : "") +
-      (d.pick ? '<div class="muted small">내 픽: <b>' + escapeHTML(d.pick) + "</b>" + (d.banned && d.banned.length ? " · 상대가 밴한 내 챔피언: " + d.banned.map(escapeHTML).join(", ") : "") + "</div>" : "") +
+      (d.pick ? '<div class="muted small">내 픽: <b>' + escapeHTML(d.pick) + "</b>" + (d.joker ? ' <span class="joker-tag">🃏 조커픽 +' + Math.round(MATCH.jokerPowerBonus * 100) + "%</span>" : "") + (d.banned && d.banned.length ? " · 상대가 밴한 내 챔피언: " + d.banned.map(escapeHTML).join(", ") : "") + "</div>" : "") +
     "</div>";
 
   const sets = d.sets.map(function (s, i) {

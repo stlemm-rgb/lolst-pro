@@ -170,6 +170,21 @@ function pickValue(name) {
   return state.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0);
 }
 
+// 상대가 밴할 때 보는 가치: 메타가 아닌 챔피언은 덜 경계함 (조커픽이 살아남기 쉬움)
+function banValue(name) {
+  return pickValue(name) - (isMeta(name) ? 0 : MATCH.jokerBanDiscount);
+}
+
+// 조커픽: 메타가 아닌데 숙련도가 높은 챔피언 (data/match.js)
+function isJoker(name) {
+  return !isMeta(name) && state.mastery[name] >= MATCH.jokerMinMastery;
+}
+
+// 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스
+function myPickValue(name) {
+  return pickValue(name) + (isJoker(name) ? MATCH.jokerPickBonus : 0);
+}
+
 // 패치 후 몇 주째인지 (1 = 패치 주)
 function weeksSincePatch() {
   let last = 1;
@@ -204,9 +219,12 @@ function metaPenaltyInfo() {
 // 한 경기 경기력 계산. bans = 밴 당하는 수 (기본 data/match.js)
 function matchPower(bans) {
   const count = bans === undefined ? MATCH.bansAgainstMe : bans;
-  const ranked = myPositionChampions().slice().sort(function (a, b) { return pickValue(b) - pickValue(a); });
+  const ranked = myPositionChampions().slice().sort(function (a, b) { return banValue(b) - banValue(a); });
   const banned = ranked.slice(0, count);
-  const pick = ranked[count] || ranked[0];
+  // 남은 챔피언 중 내 가치(조커픽 보너스 포함)가 가장 높은 챔피언
+  const left = ranked.filter(function (n) { return banned.indexOf(n) === -1; });
+  const pick = left.slice().sort(function (a, b) { return myPickValue(b) - myPickValue(a); })[0] || ranked[0];
+  const joker = isJoker(pick);
   const score = statScore();
   const tier = metaTier(pick);
   const mult = (MATCH.masteryBase + state.mastery[pick] / MATCH.masteryScale) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0));
@@ -217,7 +235,8 @@ function matchPower(bans) {
     pick: pick,
     multiplier: mult,
     meta: meta,
-    power: score * mult * (1 + signatureBonus(pick)) - meta.penalty,
+    joker: joker,
+    power: score * mult * (1 + signatureBonus(pick)) * (1 + (joker ? MATCH.jokerPowerBonus : 0)) - meta.penalty,
   };
 }
 
