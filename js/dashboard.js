@@ -16,12 +16,16 @@ function playLadder(training) {
   let wins = 0;
   const me = playerScore(USER_ID);
   for (let i = 0; i < games; i++) {
+    const fast = r.points < LADDER.fastUntil; // 다이아몬드 아래: 프로라서 쉽게 이김
     const skillHere = LADDER.skillBase + r.points / LADDER.skillPer;
-    const chance = Math.max(LADDER.minChance, Math.min(LADDER.maxChance, 0.5 + (me - skillHere) / LADDER.winSpread));
-    const step = randInt(LADDER.pointsPerGame[0], LADDER.pointsPerGame[1]);
-    if (Math.random() < chance) { r.points += step; wins++; }
-    else r.points = Math.max(0, r.points - step);
+    let chance = Math.max(LADDER.minChance, Math.min(LADDER.maxChance, 0.5 + (me - skillHere) / LADDER.winSpread));
+    if (fast) chance = Math.max(chance, LADDER.fastWinChance);
+    const winRange = fast ? LADDER.fastPointsWin : LADDER.pointsPerGame;
+    const lossRange = fast ? LADDER.fastPointsLoss : LADDER.pointsPerGame;
+    if (Math.random() < chance) { r.points += randInt(winRange[0], winRange[1]); wins++; }
+    else r.points = Math.max(0, r.points - randInt(lossRange[0], lossRange[1]));
   }
+  r.patchPeak = Math.max(r.patchPeak || 0, r.points);
   r.wins += wins;
   r.losses += games - wins;
   r.peak = Math.max(r.peak, r.points);
@@ -136,8 +140,62 @@ function summaryRowHTML() {
       "</div>" +
       '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="훈련할 때마다 랭크 게임을 하고, 승패에 따라 점수가 오르내려요. 솔로 랭크 훈련이 가장 많이 해요.">솔로 랭크</div>' +
         '<div class="sum-main">' + ladderTier(sr.points) + ' <span class="sum-points">' + sr.points.toLocaleString() + "점</span></div>" +
-        '<div class="sum-sub">통산 ' + sr.wins + "승 " + sr.losses + "패 · 최고 " + sr.peak.toLocaleString() + "점 (" + ladderTier(sr.peak) + ")</div>" +
+        '<div class="sum-sub">이번 패치 최고 ' + (sr.patchPeak || sr.points).toLocaleString() + "점 · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
+        '<div class="sum-sub muted">역대 최고 ' + sr.peak.toLocaleString() + "점 (" + ladderTier(sr.peak) + ") · 패치마다 초기화</div>" +
       "</div>" +
+    "</div>"
+  );
+}
+
+// 패치 때 솔로 랭크 초기화 (main.js의 패치 처리에서 부름)
+function resetLadder() {
+  const r = state.soloRank;
+  if (!r) return;
+  const before = r.points;
+  r.points = LADDER.resetPoints;
+  r.patchPeak = r.points;
+  return before;
+}
+
+// ----- 다음 진행 주: 경기와 메타 챔피언 -----
+function upcomingHTML() {
+  const mine = myTeam();
+  const week = state.week;
+  const matches = state.league.season.matches.filter(function (m) {
+    return m.week === week && !m.winner && (m.a === mine.id || m.b === mine.id);
+  });
+  let matchHTML;
+  if (matches.length) {
+    matchHTML = matches.map(function (m) {
+      const opp = m.a === mine.id ? m.b : m.a;
+      return '<div class="rep-row"><span class="rep-tag train">경기</span>' + escapeHTML(m.label) + " · vs <b>" + escapeHTML(teamName(opp)) + "</b>" +
+        ' <span class="muted small">(' + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승 · 상대 전력 " + strengthOf(opp).toFixed(1) + " / 우리 " + teamStrength(mine.id).toFixed(1) + ")</span>" +
+        (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : "") + "</div>";
+    }).join("");
+  } else {
+    const later = nextUserMatch();
+    const ko = ["cup_po", "playin", "playoffs", "promotion", "worlds"].some(function (id) { return scheduleOfWeek(week).id.indexOf(id) === 0; });
+    matchHTML = '<div class="rep-row muted">이번 주는 잡힌 경기가 없어요' +
+      (ko ? " (토너먼트 대진은 경기 주에 정해져요)" : "") +
+      (later ? ". 다음 경기: " + later.week + "주차 " + escapeHTML(later.label) + " vs " + escapeHTML(teamName(later.a === mine.id ? later.b : later.a)) : "") + ".</div>";
+  }
+
+  // 메타 챔피언: 내 포지션은 숙련도와 함께, 다른 포지션은 이름만
+  const myPos = state.player.position;
+  const myMeta = state.meta.champs[myPos].map(function (name) {
+    const v = state.mastery[name] || 1;
+    return '<span class="chip meta">' + name + " <b>" + v + "</b></span>";
+  }).join("");
+  const others = POSITION_IDS.filter(function (p) { return p !== myPos; }).map(function (p) {
+    return '<div class="muted small">' + findPosition(p).name + ": " + state.meta.champs[p].join(", ") + "</div>";
+  }).join("");
+
+  return (
+    '<div class="card upcoming"><h2>▶ 다음 진행 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + "</span></h2>" +
+      matchHTML +
+      '<h2 class="sub">메타 챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + " · 숫자 = 내 숙련도</span></h2>" +
+      '<div class="chips">' + myMeta + "</div>" +
+      '<div class="other-meta">' + others + "</div>" +
     "</div>"
   );
 }

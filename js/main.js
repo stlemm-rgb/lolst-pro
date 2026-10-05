@@ -149,6 +149,7 @@ pages.dashboard = function () {
   return (
     "<h1>대시보드</h1>" +
     weekReportHTML() +
+    upcomingHTML() +
     summaryRowHTML() +
     '<div class="grid">' +
       '<div class="card"><h2>프로필</h2>' +
@@ -661,6 +662,9 @@ function nextWeek(restWeek) {
     const mine = state.meta.champs[state.player.position].join(", ");
     addNews("패치", state.meta.label + " 적용! " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
     state.weekCtx.patch = true;
+    // 패치마다 솔로 랭크 초기화
+    const oldPoints = resetLadder();
+    if (oldPoints !== undefined) addNews("랭크 초기화", "패치로 솔로 랭크가 초기화됐다. (" + ladderTier(oldPoints) + " " + oldPoints.toLocaleString() + "점 → " + ladderTier(LADDER.resetPoints) + " " + LADDER.resetPoints.toLocaleString() + "점)");
     // 숙련도 1위 챔피언이 메타에서 빠졌으면 "너프" 소식 후보
     const top = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
     if (top && !isMeta(top)) state.weekCtx.nerfChamp = top;
