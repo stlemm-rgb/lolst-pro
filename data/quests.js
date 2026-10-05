@@ -20,7 +20,7 @@ const QUESTS = [
   { id: "q_scrim", giver: "coach",   kind: "training", training: "scrim",      title: "팀 합 맞추기",           desc: "팀 스크림을 {need}회 소화해라.",            reward: { teamfight: 2, shotcall: 1 } },
   { id: "q_replay", giver: "coach",  kind: "training", training: "replay",     title: "리플레이 숙제",           desc: "리플레이 분석을 {need}회 해 와라.",          reward: { vision: 2, focus: 1 } },
   { id: "q_focus", giver: "coach",   kind: "training", training: "champ_focus", title: "주력 챔피언 만들기",     desc: "챔피언 집중 연습을 {need}회 해라.",          reward: { accuracy: 1, spacing: 1, pool: 1 } },
-  { id: "q_meta_s", giver: "manager", kind: "metaS",                            title: "S급 메타 장악",           desc: "이번 패치 S급 '{champ}'을(를) {need}회 연습해라.", reward: { masteryChamp: 10, adapt: 2 } },
-  { id: "q_meta_any", giver: "coach", kind: "metaAny",                          title: "메타 챔피언 준비",        desc: "{pos} 메타 챔피언을 {need}회 연습해라.",     reward: { masteryMetaAll: 4, pool: 2 } },
+  { id: "q_meta_s", giver: "manager", kind: "metaS",                            title: "S급 메타 장악",           desc: "이번 패치 S급 '{champ}'을(를) {need}회 연습해라.", reward: { masteryChamp: 5, adapt: 2 } },
+  { id: "q_meta_any", giver: "coach", kind: "metaAny",                          title: "메타 챔피언 준비",        desc: "{pos} 메타 챔피언을 {need}회 연습해라.",     reward: { masteryMetaAll: 2, pool: 2 } },
   { id: "q_rest",  giver: "manager", kind: "training", training: "rest", need: [2, 3], title: "컨디션 관리", desc: "무리하지 말고 {need}회 쉬어라.",           reward: { mental: 2, condition: 8 } },
 ];

@@ -84,7 +84,7 @@ const EVENTS = [
     text: "내일은 결승이다. 숙소가 조용하다. 오늘 밤 어떻게 보낼까?",
     choices: [
       { label: "평소대로 보낸다", effects: {} },
-      { label: "밤새 상대를 연구한다", effects: { masteryMetaAll: 5, stamina: -10 } },
+      { label: "밤새 상대를 연구한다", effects: { masteryMetaAll: 3, stamina: -10 } },
       { label: "일찍 잔다", effects: { condition: 8 } },
     ],
   },
@@ -101,8 +101,8 @@ const EVENTS = [
     title: "새 챔피언 '{champ}' 연구",
     text: "새 챔피언 '{champ}'이(가) 나왔다. 팀에서 먼저 연구해 보자는 말이 나온다.",
     choices: [
-      { label: "내가 먼저 파 본다", effects: { masteryChamp: 15, stamina: -8 } },
-      { label: "지금 하던 챔피언에 집중한다", effects: { masteryMetaAll: 5 } },
+      { label: "내가 먼저 파 본다", effects: { masteryChamp: 8, stamina: -8 } },
+      { label: "지금 하던 챔피언에 집중한다", effects: { masteryMetaAll: 3 } },
     ],
   },
   {
@@ -111,7 +111,7 @@ const EVENTS = [
     text: "새 패치가 나왔다. 코치진이 분석 회의를 연다고 한다.",
     choices: [
       { label: "회의에 참석한다", effects: { adapt: 2 } },
-      { label: "혼자 메타 챔피언을 판다", effects: { masteryMetaOne: 8, stamina: -5 } },
+      { label: "혼자 메타 챔피언을 판다", effects: { masteryMetaOne: 4, stamina: -5 } },
     ],
   },
   {

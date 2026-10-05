@@ -68,7 +68,7 @@ const TRAININGS = [
     effects: {
       pool:     [1, 3],
       adapt:    [1, 2],
-      mastery:  [6, 10],
+      mastery:  [3, 5],     // 챔피언 숙련도 (2026-10-06 절반으로 낮춤)
       stamina:  [-6, -4],
     },
     messages: [
@@ -83,7 +83,7 @@ const TRAININGS = [
     name: "챔피언 집중 연습",
     desc: "챔피언 한 명만 골라 하루 종일 파고든다. 그 챔피언 숙련도가 크게 오른다.",
     effects: {
-      masteryFocus: [12, 18],
+      masteryFocus: [6, 9],  // 고른 챔피언 숙련도 (2026-10-06 절반으로 낮춤)
       pool:         [0, 1],
       stamina:      [-6, -4],
     },
