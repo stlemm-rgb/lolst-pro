@@ -418,3 +418,14 @@ tr.sel { outline: 1px solid var(--accent); }
 /* 대시보드: 다음 진행 주 */
 .card.upcoming { border-color: var(--gold); }
 .other-meta { margin-top: 8px; }
+
+/* 메타 등급 */
+.meta-tag.tier-S, .chip.tier-S { border-color: #f97316; color: #f97316; }
+.chip.tier-S { background: rgba(249, 115, 22, 0.12); font-weight: bold; }
+.tier-badge { font-weight: bold; }
+
+/* 퀘스트 */
+.quest { border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; background: var(--panel-2); }
+.quest-head { display: flex; gap: 8px; align-items: center; }
+.quest-left { margin-left: auto; }
+.quest .stat { grid-template-columns: 60px 1fr 44px; margin: 4px 0; }

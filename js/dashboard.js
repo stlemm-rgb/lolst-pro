@@ -39,6 +39,7 @@ function startWeekReport(training, message, changes, ladder) {
     training: { name: training.name, message: message, changes: changes },
     ladder: ladder,
     userLines: [],   // 내가 뛴 경기 (afterUserMatch에서 채움)
+    questLines: [],  // 퀘스트 진행·완료
     teamLines: [],   // 내 팀 경기 결과 (후보일 때도)
     news: [],
     messages: [],
@@ -87,6 +88,9 @@ function weekReportHTML() {
   const t = r.training;
   html += '<div class="rep-row"><span class="rep-tag train">훈련</span><b>' + escapeHTML(t.name) + "</b> · " + escapeHTML(t.message) +
     ' <span class="log-changes">' + changesText(t.changes) + "</span></div>";
+  (r.questLines || []).forEach(function (q) {
+    html += '<div class="rep-row"><span class="rep-tag rank">퀘스트</span>' + escapeHTML(q) + "</div>";
+  });
   if (r.ladder && r.ladder.games) {
     const d = r.ladder.delta;
     html += '<div class="rep-row"><span class="rep-tag rank">랭크</span>솔로 랭크 ' + r.ladder.wins + "승 " + r.ladder.losses + "패 · " +
@@ -182,12 +186,14 @@ function upcomingHTML() {
 
   // 메타 챔피언: 내 포지션은 숙련도와 함께, 다른 포지션은 이름만
   const myPos = state.player.position;
-  const myMeta = state.meta.champs[myPos].map(function (name) {
+  const myMeta = state.meta.champs[myPos].slice().sort(function (a, b) { return (metaTier(b) === "S") - (metaTier(a) === "S"); }).map(function (name) {
     const v = state.mastery[name] || 1;
-    return '<span class="chip meta">' + name + " <b>" + v + "</b></span>";
+    const t = metaTier(name);
+    return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + t + "</span> " + name + " <b>" + v + "</b></span>";
   }).join("");
   const others = POSITION_IDS.filter(function (p) { return p !== myPos; }).map(function (p) {
-    return '<div class="muted small">' + findPosition(p).name + ": " + state.meta.champs[p].join(", ") + "</div>";
+    const sName = (state.meta.s && state.meta.s[p]) || state.meta.champs[p][0];
+    return '<div class="muted small">' + findPosition(p).name + ": " + state.meta.champs[p].map(function (n) { return n === sName ? n + "(S)" : n; }).join(", ") + "</div>";
   }).join("");
 
   return (
@@ -196,6 +202,8 @@ function upcomingHTML() {
       '<h2 class="sub">메타 챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + " · 숫자 = 내 숙련도</span></h2>" +
       '<div class="chips">' + myMeta + "</div>" +
       '<div class="other-meta">' + others + "</div>" +
+      '<p class="muted small">S급: 픽 우선 +' + MATCH.metaPickBonus.S + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.S * 100) + "% · A급: 픽 우선 +" + MATCH.metaPickBonus.A + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.A * 100) + "%</p>" +
+      questsHTML(true) +
     "</div>"
   );
 }

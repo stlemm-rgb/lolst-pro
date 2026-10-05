@@ -50,13 +50,35 @@ function makePatch(year, week) {
     const list = pool.filter(function (c) { return c.positions.indexOf(pos) !== -1; });
     champs[pos] = shuffled(list).slice(0, MASTERY.metaPerPosition).map(function (c) { return c.name; });
   });
+  // 포지션마다 메타 중 1명은 S급 (맨 앞)
+  const s = {};
+  POSITION_IDS.forEach(function (pos) { s[pos] = champs[pos][0]; });
   const number = MASTERY.patchWeeks.indexOf(week) + 1;
-  return { label: year + "년 " + (number > 0 ? number + "차" : "") + " 패치", champs: champs };
+  return { label: year + "년 " + (number > 0 ? number + "차" : "") + " 패치", champs: champs, s: s };
 }
 
 function isMeta(name) {
   if (!state.meta) return false;
   return POSITION_IDS.some(function (pos) { return state.meta.champs[pos].indexOf(name) !== -1; });
+}
+
+// 메타 등급: "S", "A" 또는 null
+function metaTier(name) {
+  if (!isMeta(name)) return null;
+  const s = state.meta.s || {};
+  return POSITION_IDS.some(function (pos) { return (s[pos] || state.meta.champs[pos][0]) === name; }) ? "S" : "A";
+}
+
+// 내 포지션 S급 메타 챔피언
+function mySMeta() {
+  const pos = state.player.position;
+  return (state.meta.s && state.meta.s[pos]) || state.meta.champs[pos][0];
+}
+
+// 화면용 등급 표시
+function metaTagHTML(name) {
+  const t = metaTier(name);
+  return t ? ' <span class="meta-tag tier-' + t + '">' + t + "</span>" : "";
 }
 
 // 내 포지션 챔피언 (출시된 것만), 메타 → 숙련도 높은 순
@@ -65,7 +87,8 @@ function myPositionChampions() {
   return Object.keys(state.mastery)
     .filter(function (name) { const c = findChampion(name); return c && c.positions.indexOf(pos) !== -1; })
     .sort(function (a, b) {
-      const ma = isMeta(a) ? 1 : 0, mb = isMeta(b) ? 1 : 0;
+      const rank = function (n) { const t = metaTier(n); return t === "S" ? 2 : t === "A" ? 1 : 0; };
+      const ma = rank(a), mb = rank(b);
       if (ma !== mb) return mb - ma;
       return state.mastery[b] - state.mastery[a];
     });
@@ -140,7 +163,8 @@ function statScore() {
 
 // 밴픽에서 챔피언 가치 = 숙련도 + (메타면 보너스)
 function pickValue(name) {
-  return state.mastery[name] + (isMeta(name) ? MATCH.metaPickBonus : 0);
+  const t = metaTier(name);
+  return state.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0);
 }
 
 // 패치 후 몇 주째인지 (1 = 패치 주)
@@ -153,9 +177,13 @@ function weeksSincePatch() {
 // 메타 페널티와 그 계산 과정
 function metaPenaltyInfo() {
   const names = state.meta.champs[state.player.position];
-  let sum = 0;
-  names.forEach(function (n) { sum += state.mastery[n] || MASTERY.min; });
-  const avg = names.length ? sum / names.length : MASTERY.max;
+  let sum = 0, weight = 0;
+  names.forEach(function (n) {
+    const w = metaTier(n) === "S" ? MATCH.metaSWeight : 1; // S급은 더 중요
+    sum += (state.mastery[n] || MASTERY.min) * w;
+    weight += w;
+  });
+  const avg = weight ? sum / weight : MASTERY.max;
   let penalty = Math.max(0, (MATCH.metaPenaltyBase - avg) / MATCH.metaPenaltyDiv);
   const adapting = weeksSincePatch() <= MATCH.adaptWeeks;
   let adaptCut = 0, stubborn = 0;
@@ -176,7 +204,8 @@ function matchPower(bans) {
   const banned = ranked.slice(0, count);
   const pick = ranked[count] || ranked[0];
   const score = statScore();
-  const mult = MATCH.masteryBase + state.mastery[pick] / MATCH.masteryScale;
+  const tier = metaTier(pick);
+  const mult = (MATCH.masteryBase + state.mastery[pick] / MATCH.masteryScale) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0));
   const meta = metaPenaltyInfo();
   return {
     score: score,

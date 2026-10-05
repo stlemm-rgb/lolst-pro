@@ -31,6 +31,9 @@ function createNewState() {
     transferRequestsLeft: 0,      // 이번 비시즌 이적 요청 남은 횟수
     soloRank: { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints }, // 솔로 랭크 (가상 래더)
     weekReport: null,             // 대시보드 "지난주 결과" (js/dashboard.js)
+    quests: [],                   // 진행 중인 퀘스트 (js/quests.js)
+    questSeq: 0,
+    focusChamp: "",               // 챔피언 집중 연습에서 고른 챔피언
     skipTraining: false,          // true면 다음 주 훈련 대신 휴식 (이벤트 효과)
     matchBoost: 0,                // 다음 경기 경기력 보너스 (이벤트 효과)
     plan: null,                   // 이번 주에 고른 훈련 id
@@ -77,6 +80,7 @@ function findTraining(id) {
 // 스탯 id 또는 체력·컨디션·인기도 id를 화면용 이름으로
 function statName(id) {
   if (id === "mastery") return "챔피언 숙련도";
+  if (id === "masteryFocus") return "고른 챔피언 숙련도";
   if (id.indexOf("m:") === 0) return id.slice(2) + " 숙련도";
   const found = STATS.concat(GAUGES).find(function (s) { return s.id === id; });
   return found ? found.name : id;
@@ -121,7 +125,7 @@ pages.dashboard = function () {
 
   // 챔피언: 내 포지션 메타 + 숙련도 상위 5
   const metaMine = state.meta.champs[p.position].map(function (name) {
-    return '<span class="chip meta">' + name + " " + (state.mastery[name] || 1) + "</span>";
+    return '<span class="chip meta tier-' + metaTier(name) + '">' + metaTier(name) + " " + name + " " + (state.mastery[name] || 1) + "</span>";
   }).join("");
   const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
   const topHTML = top5.map(function (name) { return masteryRowHTML(name); }).join("");
@@ -217,7 +221,7 @@ function masteryRowHTML(name) {
   return (
     '<div class="stat mastery-row">' +
       '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
-        (isMeta(name) ? ' <span class="meta-tag">META</span>' : "") + "</div>" +
+        metaTagHTML(name) + "</div>" +
       '<div class="bar"><div class="bar-fill' + (isMeta(name) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
     "</div>"
@@ -282,11 +286,11 @@ pages.career = function () {
       '<table class="calc">' +
         "<tr><td>스탯 점수</td><td>12개 평균, ★가산점 " + POSITION_BONUS.matchMultiplier + "배</td><td><b>" + m.score.toFixed(1) + "</b></td></tr>" +
         "<tr><td>밴 당한 챔피언</td><td colspan=\"2\">" + (m.banned.join(", ") || "없음") + "</td></tr>" +
-        "<tr><td>고른 챔피언</td><td>" + m.pick + " (숙련도 " + state.mastery[m.pick] + (isMeta(m.pick) ? ", 메타" : "") + ")</td><td>× <b>" + m.multiplier.toFixed(2) + "</b></td></tr>" +
+        "<tr><td>고른 챔피언</td><td>" + m.pick + " (숙련도 " + state.mastery[m.pick] + (metaTier(m.pick) ? ", 메타 " + metaTier(m.pick) + "급 +" + Math.round(MATCH.metaPowerBonus[metaTier(m.pick)] * 100) + "%" : "") + ")</td><td>× <b>" + m.multiplier.toFixed(2) + "</b></td></tr>" +
         "<tr><td>메타 페널티</td><td>메타 챔피언 평균 숙련도 " + mp.avg.toFixed(0) +
           (mp.adapting ? " · 패치 적응 기간 (적응력 −" + Math.round(mp.adaptCut * 100) + "%" + (mp.stubborn ? ", 고집 +" + mp.stubborn : "") + ")" : "") +
           "</td><td>− <b>" + mp.penalty.toFixed(1) + "</b></td></tr>" +
-        '<tr class="total"><td>경기력</td><td>스탯 점수 × 숙련도 배율 − 메타 페널티</td><td><b>' + m.power.toFixed(1) + "</b></td></tr>" +
+        '<tr class="total"><td>경기력</td><td>스탯 점수 × 숙련도 배율(메타 등급 보너스 포함) − 메타 페널티</td><td><b>' + m.power.toFixed(1) + "</b></td></tr>" +
       "</table>" +
     "</div>";
 
@@ -303,15 +307,32 @@ pages.career = function () {
 };
 
 // 챔피언 연습에서 연습할 챔피언 고르기
-function practiceSelectHTML() {
-  const options = myPositionChampions().map(function (name) {
-    return '<option value="' + name + '"' + (state.practiceChamp === name ? " selected" : "") + ">" +
-      name + (isMeta(name) ? " ★메타" : "") + " · " + findChampionType(findChampion(name).type).name +
+function champOptionsHTML(selected) {
+  return myPositionChampions().map(function (name) {
+    const tier = metaTier(name);
+    return '<option value="' + name + '"' + (selected === name ? " selected" : "") + ">" +
+      name + (tier ? " ★메타 " + tier + "급" : "") + " · " + findChampionType(findChampion(name).type).name +
       " (숙련도 " + state.mastery[name] + ", 성장 " + percentText(masteryGrowthMultiplier(name) - 1) + ")</option>";
   }).join("");
+}
+
+function practiceSelectHTML() {
   return (
     '<p class="effects"><label>연습할 챔피언 ' +
-      '<select id="practice-champ"><option value="">자동 (메타·낮은 숙련도 3명에게 나눠서)</option>' + options + "</select>" +
+      '<select id="practice-champ"><option value="">자동 (메타·낮은 숙련도 3명에게 나눠서)</option>' + champOptionsHTML(state.practiceChamp) + "</select>" +
+    "</label></p>"
+  );
+}
+
+// 챔피언 집중 연습: 한 명 고르기 (안 골랐으면 S급 메타)
+function focusChamp() {
+  return state.focusChamp && state.mastery[state.focusChamp] !== undefined ? state.focusChamp : mySMeta();
+}
+
+function focusSelectHTML() {
+  return (
+    '<p class="effects"><label>집중할 챔피언 ' +
+      '<select id="focus-champ">' + champOptionsHTML(focusChamp()) + "</select>" +
     "</label></p>"
   );
 }
@@ -330,6 +351,7 @@ pages.training = function () {
       if (id === "stamina" && r[1] < 0) extra = staminaCostMultiplier() - 1;
       if (id === "popularity" && r[1] > 0) extra = popularityMultiplier() - 1;
       if (id === "mastery") extra = masteryGrowthMultiplier() - 1;
+      if (id === "masteryFocus") extra = masteryGrowthMultiplier(focusChamp()) - 1;
       if (Math.abs(extra) > 0.001) text += ' <span class="' + (extra > 0 === (id !== "stamina") ? "up" : "down") + '">(' + percentText(extra) + ")</span>";
       return text;
     }).join("<br>");
@@ -340,6 +362,7 @@ pages.training = function () {
         "<p>" + t.desc + "</p>" +
         '<p class="effects">' + effects + "</p>" +
         (t.effects.mastery ? practiceSelectHTML() : "") +
+        (t.effects.masteryFocus ? focusSelectHTML() : "") +
         '<button data-plan="' + t.id + '"' + (selected ? ' class="primary"' : "") + ">" +
           (selected ? "✔ 선택됨" : "이번 주 훈련으로 선택") +
         "</button>" +
@@ -350,7 +373,7 @@ pages.training = function () {
     ? '<div class="notice">체력이 ' + state.stamina + "밖에 남지 않았어요. 체력이 " + TIRED_LIMIT + " 미만이면 훈련 효과가 절반이 돼요. 휴식을 고려해 보세요.</div>"
     : "";
   return (
-    "<h1>훈련</h1>" + tired +
+    "<h1>훈련</h1>" + tired + questsHTML(false) +
     '<p class="placeholder">이번 주에 할 훈련을 고른 뒤, 위의 [다음 주로 진행]을 누르세요. 괄호 안은 포지션 가산점·유형·특성으로 받는 내 보너스예요.</p>' +
     '<p class="muted small">📉 성장 곡선: 스탯이 높을수록 덜 올라요. ' + GROWTH_CURVE.map(function (g, i) {
       const from = i ? GROWTH_CURVE[i - 1].upTo : 0;
@@ -549,6 +572,8 @@ function renderPage() {
   // 챔피언 연습: 연습할 챔피언 고르기
   const practice = document.getElementById("practice-champ");
   if (practice) practice.onchange = function () { state.practiceChamp = this.value; };
+  const focusSel = document.getElementById("focus-champ");
+  if (focusSel) focusSel.onchange = function () { state.focusChamp = this.value; };
 
   // 나의 커리어: 포지션 탭
   page.querySelectorAll("[data-stab]").forEach(function (btn) {
@@ -601,6 +626,14 @@ function nextWeek(restWeek) {
       before = state.reputation;
       state.reputation = Math.max(-100, Math.min(100, state.reputation + amount));
       changes[id] = state.reputation - before;
+    } else if (id === "masteryFocus") {
+      // 챔피언 집중 연습: 고른 챔피언 1명만 크게
+      const name = focusChamp();
+      const now = state.mastery[name];
+      let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
+      if (tired) gain *= 0.5;
+      state.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
+      changes["m:" + name] = state.mastery[name] - now;
     } else if (id === "mastery") {
       // 챔피언 숙련도: 고른 챔피언(또는 자동으로 고른 챔피언)들에게
       const gained = practiceChampions(range, tired);
@@ -631,6 +664,7 @@ function nextWeek(restWeek) {
   });
   // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
   startWeekReport(training, message, changes, playLadder(training));
+  progressQuests(training, changes); // 퀘스트 진행 (js/quests.js)
 
   // 이번 주 리그 경기 (훈련 다음에 진행), 연봉 1주치
   const playedWeek = state.week;
@@ -679,8 +713,9 @@ function nextWeek(restWeek) {
   checkBench();
   if (state.week === CONTRACT.windowStart) startTransferWindow();
 
-  // 이번 주 이벤트 (SNS)
+  // 이번 주 이벤트 (SNS), 퀘스트 기한·새 퀘스트
   runWeeklyEvents();
+  updateQuests();
   state.log = state.log.slice(0, 30);
   state.currentMenu = "dashboard";
   state.notice = "";

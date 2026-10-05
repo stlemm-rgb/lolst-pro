@@ -4,10 +4,10 @@
 
 const SAVE_KEY = "progamer-career-save";
 const SAVE_GAME_ID = "progamer-career";
-const SAVE_VERSION = 7; // 7: 솔로 랭크·지난주 결과 / 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
+const SAVE_VERSION = 8; // 8: 메타 S급·퀘스트 / 7: 솔로 랭크·지난주 결과 / 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
-const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport"];
+const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp"];
 
 // 현재 게임 상태를 세이브 모양으로 만들기
 function makeSaveData() {
@@ -79,7 +79,7 @@ function stateFromSave(save) {
   if (s.career && typeof s.career === "object") {
     fresh.career.finalsWon = Number(s.career.finalsWon) || 0;
     fresh.career.gainTried = s.career.gainTried || {};
-    ["seasonGames", "games", "wins", "seasonWins"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
+    ["seasonGames", "games", "wins", "seasonWins", "questsDone", "questsGiven"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
     if (Array.isArray(s.career.seasons)) fresh.career.seasons = s.career.seasons;
     if (Array.isArray(s.career.awards)) fresh.career.awards = s.career.awards;
     if (s.career.debut) fresh.career.debut = s.career.debut;
@@ -93,6 +93,9 @@ function stateFromSave(save) {
   if (Number.isFinite(s.benchWeeks)) fresh.benchWeeks = s.benchWeeks;
   fresh.transferListed = s.transferListed === true;
   if (s.soloRank && Number.isFinite(s.soloRank.points)) fresh.soloRank = s.soloRank;
+  if (Array.isArray(s.quests)) fresh.quests = s.quests.filter(function (q) { return findQuest(q.id); });
+  if (Number.isFinite(s.questSeq)) fresh.questSeq = s.questSeq;
+  if (typeof s.focusChamp === "string") fresh.focusChamp = s.focusChamp;
   if (s.weekReport && typeof s.weekReport === "object" && s.weekReport.training) fresh.weekReport = s.weekReport;
   if (Number.isFinite(s.transferRequestsLeft)) fresh.transferRequestsLeft = s.transferRequestsLeft;
   if (Number.isFinite(s.matchBoost)) fresh.matchBoost = s.matchBoost;
