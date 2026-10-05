@@ -2,7 +2,7 @@
 // - type: "good"(좋은 특성) 또는 "bad"(나쁜 특성)
 //   좋은 특성은 캐릭터 생성 때 무작위로, 나쁜 특성은 이벤트로만 생겨요(최대 5%). 나쁜 특성마다 극복 이벤트가 있어요.
 // - desc: 화면에 보이는 설명 (효과 숫자를 바꾸면 설명도 같이 바꿔 주세요)
-// - effects: 실제 효과 (✅ 지금 적용, ⏳ 나중 단계)
+// - effects: 실제 효과 (모두 적용됨)
 //   [훈련]
 //     ✅ trainingAll: 모든 훈련 효과 (0.2 = +20%)      ✅ trainingStat: 특정 스탯 훈련 효과 ({ laning: 0.3 })
 //     ✅ staminaCost: 훈련·경기 체력 소모 (-0.25 = 25% 덜)  ✅ restBonus: 휴식 체력 회복 (0.5 = +50%)
@@ -22,7 +22,7 @@
 //     ✅ popularityGain: 인기도 상승                     ✅ winPopularity: 이긴 경기마다 인기도 +n
 //     ✅ questBonus: 퀘스트 보상 (0.5 = +50%)             ✅ negotiate: 계약 협상 성공률 +n
 //     ✅ salaryBonus: 연봉 +n                            ✅ spend: 주급 중 n만큼 써 버림
-//     ✅ injuryRate / scandalRate: 이벤트 확률 배율        ⏳ agingDelay: 노화가 늦게 시작 (7단계)
+//     ✅ injuryRate / scandalRate: 이벤트 확률 배율        ✅ agingDelay: 노화가 늦게 시작 (n년)
 const TRAITS = [
   // ===== 좋은 특성: 훈련 =====
   { id: "genius",       type: "good", name: "천재적 감각",   desc: "모든 훈련 효과 +20%",                                  effects: { trainingAll: 0.2 } },
@@ -53,7 +53,7 @@ const TRAITS = [
   { id: "fan_service",  type: "good", name: "팬서비스",      desc: "인기도 상승 +50%",                                     effects: { popularityGain: 0.5 } },
   { id: "star_power",   type: "good", name: "스타성",        desc: "이긴 경기마다 인기도 +1 추가",                            effects: { winPopularity: 1 } },
   { id: "negotiator",   type: "good", name: "협상가",        desc: "계약 협상 성공률 +20%, 연봉 +10%",                        effects: { negotiate: 0.2, salaryBonus: 0.1 } },
-  { id: "late_bloomer", type: "good", name: "늦게 피는 꽃",  desc: "노화가 2년 늦게 시작 (7단계 노화에서 적용)",               effects: { agingDelay: 2 } },
+  { id: "late_bloomer", type: "good", name: "늦게 피는 꽃",  desc: "노화가 2년 늦게 시작 (29세부터)",                       effects: { agingDelay: 2 } },
 
   // ===== 나쁜 특성 (이벤트로만 생김, 극복 이벤트 있음) =====
   { id: "glass_mental", type: "bad", name: "유리멘탈",     desc: "패배 후 컨디션 하락 1.5배",                          effects: { lossMental: 0.5 } },

@@ -357,6 +357,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
     state.career.finalsWon = (state.career.finalsWon || 0) + 1;
+    addMoment("🏆", mine.name + " " + { cup: "컵 대회 우승", playoffs: "리그 우승", worlds: "월드 챔피언십 우승" }[champKey]);
     if (state.weekCtx) state.weekCtx.champion = title;
   }
   if (champKey === "playoffs") {

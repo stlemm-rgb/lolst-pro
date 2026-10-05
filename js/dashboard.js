@@ -32,6 +32,10 @@ function playLadder(training) {
   if (tilt && games - wins > wins) state.condition = clamp(state.condition - tilt);
   r.wins += wins;
   r.losses += games - wins;
+  if (r.peak < 3200 && r.points >= 3200 && !state.career.challenger) {
+    state.career.challenger = true;
+    addMoment("👑", "솔로 랭크 첫 챌린저 달성");
+  }
   r.peak = Math.max(r.peak, r.points);
   return { games: games, wins: wins, losses: games - wins, delta: r.points - before };
 }

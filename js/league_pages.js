@@ -194,7 +194,8 @@ pages.tournament = function () {
   return (
     "<h1>대회 일정</h1>" +
     '<div class="card"><h2>' + state.year + '년 우승</h2><table class="mini">' + champHTML + "</table></div>" +
-    body + competitionGuideHTML() + championsHistoryHTML()
+    body + competitionGuideHTML() +
+    '<p class="muted small">역대 우승 기록은 [역사관]에서 볼 수 있어요.</p>'
   );
 };
 

@@ -22,7 +22,9 @@ function createNewState() {
     inbox: [],                    // SNS 메시지 (js/events.js)
     msgSeq: 0,                    // 메시지 번호
     eventCooldown: {},            // 이벤트별 마지막으로 온 주
-    career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0 }, // 커리어 기록
+    career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0, earned: 0, moments: [] }, // 커리어 기록
+    retirePlanned: false,         // true면 이번 시즌이 끝날 때 은퇴 (js/retire.js)
+    retired: null,                // 은퇴 후 엔딩 요약 (있으면 엔딩 화면)
     contract: null,               // 내 계약 { teamId, salary, endYear, guarantee } (js/contracts.js)
     pendingMove: null,            // 새 시즌에 옮길 팀 (이적 합의)
     benched: false,               // true면 후보 (2군행) — 경기에 못 나감
@@ -81,6 +83,7 @@ function findTraining(id) {
 function statName(id) {
   if (id === "mastery") return "챔피언 숙련도";
   if (id === "masteryFocus") return "고른 챔피언 숙련도";
+  if (id === "staminaMax") return "체력 최대치";
   if (id.indexOf("m:") === 0) return id.slice(2) + " 숙련도";
   const found = STATS.concat(GAUGES).find(function (s) { return s.id === id; });
   return found ? found.name : id;
@@ -302,9 +305,32 @@ pages.career = function () {
       '<div class="buttons">' + tabs + "</div>" +
       '<div class="stat-columns mastery-list">' + rows + "</div>" +
     "</div>" +
-    ""
+    retireCardHTML()
   );
 };
+
+// 나이와 은퇴 카드 (나의 커리어 맨 아래)
+function retireCardHTML() {
+  const age = state.player.age;
+  const start = agingStartAge();
+  const agingLine = age >= start
+    ? "노화 중: 매년 새해에 반응속도·입력 정확도·체력 최대치가 줄고, 두 스탯 훈련 효과도 " + Math.round(agingTrainingMultiplier("reaction") * 100) + "%로 줄었어요. (운영·오더 같은 머리 스탯은 계속 올릴 수 있어요)"
+    : start + "세부터 노화가 시작돼요. (앞으로 " + (start - age) + "년)";
+  let planLine = "";
+  if (state.retirePlanned) {
+    planLine = '<p class="notice-inline">이번 시즌(52주)이 끝나면 은퇴해요.</p>' +
+      (age < CAREER.maxAge ? '<button data-retire="cancel">은퇴 취소 (한 시즌 더 뛰기)</button> ' : "");
+  }
+  return (
+    '<div class="card"><h2>나이와 은퇴</h2>' +
+      "<p>" + age + "세 · 프로 " + careerYears() + "년차</p>" +
+      '<p class="muted small">' + agingLine + "</p>" +
+      '<p class="muted small">평균 은퇴 나이 ' + CAREER.avgRetireAge + "세. " + CAREER.retireAskAge + "세부터 비시즌마다 감독이 은퇴를 물어봐요. 최대 " + CAREER.maxAge + "세까지 뛸 수 있어요.</p>" +
+      planLine +
+      '<div class="buttons"><button class="danger" data-retire="now">지금 은퇴하기</button></div>' +
+    "</div>"
+  );
+}
 
 // 챔피언 연습에서 연습할 챔피언 고르기
 function champOptionsHTML(selected) {
@@ -569,6 +595,14 @@ function renderPage() {
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
+  page.querySelectorAll("[data-retire]").forEach(function (btn) {
+    btn.onclick = function () {
+      if (btn.getAttribute("data-retire") === "now") return retireNowButton();
+      setRetirePlanned(false);
+      if (state.settings.autoSave) saveGame();
+      showNotice("은퇴를 취소했어요. 한 시즌 더 뛰어요!");
+    };
+  });
 
   // 챔피언 연습: 연습할 챔피언 고르기
   const practice = document.getElementById("practice-champ");
@@ -589,6 +623,7 @@ function renderPage() {
 // restWeek: true면 고른 훈련과 상관없이 이번 주만 휴식 ([휴식 주] 버튼)
 function nextWeek(restWeek) {
   restWeek = restWeek === true;
+  if (state.retired) return; // 은퇴한 뒤에는 진행 없음
   // 훈련을 안 골랐으면 훈련 화면으로 안내
   if (!state.plan && !state.skipTraining && !restWeek) {
     state.currentMenu = "training";
@@ -643,7 +678,7 @@ function nextWeek(restWeek) {
     } else if (state.stats[id] !== undefined) {
       // 실력 스탯: 오를 때만 보너스(가산점·유형·특성)를 붙임
       if (amount > 0) {
-        let boosted = amount * (1 + trainingBonusFor(id)) * growthMultiplier(state.stats[id]); // 높은 스탯일수록 덜 오름
+        let boosted = amount * (1 + trainingBonusFor(id)) * growthMultiplier(state.stats[id]) * agingTrainingMultiplier(id); // 높은 스탯일수록 덜 오름, 노화하면 손 스탯 덜 오름
         if (tired) boosted *= 0.5;
         amount = roundRandom(Math.max(0, boosted));
       }
@@ -682,9 +717,18 @@ function nextWeek(restWeek) {
   if (state.week > CREATION.weeksPerSeason) {
     // 새해 = 새 시즌. 나이 +1, 승강·선수 성장/은퇴
     saveSeasonHistory();
+    // 은퇴 (스스로 결정 / 최대 나이 / 받아 줄 팀 없음) → 엔딩
+    const retireReason = seasonEndRetireReason();
+    if (retireReason) {
+      state.week = CREATION.weeksPerSeason;
+      finishCareer(retireReason, false);
+      renderAll();
+      return;
+    }
     state.year += 1;
     state.week = 1;
     state.player.age += 1;
+    applyAging(); // 27세부터 노화 (js/retire.js)
     const leagueNews = newSeasonLeague().concat(contractsNewSeason());
     initContracts(); // 새로 들어온 신인들 계약
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
@@ -716,7 +760,10 @@ function nextWeek(restWeek) {
 
   // 2군행/승격 판정, 비시즌 시작이면 재계약·영입 제안
   checkBench();
-  if (state.week === CONTRACT.windowStart) startTransferWindow();
+  if (state.week === CONTRACT.windowStart) {
+    askRetirement(); // 29세부터 은퇴 권유 (js/retire.js)
+    startTransferWindow();
+  }
 
   // 이번 주 이벤트 (SNS), 퀘스트 기한·새 퀘스트
   runWeeklyEvents();
@@ -752,8 +799,17 @@ function addNews(title, message) {
 
 function renderAll() {
   const creating = !state.player; // 캐릭터가 없으면 캐릭터 생성 화면
-  document.getElementById("layout").hidden = creating;
+  const ended = !creating && !!state.retired; // 은퇴했으면 엔딩 화면
+  document.getElementById("layout").hidden = creating || ended;
   document.getElementById("creation").hidden = !creating;
+  document.getElementById("ending").hidden = !ended;
+  if (ended) {
+    document.getElementById("creation").innerHTML = "";
+    renderEnding();
+    window.scrollTo(0, 0);
+    return;
+  }
+  document.getElementById("ending").innerHTML = "";
   if (creating) {
     renderCreation();
     return;

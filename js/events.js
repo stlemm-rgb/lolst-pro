@@ -249,6 +249,7 @@ function checkTraitGains() {
     state.career.gainTried[g.id] = true;
     if (hasTrait(g.trait) || Math.random() >= g.chance) return;
     state.player.traits.push(g.trait);
+    addMoment("✨", "특성 '" + findTrait(g.trait).name + "' 획득");
     postMessage("news", "✨ 새 특성: " + findTrait(g.trait).name, g.text, { notes: ["좋은 특성 '" + findTrait(g.trait).name + "'을(를) 얻었다!"] });
   });
 }
@@ -292,6 +293,7 @@ function answerMessage(msgId, index) {
   const msg = state.inbox.find(function (m) { return m.id === msgId; });
   if (!msg || msg.answered !== null) return;
   if (msg.kind === "offer") { answerOffer(msg, index); return; } // 계약 제안 (js/contracts.js)
+  if (msg.kind === "retire") { answerRetire(msg, index); return; } // 은퇴 권유 (js/retire.js)
   const ev = findEvent(msg.eventId);
   const choice = ev && ev.choices[index];
   if (!choice || choiceTooExpensive(msg, index)) return;

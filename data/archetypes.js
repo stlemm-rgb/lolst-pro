@@ -58,9 +58,3 @@ const CREATION = {
   ],
   weeksPerSeason: 52, // 한 시즌 = 52주 (1년)
 };
-
-// 나이와 은퇴 (7단계에서 사용)
-const CAREER = {
-  agingStartAge: 27,   // 이 나이부터 노화 시작
-  avgRetireAge: 31,    // 평균 은퇴 나이
-};

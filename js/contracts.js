@@ -58,7 +58,9 @@ function initContracts() {
 function paySalary() {
   if (!state.contract) return;
   const weekly = Math.round(state.contract.salary / CREATION.weeksPerSeason);
-  state.money += Math.round(weekly * (1 - traitEffectSum("spend"))); // 낭비벽
+  const net = Math.round(weekly * (1 - traitEffectSum("spend"))); // 낭비벽
+  state.money += net;
+  state.career.earned = (state.career.earned || 0) + net; // 엔딩의 "번 돈"
 }
 
 function isTransferWindow() {
@@ -153,6 +155,7 @@ function sendOffer(o) {
 // ----- 비시즌 시작: 재계약·영입 제안 -----
 function startTransferWindow() {
   state.transferRequestsLeft = CONTRACT.myRequests;
+  if (state.retirePlanned) { state.transferRequestsLeft = 0; return; } // 은퇴 예정이면 제안 없음
   const mine = myTeam();
   const me = playerScore(USER_ID);
 
@@ -234,6 +237,7 @@ function answerOffer(msg, index) {
 // ----- 내가 이적 요청 보내기 (이적 시장 화면) -----
 function canRequestTransfer(teamId) {
   if (!isTransferWindow()) return "이적 시장은 비시즌(" + CONTRACT.windowStart + "~" + CONTRACT.windowEnd + "주)에만 열려요.";
+  if (state.retirePlanned) return "은퇴 예정이라 이적할 수 없어요.";
   if (state.pendingMove) return "이미 이적이 정해졌어요.";
   if (!state.transferRequestsLeft) return "이번 비시즌 이적 요청 횟수를 다 썼어요.";
   if (teamId === myTeam().id) return "지금 소속팀이에요.";
@@ -323,6 +327,7 @@ function contractsNewSeason() {
     moveUserTo(mv.teamId);
     state.contract = { teamId: mv.teamId, salary: mv.salary, endYear: mv.endYear, guarantee: mv.guarantee };
     news.push(state.player.name + ", " + findTeam(mv.teamId).name + " 이적 완료");
+    addMoment("✈️", findTeam(mv.teamId).name + "(으)로 이적");
     state.pendingMove = null;
   } else if (state.contract.endYear <= lastYear) {
     // 계약이 끝났는데 새 계약이 없음 → 1년 계약으로 어딘가에 들어감 (팀 없는 상태는 만들지 않음)
@@ -340,6 +345,7 @@ function contractsNewSeason() {
     moveUserTo(team.id);
     state.contract = { teamId: team.id, salary: Math.round(userSalaryFor(team.tier) * 0.8 / 1000000) * 1000000, endYear: state.year, guarantee: 0 };
     postMessage("inbox", CONTRACT_TEXTS.forcedTitle, contractText(CONTRACT_TEXTS.forced), { read: false });
+    if (team.id !== mine.id) addMoment("📝", "FA로 " + team.name + "과(와) 1년 계약");
   }
   state.benched = false;
   state.benchWeeks = 0;

@@ -75,7 +75,8 @@ function giveAward(key, id, value, extraTitle) {
   state.league.awards.push(entry);
   if (id === USER_ID) {
     if (!state.career.awards) state.career.awards = [];
-    state.career.awards.push({ year: state.year, title: title });
+    state.career.awards.push({ year: state.year, title: title, key: key });
+    addMoment("🏅", title + " 수상");
     state.popularity = clamp(state.popularity + RECORDS.awardBonus.popularity);
     state.reputation = Math.min(100, state.reputation + RECORDS.awardBonus.reputation);
     postMessage("news", "🏆 수상: " + title, state.player.name + "이(가) " + state.year + " " + title + "을(를) 받았다!", {
@@ -157,6 +158,7 @@ function ensureCareerRecords() {
     c.debut = { year: state.year, team: myTeam().name, age: state.player.age, score: playerScore(USER_ID) };
   }
   if (!c.statStart && state.player) c.statStart = JSON.parse(JSON.stringify(state.stats));
+  ensureMoments(); // 커리어 주요 순간 (js/retire.js)
 }
 
 // 이번 시즌 내 기록 (진행 중)

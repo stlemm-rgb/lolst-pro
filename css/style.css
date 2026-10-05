@@ -429,3 +429,14 @@ tr.sel { outline: 1px solid var(--accent); }
 .quest-head { display: flex; gap: 8px; align-items: center; }
 .quest-left { margin-left: auto; }
 .quest .stat { grid-template-columns: 60px 1fr 44px; margin: 4px 0; }
+
+/* ===== 역사관 · 은퇴 · 엔딩 (7단계) ===== */
+.timeline { max-height: 420px; overflow-y: auto; }
+.moment { padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+.moment:last-child { border-bottom: none; }
+.moment-when { display: inline-block; min-width: 92px; }
+.notice-inline { color: var(--gold); margin: 6px 0; }
+.ending-title { margin: 0 0 4px; }
+.ending-grade { text-align: center; padding: 24px 16px; margin-top: 16px; }
+.grade-stars { font-size: 32px; color: var(--gold); letter-spacing: 4px; }
+.grade-name { font-size: 28px; font-weight: bold; margin: 6px 0; }

@@ -275,6 +275,8 @@ function newSeasonLeague() {
     if (p.winner === p.tier2) {
       findTeam(p.tier2).tier = 1;
       findTeam(p.tier1).tier = 2;
+      if (p.tier2 === myTeam().id) addMoment("⬆️", myTeam().name + " 1부 승격");
+      if (p.tier1 === myTeam().id) addMoment("⬇️", myTeam().name + " 2부 강등");
       news.push(findTeam(p.tier2).name + " 1부 승격, " + findTeam(p.tier1).name + " 2부 강등");
     }
   });
@@ -301,6 +303,7 @@ function newSeasonLeague() {
 // 은퇴: 팀에서 빠지고 같은 포지션 신인이 들어옴
 function retirePlayer(p) {
   const team = p.teamId && findTeam(p.teamId);
+  recordRetiree(p, team);
   delete state.league.players[p.id];
   const fa = state.league.freeAgents.indexOf(p.id);
   if (fa !== -1) state.league.freeAgents.splice(fa, 1);
