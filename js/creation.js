@@ -181,6 +181,7 @@ function creationHTML() {
     '<div class="card"><h2>6. 스탯 <span class="muted small">보너스 포인트 남음: <b>' + pointsLeft() + "</b> / " + CREATION.bonusPoints + "</span></h2>" +
       '<p class="muted small"><span class="bonus">★</span> = 포지션 가산점 스탯. 스탯 이름에 마우스를 올리면 설명이 나와요.</p>' +
       statRows +
+      statGuideHTML(draft.position) +
     "</div>";
 
   // 시작 버튼

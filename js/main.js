@@ -136,7 +136,7 @@ pages.dashboard = function () {
 
   let statsHTML = "";
   STATS.forEach(function (s) {
-    statsHTML += barHTML(s.name, state.stats[s.id], s.desc + " (상한선 " + userStatCap(s.id) + ")", isBonusStat(s.id), userStatCap(s.id)); // 값/상한선
+    statsHTML += barHTML(s.name, state.stats[s.id], s.desc + " (상한선 " + userStatCap(s.id) + ") · " + (s.roles || []).join(" · "), isBonusStat(s.id), userStatCap(s.id)); // 값/상한선
   });
 
   const plan = state.plan ? findTraining(state.plan).name : "아직 안 정함";
@@ -175,6 +175,7 @@ pages.dashboard = function () {
     "</div>" +
     '<div class="card"><h2>내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점</span></h2>' +
       '<div class="stat-columns">' + statsHTML + "</div>" +
+      statGuideHTML(p.position) +
       '<h2 class="sub">유형 스탯 <span class="muted small">높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)</span></h2>' +
       '<div class="stat-columns type-stats">' + typeScoresHTML() + "</div>" +
     "</div>" +
@@ -408,7 +409,8 @@ pages.training = function () {
       const from = i ? GROWTH_CURVE[i - 1].upTo : 0;
       return from + "~" + Math.min(100, g.upTo - 1) + " " + Math.round(g.mult * 100) + "%";
     }).join(" · ") + "</p>" +
-    '<div class="grid">' + cards + "</div>"
+    '<div class="grid">' + cards + "</div>" +
+    '<div class="card">' + statGuideHTML(state.player.position) + "</div>"
   );
 };
 

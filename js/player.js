@@ -131,3 +131,26 @@ function growthMultiplier(value) {
 function traitEffectKey(effect, key) {
   return traitKeyOf(state.player.traits, effect, key);
 }
+
+// "각 스탯이 하는 일" 표 (대시보드·훈련·캐릭터 생성 화면). 펼친 상태는 화면을 다시 그려도 유지
+let statGuideOpen = false;
+function statGuideHTML(positionId) {
+  const pos = positionId && findPosition(positionId);
+  const row = function (s, bonus) {
+    return "<tr><td><b" + (bonus ? ' class="bonus"' : "") + ">" + (bonus ? "★ " : "") + s.name + '</b></td><td class="small">' + s.desc +
+      '</td><td class="small">' + (s.roles || []).join(" · ") + "</td></tr>";
+  };
+  return (
+    '<details class="stat-guide"' + (statGuideOpen ? " open" : "") + ' ontoggle="statGuideOpen = this.open"><summary>❓ 각 스탯이 하는 일</summary>' +
+      '<p class="small">모든 실력 스탯은 <b>종합 능력(스탯 점수)</b>에 들어가요. 종합 능력은 경기력의 바탕이고, 주전 경쟁·연봉·이적 제안도 이 값으로 정해져요. ' +
+        "★ 포지션 가산점 스탯은 종합 능력에서 " + POSITION_BONUS.matchMultiplier + "배로 계산되고 훈련 효과도 +" + Math.round(POSITION_BONUS.trainingBonus * 100) + "%예요." +
+        (pos ? " (" + pos.name + " 가산점: " + pos.bonus.map(function (id) { return STATS.find(function (s) { return s.id === id; }).name; }).join("·") + ")" : "") + "</p>" +
+      '<table class="mini"><tr><th>스탯</th><th>뜻</th><th>따로 쓰이는 곳</th></tr>' +
+        STATS.map(function (s) { return row(s, pos && pos.bonus.indexOf(s.id) !== -1); }).join("") +
+        '<tr><td colspan="3" class="muted small">— 특수 스탯 —</td></tr>' +
+        GAUGES.map(function (g) { return row(g, false); }).join("") +
+      "</table>" +
+      '<p class="muted small">챔피언 유형 숙련도 보너스: 그 유형의 스탯 3개 평균이 50보다 높을수록 그 유형 챔피언 숙련도가 빨리 올라요 (캐리형: 입력 정확도·거리 조절·집중력 / 지원형: 시야·오더·한타 / 공격형: 라인전·반응속도·멘탈 / 운영형: 운영·적응력·챔피언 폭).</p>' +
+    "</details>"
+  );
+}

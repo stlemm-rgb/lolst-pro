@@ -495,3 +495,8 @@ table.box td, table.box th { white-space: nowrap; font-size: 13px; }
 .comp-peel  { border-color: #34d399; color: #34d399; }
 .comp-brawl { border-color: #fb923c; color: #fb923c; }
 .comp-burst { border-color: #c084fc; color: #c084fc; }
+
+/* 각 스탯이 하는 일 */
+.stat-guide { margin-top: 12px; }
+.stat-guide summary { cursor: pointer; color: var(--accent); font-size: 14px; }
+.stat-guide table td { vertical-align: top; }
