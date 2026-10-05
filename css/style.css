@@ -116,3 +116,47 @@ button.primary {
 }
 
 button:hover { filter: brightness(0.95); }
+
+/* 카드 여러 개를 나란히 (화면이 좁으면 자동 줄바꿈) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+.grid .card { margin-bottom: 0; }
+.grid + .card { margin-top: 16px; }
+.card h2.sub { margin-top: 20px; }
+
+/* 스탯 막대 */
+.stat {
+  display: grid;
+  grid-template-columns: 64px 1fr 36px;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+.stat-label { cursor: help; }
+.stat-value { text-align: right; font-weight: bold; }
+.bar { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--accent); }
+
+/* 훈련 카드 */
+.training.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25); }
+.effects { color: var(--muted); font-size: 14px; }
+
+/* 안내 문구 */
+.notice {
+  background: #fff7e0;
+  border: 1px solid #f5d27a;
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+}
+
+/* 주간 기록 */
+.log-entry { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.log-entry:last-child { border-bottom: none; }
+.log-head { font-weight: bold; margin-bottom: 4px; }
+.log-changes { font-size: 14px; margin-top: 4px; }
+.up { color: var(--good); }
+.down { color: var(--bad); }
