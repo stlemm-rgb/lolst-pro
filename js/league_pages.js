@@ -42,7 +42,7 @@ function leagueDashboardHTML() {
     nextHTML =
       "<p><b>" + next.week + "주차</b> · " + escapeHTML(next.label) + " (" + next.bo + "판 " + Math.ceil(next.bo / 2) + "선승)</p>" +
       '<p class="big-vs">' + escapeHTML(mine.name) + ' <span class="muted">vs</span> ' + escapeHTML(teamName(opp)) + "</p>" +
-      '<p class="muted small">팀 전력 ' + teamStrength(mine.id).toFixed(1) + " vs " + teamStrength(opp).toFixed(1) +
+      '<p class="muted small">팀 전력 ' + teamStrength(mine.id).toFixed(1) + " vs " + strengthOf(opp).toFixed(1) +
         (next.week === state.week ? " · <b>이번 주 경기!</b>" : "") + "</p>";
   }
   const done = userMatches().filter(function (m) { return m.winner; }).slice(-5).reverse();

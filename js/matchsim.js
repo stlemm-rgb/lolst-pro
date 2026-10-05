@@ -80,6 +80,7 @@ function userMatchContext() {
   const m = matchPower();
   let mult = TEAM_MATCH.conditionBase + state.condition / TEAM_MATCH.conditionDiv;
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
+  mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
   return { power: m.power * mult, pick: m.pick, banned: m.banned };
 }
 
@@ -159,6 +160,16 @@ function afterUserMatch(m, ctx, lanes) {
   const myScore = m.a === mine ? m.score[0] : m.score[1];
   const oppScore = m.a === mine ? m.score[1] : m.score[0];
   const changes = {};
+  state.matchBoost = 0;
+
+  // 이벤트 조건용 기록
+  const w = state.weekCtx;
+  if (w) {
+    if (won) w.wins++; else w.losses++;
+    w.opp = oppId;
+    w.solos += lanes.filter(function (l) { return l.won && l.solo; }).length;
+    if (won && m.label.indexOf("4강") !== -1 && m.comp !== "cup_po") w.wonSemi = true;
+  }
 
   const cost = m.bo >= 5 ? TEAM_MATCH.staminaCostBo5 : TEAM_MATCH.staminaCostBo3;
   let before = state.stamina;
@@ -302,6 +313,11 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const f = schedule(week, comp, label, semis[0].winner, semis[1].winner, bo);
   playMatch(f);
   seasonOf().champions[champKey] = f.winner;
+  const mine = myTeam();
+  if (mine && f.winner === mine.id) {
+    state.career.finalsWon = (state.career.finalsWon || 0) + 1;
+    if (state.weekCtx) state.weekCtx.champion = title;
+  }
   if (champKey === "playoffs") {
     // 월드 진출: 결승 두 팀 + 4강 패자 두 팀
     seasonOf().worldsTeams = [f.winner, f.loser, semis[0].loser, semis[1].loser];

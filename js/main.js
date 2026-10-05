@@ -19,6 +19,12 @@ function createNewState() {
     mastery: {},                  // 챔피언 숙련도 { 챔피언 이름: 1 ~ 100 }
     meta: null,                   // 지금 패치 { label, champs: { top: [...], ... } }
     practiceChamp: "",            // 챔피언 연습에서 고른 챔피언 ("" = 자동)
+    inbox: [],                    // SNS 메시지 (js/events.js)
+    msgSeq: 0,                    // 메시지 번호
+    eventCooldown: {},            // 이벤트별 마지막으로 온 주
+    career: { finalsWon: 0, gainTried: {} }, // 커리어 기록 (결승 승리 수 등)
+    skipTraining: false,          // true면 다음 주 훈련 대신 휴식 (이벤트 효과)
+    matchBoost: 0,                // 다음 경기 경기력 보너스 (이벤트 효과)
     plan: null,                   // 이번 주에 고른 훈련 id
     log: [],                      // 최근 주간 결과 (최신이 맨 앞)
     settings: { autoSave: true }, // 게임 설정
@@ -458,6 +464,14 @@ function renderMenu() {
   MENUS.forEach(function (item) {
     const li = document.createElement("li");
     li.textContent = item.name;
+    // SNS: 안 읽었거나 답하지 않은 받은 연락 수
+    const badge = item.id === "sns" ? unreadCount("inbox") : 0;
+    if (badge) {
+      const b = document.createElement("span");
+      b.className = "badge";
+      b.textContent = badge;
+      li.appendChild(b);
+    }
     if (item.id === state.currentMenu) li.classList.add("active");
     li.onclick = function () { selectMenu(item.id); };
     menu.appendChild(li);
@@ -509,6 +523,7 @@ function renderPage() {
   });
 
   if (state.currentMenu === "settings") bindSettings(page);
+  if (state.currentMenu === "sns") bindSns(page);
 
   // 챔피언 연습: 연습할 챔피언 고르기
   const practice = document.getElementById("practice-champ");
@@ -526,15 +541,18 @@ function renderPage() {
 // ===== 다음 주로 진행 =====
 function nextWeek() {
   // 훈련을 안 골랐으면 훈련 화면으로 안내
-  if (!state.plan) {
+  if (!state.plan && !state.skipTraining) {
     state.currentMenu = "training";
     state.notice = "이번 주 훈련을 먼저 골라 주세요.";
     renderAll();
     return;
   }
 
-  // 훈련 효과 적용
-  const training = findTraining(state.plan);
+  resetWeekCtx(); // 이번 주에 일어난 일 기록 시작 (이벤트 조건용)
+
+  // 훈련 효과 적용 (이벤트로 "쉰다"를 골랐으면 이번 주는 휴식)
+  const training = state.skipTraining ? findTraining("rest") : findTraining(state.plan);
+  state.skipTraining = false;
   const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
   const changes = {};
   Object.keys(training.effects).forEach(function (id) {
@@ -608,6 +626,7 @@ function nextWeek() {
   newlyReleased(state.year, state.week).forEach(function (c) {
     if (state.mastery[c.name] !== undefined) return;
     state.mastery[c.name] = MASTERY.min;
+    state.weekCtx.newChamps.push(c);
     const posNames = c.positions.map(function (id) { return findPosition(id).name; }).join("·");
     addNews("새 챔피언", "새 챔피언 '" + c.name + "'(" + posNames + ")이(가) 출시됐다!");
   });
@@ -617,7 +636,14 @@ function nextWeek() {
     state.meta = makePatch(state.year, state.week);
     const mine = state.meta.champs[state.player.position].join(", ");
     addNews("패치", state.meta.label + " 적용! " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
+    state.weekCtx.patch = true;
+    // 숙련도 1위 챔피언이 메타에서 빠졌으면 "너프" 소식 후보
+    const top = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
+    if (top && !isMeta(top)) state.weekCtx.nerfChamp = top;
   }
+
+  // 이번 주 이벤트 (SNS)
+  runWeeklyEvents();
   state.log = state.log.slice(0, 30);
   state.currentMenu = "dashboard";
   state.notice = "";
@@ -642,6 +668,7 @@ function addNews(title, message) {
     message: message,
     changes: {},
   });
+  if (state.inbox) postMessage("news", "[" + title + "] " + message, message); // SNS 소식 탭에도
 }
 
 function renderAll() {

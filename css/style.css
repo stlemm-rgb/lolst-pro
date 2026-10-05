@@ -344,3 +344,31 @@ table td.c { text-align: center; }
 /* 소속팀 고르기 */
 .team-choices { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-bottom: 8px; }
 .team-choice { padding: 10px 12px; font-size: 14px; }
+
+/* 메뉴 배지 (안 읽은 연락 수) */
+#menu li { display: flex; align-items: center; gap: 8px; }
+.badge {
+  background: var(--bad); color: #fff; border-radius: 999px;
+  font-size: 11px; font-weight: bold; padding: 1px 7px; margin-left: auto;
+}
+.badge.inline { margin-left: 4px; }
+
+/* SNS */
+.sns-tabs { margin-bottom: 8px; }
+.messages { margin-top: 8px; }
+.msg { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: var(--panel-2); }
+.msg.read { opacity: 0.6; }
+.msg.read.open { opacity: 1; }
+.msg-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; }
+.msg-title { font-weight: bold; flex: 1; }
+.msg.read .msg-title { font-weight: normal; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.status { font-size: 11px; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; color: var(--muted); }
+.status.wait { border-color: var(--gold); color: var(--gold); }
+.status.done { border-color: var(--good); color: var(--good); }
+.msg-text, .msg-choices, .msg-answer, .msg-notes, .msg .log-changes { padding: 0 14px 10px; }
+.msg-choices button { display: block; margin: 6px 0 2px; text-align: left; white-space: normal; }
+.hint { font-size: 12px; color: var(--muted); margin: 0 0 6px 4px; }
+.msg-notes { font-size: 14px; color: var(--gold); }
+.post { padding: 10px 4px; border-bottom: 1px solid var(--border); }
+.post-author { font-weight: bold; color: var(--accent); }
