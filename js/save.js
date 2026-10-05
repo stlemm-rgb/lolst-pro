@@ -4,10 +4,10 @@
 
 const SAVE_KEY = "progamer-career-save";
 const SAVE_GAME_ID = "progamer-career";
-const SAVE_VERSION = 3; // 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
+const SAVE_VERSION = 4; // 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
-const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings"];
+const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league"];
 
 // 현재 게임 상태를 세이브 모양으로 만들기
 function makeSaveData() {
@@ -71,7 +71,15 @@ function stateFromSave(save) {
     POSITION_IDS.every(function (id) { return Array.isArray(s.meta.champs[id]); });
   fresh.meta = metaOk ? s.meta : makePatch(fresh.year, fresh.week);
   if (typeof s.practiceChamp === "string" && fresh.mastery[s.practiceChamp] !== undefined) fresh.practiceChamp = s.practiceChamp;
-  if (Array.isArray(s.log)) fresh.log = s.log.slice(0, 15);
+  if (Array.isArray(s.log)) fresh.log = s.log.slice(0, 30);
+  // 리그: 기본 모양이 맞으면 그대로, 아니면 화면을 그릴 때 새로 만듦
+  const L = s.league;
+  if (L && Array.isArray(L.teams) && L.players && L.season && Array.isArray(L.season.matches) &&
+      L.teams.some(function (t) { return Array.isArray(t.roster) && t.roster.indexOf("USER") !== -1; })) {
+    fresh.league = L;
+    if (!Array.isArray(L.freeAgents)) L.freeAgents = [];
+    if (!Array.isArray(L.usedNames)) L.usedNames = [];
+  }
   if (s.settings && typeof s.settings.autoSave === "boolean") fresh.settings.autoSave = s.settings.autoSave;
 
   return fresh;

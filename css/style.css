@@ -326,3 +326,21 @@ table.schedule td:first-child { white-space: nowrap; color: var(--muted); width:
 table.schedule tr.past { opacity: 0.45; }
 table.schedule tr.now { background: rgba(59, 130, 246, 0.15); }
 .now-tag { font-size: 11px; color: #fff; background: var(--accent); border-radius: 4px; padding: 1px 5px; }
+
+/* 리그 표 */
+table.matches, table.standings, table.roster, table.mini { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.matches td, table.standings td, table.standings th, table.roster td, table.roster th, table.mini td {
+  padding: 7px 8px; border-bottom: 1px solid var(--border); text-align: left;
+}
+table th { color: var(--muted); font-weight: normal; font-size: 13px; }
+td.r, th.r { text-align: right; }
+td.c { text-align: center; white-space: nowrap; }
+tr.me { background: rgba(59, 130, 246, 0.15); }
+.my-team { color: var(--accent); }
+.big-vs { font-size: 18px; font-weight: bold; margin: 6px 0; }
+table td.r, table th.r { text-align: right; }
+table td.c { text-align: center; }
+
+/* 소속팀 고르기 */
+.team-choices { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-bottom: 8px; }
+.team-choice { padding: 10px 12px; font-size: 14px; }

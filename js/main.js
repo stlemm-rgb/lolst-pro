@@ -5,7 +5,8 @@
 function createNewState() {
   return {
     player: null,                 // { name, position, archetype, age, traits } (캐릭터 생성 때 채워짐)
-    team: "무소속",
+    team: "무소속",                // 소속팀 이름 (리그가 생기면 myTeam()을 씀)
+    league: null,                 // 리그 정보: 구단·선수·경기 기록 (js/league.js)
     money: 0,
     year: 2012,                   // 현재 연도 (= 시즌). 캐릭터 생성 때 고른 시작 연도
     week: 1,                      // 1 ~ 52주차
@@ -152,6 +153,7 @@ pages.dashboard = function () {
       '<h2 class="sub">유형 스탯 <span class="muted small">높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)</span></h2>' +
       '<div class="stat-columns type-stats">' + typeScoresHTML() + "</div>" +
     "</div>" +
+    leagueDashboardHTML() +
     '<div class="card"><h2>챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
       '<p class="muted small">이번 패치 ' + pos.name + " 메타 챔피언 (숫자는 내 숙련도)</p>" +
       '<div class="chips">' + metaMine + "</div>" +
@@ -226,6 +228,7 @@ pages.schedule = function () {
       '<p class="muted small">2026년 실제 리그 일정을 바탕으로 한 52주 달력이에요. 경기는 3단계에서 추가돼요.</p>' +
       '<table class="schedule">' + rows + "</table>" +
     "</div>" +
+    userScheduleHTML() +
     '<div class="card"><h2>월드 챔피언십</h2>' +
       "<p>우리 리그 상위 <b>" + WORLDS.myRegionSlots + "팀</b> + 해외 가상 지역 " +
         WORLDS.regions.map(function (r) { return r.name + " " + r.teams + "팀"; }).join(", ") + "</p>" +
@@ -473,7 +476,7 @@ function renderTopbar() {
   document.getElementById("topbar").innerHTML =
     '<span class="item"><b>' + state.year + "</b>년 <b>" + state.week + "</b>주차 · " + scheduleOfWeek(state.week).name + "</span>" +
     '<span class="item">선수 <b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
-    '<span class="item">소속 <b>' + escapeHTML(state.team) + "</b></span>" +
+    '<span class="item">소속 <b>' + escapeHTML(myTeam().name) + "</b> (" + tierName(myTeam().tier) + ")</span>" +
     '<span class="item">자금 <b>' + state.money.toLocaleString() + "</b>원</span>" +
     '<span class="spacer"></span>' +
     '<button class="primary" id="next-week">다음 주로 진행 ▶</button>';
@@ -512,6 +515,9 @@ function renderPage() {
   if (practice) practice.onchange = function () { state.practiceChamp = this.value; };
 
   // 나의 커리어: 포지션 탭
+  page.querySelectorAll("[data-stab]").forEach(function (btn) {
+    btn.onclick = function () { standingsTab = btn.getAttribute("data-stab"); renderPage(); };
+  });
   page.querySelectorAll("[data-ctab]").forEach(function (btn) {
     btn.onclick = function () { championTab = btn.getAttribute("data-ctab"); renderPage(); };
   });
@@ -582,14 +588,20 @@ function nextWeek() {
     message: message,
     changes: changes,
   });
+  // 이번 주 리그 경기 (훈련 다음에 진행)
+  playLeagueWeek(state.week);
+
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
   state.week += 1;
   if (state.week > CREATION.weeksPerSeason) {
-    // 새해 = 새 시즌. 나이 +1
+    // 새해 = 새 시즌. 나이 +1, 승강·선수 성장/은퇴
+    saveSeasonHistory();
     state.year += 1;
     state.week = 1;
     state.player.age += 1;
-    addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세.");
+    const leagueNews = newSeasonLeague();
+    addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
+    leagueNews.forEach(function (text) { addNews("승강", text); });
   }
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
@@ -606,11 +618,20 @@ function nextWeek() {
     const mine = state.meta.champs[state.player.position].join(", ");
     addNews("패치", state.meta.label + " 적용! " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
   }
-  state.log = state.log.slice(0, 15);
+  state.log = state.log.slice(0, 30);
   state.currentMenu = "dashboard";
   state.notice = "";
   if (state.settings.autoSave) saveGame();
   renderAll();
+}
+
+// 지난 시즌 우승 기록 남기기 (7단계 역사관에서 사용)
+function saveSeasonHistory() {
+  const season = state.league.season;
+  if (!state.league.history) state.league.history = [];
+  const names = {};
+  Object.keys(season.champions).forEach(function (k) { names[k] = teamName(season.champions[k]); });
+  state.league.history.push({ year: season.year, champions: names, myTeam: myTeam().name });
 }
 
 // 소식 기록 (새 시즌, 새 챔피언, 패치 등)
@@ -632,11 +653,9 @@ function renderAll() {
     return;
   }
   document.getElementById("creation").innerHTML = "";
+  if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   renderMenu();
   renderTopbar();
   renderPage();
 }
 
-// 게임 시작: 저장된 게임이 있으면 이어서, 없으면 캐릭터 생성 화면
-state = loadGame() || createNewState();
-renderAll();

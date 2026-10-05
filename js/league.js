@@ -1,0 +1,308 @@
+// ===== 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 =====
+// 리그 정보는 모두 state.league 안에 있어요.
+//   teams:   [{ id, name, short, tier(1 또는 2), roster: [선수 id...] }]
+//   players: { 선수 id: { id, name, pos, age, stats, teamId } }   ※ 내 선수는 id "USER" (스탯은 state.stats)
+//   freeAgents: [선수 id...]   (소속 없는 선수, 5단계 이적 시장에서 사용)
+//   usedNames: [이름...]
+//   season:  { year, matches: [...], groups, worlds, promo, ... }  (경기 기록은 js/matchsim.js)
+
+const USER_ID = "USER";
+
+function findTeam(id) {
+  return state.league.teams.find(function (t) { return t.id === id; });
+}
+
+function findPlayer(id) {
+  return state.league.players[id];
+}
+
+function myTeam() {
+  return state.league.teams.find(function (t) { return t.roster.indexOf(USER_ID) !== -1; });
+}
+
+function tierTeams(tier) {
+  return state.league.teams.filter(function (t) { return t.tier === tier; });
+}
+
+// 스탯 점수 (12개 평균, 포지션 가산점 스탯은 1.5배) — 아무 선수에게나
+function statScoreFor(stats, pos) {
+  const bonus = findPosition(pos).bonus;
+  let sum = 0, weight = 0;
+  STATS.forEach(function (s) {
+    const w = bonus.indexOf(s.id) !== -1 ? POSITION_BONUS.matchMultiplier : 1;
+    sum += stats[s.id] * w;
+    weight += w;
+  });
+  return sum / weight;
+}
+
+// 선수 스탯 점수 (내 선수면 state.stats 사용)
+function playerScore(id) {
+  if (id === USER_ID) return statScoreFor(state.stats, state.player.position);
+  const p = findPlayer(id);
+  return statScoreFor(p.stats, p.pos);
+}
+
+function playerName(id) {
+  return id === USER_ID ? state.player.name : findPlayer(id).name;
+}
+
+function playerPos(id) {
+  return id === USER_ID ? state.player.position : findPlayer(id).pos;
+}
+
+function playerAge(id) {
+  return id === USER_ID ? state.player.age : findPlayer(id).age;
+}
+
+// ----- 선수 만들기 -----
+function takeName() {
+  const used = state.league.usedNames;
+  const free = PLAYER_NAMES.filter(function (n) { return used.indexOf(n) === -1; });
+  let name;
+  if (free.length) {
+    name = pick(free);
+  } else {
+    // 이름이 다 떨어지면 숫자를 붙여서 (예: Ace2)
+    let n = 2;
+    do { name = pick(PLAYER_NAMES) + n; n++; } while (used.indexOf(name) !== -1);
+  }
+  used.push(name);
+  return name;
+}
+
+let nextPlayerNumber = 1;
+function newPlayerId() {
+  let id;
+  do { id = "P" + (nextPlayerNumber++); } while (state.league.players[id]);
+  return id;
+}
+
+// 평균 avg ± spread 수준의 선수 하나 만들기
+function makeNpc(pos, level, ageRange) {
+  const target = level.avg + randInt(-level.spread, level.spread);
+  const bonus = findPosition(pos).bonus;
+  const stats = {};
+  STATS.forEach(function (s) {
+    let v = target + randInt(-LEAGUE.npc.statSpread, LEAGUE.npc.statSpread);
+    if (bonus.indexOf(s.id) !== -1) v += 4;
+    stats[s.id] = Math.max(1, Math.min(99, v));
+  });
+  const p = {
+    id: newPlayerId(),
+    name: takeName(),
+    pos: pos,
+    age: randInt(ageRange[0], ageRange[1]),
+    stats: stats,
+    teamId: null,
+  };
+  state.league.players[p.id] = p;
+  return p;
+}
+
+// ----- 구단 이름 정하기 -----
+// 1부: 고정 기업명 10개 + 무작위 서브 브랜드 / 2부: 무작위 영문 2글자 + 서브 브랜드
+// 결과: [{ name: "T1 VANGUARD", short: "T1", tier: 1 }, ...]
+function makeTeamDefs() {
+  const brands = shuffled(TEAM_BRANDS.map(function (b) { return b[0]; }));
+  const defs = [];
+  TIER1_ORGS.slice(0, LEAGUE.tier1Teams).forEach(function (org) {
+    defs.push({ name: org + " " + brands.pop(), short: org, tier: 1 });
+  });
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const taken = TIER1_ORGS.slice();
+  for (let i = 0; i < LEAGUE.tier2Teams; i++) {
+    let tag;
+    do { tag = letters[randInt(0, 25)] + letters[randInt(0, 25)]; } while (taken.indexOf(tag) !== -1);
+    taken.push(tag);
+    defs.push({ name: tag + " " + brands.pop(), short: tag, tier: 2 });
+  }
+  return defs;
+}
+
+// ----- 리그 만들기 (새 게임) -----
+// defs: 구단 이름 목록 (없으면 새로 만듦), chosenIndex: 내가 고른 구단 번호 (-1이면 무작위)
+function makeLeague(defs, chosenIndex) {
+  state.league = { teams: [], players: {}, freeAgents: [], usedNames: [], season: null };
+  const names = defs || makeTeamDefs();
+  names.forEach(function (n, i) {
+    const tier = n.tier;
+    const team = { id: "T" + (i + 1), name: n.name, short: n.short, tier: tier, roster: [] };
+    const npc = LEAGUE.npc;
+    // 주전 5명 (포지션마다 1명)
+    POSITION_IDS.forEach(function (pos) {
+      const p = makeNpc(pos, tier === 1 ? npc.tier1Starter : npc.tier2Starter, npc.ageRange);
+      p.teamId = team.id;
+      team.roster.push(p.id);
+    });
+    // 후보 2명 (포지션 무작위)
+    for (let k = 0; k < LEAGUE.rosterSize - 5; k++) {
+      const p = makeNpc(pick(POSITION_IDS), tier === 1 ? npc.tier1Sub : npc.tier2Sub, npc.ageRange);
+      p.teamId = team.id;
+      team.roster.push(p.id);
+    }
+    state.league.teams.push(team);
+  });
+  placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
+  startSeason();
+}
+
+// 내 선수를 구단에 넣기. 그 팀의 같은 포지션 주전은 자유 계약으로
+// - chosenId: 캐릭터 생성 때 고른 구단
+// - 안 골랐으면(무작위): 실력이 되면 1부 하위권 팀, 아니면 2부 팀
+function placeUser(chosenId) {
+  let team = chosenId ? findTeam(chosenId) : null;
+  if (!team) {
+    const score = statScoreFor(state.stats, state.player.position);
+    let candidates;
+    if (score >= LEAGUE.userTier1Score) {
+      candidates = tierTeams(1).sort(function (a, b) { return teamStrength(a.id) - teamStrength(b.id); }).slice(0, 5);
+    } else {
+      candidates = tierTeams(2);
+    }
+    team = pick(candidates);
+  }
+  const old = starterAt(team.id, state.player.position);
+  if (old) {
+    team.roster.splice(team.roster.indexOf(old), 1);
+    findPlayer(old).teamId = null;
+    state.league.freeAgents.push(old);
+  }
+  team.roster.unshift(USER_ID);
+  state.team = team.name;
+}
+
+// 그 팀 그 포지션의 주전 (내 선수는 항상 주전, 아니면 스탯 점수가 가장 높은 선수)
+function starterAt(teamId, pos) {
+  const team = findTeam(teamId);
+  if (team.roster.indexOf(USER_ID) !== -1 && state.player.position === pos) return USER_ID;
+  let best = null, bestScore = -1;
+  team.roster.forEach(function (id) {
+    if (id === USER_ID || playerPos(id) !== pos) return;
+    const s = playerScore(id);
+    if (s > bestScore) { best = id; bestScore = s; }
+  });
+  return best;
+}
+
+// 주전 5명 { top: id, jungle: id, ... } — 그 포지션 선수가 없으면 후보 중 가장 잘하는 선수
+function starters(teamId) {
+  const team = findTeam(teamId);
+  const result = {};
+  const used = [];
+  POSITION_IDS.forEach(function (pos) {
+    const id = starterAt(teamId, pos);
+    if (id) { result[pos] = id; used.push(id); }
+  });
+  POSITION_IDS.forEach(function (pos) {
+    if (result[pos]) return;
+    const rest = team.roster.filter(function (id) { return used.indexOf(id) === -1; })
+      .sort(function (a, b) { return playerScore(b) - playerScore(a); });
+    if (rest.length) { result[pos] = rest[0]; used.push(rest[0]); }
+  });
+  return result;
+}
+
+// 팀 전력 (주전 5명 스탯 점수 평균) — 화면 표시와 대진 정리용
+function teamStrength(teamId) {
+  const s = starters(teamId);
+  let sum = 0, n = 0;
+  POSITION_IDS.forEach(function (pos) { if (s[pos]) { sum += playerScore(s[pos]); n++; } });
+  return n ? sum / n : 0;
+}
+
+// 국내 팀이면 팀 전력, 해외 가상 팀이면 정해진 전력
+function strengthOf(id) {
+  if (findTeam(id)) return teamStrength(id);
+  const o = findOverseas(id);
+  return o ? o.power : 0;
+}
+
+// ----- 순위 계산 -----
+// comp: 대회 id (예: "split1"), teamIds: 순위에 넣을 팀
+// 정렬: 승 → 세트 득실 → 팀 전력
+function standings(comps, teamIds) {
+  const list = Array.isArray(comps) ? comps : [comps];
+  const rows = {};
+  teamIds.forEach(function (id) { rows[id] = { id: id, w: 0, l: 0, sw: 0, sl: 0 }; });
+  state.league.season.matches.forEach(function (m) {
+    if (list.indexOf(m.comp) === -1 || !m.winner) return;
+    [[m.a, 0], [m.b, 1]].forEach(function (pair) {
+      const r = rows[pair[0]];
+      if (!r) return;
+      const mine = m.score[pair[1]], theirs = m.score[1 - pair[1]];
+      if (m.winner === pair[0]) r.w++; else r.l++;
+      r.sw += mine; r.sl += theirs;
+    });
+  });
+  return Object.keys(rows).map(function (id) { return rows[id]; }).sort(function (a, b) {
+    return (b.w - a.w) || ((b.sw - b.sl) - (a.sw - a.sl)) || (strengthOf(b.id) - strengthOf(a.id));
+  });
+}
+
+// 1부 정규 시즌 최종 순위: 후반기 상위 그룹 5팀(전·후반 합산 순) → 하위 그룹 5팀
+function tier1FinalOrder() {
+  const g = state.league.season.groups;
+  if (!g) return standings("split1", tierTeams(1).map(function (t) { return t.id; })).map(function (r) { return r.id; });
+  const top = standings(["split1", "split2"], g.legend).map(function (r) { return r.id; });
+  const low = standings(["split1", "split2"], g.rise).map(function (r) { return r.id; });
+  return top.concat(low);
+}
+
+// ----- 시즌 넘기기 -----
+function startSeason() {
+  state.league.season = {
+    year: state.year,
+    matches: [],     // 모든 경기 기록
+    cupGroups: null, // 컵 대회 두 조
+    groups: null,    // 후반기 상위/하위 그룹
+    seeds: null,     // 플레이오프 시드
+    promo: [],       // 승강전 결과 [{ tier1, tier2, winner }]
+    worlds: null,    // 월드 챔피언십 정보
+    champions: {},   // 대회별 우승 팀 { cup, playoffs, worlds }
+  };
+}
+
+// 새해: 승강, NPC 성장·노화·은퇴, 새 시즌
+function newSeasonLeague() {
+  const season = state.league.season;
+  const news = [];
+
+  // 승강전 결과 반영
+  season.promo.forEach(function (p) {
+    if (p.winner === p.tier2) {
+      findTeam(p.tier2).tier = 1;
+      findTeam(p.tier1).tier = 2;
+      news.push(findTeam(p.tier2).name + " 1부 승격, " + findTeam(p.tier1).name + " 2부 강등");
+    }
+  });
+
+  // NPC 성장·노화·은퇴
+  Object.keys(state.league.players).forEach(function (id) {
+    const p = state.league.players[id];
+    p.age += 1;
+    const rule = LEAGUE.npcGrowth.find(function (g) { return p.age <= g.maxAge; });
+    STATS.forEach(function (s) {
+      p.stats[s.id] = Math.max(1, Math.min(99, p.stats[s.id] + randInt(rule.change[0], rule.change[1])));
+    });
+    if (p.age >= LEAGUE.retireFromAge && Math.random() < (p.age - LEAGUE.retireFromAge + 1) * LEAGUE.retireChancePerYear) {
+      retirePlayer(p);
+    }
+  });
+
+  startSeason();
+  return news;
+}
+
+// 은퇴: 팀에서 빠지고 같은 포지션 신인이 들어옴
+function retirePlayer(p) {
+  const team = p.teamId && findTeam(p.teamId);
+  delete state.league.players[p.id];
+  const fa = state.league.freeAgents.indexOf(p.id);
+  if (fa !== -1) state.league.freeAgents.splice(fa, 1);
+  if (!team) return;
+  team.roster.splice(team.roster.indexOf(p.id), 1);
+  const rookie = makeNpc(p.pos, LEAGUE.rookie, LEAGUE.rookie.ageRange);
+  rookie.teamId = team.id;
+  team.roster.push(rookie.id);
+}

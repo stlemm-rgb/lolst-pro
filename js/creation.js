@@ -29,6 +29,8 @@ function newDraft() {
     offsets: offsets,
     alloc: {},                          // 보너스 포인트를 어디에 몇 점 줬는지
     traitOrder: shuffled(goodIds),      // 특성 뽑기 순서 (앞에서부터 개수만큼 받음)
+    teams: makeTeamDefs(),              // 이번 판 구단 이름 (1부 10 + 2부 8)
+    teamChoice: -1,                     // 고른 구단 번호 (-1 = 무작위)
     rerollsLeft: CREATION.traitRerolls,
     error: "",
   };
@@ -161,6 +163,32 @@ function creationHTML() {
     "</div>";
 
   // 시작 버튼
+  // 7. 소속팀
+  const stats = {};
+  STATS.forEach(function (s) { stats[s.id] = draftStat(s.id); });
+  const myScore = statScoreFor(stats, draft.position);
+  const teamBtn = function (def, i) {
+    return '<div class="choice team-choice' + (draft.teamChoice === i ? " selected" : "") + '" data-cteam="' + i + '">' +
+      '<b>' + escapeHTML(def.name) + "</b></div>";
+  };
+  let t1 = "", t2 = "";
+  draft.teams.forEach(function (def, i) { if (def.tier === 1) t1 += teamBtn(def, i); else t2 += teamBtn(def, i); });
+  const chosen = draft.teams[draft.teamChoice];
+  let warn = "";
+  if (chosen && chosen.tier === 1 && myScore < LEAGUE.userTier1Score) {
+    warn = '<div class="notice">지금 내 스탯 점수는 <b>' + myScore.toFixed(1) + "</b>이고, 1부 주전 평균은 약 " + LEAGUE.npc.tier1Starter.avg +
+      "이에요. 주전으로 뛰지만 힘든 출발이 될 수 있어요.</div>";
+  }
+  const teamCard =
+    '<div class="card"><h2>7. 소속팀</h2>' +
+      '<p class="muted small">뛰고 싶은 팀을 고르세요. 내 선수는 그 팀의 주전이 돼요. 지금 내 스탯 점수: <b>' + myScore.toFixed(1) + "</b></p>" +
+      '<div class="choices team-choices"><div class="choice team-choice' + (draft.teamChoice === -1 ? " selected" : "") + '" data-cteam="-1">' +
+        "<b>무작위</b><br><span class=\"muted small\">내 실력에 맞는 팀으로</span></div></div>" +
+      '<h2 class="sub">1부 리그</h2><div class="choices team-choices">' + t1 + "</div>" +
+      '<h2 class="sub">2부 리그</h2><div class="choices team-choices">' + t2 + "</div>" +
+      warn +
+    "</div>";
+
   const saved = loadGame();
   const startCard =
     '<div class="card start-card">' +
@@ -174,7 +202,7 @@ function creationHTML() {
   return (
     '<h1 class="creation-title">캐릭터 생성</h1>' +
     '<p class="muted">프로게이머로서의 첫걸음. 어떤 선수가 될지 정해 주세요.</p>' +
-    nameCard + yearCard + posCard + archCard + traitCard + statCard + startCard
+    nameCard + yearCard + posCard + archCard + traitCard + statCard + teamCard + startCard
   );
 }
 
@@ -199,6 +227,9 @@ function renderCreation() {
 
   box.querySelectorAll("[data-cyear]").forEach(function (el) {
     el.onclick = function () { draft.startYear = Number(el.getAttribute("data-cyear")); renderCreation(); };
+  });
+  box.querySelectorAll("[data-cteam]").forEach(function (el) {
+    el.onclick = function () { draft.teamChoice = Number(el.getAttribute("data-cteam")); renderCreation(); };
   });
   box.querySelectorAll("[data-cpos]").forEach(function (el) {
     el.onclick = function () { draft.position = el.getAttribute("data-cpos"); renderCreation(); };
@@ -273,8 +304,11 @@ function startCareer() {
   fresh.mastery = startMastery(fresh.stats, fresh.player.position, fresh.year, fresh.week);
   fresh.meta = makePatch(fresh.year, fresh.week);
 
+  const teams = draft.teams, teamChoice = draft.teamChoice;
   draft = null;
   window.scrollTo(0, 0); // 생성 화면에서 내려간 스크롤을 맨 위로
+  state = fresh;
+  makeLeague(teams, teamChoice); // 리그·구단·선수 만들고 내 소속팀 정하기
   replaceState(fresh, "dashboard", escapeHTML(fresh.player.name) + " 선수의 커리어가 시작됐어요! 훈련을 고르고 [다음 주로 진행]을 눌러 보세요.");
   saveGame();
 }
