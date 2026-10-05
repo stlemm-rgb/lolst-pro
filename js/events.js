@@ -270,9 +270,11 @@ function postSocial() {
   if (Math.random() < 0.3) postMessage("social", author(), fillText(pick(SOCIAL_POSTS.general), ctx), { read: true });
 }
 
-// 오래 답하지 않은 연락은 "무시"로
+// 오래 답하지 않은 연락은 "무시"로, 오래 안 읽은 소식·연락은 "읽음"으로 (알림 배지에서 빠짐)
 function autoIgnore() {
   state.inbox.forEach(function (m) {
+    const age = absWeek() - absWeek(m.year, m.week);
+    if (!m.read && !(m.choices && m.answered === null) && age >= EVENT_RULES.readAfterWeeks) m.read = true;
     if (m.tab !== "inbox" || m.answered !== null || !m.choices) return;
     if (absWeek() - absWeek(m.year, m.week) >= EVENT_RULES.ignoreAfterWeeks) {
       m.answered = "ignored";

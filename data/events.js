@@ -40,6 +40,7 @@ const EVENT_RULES = {
   randomChance: 0.25,   // 매주 무작위 이벤트가 올 확률
   cooldown: 8,          // 같은 이벤트가 다시 오기까지 최소 주
   ignoreAfterWeeks: 4,  // 답하지 않으면 이 주 뒤에 자동으로 "무시"
+  readAfterWeeks: 4,    // 안 읽은 소식·연락은 이 주 뒤에 자동으로 "읽음" (알림 배지에서 빠짐)
   maxRisk: 0.05,        // 나쁜 특성 확률 상한 (데이터에 더 높게 적어도 이 값으로 잘림)
   keepMessages: 120,    // SNS에 남겨 둘 메시지 수
 };
