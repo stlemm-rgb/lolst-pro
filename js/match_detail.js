@@ -164,8 +164,13 @@ function matchHeaderHTML(m) {
       '<div class="muted small">' + m.week + "주차 · " + escapeHTML(m.label) + " · " + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승</div>" +
       '<div class="res-score">' + teamLabel(m.a) + " <b>" + m.score[0] + " : " + m.score[1] + "</b> " + teamLabel(m.b) + "</div>" +
       '<div class="small">' + (m.pogName ? "🏅 POG <b>" + escapeHTML(m.pogName) + "</b>" : "") +
-        (d.pick ? " · 내 픽 <b>" + escapeHTML(d.pick) + "</b>" + (d.joker ? ' <span class="joker-tag">🃏 조커픽</span>' : "") +
-          (d.banned && d.banned.length ? ' <span class="muted">(밴 당함: ' + d.banned.map(escapeHTML).join(", ") + ")</span>" : "") : "") + "</div>" +
+        (d.sets.some(function (s) { return s.pick; })
+          ? " · 내 픽 " + d.sets.map(function (s, i) {
+              return (i + 1) + "세트 <b>" + escapeHTML(s.pick || "-") + "</b>" + (s.joker ? ' <span class="joker-tag">🃏</span>' : "") +
+                (s.banned && s.banned.length ? ' <span class="muted small">(밴: ' + s.banned.map(escapeHTML).join(", ") + ")</span>" : "");
+            }).join(" · ")
+          : d.pick ? " · 내 픽 <b>" + escapeHTML(d.pick) + "</b>" + (d.joker ? ' <span class="joker-tag">🃏 조커픽</span>' : "") : "") + "</div>" +
+      '<div class="muted small">피어리스 밴픽: 한 번 나온 챔피언은 같은 경기 뒤 세트에서 누구도 고를 수 없어요.</div>' +
       '<div class="chips">' + sets + "</div>" +
     "</div>"
   );

@@ -236,8 +236,11 @@ function metaPenaltyInfo() {
 
 // 한 경기 경기력 계산. bans = 밴 당하는 수 (기본 data/match.js)
 // 실제 경기 밴: 밴 수와 대상을 무작위로 (data/match.js의 banCount, banWeights)
-function rollBans() {
-  const ranked = myPositionChampions().slice().sort(function (a, b) { return banValue(b) - banValue(a); });
+// exclude: 이번 경기 앞 세트에서 이미 나온 챔피언 (피어리스: 다시 못 나오니 밴할 필요도 없음)
+function rollBans(exclude) {
+  exclude = exclude || [];
+  const ranked = myPositionChampions().filter(function (n) { return exclude.indexOf(n) === -1; })
+    .sort(function (a, b) { return banValue(b) - banValue(a); });
   let r = Math.random(), count = 0;
   for (let i = 0; i < MATCH.banCount.length; i++) {
     r -= MATCH.banCount[i][1];
@@ -256,11 +259,13 @@ function rollBans() {
 
 // bans: 밴 당하는 수(숫자, 미리보기용 — 상대가 가장 경계하는 챔피언부터) 또는 밴 당한 챔피언 목록(실제 경기)
 // target: 우리 팀이 이번 경기에 노리는 조합 성향 (있으면 그 성향 챔피언을 더 잘 고름)
-function matchPower(bans, target) {
+// exclude: 이번 경기 앞 세트에서 이미 나온 챔피언 (다시 고를 수 없음)
+function matchPower(bans, target, exclude) {
+  exclude = exclude || [];
   const ranked = myPositionChampions().slice().sort(function (a, b) { return banValue(b) - banValue(a); });
-  const banned = Array.isArray(bans) ? bans : ranked.slice(0, bans === undefined ? MATCH.bansAgainstMe : bans);
+  const banned = Array.isArray(bans) ? bans : ranked.filter(function (n) { return exclude.indexOf(n) === -1; }).slice(0, bans === undefined ? MATCH.bansAgainstMe : bans);
   // 남은 챔피언 중 내 가치(조커픽 보너스 포함)가 가장 높은 챔피언
-  const left = ranked.filter(function (n) { return banned.indexOf(n) === -1; });
+  const left = ranked.filter(function (n) { return banned.indexOf(n) === -1 && exclude.indexOf(n) === -1; });
   const pick = left.slice().sort(function (a, b) { return myPickValue(b, target) - myPickValue(a, target); })[0] || ranked[0];
   const joker = isJoker(pick);
   const score = statScore();

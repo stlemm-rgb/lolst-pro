@@ -120,7 +120,8 @@ function pickLineup(list, target, used, userPick) {
 // 결과 { a: {...}, b: {...} } 각 팀: picks, counts, main, n, plan, target, syn(시너지 단계 0/3/4), match(+2/−2/0), soloEasy, laneExtra, bonus(팀 점수 합)
 function setComps(la, lb, setCtx, userPick) {
   const plans = setCtx.plans || {};
-  const used = userPick ? [userPick] : [];
+  const used = (setCtx.used || []).slice(); // 앞 세트에서 나온 챔피언은 제외 (피어리스)
+  if (userPick) used.push(userPick);
   const make = function (list, plan) {
     const p = plan || { plan: "meta", target: metaComp() };
     const picks = pickLineup(list, p.target, used, userPick);

@@ -81,8 +81,9 @@ function isBigMatch(match) {
   return ["playoffs", "worlds_ko", "promotion"].indexOf(match.comp) !== -1 || match.label.indexOf("결승") !== -1;
 }
 
-function userMatchContext(match, target) {
-  const m = matchPower(rollBans(), target); // 경기마다 밴 수·대상이 달라짐, 조합 성향 반영
+// 내 선수 한 세트 준비: 밴·픽·경기력 (세트마다 새로. used = 이번 경기에서 이미 나온 챔피언 → 다시 못 고름)
+function userMatchContext(match, target, used) {
+  const m = matchPower(rollBans(used), target, used); // 세트마다 밴 수·대상이 달라짐, 조합 성향 반영
   let mult = TEAM_MATCH.conditionBase + state.condition / TEAM_MATCH.conditionDiv;
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
@@ -208,14 +209,17 @@ function playMatch(m) {
   const userIn = mine && (m.a === mine.id || m.b === mine.id) && !state.benched; // 후보면 출전 안 함
   // 조합 전략 (경기마다): 메타 따라가기 / 메타 카운터 / 자유 (js/comps.js)
   const plans = { a: teamCompPlan(m.a), b: teamCompPlan(m.b) };
-  const userCtx = userIn ? userMatchContext(m, (m.a === mine.id ? plans.a : plans.b).target) : null;
+  const myTarget = userIn ? (m.a === mine.id ? plans.a : plans.b).target : null;
+  const seriesUsed = []; // 피어리스: 이번 경기에서 한 번 나온 챔피언은 뒤 세트에서 아무도 못 고름
+  const userPicks = [];
+  let userCtx = null;
   const need = Math.ceil(m.bo / 2);
   const lanes = [];
   const perf = {}; // 이 경기 선수별 기록 (js/records.js)
   const downTwo = []; // 0:2로 몰렸던 팀 (역전의 명수)
   // 경기 상세: 우리 팀 경기와 결승전만 저장 (js/match_detail.js)
   const keepDetail = (mine && (m.a === mine.id || m.b === mine.id)) || m.label.indexOf("결승") !== -1;
-  const detail = keepDetail ? { sets: [], pick: userCtx ? userCtx.pick : null, joker: !!(userCtx && userCtx.joker), banned: userCtx ? userCtx.banned : [] } : null;
+  const detail = keepDetail ? { sets: [] } : null;
   m.score = [0, 0];
   while (m.score[0] < need && m.score[1] < need) {
     if (m.score[0] === 0 && m.score[1] === 2) downTwo.push(m.a);
@@ -226,19 +230,29 @@ function playMatch(m) {
       behind: m.score[0] < m.score[1] ? m.a : m.score[1] < m.score[0] ? m.b : null,
       setNo: m.score[0] + m.score[1] + 1,
       plans: plans,
+      used: seriesUsed,
     };
+    if (userIn) {
+      userCtx = userMatchContext(m, myTarget, seriesUsed);
+      userPicks.push({ pick: userCtx.pick, joker: userCtx.joker });
+    }
     const set = playSet(m.a, m.b, userCtx, setCtx);
+    set.comps.a.picks.concat(set.comps.b.picks).forEach(function (n) { if (seriesUsed.indexOf(n) === -1) seriesUsed.push(n); });
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
     recordSet(set, m, perf);
-    if (detail) detail.sets.push(setDetail(set, setCtx, m, detail.pick));
+    if (detail) {
+      const sd = setDetail(set, setCtx, m, userCtx ? userCtx.pick : null);
+      if (userCtx) { sd.pick = userCtx.pick; sd.joker = !!userCtx.joker; sd.banned = userCtx.banned; }
+      detail.sets.push(sd);
+    }
   }
   if (detail) m.detail = detail;
   m.winner = m.score[0] > m.score[1] ? m.a : m.b;
   m.loser = m.winner === m.a ? m.b : m.a;
   finishSeriesRecord(m, perf);
   sTraitsOnMatch(m, perf, downTwo); // 0:2 역전승 기록 (역전의 명수, js/straits.js)
-  if (userIn) afterUserMatch(m, userCtx, lanes, perf[USER_ID]);
+  if (userIn) afterUserMatch(m, { pick: userPicks.map(function (u) { return (u.joker ? "🃏" : "") + u.pick; }).join(" / "), joker: false }, lanes, perf[USER_ID]);
   return m;
 }
 
