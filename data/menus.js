@@ -5,6 +5,7 @@ const MENUS = [
   { id: "dashboard",  name: "대시보드" },
   { id: "training",   name: "훈련" },
   { id: "sns",        name: "SNS" },
+  { id: "results",    name: "경기 결과" },
   { id: "career",     name: "나의 커리어" },
   { id: "team",       name: "소속팀" },
   { id: "schedule",   name: "시즌 일정" },

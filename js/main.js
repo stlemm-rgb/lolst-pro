@@ -285,7 +285,7 @@ pages.career = function () {
   const m = matchPower();
   const mp = m.meta;
   const preview =
-    '<div class="card"><h2>경기력 미리보기 <span class="muted small">상대가 내 챔피언 ' + MATCH.bansAgainstMe + "명을 밴했을 때 (3단계 경기 판정에 쓰여요)</span></h2>" +
+    '<div class="card"><h2>경기력 미리보기 <span class="muted small">상대가 가장 경계하는 내 챔피언 ' + MATCH.bansAgainstMe + "명을 밴했을 때 · 실제 경기에서는 밴 수(0~3명)와 대상이 경기마다 달라요</span></h2>" +
       '<table class="calc">' +
         "<tr><td>스탯 점수</td><td>12개 평균, ★가산점 " + POSITION_BONUS.matchMultiplier + "배</td><td><b>" + m.score.toFixed(1) + "</b></td></tr>" +
         "<tr><td>밴 당한 챔피언</td><td colspan=\"2\">" + (m.banned.join(", ") || "없음") + "</td></tr>" +

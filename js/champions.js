@@ -217,10 +217,29 @@ function metaPenaltyInfo() {
 }
 
 // 한 경기 경기력 계산. bans = 밴 당하는 수 (기본 data/match.js)
-function matchPower(bans) {
-  const count = bans === undefined ? MATCH.bansAgainstMe : bans;
+// 실제 경기 밴: 밴 수와 대상을 무작위로 (data/match.js의 banCount, banWeights)
+function rollBans() {
   const ranked = myPositionChampions().slice().sort(function (a, b) { return banValue(b) - banValue(a); });
-  const banned = ranked.slice(0, count);
+  let r = Math.random(), count = 0;
+  for (let i = 0; i < MATCH.banCount.length; i++) {
+    r -= MATCH.banCount[i][1];
+    if (r < 0) { count = MATCH.banCount[i][0]; break; }
+  }
+  const pool = ranked.slice(0, MATCH.banWeights.length);
+  const weights = MATCH.banWeights.slice(0, pool.length);
+  const banned = [];
+  while (banned.length < count && pool.length) {
+    const i = weightedIndex(weights);
+    banned.push(pool.splice(i, 1)[0]);
+    weights.splice(i, 1);
+  }
+  return banned;
+}
+
+// bans: 밴 당하는 수(숫자, 미리보기용 — 상대가 가장 경계하는 챔피언부터) 또는 밴 당한 챔피언 목록(실제 경기)
+function matchPower(bans) {
+  const ranked = myPositionChampions().slice().sort(function (a, b) { return banValue(b) - banValue(a); });
+  const banned = Array.isArray(bans) ? bans : ranked.slice(0, bans === undefined ? MATCH.bansAgainstMe : bans);
   // 남은 챔피언 중 내 가치(조커픽 보너스 포함)가 가장 높은 챔피언
   const left = ranked.filter(function (n) { return banned.indexOf(n) === -1; });
   const pick = left.slice().sort(function (a, b) { return myPickValue(b) - myPickValue(a); })[0] || ranked[0];

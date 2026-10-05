@@ -82,7 +82,7 @@ function isBigMatch(match) {
 }
 
 function userMatchContext(match) {
-  const m = matchPower();
+  const m = matchPower(rollBans()); // 경기마다 밴 수·대상이 달라짐
   let mult = TEAM_MATCH.conditionBase + state.condition / TEAM_MATCH.conditionDiv;
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
@@ -130,7 +130,17 @@ function average(list) {
   return list.length ? sum / list.length : 0;
 }
 
-// 한 세트: 라인전 → 한타
+// 운영·한타 점수: 5명의 운영·오더·시야·한타·거리 조절 평균이 기준보다 높은 만큼 (해외 가상 팀은 경기력으로 대신)
+function teamplayScore(list) {
+  const vals = list.map(function (p) {
+    const st = p.id ? statsOfId(p.id) : null;
+    if (!st) return p.power;
+    return average(TEAM_MATCH.teamplayStats.map(function (id) { return st[id]; }));
+  });
+  return (average(vals) - TEAM_MATCH.teamplayBase) * TEAM_MATCH.teamplayWeight;
+}
+
+// 한 세트: 라인전 → 운영·한타
 function playSet(a, b, userCtx, setCtx) {
   const la = lineup(a, userCtx, setCtx), lb = lineup(b, userCtx, setCtx);
   let bonusA = 0, bonusB = 0, userLane = null;
@@ -148,15 +158,16 @@ function playSet(a, b, userCtx, setCtx) {
   });
   const luckA = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom), luckB = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
   const avgA = average(la.map(function (p) { return p.power; })), avgB = average(lb.map(function (p) { return p.power; }));
-  const powerA = avgA + bonusA + luckA;
-  const powerB = avgB + bonusB + luckB;
+  const playA = teamplayScore(la), playB = teamplayScore(lb);
+  const powerA = avgA + bonusA + playA + luckA;
+  const powerB = avgB + bonusB + playB + luckB;
   // 타고난 리더·원클럽맨: 그 선수가 있는 팀 한타 전력 보너스
   const mood = function (list) { return list.reduce(function (sum, p) { return sum + (p.id ? traitSumOf(traitsOf(p.id), "teamMood") : 0); }, 0); };
   const moodA = mood(la), moodB = mood(lb);
   return {
     winner: powerA + moodA >= powerB + moodB ? a : b, userLane: userLane, la: la, lb: lb,
     lanes: laneResults,
-    teamA: { avg: avgA, lane: bonusA, luck: luckA, mood: moodA }, teamB: { avg: avgB, lane: bonusB, luck: luckB, mood: moodB },
+    teamA: { avg: avgA, lane: bonusA, play: playA, luck: luckA, mood: moodA }, teamB: { avg: avgB, lane: bonusB, play: playB, luck: luckB, mood: moodB },
   };
 }
 
@@ -185,7 +196,7 @@ function playMatch(m) {
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
     recordSet(set, m, perf);
-    if (detail) detail.sets.push(setDetail(set, setCtx, m));
+    if (detail) detail.sets.push(setDetail(set, setCtx, m, detail.pick));
   }
   if (detail) m.detail = detail;
   m.winner = m.score[0] > m.score[1] ? m.a : m.b;

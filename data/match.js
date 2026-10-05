@@ -15,7 +15,11 @@
 //    다른 선수들은 경기마다 경기력 = 스탯 점수 × npcMultiplier 사이 무작위 값
 const MATCH = {
   npcMultiplier: [0.8, 1.2],
-  bansAgainstMe: 2,
+  bansAgainstMe: 2,                      // [나의 커리어] 경기력 미리보기에서 가정하는 밴 수
+  // 실제 경기의 밴: 경기마다 상대가 내 챔피언을 몇 명 밴할지 [밴 수, 확률]
+  banCount: [[0, 0.15], [1, 0.35], [2, 0.35], [3, 0.15]],
+  // 밴 대상: 상대가 경계하는 순서(숙련도 + 메타) 상위 5명 중에서, 앞쪽일수록 잘 뽑힘 (비율)
+  banWeights: [40, 25, 15, 12, 8],
   // 메타 등급: 포지션마다 메타 5명 중 1명은 S급, 나머지는 A급
   metaPickBonus: { S: 25, A: 15 },      // 밴픽 때 "숙련도 + 이 값"으로 가치를 매김
   metaPowerBonus: { S: 0.08, A: 0.03 }, // 고른 챔피언이 메타면 경기력 +8% / +3%
@@ -39,17 +43,22 @@ const MATCH = {
 // 팀 경기 판정: 라인 맞대결 방식 (3단계에서 사용)
 // 1) 라인전: 같은 포지션끼리 경기력 비교 → 이긴 쪽 팀에 laneWinBonus
 //    차이가 soloKillGap 이상이면 "솔로킬"로 soloKillBonus 추가
-// 2) 한타: 팀 전력 = 5명 평균 + 라인전 보너스 합 + 무작위(±teamRandom)
+// 2) 운영·한타: 5명의 운영·오더·시야·한타·거리 조절 평균이 teamplayBase보다 높은 만큼 × teamplayWeight
+// 3) 팀 전력 = 5명 경기력 평균 + 라인전 보너스 합 + 운영·한타 + 무작위(±teamRandom)
 //    → 전력이 높은 팀이 그 세트 승리
-// 3) 3판 2선승 / 5판 3선승은 세트마다 따로 판정
+// 4) 3판 2선승 / 5판 3선승은 세트마다 따로 판정
+// (2026-10-06) 라인전이 너무 중요해서 라인전 보너스를 3 → 1.5, 솔로킬 2 → 1로 줄이고 운영·한타 점수를 추가
 // 내 선수만: 컨디션·체력 영향
 //    경기력 × (conditionBase + 컨디션 ÷ conditionDiv)   (컨디션 0 → 0.9배, 50 → 1.0배, 100 → 1.1배)
 //    체력이 lowStaminaLimit 미만이면 경기력 × (1 − lowStaminaCut)
 //    경기마다 체력 소모: 3판 2선승 staminaCostBo3, 5판 3선승 staminaCostBo5
 const TEAM_MATCH = {
-  laneWinBonus: 3,
+  laneWinBonus: 1.5,
   soloKillGap: 15,
-  soloKillBonus: 2,
+  soloKillBonus: 1,
+  teamplayStats: ["macro", "shotcall", "vision", "teamfight", "spacing"],
+  teamplayBase: 60,
+  teamplayWeight: 0.35,
   teamRandom: 8,
   conditionBase: 0.9,
   conditionDiv: 500,

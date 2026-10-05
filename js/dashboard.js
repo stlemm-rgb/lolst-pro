@@ -84,14 +84,12 @@ function weekReportHTML() {
   if (r.userLines.length) {
     html += r.userLines.map(function (l) {
       return '<div class="rep-row"><span class="rep-tag ' + (l.won ? "win" : "lose") + '">' + (l.won ? "승" : "패") + "</span>" +
-        escapeHTML(l.text) + (l.changes ? ' <span class="log-changes">' + changesText(l.changes) + "</span>" : "") + detailButtonHTML(l.matchKey) + "</div>" +
-        openDetailHTML(l.matchKey);
+        escapeHTML(l.text) + (l.changes ? ' <span class="log-changes">' + changesText(l.changes) + "</span>" : "") + detailButtonHTML(l.matchKey) + "</div>";
     }).join("");
   } else if (r.teamLines.length) {
     html += r.teamLines.map(function (l) {
       return '<div class="rep-row"><span class="rep-tag ' + (l.won ? "win" : "lose") + '">' + (l.won ? "승" : "패") + "</span>" +
-        escapeHTML(l.text) + ' <span class="muted small">(후보라서 출전하지 않음)</span>' + detailButtonHTML(l.matchKey) + "</div>" +
-        openDetailHTML(l.matchKey);
+        escapeHTML(l.text) + ' <span class="muted small">(후보라서 출전하지 않음)</span>' + detailButtonHTML(l.matchKey) + "</div>";
     }).join("");
   } else {
     html += '<div class="rep-row muted">이번 주는 경기가 없었어요.</div>';

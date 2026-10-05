@@ -474,3 +474,16 @@ table.lane-table th { color: var(--muted, #8b95a7); font-weight: normal; text-al
 .stamina-badge.warn { border-color: var(--gold); color: var(--gold); }
 .stamina-badge.down { border-color: var(--bad); color: var(--bad); }
 .joker-tag { font-size: 11px; padding: 1px 6px; border-radius: 999px; border: 1px solid #c084fc; color: #c084fc; margin-left: 4px; }
+
+/* ===== 경기 결과 화면 ===== */
+.results-layout { display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: start; }
+.res-list { max-height: calc(100vh - 160px); overflow-y: auto; padding: 12px; position: sticky; top: 12px; }
+.res-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; margin-bottom: 4px; font-size: 14px; }
+.res-item:hover { background: rgba(255, 255, 255, 0.04); }
+.res-item.sel { border-color: var(--accent); background: rgba(59, 130, 246, 0.1); }
+.res-main { min-width: 0; }
+.res-head .res-score { font-size: 22px; margin: 6px 0; }
+.res-tabs { margin-bottom: 12px; }
+.table-wrap { overflow-x: auto; }
+table.box td, table.box th { white-space: nowrap; font-size: 13px; }
+@media (max-width: 900px) { .results-layout { grid-template-columns: 1fr; } .res-list { position: static; max-height: 240px; } }
