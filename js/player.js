@@ -71,3 +71,9 @@ function traitChipHTML(id) {
   if (!t) return "";
   return '<span class="chip tip ' + t.type + '" tabindex="0" data-tip="' + escapeHTML(t.desc) + '">' + t.name + "</span>";
 }
+
+// 성장 곡선 배율: 스탯이 높을수록 덜 오름 (data/growth.js)
+function growthMultiplier(value) {
+  const row = GROWTH_CURVE.find(function (g) { return value < g.upTo; });
+  return row ? row.mult : GROWTH_CURVE[GROWTH_CURVE.length - 1].mult;
+}

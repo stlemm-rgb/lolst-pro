@@ -352,6 +352,10 @@ pages.training = function () {
   return (
     "<h1>훈련</h1>" + tired +
     '<p class="placeholder">이번 주에 할 훈련을 고른 뒤, 위의 [다음 주로 진행]을 누르세요. 괄호 안은 포지션 가산점·유형·특성으로 받는 내 보너스예요.</p>' +
+    '<p class="muted small">📉 성장 곡선: 스탯이 높을수록 덜 올라요. ' + GROWTH_CURVE.map(function (g, i) {
+      const from = i ? GROWTH_CURVE[i - 1].upTo : 0;
+      return from + "~" + Math.min(100, g.upTo - 1) + " " + Math.round(g.mult * 100) + "%";
+    }).join(" · ") + "</p>" +
     '<div class="grid">' + cards + "</div>"
   );
 };
@@ -604,7 +608,7 @@ function nextWeek(restWeek) {
     } else if (state.stats[id] !== undefined) {
       // 실력 스탯: 오를 때만 보너스(가산점·유형·특성)를 붙임
       if (amount > 0) {
-        let boosted = amount * (1 + trainingBonusFor(id));
+        let boosted = amount * (1 + trainingBonusFor(id)) * growthMultiplier(state.stats[id]); // 높은 스탯일수록 덜 오름
         if (tired) boosted *= 0.5;
         amount = roundRandom(Math.max(0, boosted));
       }

@@ -285,7 +285,9 @@ function newSeasonLeague() {
     p.age += 1;
     const rule = LEAGUE.npcGrowth.find(function (g) { return p.age <= g.maxAge; });
     STATS.forEach(function (s) {
-      p.stats[s.id] = Math.max(1, Math.min(99, p.stats[s.id] + randInt(rule.change[0], rule.change[1])));
+      let d = randInt(rule.change[0], rule.change[1]);
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id])); // 높은 스탯일수록 덜 오름
+      p.stats[s.id] = Math.max(1, Math.min(99, p.stats[s.id] + d));
     });
     if (p.age >= LEAGUE.retireFromAge && Math.random() < (p.age - LEAGUE.retireFromAge + 1) * LEAGUE.retireChancePerYear) {
       retirePlayer(p);
