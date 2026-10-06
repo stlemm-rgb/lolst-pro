@@ -587,12 +587,24 @@ function renderTopbar() {
     '<span class="item tip" tabindex="0" data-tip="자금 ' + state.money.toLocaleString() + '원">💰 <b>' + moneyText(state.money) + "</b></span>" +
     '<span class="spacer"></span>' +
     '<span class="topbar-actions">' +
+      planBadgeHTML() +
       staminaBadgeHTML() +
       '<button id="rest-week" class="tip" data-tip="고른 훈련은 그대로 두고 이번 주만 쉬어요 (체력·컨디션 회복)">휴식 주 💤</button>' +
       '<button class="primary" id="next-week">다음 주로 진행 ▶</button>' +
     "</span>";
   document.getElementById("next-week").onclick = function () { nextWeek(false); };
+  document.getElementById("plan-badge").onclick = function () { selectMenu("training"); };
   document.getElementById("rest-week").onclick = function () { nextWeek(true); };
+}
+
+// 상단바: 지금 고른 훈련 ([다음 주로 진행]을 누르면 할 훈련). 누르면 훈련 화면으로
+function planBadgeHTML() {
+  if (!state.plan) return '<button id="plan-badge" class="plan-badge none">🏋️ 훈련 미선택</button>';
+  const t = findTraining(state.plan);
+  let extra = "";
+  if (state.plan === "champ_focus") extra = " · " + focusChamp();
+  else if (state.plan === "champion") extra = state.practiceChamp ? " · " + state.practiceChamp : " · 자동";
+  return '<button id="plan-badge" class="plan-badge tip" data-tip="[다음 주로 진행]을 누르면 할 훈련이에요. 눌러서 바꾸기">🏋️ ' + t.name + extra + "</button>";
 }
 
 // 상단바 체력 표시 (낮으면 빨간색)
@@ -609,6 +621,7 @@ function staminaBadgeHTML() {
 // ===== 우측 본문 =====
 function renderPage() {
   updateTutorial(); // 처음 안내 단계 확인 (js/guide.js)
+  renderTopbar(); // 상단바 (고른 훈련·체력이 바뀌었을 수 있어서)
   const page = document.getElementById("page");
   const draw = pages[state.currentMenu];
   let html;
@@ -660,9 +673,9 @@ function renderPage() {
 
   // 챔피언 연습: 연습할 챔피언 고르기
   const practice = document.getElementById("practice-champ");
-  if (practice) practice.onchange = function () { state.practiceChamp = this.value; };
+  if (practice) practice.onchange = function () { state.practiceChamp = this.value; renderTopbar(); };
   const focusSel = document.getElementById("focus-champ");
-  if (focusSel) focusSel.onchange = function () { state.focusChamp = this.value; };
+  if (focusSel) focusSel.onchange = function () { state.focusChamp = this.value; renderTopbar(); };
 
   // 퀘스트 [이번 주 훈련으로 선택] (js/quests.js)
   bindQuestPlan(page);

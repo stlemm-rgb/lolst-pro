@@ -612,3 +612,5 @@ ul.howto li { margin: 4px 0; font-size: 14px; }
 .salary-breakdown { white-space: pre-line; margin-top: 4px; }
 .msg-text { white-space: pre-line; }
 .chip.named { border-color: #f59e0b; color: #f59e0b; font-weight: bold; }
+.plan-badge { font-size: 14px; white-space: nowrap; border-color: var(--accent); }
+.plan-badge.none { border-color: var(--bad); color: var(--bad); }
