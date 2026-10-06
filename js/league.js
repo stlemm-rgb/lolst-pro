@@ -97,6 +97,7 @@ function makeNpc(pos, level, ageRange) {
     teamId: null,
     traits: randomNpcTraits(),
   };
+  if (state.year) npcMasteryInit(p); // 챔피언 숙련도 (js/npc_mastery.js)
   state.league.players[p.id] = p;
   return p;
 }
@@ -214,6 +215,7 @@ function placeNamedPlayers() {
     STATS.forEach(function (st) { p.stats[st.id] = Math.max(1, Math.min(90, p.stats[st.id] + shift)); });
     // 좋은 특성 (다른 선수가 가질 수 있는 것 중 무작위)
     p.traits = shuffled(TRAITS.filter(function (t) { return t.npc && t.type === "good"; })).slice(0, NAMED_RULES.traits).map(function (t) { return t.id; });
+    npcMasteryInit(p); // 바뀐 스탯(챔피언 폭)에 맞게 숙련도 다시
   });
 }
 

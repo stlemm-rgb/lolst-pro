@@ -100,10 +100,21 @@ function playerDetailHTML(id) {
       "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.pos).name + " · " + p.age + "세 · " +
         (team ? escapeHTML(team.name) : "FA") + " · 스탯 점수 " + playerScore(id).toFixed(1) + "</span></h2>" +
       '<div class="chips">' + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
+      champLineHTML(id) +
       '<div class="stat-columns">' + bars + "</div>" +
       '<p class="muted small">숫자 옆 /값은 스탯 상한선이에요.</p>' +
     "</div>"
   );
+}
+
+// 주력 챔피언(숙련도 상위 3) + 이번 패치 메타 챔피언 평균 숙련도 (js/npc_mastery.js)
+function champLineHTML(id) {
+  const champs = topChampsHTML(id, 3);
+  if (!champs) return "";
+  const p = id === USER_ID ? null : findPlayer(id);
+  const avg = id === USER_ID ? metaPenaltyInfo().avg : p && p.mastery ? npcMetaAvg(p) : null;
+  return '<p class="small champ-line">⚔️ 주력 챔피언: ' + champs +
+    (avg !== null ? ' <span class="muted">· 이번 메타 평균 숙련도 ' + Math.round(avg) + "</span>" : "") + "</p>";
 }
 
 // ----- 구단 탐색 -----
@@ -141,7 +152,9 @@ function clubRosterHTML(teamId) {
     return (starterIds.indexOf(b) !== -1) - (starterIds.indexOf(a) !== -1) || POSITION_IDS.indexOf(playerPos(a)) - POSITION_IDS.indexOf(playerPos(b));
   }).map(function (id) {
     const p = playerInfo(id);
-    return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + traitChipsMini(id) + "</td><td>" + p.age + '세</td><td class="r"><b>' +
+    const mainText = topChampList(id, 2).map(function (c) { return escapeHTML(c.name); }).join(" · ");
+    return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + traitChipsMini(id) +
+      (mainText ? ' <span class="muted small">⚔️ ' + mainText + "</span>" : "") + "</td><td>" + p.age + '세</td><td class="r"><b>' +
       playerScore(id).toFixed(1) + '</b></td><td class="r">' + moneyText(p.salary || 0) + "</td><td>" + (starterIds.indexOf(id) !== -1 ? "주전" : '<span class="muted">후보</span>') + "</td></tr>";
   }).join("");
   return '<table class="roster club-roster">' + rows + "</table>";

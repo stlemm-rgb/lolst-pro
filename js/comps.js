@@ -97,7 +97,9 @@ function teamCompPlan(teamId) {
 function pickLineup(list, target, used, userPick) {
   return list.map(function (p) {
     let champ;
+    const npc = npcMasteryPlayer(p); // 숙련도가 있는 다른 선수: 밴 → 가치 높은 챔피언 (js/npc_mastery.js)
     if (p.id === USER_ID && userPick) champ = userPick;
+    else if (npc && (champ = npcPickChamp(npc, target, used))) { /* 골랐음 */ }
     else {
       const released = Object.keys(state.mastery).filter(function (n) {
         return used.indexOf(n) === -1 && findChampion(n).positions.indexOf(p.pos) !== -1;

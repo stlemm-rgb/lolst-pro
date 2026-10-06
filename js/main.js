@@ -783,6 +783,7 @@ function nextWeek(restWeek) {
   // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
   startWeekReport(training, message, changes, playLadder(training));
   playNpcLadder(); // 다른 선수들도 솔로 랭크 (리그 솔로 랭크 순위)
+  npcPractice(); // 다른 선수들도 매주 챔피언 연습 (js/npc_mastery.js)
   progressQuests(training, changes); // 퀘스트 진행 (js/quests.js)
 
   // 이번 주 리그 경기 (훈련 다음에 진행), 연봉 1주치
@@ -832,6 +833,7 @@ function nextWeek(restWeek) {
     const posNames = c.positions.map(function (id) { return findPosition(id).name; }).join("·");
     addNews("새 챔피언", "새 챔피언 '" + c.name + "'(" + posNames + ")이(가) 출시됐다!");
   });
+  ensureNpcMastery(); // 다른 선수들도 새 챔피언 숙련도 1부터
 
   // 패치 주차면 메타가 바뀜
   if (MASTERY.patchWeeks.indexOf(state.week) !== -1) {
@@ -839,6 +841,8 @@ function nextWeek(restWeek) {
     const mine = state.meta.champs[state.player.position].join(", ");
     addNews("패치", state.meta.label + " 적용! 메타 조합: " + findComp(metaComp()).icon + " " + findComp(metaComp()).name + " · " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
     state.weekCtx.patch = true;
+    const outlook = npcPatchNews(); // 새 메타에 강한/고전할 선수 (js/npc_mastery.js)
+    if (outlook) addNews("패치 전망", outlook);
     // 패치마다 솔로 랭크 초기화
     const oldPoints = resetLadder();
     if (oldPoints !== undefined) addNews("랭크 초기화", "패치로 솔로 랭크가 초기화됐다. (" + ladderTier(oldPoints) + " " + oldPoints.toLocaleString() + "점 → " + ladderTier(LADDER.resetPoints) + " " + LADDER.resetPoints.toLocaleString() + "점)");
@@ -918,6 +922,7 @@ function renderAll() {
   document.getElementById("creation").innerHTML = "";
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
+  ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)
   if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦
   ensureCareerRecords(); // 데뷔 기록 등
   renderMenu();

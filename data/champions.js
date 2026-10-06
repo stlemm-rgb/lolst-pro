@@ -213,3 +213,19 @@ const MASTERY = {
   typeBonusPivot: 50,
   typeBonusScale: 100,
 };
+
+// 다른 선수(NPC) 챔피언 숙련도 (js/npc_mastery.js)
+// - 자기 포지션 챔피언만 숙련도를 가져요. 처음 값은 내 선수와 같은 규칙(챔피언 폭 × 0.7 ± 15)
+// - 선수마다 '시그니처 챔피언' 몇 명은 크게 높음
+// - 매주 챔피언 연습: 적응력이 높을수록 메타 챔피언을 더 자주 연습 (패치 직후 '적응 경쟁')
+// - 경기에서는 내 선수와 똑같이 밴 → 픽 → 숙련도 배율·메타 보너스·메타 페널티 (data/match.js MATCH)
+const NPC_MASTERY = {
+  signatureCount: [2, 3],     // 시그니처 챔피언 수
+  signatureBonus: [10, 25],   // 시그니처 챔피언 숙련도 + (최대 100)
+  practiceCount: 2,           // 매주 연습하는 챔피언 수
+  practiceGain: [2, 4],       // 한 명당 오르는 숙련도 (숙련도가 높을수록 덜 오름, 내 선수와 같은 규칙)
+  metaFocusBase: 0.5,         // 메타 챔피언을 연습할 확률 = metaFocusBase + (적응력 − 50) × metaFocusPerAdapt
+  metaFocusPerAdapt: 0.01,
+  pickWeights: [60, 25, 15],  // 픽: 가치(숙련도 + 메타 보너스) 상위 3명 중에서, 앞쪽일수록 잘 고름
+  patchNewsCount: 3,          // 패치 소식: 새 메타에 강한/고전할 1부 주전 몇 명씩
+};

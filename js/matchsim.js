@@ -171,6 +171,9 @@ function playSet(a, b, userCtx, setCtx) {
   const la = lineup(a, userCtx, setCtx), lb = lineup(b, userCtx, setCtx);
   // 밴픽 조합: 상성·시너지 (js/comps.js)
   const comps = setComps(la, lb, Object.assign({}, setCtx, { teamA: a, teamB: b }), userCtx ? userCtx.pick : null);
+  // 다른 선수: 고른 챔피언 숙련도·메타 보너스·메타 페널티 반영 (js/npc_mastery.js)
+  applyNpcChampPower(la, comps.a.picks);
+  applyNpcChampPower(lb, comps.b.picks);
   let bonusA = 0, bonusB = 0, userLane = null;
   const laneResults = []; // 경기 상세용: 라인마다 { aWon, solo }
   POSITION_IDS.forEach(function (pos, i) {
@@ -477,7 +480,8 @@ function promoMatch(week, tier1Index, tier2Index) {
 function setupWorlds() {
   const season = seasonOf();
   const domestic = season.worldsTeams || [];
-  const base = average(tier1Ids().map(teamStrength));
+  // 국내 선수들은 숙련도·메타로 경기력이 달라지니 해외 팀도 같은 비율로 (js/npc_mastery.js)
+  const base = average(tier1Ids().map(teamStrength)) * npcPowerFactor();
   const names = shuffled(OVERSEAS_TEAM_NAMES);
   const overseas = [];
   WORLDS.regions.forEach(function (region) {
