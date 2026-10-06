@@ -25,6 +25,7 @@ function createNewState() {
     career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0, earned: 0, moments: [] }, // 커리어 기록
     retirePlanned: false,         // true면 이번 시즌이 끝날 때 은퇴 (js/retire.js)
     shop: { gear: {}, staff: {}, fame: {}, invest: [], investProfit: 0 }, // 상점 (js/shop.js)
+    tutorial: { on: true, done: {}, visited: {} }, // 처음 안내 (js/guide.js). 예전 세이브를 불러오면 꺼짐
     activities: [],               // 오래 가는 계약·활동 (스폰서·개인 방송·라이벌, js/events.js)
     pendingEvents: [],            // 몇 주 뒤에 올 후속 연락
     compPlan: "auto",             // 조합 전략: meta / counter / auto (js/comps.js)
@@ -129,6 +130,8 @@ pages.dashboard = function () {
   // 조각들은 js/dashboard.js
   return (
     "<h1>대시보드</h1>" +
+    tutorialCardHTML() + // 📘 처음이라면 (js/guide.js)
+    guideCardHTML() +    // 🎯 지금 목표 · 💡 이번 주 추천
     dashStripHTML() +
     '<div class="dash">' +
       '<div class="dash-main">' +
@@ -415,6 +418,9 @@ pages.settings = function () {
       '<div class="setting-row">' +
         '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
       "</div>" +
+      '<div class="setting-row">처음 안내 (📘 대시보드 맨 위) ' +
+        (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
+      "</div>" +
     "</div>" +
     '<div class="card"><h2>새 게임</h2>' +
       '<p class="placeholder">캐릭터 생성부터 다시 시작합니다. 커리어를 시작하기 전까지는 기존 저장이 남아 있어요.</p>' +
@@ -558,6 +564,7 @@ function selectMenu(id) {
   });
   state.currentMenu = id;
   state.notice = "";
+  tutorialVisit(id); // 처음 안내: 들어가 본 메뉴 (js/guide.js)
   renderMenu();
   renderPage();
 }
@@ -600,6 +607,7 @@ function staminaBadgeHTML() {
 
 // ===== 우측 본문 =====
 function renderPage() {
+  updateTutorial(); // 처음 안내 단계 확인 (js/guide.js)
   const page = document.getElementById("page");
   const draw = pages[state.currentMenu];
   let html;
@@ -639,6 +647,7 @@ function renderPage() {
   bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
   bindCompPlan(page); // 조합 전략 (js/comps.js)
   bindShop(page); // 상점 (js/shop.js)
+  bindGuide(page); // 이번 주 추천·처음 안내 (js/guide.js)
   page.querySelectorAll("[data-retire]").forEach(function (btn) {
     btn.onclick = function () {
       if (btn.getAttribute("data-retire") === "now") return retireNowButton();
@@ -694,6 +703,7 @@ function nextWeek(restWeek) {
   const training = (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
   state.skipTraining = false;
   state.weekCtx.training = training.id; // 선수 SNS용 (이번 주 훈련 글)
+  if (training.id === "rest" && state.tutorial) state.tutorial.restDone = true; // 처음 안내: 쉬어 보기
   const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
   const changes = {};
   Object.keys(training.effects).forEach(function (id) {

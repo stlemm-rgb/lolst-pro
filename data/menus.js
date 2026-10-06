@@ -37,6 +37,7 @@ const MENU_GROUPS = [
 
 // 맨 아래 따로 놓는 메뉴
 const MENU_BOTTOM = [
+  { id: "howto",    name: "❓ 게임 방법" },
   { id: "settings", name: "⚙ 설정·저장" },
 ];
 

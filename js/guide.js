@@ -1,0 +1,183 @@
+// ===== 초보자 도움: 튜토리얼 · 지금 목표 · 이번 주 추천 · 게임 방법 (글은 data/guide.js) =====
+// state.tutorial = { on: true/false, done: { plan: true, ... }, visited: { schedule: true, ... }, restDone }
+
+function tutorialState() {
+  if (!state.tutorial) state.tutorial = { on: false, done: {}, visited: {} };
+  const t = state.tutorial;
+  t.done = t.done || {}; t.visited = t.visited || {};
+  return t;
+}
+
+// 단계 완료 확인 (지금 상태를 보고 자동으로)
+function tutorialChecks(check) {
+  const t = tutorialState();
+  switch (check) {
+    case "plan": return !!state.plan;
+    case "advance": return !!state.weekReport;
+    case "sns": return state.inbox.some(function (m) { return m.tab === "inbox" && m.choices && m.answered !== null && m.answered !== "ignored"; });
+    case "schedule": return !!t.visited.schedule;
+    case "rest": return !!t.restDone;
+    case "shop": return !!t.visited.shop;
+    default: return false;
+  }
+}
+
+// 매번 화면을 그릴 때: 끝난 단계 표시, 다 끝나면 자동으로 끔
+function updateTutorial() {
+  const t = tutorialState();
+  if (!t.on) return;
+  TUTORIAL_STEPS.forEach(function (s) { if (!t.done[s.check] && tutorialChecks(s.check)) t.done[s.check] = true; });
+  if (TUTORIAL_STEPS.every(function (s) { return t.done[s.check]; })) {
+    t.on = false;
+    t.finished = true;
+    state.notice = "🎉 처음 안내를 모두 마쳤어요! 이제 대시보드의 🎯 지금 목표와 💡 이번 주 추천을 따라가 보세요. (게임 규칙은 왼쪽 아래 ❓ 게임 방법)";
+  }
+}
+
+// 메뉴를 열 때 (main.js selectMenu에서)
+function tutorialVisit(id) {
+  if (state && state.tutorial) state.tutorial.visited[id] = true;
+}
+
+function tutorialCardHTML() {
+  const t = tutorialState();
+  if (!t.on) return "";
+  let current = -1;
+  const rows = TUTORIAL_STEPS.map(function (s, i) {
+    const ok = !!t.done[s.check];
+    if (!ok && current === -1) current = i;
+    const now = !ok && current === i;
+    return '<li class="' + (ok ? "done" : now ? "now" : "") + '">' + (ok ? "✅" : now ? "▶" : "⬜") + " " + s.title +
+      (now ? '<div class="tut-hint">' + s.hint + "</div>" : "") + "</li>";
+  }).join("");
+  const doneCount = TUTORIAL_STEPS.filter(function (s) { return t.done[s.check]; }).length;
+  return '<div class="card tutorial"><h2>📘 처음이라면 <span class="muted small">' + doneCount + " / " + TUTORIAL_STEPS.length + "</span>" +
+    '<button class="small-btn tut-off" data-tutorial="off">안내 끄기</button></h2><ol class="tut-steps">' + rows + "</ol></div>";
+}
+
+// ----- 🎯 지금 목표 -----
+function currentGoal() {
+  const team = myTeam();
+  if (!team) return null;
+  const fill = function (g, extra) {
+    let text = g.text;
+    Object.keys(extra).forEach(function (k) { text = text.replace(new RegExp("\\{" + k + "\\}", "g"), extra[k]); });
+    return { title: g.title, text: text };
+  };
+  const rankList = team.tier === 1 ? tier1FinalOrder() : standings(["tier2", "tier2b"], tier2Ids()).map(function (x) { return x.id; });
+  // 리그 경기를 아직 안 했으면 순위 대신 "아직 리그 경기 전"
+  const leagueComps = team.tier === 1 ? ["split1", "split2"] : ["tier2", "tier2b"];
+  const played = userMatches().some(function (m) { return m.winner && leagueComps.indexOf(m.comp) !== -1; });
+  const rank = played ? (rankList.indexOf(team.id) + 1) + "위" : "아직 리그 경기 전";
+  const score = playerScore(USER_ID).toFixed(1);
+  let step;
+  if (state.benched) {
+    const rival = benchRival();
+    return Object.assign(fill(GOAL_TEXT.bench, { score: score, rival: rival ? playerName(rival) + " " + playerScore(rival).toFixed(1) : "-" }), { step: 0 });
+  }
+  if (team.tier === 2) return Object.assign(fill(GOAL_TEXT.tier2, { rank: rank }), { step: 1 });
+  const sum = careerSummary(true);
+  if (!sum.titles.playoffs) step = 2;
+  else if (!sum.titles.worlds) step = 3;
+  else step = 4;
+  const key = ["bench", "tier2", "league", "worlds", "legend"][step];
+  return Object.assign(fill(GOAL_TEXT[key], { rank: rank, points: sum.points, grade: sum.grade }), { step: step });
+}
+
+// ----- 💡 이번 주 추천: [{ text, label, act }] 중요한 것부터 최대 3개 -----
+let adviceActions = [];
+function weekAdvice() {
+  const list = [];
+  const wk = userWeekMatches(state.week);
+  const hasMatch = wk.matches.length + wk.preview.length > 0 && !state.benched;
+  // 1) 훈련을 안 골랐음
+  if (!state.plan) list.push({ text: "이번 주 훈련을 아직 안 골랐어요.", label: "훈련 고르기", act: { go: "training" } });
+  // 2) 체력
+  if (state.stamina < TIRED_LIMIT) {
+    list.push({ text: "체력 " + state.stamina + " → 20 아래라서 훈련 효과가 절반이에요" + (hasMatch ? " (이번 주 경기도 있어요)" : "") + ".", label: "휴식 주로 진행", act: { rest: true } });
+  } else if (hasMatch && state.stamina < TEAM_MATCH.lowStaminaLimit) {
+    list.push({ text: "이번 주 경기가 있는데 체력 " + state.stamina + ". " + TEAM_MATCH.lowStaminaLimit + " 미만이면 경기력 −" + Math.round(TEAM_MATCH.lowStaminaCut * 100) + "%.", label: "상점에서 회복", act: { go: "shop" } });
+  }
+  // 3) 답하지 않은 연락
+  const waiting = state.inbox.filter(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; }).length;
+  if (waiting) list.push({ text: "답하지 않은 연락이 " + waiting + "개 있어요. 4주가 지나면 그냥 지나가요.", label: "SNS 열기", act: { sns: true } });
+  // 4) 지금 훈련이 채우지 않는 퀘스트
+  const q = (state.quests || []).find(function (x) { return questPlan(x) && !questPlanActive(x); });
+  if (q) list.push({ text: "퀘스트 '" + findQuest(q.id).title + "' (" + Math.max(0, q.deadline - absWeek()) + "주 남음)", label: questPlanLabel(q) + "(으)로 선택", act: { quest: q.uid } });
+  // 5) 메타 챔피언 숙련도가 낮음
+  const meta = state.meta.champs[state.player.position];
+  const avg = meta.reduce(function (a, n) { return a + (state.mastery[n] || 0); }, 0) / meta.length;
+  if (avg < MATCH.metaPenaltyBase && state.plan !== "champion" && state.plan !== "champ_focus") {
+    list.push({ text: "이번 패치 메타 챔피언 숙련도 평균 " + Math.round(avg) + " → 경기력이 깎여요 (" + MATCH.metaPenaltyBase + " 이상이면 괜찮아요).", label: "챔피언 연습으로 선택", act: { plan: "champion" } });
+  }
+  // 6) 컨디션
+  if (state.condition < 40) list.push({ text: "컨디션 " + state.condition + " → 낮으면 경기력이 떨어져요.", label: "상점에서 회복", act: { go: "shop" } });
+  // 7) 돈이 쌓였는데 장비가 없음
+  const s = state.shop || {};
+  const gearCount = Object.keys(s.gear || {}).filter(function (k) { return s.gear[k] > 0; }).length;
+  if (state.money >= 10000000 && gearCount === 0) list.push({ text: "자금이 " + moneyText(state.money) + " 쌓였어요. 장비를 사면 훈련 효과가 영구로 올라요.", label: "상점 가기", act: { go: "shop" } });
+  // 8) 이적 시장 기간 + 제안
+  if (isTransferWindow() && state.inbox.some(function (m) { return m.kind === "offer" && m.answered === null; })) {
+    list.push({ text: "이적 시장 기간이에요. 계약 제안을 확인해 보세요.", label: "SNS 열기", act: { sns: true } });
+  }
+  return list.slice(0, 3);
+}
+
+function guideCardHTML() {
+  const goal = currentGoal();
+  const advice = weekAdvice();
+  adviceActions = advice.map(function (a) { return a.act; });
+  const ladder = goal ? GOAL_LADDER.map(function (name, i) {
+    return '<span class="goal-step' + (i < goal.step ? " passed" : i === goal.step ? " now" : "") + '">' + (i < goal.step ? "✓ " : "") + name + "</span>";
+  }).join('<span class="muted"> → </span>') : "";
+  const rows = advice.length ? advice.map(function (a, i) {
+    return '<div class="rep-row advice"><span>' + escapeHTML(a.text) + '</span> <button class="small-btn" data-advice="' + i + '">' + escapeHTML(a.label) + "</button></div>";
+  }).join("") : '<div class="rep-row muted">지금은 특별히 할 일이 없어요. [다음 주로 진행 ▶]을 눌러도 좋아요.</div>';
+  return (
+    '<div class="card guide">' +
+      (goal ? '<div class="goal"><h2>🎯 지금 목표: ' + goal.title + '</h2><p class="small">' + escapeHTML(goal.text) + '</p><div class="goal-ladder small">' + ladder + "</div></div>" : "") +
+      '<h2 class="sub">💡 이번 주 추천</h2>' + rows +
+    "</div>"
+  );
+}
+
+function bindGuide(page) {
+  page.querySelectorAll("[data-advice]").forEach(function (b) {
+    b.onclick = function () {
+      const a = adviceActions[Number(b.getAttribute("data-advice"))];
+      if (!a) return;
+      if (a.go) selectMenu(a.go);
+      else if (a.rest) nextWeek(true);
+      else if (a.sns) { snsTab = "inbox"; selectMenu("sns"); }
+      else if (a.plan) { state.plan = a.plan; if (a.plan === "champion") state.practiceChamp = ""; state.notice = "이번 주 훈련을 <b>" + findTraining(a.plan).name + "</b>(으)로 골랐어요."; renderPage(); }
+      else if (a.quest) {
+        const q = (state.quests || []).find(function (x) { return x.uid === a.quest; });
+        const qp = q && questPlan(q);
+        if (!qp) return;
+        state.plan = qp.plan;
+        if (qp.focusChamp !== undefined) state.focusChamp = qp.focusChamp;
+        if (qp.practiceChamp !== undefined) state.practiceChamp = qp.practiceChamp;
+        state.notice = "이번 주 훈련을 <b>" + escapeHTML(questPlanLabel(q)) + "</b>(으)로 골랐어요.";
+        renderPage();
+      }
+    };
+  });
+  const off = page.querySelector("[data-tutorial]");
+  if (off) off.onclick = function () {
+    tutorialState().on = off.getAttribute("data-tutorial") === "on";
+    if (tutorialState().on) { tutorialState().done = {}; }
+    renderPage();
+  };
+}
+
+// ----- ❓ 게임 방법 -----
+pages.howto = function () {
+  const cards = HOW_TO_PLAY.map(function (h) {
+    return '<div class="card"><h2>' + h.icon + " " + h.title + '</h2><ul class="howto">' + h.lines.map(function (l) { return "<li>" + escapeHTML(l) + "</li>"; }).join("") + "</ul></div>";
+  }).join("");
+  const t = tutorialState();
+  return "<h1>게임 방법</h1>" +
+    '<div class="card"><p>처음이라면 대시보드의 📘 처음이라면 안내를 따라가 보세요. ' +
+      (t.on ? '<span class="up small">(지금 켜져 있어요)</span>' : '<button class="small-btn" data-tutorial="on">처음 안내 다시 켜기</button>') + "</p></div>" +
+    '<div class="grid">' + cards + "</div>";
+};
