@@ -618,3 +618,9 @@ ul.howto li { margin: 4px 0; font-size: 14px; }
 .salary-details .salary-breakdown { font-size: 13px; color: var(--muted); white-space: pre-line; }
 .warn-text { color: var(--gold); font-weight: bold; }
 .rep-row.ladder-reset { background: rgba(251, 191, 36, 0.08); }
+/* 아래로 펼쳐지는 말풍선 (카드 제목 등 위쪽이 좁을 때) */
+.tip.tip-down:hover::after, .tip.tip-down:focus::after { left: 0; transform: none; bottom: auto; top: calc(100% + 8px); max-width: 320px; font-size: 13px; font-weight: normal; }
+.tip-mark { font-size: 12px; color: var(--muted); }
+.mastery-table th, .mastery-table td { text-align: center; }
+.mastery-table td:first-child { text-align: left; white-space: nowrap; }
+table.calc.mastery-table td:last-child { text-align: center; }

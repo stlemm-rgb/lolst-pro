@@ -298,7 +298,7 @@ function championCardHTML() {
   }).join("");
   const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
   return (
-    '<div class="card"><h2>⚔️ 챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
+    '<div class="card"><h2><span class="tip tip-down" tabindex="0" data-tip="' + escapeHTML(masteryTipText()) + '">⚔️ 챔피언 <span class="tip-mark">ⓘ</span></span> <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
       '<p class="muted small">' + findPosition(myPos).name + " 메타 챔피언 · 숫자 = 내 숙련도</p>" +
       '<div class="chips">' + myMeta + "</div>" +
       '<p class="muted small">S급: 픽 우선 +' + MATCH.metaPickBonus.S + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.S * 100) + "% · A급: 픽 우선 +" + MATCH.metaPickBonus.A + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.A * 100) + "%</p>" +

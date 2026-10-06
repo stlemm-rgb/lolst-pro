@@ -202,7 +202,7 @@ function masteryRowHTML(name, pos) {
   return (
     '<div class="stat mastery-row">' +
       '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
-        metaTagHTML(name, pos) + champCompsHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도 ' + MATCH.jokerMinMastery + ' 이상: 고르면 경기력 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%">🃏 조커</span>' : "") + "</div>" +
+        metaTagHTML(name, pos) + champCompsHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도가 높음: 고르면 경기력 +' + (MATCH.jokerPowerBonus * 100 * jokerFactor(v, false)).toFixed(1) + '% (숙련도 ' + MATCH.jokerFull + '이면 최대 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%)">🃏 조커</span>' : "") + "</div>" +
       '<div class="bar"><div class="bar-fill' + (isMeta(name, pos) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
     "</div>"
@@ -268,7 +268,7 @@ pages.career = function () {
         "<tr><td>스탯 점수</td><td>12개 평균, ★가산점 " + POSITION_BONUS.matchMultiplier + "배</td><td><b>" + m.score.toFixed(1) + "</b></td></tr>" +
         "<tr><td>밴 당한 챔피언</td><td colspan=\"2\">" + (m.banned.join(", ") || "없음") + "</td></tr>" +
         "<tr><td>고른 챔피언</td><td>" + m.pick + " (숙련도 " + state.mastery[m.pick] + (metaTier(m.pick) ? ", 메타 " + metaTier(m.pick) + "급 +" + Math.round(MATCH.metaPowerBonus[metaTier(m.pick)] * 100) + "%" : "") + ")</td><td>× <b>" + m.multiplier.toFixed(2) + "</b></td></tr>" +
-        (m.joker ? "<tr><td>🃏 조커픽</td><td>메타가 아닌데 숙련도 " + MATCH.jokerMinMastery + " 이상 · 상대가 예상 못 함</td><td>× <b>" + (1 + MATCH.jokerPowerBonus).toFixed(2) + "</b></td></tr>" : "") +
+        (m.jokerBonus > 0 ? "<tr><td>🃏 조커픽</td><td>메타가 아닌 챔피언 · 숙련도 " + MATCH.jokerFrom + "~" + MATCH.jokerFull + "에서 서서히 커짐 · 상대가 예상 못 함</td><td>× <b>" + (1 + m.jokerBonus).toFixed(3) + "</b></td></tr>" : "") +
         "<tr><td>메타 페널티</td><td>메타 챔피언 평균 숙련도 " + mp.avg.toFixed(0) +
           (mp.adapting ? " · 패치 적응 기간 (적응력 −" + Math.round(mp.adaptCut * 100) + "%" + (mp.stubborn ? ", 고집 +" + mp.stubborn : "") + ")" : "") +
           "</td><td>− <b>" + mp.penalty.toFixed(1) + "</b></td></tr>" +

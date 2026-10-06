@@ -4,7 +4,7 @@
 // 2) 밴: 상대가 내 챔피언 중 "숙련도 + 메타 보너스"가 높은 챔피언을 bansAgainstMe 명 금지
 // 3) 픽: 남은 챔피언 중 "숙련도 + 메타 보너스"가 가장 높은 챔피언을 고름
 //    (메타 보너스는 S급이 더 큼. 메타 챔피언을 고르면 경기력 보너스도 있음: S급 +8%, A급 +3%)
-// 4) 숙련도 배율 = masteryBase + 숙련도 ÷ masteryScale  (숙련도 1 → 약 0.8배, 100 → 1.2배)
+// 4) 숙련도 배율 = masteryCurve 표를 직선으로 이은 값 (60까지 빠르게, 60~80은 절반, 80부터는 조금씩. 50 → 1.0배)
 // 5) 메타 페널티 = (metaPenaltyBase − 내 포지션 메타 챔피언 평균 숙련도) ÷ metaPenaltyDiv  (0보다 클 때만)
 //    - 패치 후 adaptWeeks 주 동안: 적응력이 높을수록 페널티 감소
 //      (적응력 adaptFrom 이하 → 그대로, 적응력이 높을수록 줄어서 adaptFrom + adaptRange 이면 절반)
@@ -27,15 +27,19 @@ const MATCH = {
   metaPickBonus: { S: 25, A: 15 },      // 밴픽 때 "숙련도 + 이 값"으로 가치를 매김
   metaPowerBonus: { S: 0.08, A: 0.03 }, // 고른 챔피언이 메타면 경기력 +8% / +3%
   metaSWeight: 2,                        // 메타 페널티 계산 때 S급 숙련도는 2배로 셈
-  // 조커픽: 메타가 아닌 챔피언인데 숙련도가 jokerMinMastery 이상이면
+  // 조커픽: 메타가 아닌 챔피언
   //   - 상대가 예상 못 해서 밴에서 빠지기 쉬움 (밴할 때 메타가 아닌 챔피언은 숙련도 −jokerBanDiscount로 봄)
-  //   - 고를 때는 가치 +jokerPickBonus, 고르면 경기력 +jokerPowerBonus
+  //   - 숙련도 jokerFrom부터 jokerFull까지 보너스가 서서히 커짐 (고를 때 가치 최대 +jokerPickBonus, 경기력 최대 +jokerPowerBonus)
+  //   - 화면의 🃏 조커 표시는 jokerMinMastery 이상 (보너스 절반 이상)
+  jokerFrom: 60,
+  jokerFull: 80,
   jokerMinMastery: 70,
   jokerPickBonus: 15,
   jokerBanDiscount: 30,
   jokerPowerBonus: 0.05,
-  masteryBase: 0.8,
-  masteryScale: 250,
+  // 숙련도 배율 곡선: [숙련도, 배율] 점들을 직선으로 이음 (나와 다른 선수 모두)
+  //   1~60: 1점에 약 0.5% · 60~80: 1점에 0.25% · 80~100: 1점에 0.125%  → 80이면 충분히 잘 다루는 수준
+  masteryCurve: [[1, 0.75], [60, 1.05], [80, 1.10], [100, 1.125]],
   metaPenaltyBase: 60,
   metaPenaltyDiv: 4,
   adaptWeeks: 4,

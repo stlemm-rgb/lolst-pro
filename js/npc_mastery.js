@@ -53,10 +53,6 @@ function npcPractice() {
 }
 
 // ----- 밴픽 -----
-function npcIsJoker(p, name) {
-  return !isMeta(name, p.pos) && p.mastery[name] >= MATCH.jokerMinMastery;
-}
-
 // 상대가 경계하는 가치 = 숙련도 + 메타 보너스 (메타가 아니면 덜 경계)
 function npcBanValue(p, name) {
   const t = metaTier(name, p.pos);
@@ -66,7 +62,7 @@ function npcBanValue(p, name) {
 // 고를 때 가치 = 숙련도 + 메타 보너스 + 조커픽 보너스 + 팀이 노리는 조합 성향 보너스
 function npcPickValue(p, name, target) {
   const t = metaTier(name, p.pos);
-  return p.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0) + (npcIsJoker(p, name) ? MATCH.jokerPickBonus : 0) +
+  return p.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0) + MATCH.jokerPickBonus * jokerFactor(p.mastery[name], !!t) +
     (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
@@ -101,8 +97,8 @@ function npcPickChamp(p, target, used) {
 // 숙련도 배율 × 메타 등급 보너스 × 조커픽 보너스 (내 선수와 같은 식)
 function npcChampMult(p, name) {
   const t = metaTier(name, p.pos);
-  return (MATCH.masteryBase + (p.mastery[name] || MASTERY.min) / MATCH.masteryScale) *
-    (1 + (t ? MATCH.metaPowerBonus[t] : 0)) * (1 + (npcIsJoker(p, name) ? MATCH.jokerPowerBonus : 0));
+  const m = p.mastery[name] || MASTERY.min;
+  return masteryMult(m) * (1 + (t ? MATCH.metaPowerBonus[t] : 0)) * (1 + MATCH.jokerPowerBonus * jokerFactor(m, !!t));
 }
 
 // 메타 챔피언 평균 숙련도 (S급은 2배로 셈)

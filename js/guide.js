@@ -177,6 +177,46 @@ function bindGuide(page) {
 }
 
 // ----- ❓ 게임 방법 -----
+// ----- 챔피언 숙련도 설명 (data/guide.js MASTERY_TIP, MASTERY_GUIDE) -----
+// {이름} 글자를 실제 규칙 값으로
+function masteryText(text) {
+  const c = MATCH.masteryCurve, F = MATCH.focusBan;
+  const slope = function (i) { return +((c[i][1] - c[i - 1][1]) / (c[i][0] - c[i - 1][0]) * 100).toFixed(2); };
+  const v = {
+    curveFast: c[1][0], curveSlow: c[2][0], slope1: slope(1), slope2: slope(2), slope3: slope(3),
+    metaS: Math.round(MATCH.metaPowerBonus.S * 100), metaA: Math.round(MATCH.metaPowerBonus.A * 100),
+    pickS: MATCH.metaPickBonus.S, pickA: MATCH.metaPickBonus.A, jokerBan: MATCH.jokerBanDiscount,
+    penBase: MATCH.metaPenaltyBase, penDiv: MATCH.metaPenaltyDiv, adaptWeeks: MATCH.adaptWeeks,
+    focusFrom: F.from, focusBase: Math.round(F.base * 100), focusPer: +(F.per * 100).toFixed(1), focusMax: Math.round(focusBanChance(MASTERY.max) * 100),
+    jokerFrom: MATCH.jokerFrom, jokerFull: MATCH.jokerFull, jokerPower: Math.round(MATCH.jokerPowerBonus * 100), jokerPick: MATCH.jokerPickBonus, jokerShow: MATCH.jokerMinMastery,
+  };
+  return text.replace(/\{(\w+)\}/g, function (all, k) { return v[k] !== undefined ? v[k] : all; });
+}
+
+function masteryTipText() {
+  return masteryText(MASTERY_TIP);
+}
+
+// 게임 방법: 숙련도 자세히 (배율 표·성장 속도 표는 실제 계산으로)
+function masteryGuideHTML() {
+  const points = [1, 30, 50, 60, 70, 80, 90, 100];
+  const multRow = points.map(function (m) { return "<td>" + masteryMult(m).toFixed(2) + "배</td>"; }).join("");
+  const growRow = points.map(function (m) { return "<td>" + Math.round(Math.max(0.3, 1 - m / 125) * 100) + "%</td>"; }).join("");
+  const banRow = points.map(function (m) { const c = focusBanChance(m); return "<td>" + (c ? "+" + Math.round(c * 100) + "%" : "-") + "</td>"; }).join("");
+  const sections = MASTERY_GUIDE.map(function (s) {
+    return '<h2 class="sub">' + s.title + '</h2><ul class="howto">' + s.lines.map(function (l) { return "<li>" + escapeHTML(masteryText(l)) + "</li>"; }).join("") + "</ul>";
+  }).join("");
+  return '<div class="card"><h2>⚔️ 챔피언 숙련도 자세히</h2>' + sections +
+    '<h2 class="sub">숫자로 보기</h2>' +
+    '<table class="calc mastery-table"><tr><th>숙련도</th>' + points.map(function (m) { return "<th>" + m + "</th>"; }).join("") + "</tr>" +
+      "<tr><td>경기력 배율</td>" + multRow + "</tr>" +
+      "<tr><td>성장 속도</td>" + growRow + "</tr>" +
+      "<tr><td>견제 밴 (메타 1위일 때)</td>" + banRow + "</tr>" +
+    "</table>" +
+    '<p class="muted small">성장 속도 = 연습했을 때 원래 오르는 양의 몇 %가 오르는지. 견제 밴 = 보통 밴에 더해 먼저 밴 당할 확률.</p>' +
+  "</div>";
+}
+
 pages.howto = function () {
   const cards = HOW_TO_PLAY.map(function (h) {
     return '<div class="card"><h2>' + h.icon + " " + h.title + '</h2><ul class="howto">' + h.lines.map(function (l) { return "<li>" + escapeHTML(l) + "</li>"; }).join("") + "</ul></div>";
@@ -185,5 +225,6 @@ pages.howto = function () {
   return "<h1>게임 방법</h1>" +
     '<div class="card"><p>처음이라면 대시보드의 📘 처음이라면 안내를 따라가 보세요. ' +
       (t.on ? '<span class="up small">(지금 켜져 있어요)</span>' : '<button class="small-btn" data-tutorial="on">처음 안내 다시 켜기</button>') + "</p></div>" +
-    '<div class="grid">' + cards + "</div>";
+    '<div class="grid">' + cards + "</div>" +
+    masteryGuideHTML();
 };

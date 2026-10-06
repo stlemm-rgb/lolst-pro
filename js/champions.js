@@ -191,7 +191,23 @@ function banValue(name) {
   return pickValue(name) - (isMeta(name) ? 0 : MATCH.jokerBanDiscount);
 }
 
-// 조커픽: 메타가 아닌데 숙련도가 높은 챔피언 (data/match.js)
+// 숙련도 배율: data/match.js masteryCurve 점들을 직선으로 이은 값
+function masteryMult(m) {
+  const c = MATCH.masteryCurve;
+  if (m <= c[0][0]) return c[0][1];
+  for (let i = 1; i < c.length; i++) {
+    if (m <= c[i][0]) return c[i - 1][1] + (c[i][1] - c[i - 1][1]) * (m - c[i - 1][0]) / (c[i][0] - c[i - 1][0]);
+  }
+  return c[c.length - 1][1];
+}
+
+// 조커픽 보너스 비율 0~1: 메타가 아니고 숙련도 jokerFrom → jokerFull 사이에서 서서히 커짐
+function jokerFactor(m, meta) {
+  if (meta) return 0;
+  return Math.max(0, Math.min(1, (m - MATCH.jokerFrom) / (MATCH.jokerFull - MATCH.jokerFrom)));
+}
+
+// 조커픽(🃏 표시): 메타가 아닌데 숙련도가 높은 챔피언 (data/match.js)
 function isJoker(name) {
   const c = findChampion(name);
   return !!c && c.positions.indexOf(state.player.position) !== -1 && !isMeta(name) && state.mastery[name] >= MATCH.jokerMinMastery;
@@ -199,7 +215,9 @@ function isJoker(name) {
 
 // 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스 (+ 우리 팀이 노리는 조합 성향이면 보너스)
 function myPickValue(name, target) {
-  return pickValue(name) + (isJoker(name) ? MATCH.jokerPickBonus : 0) +
+  const c = findChampion(name);
+  const mine = !!c && c.positions.indexOf(state.player.position) !== -1;
+  return pickValue(name) + (mine ? MATCH.jokerPickBonus * jokerFactor(state.mastery[name], isMeta(name)) : 0) +
     (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
@@ -287,7 +305,8 @@ function matchPower(bans, target, exclude) {
   const joker = isJoker(pick);
   const score = statScore();
   const tier = metaTier(pick);
-  const mult = (MATCH.masteryBase + state.mastery[pick] / MATCH.masteryScale) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0));
+  const mult = masteryMult(state.mastery[pick]) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0));
+  const jokerBonus = MATCH.jokerPowerBonus * jokerFactor(state.mastery[pick], !!tier);
   const meta = metaPenaltyInfo();
   return {
     score: score,
@@ -296,7 +315,8 @@ function matchPower(bans, target, exclude) {
     multiplier: mult,
     meta: meta,
     joker: joker,
-    power: score * mult * (1 + signatureBonus(pick)) * (1 + (joker ? MATCH.jokerPowerBonus : 0)) - meta.penalty,
+    jokerBonus: jokerBonus,
+    power: score * mult * (1 + signatureBonus(pick)) * (1 + jokerBonus) - meta.penalty,
   };
 }
 
