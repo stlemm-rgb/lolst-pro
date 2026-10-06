@@ -91,6 +91,61 @@ function updateQuests() {
   postMessage("inbox", "📋 새 퀘스트: " + tpl.title, QUEST_GIVERS[tpl.giver] + ": \"" + questText(q, tpl.desc) + "\"\n보상: " + rewardText(q) + "\n기한: " + QUEST_RULES.deadlineWeeks + "주", {});
 }
 
+// ----- 퀘스트 → 이번 주 훈련 바로 고르기 -----
+// 퀘스트마다 맞는 훈련: { plan: 훈련 id, practiceChamp?, focusChamp? }
+//   training → 그 훈련 / metaS → 챔피언 집중 연습(그 S급 챔피언) / metaAny → 챔피언 연습(자동 = 메타 챔피언 위주)
+function questPlan(q) {
+  const tpl = findQuest(q.id);
+  if (tpl.kind === "training") return { plan: tpl.training };
+  if (tpl.kind === "metaS") return { plan: "champ_focus", focusChamp: q.champ };
+  if (tpl.kind === "metaAny") return { plan: "champion", practiceChamp: "" };
+  return null;
+}
+
+// 지금 고른 훈련이 이미 이 퀘스트를 채우는가?
+function questPlanActive(q) {
+  const tpl = findQuest(q.id);
+  const myMeta = state.meta.champs[state.player.position];
+  if (tpl.kind === "training") return state.plan === tpl.training;
+  if (tpl.kind === "metaS") {
+    return (state.plan === "champ_focus" && focusChamp() === q.champ) || (state.plan === "champion" && state.practiceChamp === q.champ);
+  }
+  if (tpl.kind === "metaAny") {
+    return (state.plan === "champion" && (!state.practiceChamp || myMeta.indexOf(state.practiceChamp) !== -1)) ||
+      (state.plan === "champ_focus" && myMeta.indexOf(focusChamp()) !== -1);
+  }
+  return false;
+}
+
+// 버튼 글자: "챔피언 집중 연습 · 제이스"
+function questPlanLabel(q) {
+  const qp = questPlan(q);
+  if (!qp) return "";
+  return findTraining(qp.plan).name + (qp.focusChamp ? " · " + qp.focusChamp : qp.plan === "champion" ? " · 자동(메타 위주)" : "");
+}
+
+function questPlanButtonHTML(q) {
+  if (!questPlan(q)) return "";
+  if (questPlanActive(q)) return '<span class="quest-picked">✓ 이번 주 훈련으로 선택됨</span>';
+  return '<button class="small-btn quest-pick" data-questplan="' + q.uid + '">▶ 이번 주 훈련으로 선택 <span class="muted">(' + escapeHTML(questPlanLabel(q)) + ")</span></button>";
+}
+
+// 버튼 연결 (main.js의 renderPage에서 부름)
+function bindQuestPlan(page) {
+  page.querySelectorAll("[data-questplan]").forEach(function (btn) {
+    btn.onclick = function () {
+      const q = (state.quests || []).find(function (x) { return x.uid === Number(btn.getAttribute("data-questplan")); });
+      const qp = q && questPlan(q);
+      if (!qp) return;
+      state.plan = qp.plan;
+      if (qp.focusChamp !== undefined) state.focusChamp = qp.focusChamp;
+      if (qp.practiceChamp !== undefined) state.practiceChamp = qp.practiceChamp;
+      state.notice = "이번 주 훈련을 <b>" + escapeHTML(questPlanLabel(q)) + "</b>(으)로 골랐어요. (퀘스트: " + escapeHTML(findQuest(q.id).title) + ")";
+      renderPage();
+    };
+  });
+}
+
 // 퀘스트 카드 (훈련 화면·대시보드)
 function questsHTML(compact) {
   const list = state.quests || [];
@@ -105,7 +160,7 @@ function questsHTML(compact) {
           '<span class="muted small quest-left">' + (q.deadline - now) + "주 남음</span></div>" +
         (compact ? "" : '<div class="small">' + escapeHTML(questText(q, tpl.desc)) + "</div>") +
         '<div class="stat"><div class="stat-label small">' + q.progress + " / " + q.need + '</div><div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div><div class="stat-value small">' + pct + "%</div></div>" +
-        '<div class="muted small">보상: ' + escapeHTML(rewardText(q)) + "</div>" +
+        '<div class="quest-foot"><span class="muted small">보상: ' + escapeHTML(rewardText(q)) + "</span>" + questPlanButtonHTML(q) + "</div>" +
       "</div>"
     );
   }).join("");

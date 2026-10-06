@@ -598,6 +598,9 @@ function renderPage() {
   const focusSel = document.getElementById("focus-champ");
   if (focusSel) focusSel.onchange = function () { state.focusChamp = this.value; };
 
+  // 퀘스트 [이번 주 훈련으로 선택] (js/quests.js)
+  bindQuestPlan(page);
+
   // 다른 메뉴로 가는 버튼 (예: 대시보드 [훈련 바꾸기])
   page.querySelectorAll("[data-go]").forEach(function (btn) {
     btn.onclick = function () { selectMenu(btn.getAttribute("data-go")); };

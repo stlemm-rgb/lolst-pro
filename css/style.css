@@ -439,6 +439,9 @@ tr.sel { outline: 1px solid var(--accent); }
 .quest { border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; background: var(--panel-2); }
 .quest-head { display: flex; gap: 8px; align-items: center; }
 .quest-left { margin-left: auto; }
+.quest-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.quest-foot .quest-pick, .quest-foot .quest-picked { margin-left: auto; }
+.quest-picked { font-size: 12px; color: var(--good); font-weight: bold; }
 .quest .stat { grid-template-columns: 60px 1fr 44px; margin: 4px 0; }
 
 /* ===== 역사관 · 은퇴 · 엔딩 (7단계) ===== */
