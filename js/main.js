@@ -24,6 +24,7 @@ function createNewState() {
     eventCooldown: {},            // 이벤트별 마지막으로 온 주
     career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0, earned: 0, moments: [] }, // 커리어 기록
     retirePlanned: false,         // true면 이번 시즌이 끝날 때 은퇴 (js/retire.js)
+    shop: { gear: {}, staff: {}, careWeek: -1, fame: {} }, // 상점 (js/shop.js)
     compPlan: "auto",             // 조합 전략: meta / counter / auto (js/comps.js)
     retired: null,                // 은퇴 후 엔딩 요약 (있으면 엔딩 화면)
     contract: null,               // 내 계약 { teamId, salary, endYear, guarantee } (js/contracts.js)
@@ -635,6 +636,7 @@ function renderPage() {
   bindRecords(page); // 개인 시상
   bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
   bindCompPlan(page); // 조합 전략 (js/comps.js)
+  bindShop(page); // 상점 (js/shop.js)
   page.querySelectorAll("[data-retire]").forEach(function (btn) {
     btn.onclick = function () {
       if (btn.getAttribute("data-retire") === "now") return retireNowButton();
@@ -764,6 +766,7 @@ function nextWeek(restWeek) {
   // 우리 팀 시즌이 끝났으면 비시즌 시작 (비시즌 솔랭 퀘스트, js/quests.js)
   if (state.career.seasonOverYear !== state.year && userSeasonOver(playedWeek)) startOffseason();
   paySalary();
+  payStaff(); // 상점 개인 고용 비용 (js/shop.js)
   // 회복력: 매주 체력 자연 회복
   const regen = traitEffectSum("staminaRegen");
   if (regen) state.stamina = Math.min(state.staminaMax, state.stamina + regen);

@@ -44,7 +44,8 @@ function traitKeyOf(traits, effect, key) {
 
 // 내 특성들의 효과 합
 function traitEffectSum(key) {
-  return traitSumOf(state.player.traits, key);
+  // 내 선수: 특성 + 상점 장비·개인 고용 효과 (js/shop.js)
+  return traitSumOf(state.player.traits, key) + (typeof shopEffectSum === "function" ? shopEffectSum(key) : 0);
 }
 
 // 선수 id의 특성 목록 (내 선수 포함)
@@ -79,6 +80,7 @@ function trainingBonusFor(statId) {
     if (perStat && perStat[statId]) bonus += perStat[statId];
   });
   if (isBonusStat(statId)) bonus += POSITION_BONUS.trainingBonus;
+  if (typeof shopEffectKey === "function") bonus += shopEffectKey("trainingStat", statId); // 상점 장비·개인 고용
   return bonus;
 }
 
@@ -129,7 +131,7 @@ function growthMultiplier(value) {
 
 // 내 특성 효과 중 { 키: 값 } 모양(예: typeMastery: { carry: 0.3 })에서 한 키의 합
 function traitEffectKey(effect, key) {
-  return traitKeyOf(state.player.traits, effect, key);
+  return traitKeyOf(state.player.traits, effect, key) + (typeof shopEffectKey === "function" ? shopEffectKey(effect, key) : 0);
 }
 
 // "각 스탯이 하는 일" 표 (대시보드·훈련·캐릭터 생성 화면). 펼친 상태는 화면을 다시 그려도 유지

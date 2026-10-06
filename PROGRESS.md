@@ -74,12 +74,14 @@
 48. (커밋 필요) 팬 SNS 새 분류 보충 (다른 AI 작성): 경기 결과 세부 4종·POG·훈련 6종을 15개씩. 프로 선수 글(data/social_posts_pro.js)도 보충 완료 (분류마다 12개, 다른 AI 작성)
 49. (커밋 필요) 버그 수정: 토너먼트 경기(컵 플레이오프·플레이인·플레이오프·승강전·월드 토너먼트)는 그 주를 진행할 때 대진이 만들어져서, 대시보드 '이번 주'에 "잡힌 경기가 없어요"라고 나온 뒤 경기를 치르던 문제 → 이전 라운드 결과로 이번 주 대진을 미리 계산(js/matchsim.js koPreview·userWeekMatches)해서 표시. 3시즌 33개 토너먼트 주에서 미리 본 대진 = 실제 대진 확인. 컵 4강 주에는 '이기면 같은 주에 결승' 안내
 50. (커밋 필요) 버그 수정: 비시즌 퀘스트 목표가 'NaN위'로 나오던 문제. 원인 = 내 컴퓨터 게임 폴더에 파일 7개(data/quests.js·social_posts.js·social_posts_pro.js·js/dashboard.js·league_pages.js·matchsim.js·PROGRESS.md)가 옛 버전으로 남아 있었음(파일 전달이 일부 안 됨) → 다시 넣고 51개 파일 모두 같은지 확인. 이미 저장된 NaN 퀘스트는 불러올 때 자동으로 고침(js/quests.js repairQuests, 받은 연락 글자도 고침)
+51. (커밋 필요) [상점] 메뉴 (내 선수 묶음): 장비 5종(키보드·마우스·모니터·헤드셋·의자, Lv1~3 영구, 훈련 효과 +5~15% 또는 체력 소모 −5~15%), 개인 고용 5종(분석가·피지컬 코치·멘탈 코치·트레이너·영양사, 주급 15~30만, 돈이 모자라면 비싼 사람부터 자동 해지, 지난주 결과에 '지출' 표시), 회복·힐링 4종(주 1회, 해외여행은 비시즌만), 팬·명성 4종(팬 선물 주 1회·팬미팅/기부 시즌 2회·방송 장비 영구). 효과는 특성과 같은 이름이라 traitEffectSum·traitEffectKey·trainingBonusFor에 자동으로 더해짐. 값은 data/shop.js, 코드는 js/shop.js, 저장 state.shop
 
 ## 파일 구성
 
 - `index.html` — 게임 시작 파일 (더블클릭해서 실행)
 - `css/style.css` — 화면 색상·모양. 맨 위 색상 모음만 바꾸면 분위기가 바뀜
 - `data/menus.js` — 좌측 메뉴 묶음·이름·탭 (MENU_GROUPS, MENU_BOTTOM)
+- `data/shop.js`, `js/shop.js` — 상점 (장비·개인 고용·회복·팬/명성) 값과 화면
 - `data/stats.js` — 스탯 12개, 체력·컨디션·인기도
 - `data/positions.js` — 포지션 5개와 가산점 스탯, 가산점 효과 크기
 - `data/archetypes.js` — 시작 유형 4개(유망주·노력형·레전드·리빙 레전드), 캐릭터 생성 규칙
