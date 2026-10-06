@@ -357,6 +357,7 @@ function leagueLadderHTML() {
     rows += "<tr" + (me ? ' class="me"' : "") + ' title="' + ladderTier(x.points) + '"><td class="r">' + (i + 1) + "</td>" +
       "<td>" + tierEmblemSVG(x.points, 18) + " " + (me ? "<b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) +
         (traitsOf(x.id).indexOf(LADDER.kingTrait) !== -1 ? ' <span title="지난 랭크 시즌 1위">👑</span>' : "") +
+        (!me && findPlayer(x.id) && findPlayer(x.id).named ? ' <span title="네임드 선수">⭐</span>' : "") +
         ' <span class="muted small">' + findPosition(playerPos(x.id)).name + "</span></td>" +
       '<td class="muted small">' + escapeHTML(team ? team.short : "-") + "</td>" +
       '<td class="r">' + x.points.toLocaleString() + "</td></tr>";

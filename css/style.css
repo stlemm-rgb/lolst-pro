@@ -611,3 +611,4 @@ ul.howto { margin: 0; padding-left: 18px; }
 ul.howto li { margin: 4px 0; font-size: 14px; }
 .salary-breakdown { white-space: pre-line; margin-top: 4px; }
 .msg-text { white-space: pre-line; }
+.chip.named { border-color: #f59e0b; color: #f59e0b; font-weight: bold; }

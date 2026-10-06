@@ -167,8 +167,48 @@ function makeLeague(defs, chosenIndex) {
     state.league.teams.push(team);
   });
   placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
+  placeNamedPlayers(); // 네임드 선수 (data/named_players.js)
   startSeason();
   initContracts(); // 선수들 연봉·계약 기간, 내 첫 계약 (2년)
+}
+
+// ----- 네임드 선수 (data/named_players.js): 1부 강팀 주전 자리에 넣기 -----
+// 그 자리에 있던 선수를 네임드 선수로 바꿔요 (이름·나이·스탯·특성). 한 번만 (state.league.namedAdded)
+function placeNamedPlayers() {
+  if (state.league.namedAdded) return;
+  state.league.namedAdded = true;
+  const mine = myTeam();
+  const pool = tierTeams(1).filter(function (t) { return !mine || t.id !== mine.id; })
+    .sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); }).slice(0, NAMED_RULES.teamPool);
+  const teams = shuffled(pool);
+  NAMED_PLAYERS.forEach(function (n, i) {
+    // 이미 같은 이름이 있으면 (예전 세이브) 건너뛰기
+    if (Object.keys(state.league.players).some(function (id) { return state.league.players[id].name === n.name && state.league.players[id].named; })) return;
+    const team = teams[i % teams.length];
+    if (!team) return;
+    const id = starterAt(team.id, n.pos);
+    const p = id && id !== USER_ID ? findPlayer(id) : null;
+    if (!p) return;
+    // 같은 이름을 쓰던 다른 선수는 이름을 바꿔 줌
+    Object.keys(state.league.players).forEach(function (oid) {
+      const o = state.league.players[oid];
+      if (o !== p && o.name === n.name) o.name = takeName();
+    });
+    if (state.league.usedNames.indexOf(n.name) === -1) state.league.usedNames.push(n.name);
+    const gap = randInt(NAMED_RULES.ageGap[0], NAMED_RULES.ageGap[1]) * (Math.random() < 0.5 ? -1 : 1);
+    p.name = n.name;
+    p.named = true;
+    p.age = Math.max(17, Math.min(27, state.player.age + gap));
+    const range = NAMED_RULES.score.find(function (r) { return p.age <= r[0]; })[1];
+    const target = randInt(range[0], range[1]);
+    // 스탯: 고르게 만든 뒤 목표 종합 능력에 맞게 한꺼번에 올리거나 내림
+    const bonus = findPosition(n.pos).bonus;
+    STATS.forEach(function (st) { p.stats[st.id] = target + randInt(-5, 5) + (bonus.indexOf(st.id) !== -1 ? 4 : 0); });
+    const shift = Math.round(target - statScoreFor(p.stats, n.pos));
+    STATS.forEach(function (st) { p.stats[st.id] = Math.max(1, Math.min(90, p.stats[st.id] + shift)); });
+    // 좋은 특성 (다른 선수가 가질 수 있는 것 중 무작위)
+    p.traits = shuffled(TRAITS.filter(function (t) { return t.npc && t.type === "good"; })).slice(0, NAMED_RULES.traits).map(function (t) { return t.id; });
+  });
 }
 
 // 내 선수를 구단에 넣기. 그 팀의 같은 포지션 주전은 자유 계약으로

@@ -120,7 +120,9 @@ function traitChipsMini(id) {
     const order = { title: -1, s: 0, good: 1, bad: 2 };
     return order[findTrait(a).type] - order[findTrait(b).type];
   });
-  return list.length ? ' <span class="mini-chips">' + list.map(traitChipHTML).join("") + "</span>" : "";
+  const p = id !== USER_ID ? findPlayer(id) : null;
+  const named = p && p.named ? '<span class="chip named tip" tabindex="0" data-tip="네임드 선수: 새 게임마다 항상 등장하는 스타">⭐ 네임드</span>' : "";
+  return list.length || named ? ' <span class="mini-chips">' + named + list.map(traitChipHTML).join("") + "</span>" : "";
 }
 
 // 성장 곡선 배율: 스탯이 높을수록 덜 오름 (data/growth.js)

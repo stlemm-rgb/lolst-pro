@@ -59,7 +59,7 @@ pages.search = function () {
     const team = p.teamId ? findTeam(p.teamId) : null;
     return (
       '<tr class="click' + (id === USER_ID ? " me" : "") + (selectedPlayer === id ? " sel" : "") + '" data-player="' + id + '">' +
-        "<td>" + escapeHTML(p.name) + "</td>" +
+        "<td>" + escapeHTML(p.name) + (id !== USER_ID && findPlayer(id) && findPlayer(id).named ? ' <span title="네임드 선수">⭐</span>' : "") + "</td>" +
         "<td>" + findPosition(p.pos).name + "</td>" +
         "<td>" + (team ? escapeHTML(team.name) + ' <span class="muted small">' + tierName(team.tier) + "</span>" : '<span class="muted">FA</span>') + "</td>" +
         '<td class="r">' + p.age + "</td>" +
