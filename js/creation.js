@@ -332,6 +332,7 @@ function startCareer() {
   window.scrollTo(0, 0); // 생성 화면에서 내려간 스크롤을 맨 위로
   state = fresh;
   makeLeague(teams, teamChoice); // 리그·구단·선수 만들고 내 소속팀 정하기
+  enforceConditionCap(); // 처음엔 집이 없어서 합숙 (js/housing.js)
   replaceState(fresh, "dashboard", escapeHTML(fresh.player.name) + " 선수의 커리어가 시작됐어요! 훈련을 고르고 [다음 주로 진행]을 눌러 보세요.");
   saveGame();
 }

@@ -71,3 +71,24 @@ const SHOP_INVEST = [
     desc: "2주 뒤 반반: 쪽박(−50 ~ −90%) 아니면 대박(+30 ~ +120%)" },
 ];
 const INVEST_AMOUNTS = [0.1, 0.25, 0.5, 1];
+
+// ----- 거주지 (부동산) — js/housing.js -----
+// 집이 없으면 '합숙': 모든 훈련 효과 +50%(스탯·챔피언 숙련도), 대신 컨디션이 상한 이상 못 올라가서 경기력이 덜 나와요
+//   (컨디션 100이면 경기력 +10%, 50이면 ±0)
+// 다른 선수: 2부는 모두 합숙(해마다 성장 +50%, 경기력 −3%), 1부는 자기 집
+// 월세(rent): 매주 나감, 자금이 모자라면 합숙으로 돌아감 / 매매(price): 한 번 사고, 다른 집으로 옮기거나 합숙으로 돌아가면 resale 비율로 팔림
+// conditionCap: 그 집에서의 컨디션 상한, effects: 매주 효과 (staminaRegen 체력 +n, conditionRegen 컨디션 +n, popularityGain 인기도 상승 +%)
+const HOUSING = {
+  dormTraining: 0.5,      // 합숙: 모든 훈련 효과 +50%
+  dormConditionCap: 50,   // 합숙: 컨디션 상한
+  npcDormPower: -0.03,    // 2부 다른 선수(합숙): 경기력 −3% (컨디션 상한)
+  npcDormGrowth: 0.5,     // 2부 다른 선수(합숙): 해마다 스탯 성장 +50%
+  resale: 0.9,            // 산 집을 팔면 산 값의 90%
+};
+const SHOP_HOUSING = [
+  { id: "oneroom",   icon: "🏠", name: "원룸 (월세)",     rent: 150000,                conditionCap: 80,  desc: "합숙 탈출. 내 방이 생겼다.",               effects: {} },
+  { id: "tworoom",   icon: "🏡", name: "투룸 (월세)",     rent: 400000,                conditionCap: 85,  desc: "쉬는 공간이 따로 있다.",                   effects: { staminaRegen: 1 } },
+  { id: "apt",       icon: "🏢", name: "아파트",          price: 200000000,            conditionCap: 90,  desc: "내 집 마련.",                              effects: { staminaRegen: 2, conditionRegen: 1 } },
+  { id: "luxury",    icon: "🏙️", name: "고급 아파트",     price: 500000000,            conditionCap: 95,  desc: "헬스장·사우나가 딸린 단지.",               effects: { staminaRegen: 3, conditionRegen: 2, popularityGain: 0.05 } },
+  { id: "penthouse", icon: "🌆", name: "초고급 아파트",   price: 1200000000,           conditionCap: 100, desc: "한강이 보이는 펜트하우스. 방송에도 나온다.", effects: { staminaRegen: 4, conditionRegen: 3, popularityGain: 0.10 } },
+];

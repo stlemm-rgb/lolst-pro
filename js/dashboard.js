@@ -264,6 +264,8 @@ function dashStripHTML() {
       '<div class="card sum"><div class="sum-label">상태</div>' +
         miniBarHTML("체력", state.stamina, state.staminaMax, staminaCls) +
         miniBarHTML("컨디션", state.condition) +
+        (inDorm() ? '<div class="sum-sub warn-text tip" tabindex="0" data-tip="집이 없어서 팀 합숙 중: 모든 훈련 효과 +' + Math.round(HOUSING.dormTraining * 100) + '%, 대신 컨디션이 ' + HOUSING.dormConditionCap + '을 못 넘어 경기력 보너스가 없어요. [상점] → 거주지에서 집을 구하면 합숙에서 나와요.">🛏️ 합숙 중 · 훈련 +' + Math.round(HOUSING.dormTraining * 100) + "% · 컨디션 상한 " + HOUSING.dormConditionCap + "</div>"
+          : '<div class="sum-sub muted">' + currentHome().icon + " " + currentHome().name + " · 컨디션 상한 " + conditionCap() + "</div>") +
         miniBarHTML("인기도", state.popularity) +
         '<div class="mini-bar"><span class="mini-label tip" tabindex="0" data-tip="-100 ~ +100. 좋은 이미지인지 나쁜 이미지인지. 구단 제안·이적에 영향">평판</span>' +
           '<span class="bar rep-bar"><span class="rep-mid"></span><span class="bar-fill ' + (v < 0 ? "neg" : "pos") + '" style="margin-left:' + (v < 0 ? 50 + v / 2 : 50) + "%;width:" + Math.abs(v) / 2 + '%"></span></span>' +

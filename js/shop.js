@@ -25,6 +25,7 @@ function shopEffectList() {
   });
   SHOP_STAFF.forEach(function (st) { if ((s.staff || {})[st.id]) list.push(st.effects); });
   SHOP_FAME.forEach(function (f) { if (f.once && (s.fame || {})[f.id]) list.push(f.effects); });
+  if (typeof housingEffects === "function") housingEffects().forEach(function (e) { list.push(e); }); // 거주지 (js/housing.js)
   return list;
 }
 
@@ -213,8 +214,9 @@ pages.shop = function () {
   return (
     "<h1>상점</h1>" +
     '<div class="card"><div class="shop-money">💰 자금 <b>' + moneyText(state.money) + "</b>" +
-      ' <span class="muted small">· 매주 연봉 +' + moneyText(weeklyIn) + (weeklyOut ? " · 개인 고용 −" + moneyText(weeklyOut) : "") + "</span></div></div>" +
+      ' <span class="muted small">· 매주 연봉 +' + moneyText(weeklyIn) + (weeklyOut ? " · 개인 고용 −" + moneyText(weeklyOut) : "") + (currentHome() && currentHome().rent ? " · 월세 −" + moneyText(currentHome().rent) : "") + "</span></div></div>" +
     activitiesCardHTML() +
+    housingCardHTML() +
     '<div class="card"><h2>🛒 장비 <span class="muted small">한 번 사면 계속 · 단계가 오를수록 효과가 커져요</span></h2>' +
       '<table class="roster shop-table"><tr><th>장비</th><th class="c">단계</th><th>지금 효과</th><th>다음 단계</th></tr>' + gearRows + "</table></div>" +
     '<div class="card"><h2>🧑‍🏫 개인 고용 <span class="muted small">매주 비용이 나가는 동안만 효과 · 자금이 모자라면 자동 해지</span></h2>' +
@@ -265,6 +267,7 @@ function activitiesCardHTML() {
 
 // 버튼 연결 (main.js renderPage에서 부름)
 function bindShop(page) {
+  page.querySelectorAll("[data-home]").forEach(function (b) { b.onclick = function () { moveHome(b.getAttribute("data-home") || null); }; });
   page.querySelectorAll("[data-buygear]").forEach(function (b) { b.onclick = function () { buyGear(b.getAttribute("data-buygear")); }; });
   page.querySelectorAll("[data-staff]").forEach(function (b) { b.onclick = function () { toggleStaff(b.getAttribute("data-staff")); }; });
   page.querySelectorAll("[data-fame]").forEach(function (b) { b.onclick = function () { buyFame(b.getAttribute("data-fame")); }; });

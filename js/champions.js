@@ -136,7 +136,7 @@ function masteryGrowthMultiplier(champName) {
   let traitBonus = traitEffectSum("masteryGrowth");
   if (c) traitBonus += traitEffectKey("typeMastery", c.type);          // 유형별 특성 (캐리 본능 등)
   if (champName && isMeta(champName)) traitBonus += traitEffectSum("metaMastery"); // 메타 리더
-  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitBonus + typeBonus);
+  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitBonus + typeBonus + dormTrainingBonus()); // 합숙 +50%
 }
 
 // 챔피언 연습: 숙련도 올리기. 바뀐 값을 { 이름: +n } 으로 돌려줌

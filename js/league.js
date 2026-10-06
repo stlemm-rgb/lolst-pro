@@ -361,7 +361,8 @@ function newSeasonLeague() {
     const rule = LEAGUE.npcGrowth.find(function (g) { return bodyAge <= g.maxAge; });
     STATS.forEach(function (s) {
       let d = randInt(rule.change[0], rule.change[1]);
-      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id]) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id)));
+      const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +50%
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id]) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm));
       else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
       const before = p.stats[s.id];
       p.stats[s.id] = Math.max(1, capRise(before, Math.min(99, before + d), statCapOf(tr, s.id)));

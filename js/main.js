@@ -808,11 +808,13 @@ function nextWeek(restWeek) {
   if (state.career.seasonOverYear !== state.year && userSeasonOver(playedWeek)) startOffseason();
   paySalary();
   payStaff(); // 상점 개인 고용 비용 (js/shop.js)
+  payHousing(); // 월세 (js/housing.js)
   runActivities(); // 스폰서·개인 방송 등 매주 효과 (js/events.js)
   settleInvestments(); // 상점 투자 결과 (js/shop.js)
   // 회복력: 매주 체력 자연 회복
   const regen = traitEffectSum("staminaRegen");
   if (regen) state.stamina = Math.min(state.staminaMax, state.stamina + regen);
+  applyHousingWeek(); // 집 효과: 컨디션 회복 + 컨디션 상한 (합숙 50)
 
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
   state.week += 1;
@@ -829,6 +831,7 @@ function nextWeek(restWeek) {
       renderAll();
       return;
     }
+    snapshotSeasonForMarket(); // 지난 시즌 순위·평점 저장 + 구단 자금 정산 (js/club_market.js)
     state.year += 1;
     state.week = 1;
     state.player.age += 1;
@@ -836,7 +839,7 @@ function nextWeek(restWeek) {
     const leagueNews = newSeasonLeague().concat(contractsNewSeason());
     initContracts(); // 새로 들어온 신인들 계약
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
-    leagueNews.forEach(function (text) { addNews("승강", text); });
+    leagueNews.forEach(function (text) { addNews(text.indexOf("🔁") === 0 ? "이적 시장" : "승강", text.replace(/^🔁 /, "")); });
   }
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
@@ -884,6 +887,7 @@ function nextWeek(restWeek) {
   runWeeklyEvents();
   updateQuests();
   state.log = state.log.slice(0, 30);
+  enforceConditionCap(); // 이벤트로 오른 컨디션도 상한까지만 (js/housing.js)
   state.currentMenu = "dashboard";
   state.notice = state.newMentions
     ? "📣 선수 SNS에서 " + escapeHTML(state.player.name) + " 선수를 언급한 글이 " + state.newMentions + "개 올라왔어요. [SNS] → 💬 선수 SNS에서 확인하세요."
@@ -937,6 +941,7 @@ function renderAll() {
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
   ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)
+  enforceConditionCap(); // 거주지 컨디션 상한 (집이 없으면 합숙, js/housing.js)
   if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦
   ensureCareerRecords(); // 데뷔 기록 등
   renderMenu();

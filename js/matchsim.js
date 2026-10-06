@@ -84,7 +84,7 @@ function isBigMatch(match) {
 // 내 선수 한 세트 준비: 밴·픽·경기력 (세트마다 새로. used = 이번 경기에서 이미 나온 챔피언 → 다시 못 고름)
 function userMatchContext(match, target, used) {
   const m = matchPower(rollBans(used), target, used); // 세트마다 밴 수·대상이 달라짐, 조합 성향 반영
-  let mult = TEAM_MATCH.conditionBase + state.condition / TEAM_MATCH.conditionDiv;
+  let mult = TEAM_MATCH.conditionBase + Math.min(state.condition, conditionCap()) / TEAM_MATCH.conditionDiv; // 합숙이면 컨디션 상한 (js/housing.js)
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
   mult *= 1 + activityMatchBoost(match); // 라이벌 선언한 팀과 경기 (js/events.js)
@@ -144,6 +144,7 @@ function lineup(teamId, userCtx, setCtx) {
     } else {
       const down = 1 - (MATCH.npcMultiplier[0] - v);
       power = playerScore(id) * randFloat(1 - down * (1 - steady), MATCH.npcMultiplier[1] + v);
+      if (findTeam(teamId).tier === 2) power *= 1 + HOUSING.npcDormPower; // 2부는 합숙: 컨디션 상한 (data/shop.js)
     }
     power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx);
     return { pos: pos, id: id, power: power };
@@ -327,6 +328,23 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
   if (solos) laneText += ", 솔로킬 " + solos + "회!";
   if (soloLosses) laneText += ", 솔로킬 " + soloLosses + "회 허용";
   if (lanes.length && lanes[0].opp) laneText += " (상대 " + playerName(lanes[0].opp) + ")";
+
+  // 팀은 졌지만 나는 빛났다: 솔로킬 또는 라인전 절반 넘게 우세 → 뉴스 기사 (data/events.js LOSS_HERO)
+  if (!won && lanes.length && (solos > 0 || laneWins * 2 > lanes.length)) {
+    const list = solos > 0 ? LOSS_HERO.solo : LOSS_HERO.lane;
+    const art = pick(list);
+    const rival = lanes[0].opp ? playerName(lanes[0].opp) : "상대";
+    const fill = function (t) {
+      return t.replace(/\{name\}/g, state.player.name).replace(/\{team\}/g, myTeam().name).replace(/\{opp\}/g, teamName(oppId))
+        .replace(/\{pos\}/g, posName).replace(/\{rival\}/g, rival).replace(/\{solos\}/g, solos)
+        .replace(/\{laneWins\}/g, laneWins).replace(/\{sets\}/g, lanes.length);
+    };
+    addNews(fill(art.title), fill(art.text));
+    const heroPop = roundRandom(LOSS_HERO.popularity * popularityMultiplier());
+    before = state.popularity;
+    state.popularity = clamp(state.popularity + heroPop);
+    changes.popularity = (changes.popularity || 0) + state.popularity - before;
+  }
 
   if (state.weekReport) {
     state.weekReport.userLines.push({

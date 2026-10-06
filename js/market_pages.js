@@ -134,7 +134,7 @@ pages.clubs = function () {
           '<div class="club-head" data-club="' + t.id + '">' +
             '<span class="club-rank">' + (i + 1) + "</span>" +
             '<span class="club-name">' + escapeHTML(t.name) + (t.id === mine.id ? ' <span class="now-tag">내 팀</span>' : "") + "</span>" +
-            '<span class="muted small">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b> · 연봉 " + moneyText(teamPayroll(t.id)) + " / 예산 " + moneyText(CONTRACT.teamBudget[t.tier]) + "</span>" +
+            '<span class="muted small">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b> · 연봉 " + moneyText(teamPayroll(t.id)) + " / 예산 " + moneyText(CONTRACT.teamBudget[t.tier]) + " · " + clubMoneyText(t.id) + "</span>" +
           "</div>" +
           '<div class="muted small club-lineup">' + lineup + "</div>" +
           (open ? clubRosterHTML(t.id) : "") +

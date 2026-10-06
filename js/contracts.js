@@ -103,8 +103,9 @@ function teamPayroll(teamId) {
   return sum;
 }
 
+// 구단이 더 쓸 수 있는 돈 (예산의 50%까지 빚 + 구단 자금, js/club_market.js)
 function teamBudgetLeft(teamId) {
-  return CONTRACT.teamBudget[findTeam(teamId).tier] - teamPayroll(teamId);
+  return clubRoom(teamId);
 }
 
 // 계약 정보가 없는 선수·내 선수에게 계약 만들기 (새 게임, 예전 세이브)
@@ -357,7 +358,7 @@ function signFA(id, teamId) {
   const i = state.league.freeAgents.indexOf(id);
   if (i !== -1) state.league.freeAgents.splice(i, 1);
   p.teamId = teamId;
-  p.salary = salaryFor(statScoreFor(p.stats, p.pos), team.tier, 0);
+  p.salary = npcContractSalary(id, team.tier); // 지난 시즌 성적 프리미엄 포함 (js/club_market.js)
   p.contractEnd = state.year - 1 + randInt(CONTRACT.years[0], CONTRACT.years[1]);
   team.roster.push(id);
 }
@@ -399,6 +400,14 @@ function contractsNewSeason() {
   // 1) 내 선수
   if (state.pendingMove) {
     const mv = state.pendingMove;
+    // 계약 기간이 남은 채로 옮기면 새 팀이 원래 팀에 이적료를 냄
+    const oldTeam = myTeam();
+    const fee = state.contract && state.contract.endYear > lastYear && oldTeam && oldTeam.id !== mv.teamId ? transferFee(USER_ID) : 0;
+    if (fee) {
+      oldTeam.money = teamMoney(oldTeam.id) + fee;
+      findTeam(mv.teamId).money = teamMoney(mv.teamId) - fee;
+      news.push(findTeam(mv.teamId).name + "이(가) " + oldTeam.name + "에 이적료 " + moneyText(fee) + "을(를) 내고 " + state.player.name + " 영입");
+    }
     moveUserTo(mv.teamId);
     state.contract = { teamId: mv.teamId, salary: mv.salary, endYear: mv.endYear, guarantee: mv.guarantee };
     news.push(state.player.name + ", " + findTeam(mv.teamId).name + " 이적 완료");
@@ -427,35 +436,30 @@ function contractsNewSeason() {
   state.transferListed = false;
   state.career.seasonGames = 0;
 
-  // 2) NPC 계약 만료: 재계약 또는 FA
+  // 2) NPC 계약 만료: 재계약(성적 프리미엄 포함) 또는 FA
+  //    2부 선수가 1부 주전 평균보다 확실히 잘하면 1부에 가려고 재계약을 거절
+  const tier1Avg = average(tierTeams(1).map(function (t) { return teamStrength(t.id); }));
   Object.keys(state.league.players).forEach(function (id) {
     const p = state.league.players[id];
     if (!p.teamId || p.contractEnd > lastYear) return;
-    if (Math.random() < CONTRACT.npcRenewChance) {
+    const wantsUp = findTeam(p.teamId).tier === 2 && playerScore(id) >= tier1Avg + CLUB_MARKET.tier2Refuse;
+    if (!wantsUp && Math.random() < CONTRACT.npcRenewChance) {
       p.contractEnd = lastYear + randInt(CONTRACT.years[0], CONTRACT.years[1]);
-      p.salary = salaryFor(statScoreFor(p.stats, p.pos), findTeam(p.teamId).tier, 0);
+      p.salary = npcContractSalary(id, findTeam(p.teamId).tier);
     } else {
       releaseToFA(id);
     }
   });
 
-  // 3) 구단들이 FA 영입: 빈 포지션 채우기 → 주전보다 나은 FA 데려오기 (1부 강팀부터)
+  // 3) 리빌딩: 지난 시즌 하위 팀부터 FA·2부 스타·다른 팀 후보를 영입 (이적료·빚 50%까지, js/club_market.js)
+  const moves = [];
+  offseasonRebuild(moves);
+  // 4) 빈 포지션 채우기, 선수단 인원 맞추기
   const order = state.league.teams.slice().sort(function (a, b) { return (a.tier - b.tier) || (teamStrength(b.id) - teamStrength(a.id)); });
   order.forEach(function (t) {
     POSITION_IDS.forEach(function (pos) {
       const has = t.roster.some(function (id) { return playerPos(id) === pos; });
       if (!has) fillPosition(t.id, pos);
-    });
-    POSITION_IDS.forEach(function (pos) {
-      const starter = starterAt(t.id, pos);
-      if (starter === USER_ID) return;
-      const best = state.league.freeAgents.filter(function (id) { return findPlayer(id).pos === pos; })
-        .sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
-      if (best && starter && playerScore(best) >= playerScore(starter) + 3) {
-        const name = findPlayer(best).name;
-        signFA(best, t.id);
-        if (t.tier === 1) news.push(t.name + ", FA " + name + " 영입");
-      }
     });
     while (t.roster.length < LEAGUE.rosterSize && state.league.freeAgents.length) {
       const best = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
@@ -464,11 +468,14 @@ function contractsNewSeason() {
     while (t.roster.length > LEAGUE.rosterSize) releaseToFA(weakestPlayer(t.id));
   });
 
-  // 4) FA가 너무 많으면 실력 낮은 순으로 은퇴 처리 (최대 40명 유지)
+  // 5) FA가 너무 많으면 실력 낮은 순으로 은퇴 처리 (최대 40명 유지)
   const fa = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); });
   fa.slice(40).forEach(function (id) {
     state.league.freeAgents.splice(state.league.freeAgents.indexOf(id), 1);
     delete state.league.players[id];
   });
-  return news.slice(0, 6);
+  // 이적 소식: 우리 팀 관련 먼저, 나머지는 이적료 큰 순서 그대로
+  const mineName = myTeam().name;
+  moves.sort(function (a, b) { return (b.indexOf(mineName) !== -1) - (a.indexOf(mineName) !== -1); });
+  return news.slice(0, 6).concat(moves.slice(0, CLUB_MARKET.newsMax));
 }

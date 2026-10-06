@@ -515,3 +515,23 @@ const TRAIT_GAINS = [
 
 // 선수 SNS 글은 data/social_posts.js 로 옮겼어요.
 
+
+// ----- 팀은 졌지만 나는 빛난 경기 → 뉴스 기사 (js/matchsim.js afterUserMatch) -----
+// 조건: 우리 팀이 진 경기에서 ① 솔로킬을 땄거나 ② 라인전을 절반 넘게 이김
+// 글자: {name} 내 선수, {team} 우리 팀, {opp} 상대 팀, {pos} 포지션, {rival} 상대 라인 선수,
+//       {solos} 솔로킬 수, {laneWins} 라인전 이긴 세트, {sets} 세트 수
+const LOSS_HERO = {
+  popularity: 1,          // 기사가 나면 인기도 +1 (인기도 배율 적용)
+  // 솔로킬을 딴 경우 (먼저 확인)
+  solo: [
+    { title: "패배 속 빛난 솔로킬", text: "{team}은(는) {opp}에게 졌지만, {pos} {name}의 솔로킬 {solos}회는 팬들의 뇌리에 남았다. \"팀이 졌으니 의미 없다\"는 {name}의 인터뷰가 오히려 화제." },
+    { title: "{name}, 혼자서 {rival}을(를) 잡았다", text: "경기는 {opp}의 승리. 하지만 {name}은(는) {rival}을(를) 상대로 솔로킬 {solos}회를 기록하며 라인에서만큼은 확실한 우위를 보였다." },
+    { title: "졌지만 잘 싸웠다: {name}", text: "{team}의 패배에도 커뮤니티는 {name}의 솔로킬 장면으로 뜨겁다. \"저 팀에서 저 정도면 혼자 게임하는 것\"이라는 반응." },
+  ],
+  // 라인전을 절반 넘게 이긴 경우
+  lane: [
+    { title: "{name}, 패배에도 라인전 압승", text: "{team}은(는) {opp}에게 무릎 꿇었지만, {pos} 라인은 {sets}세트 중 {laneWins}세트를 {name}이(가) 가져갔다. 해설진: \"라인전만 보면 {name}이(가) 이긴 경기\"." },
+    { title: "고군분투한 {name}", text: "{opp}전 패배. 그래도 {name}은(는) 상대 {rival}을(를) 라인에서 꾸준히 압박하며 제 몫을 다했다. 팀 전체의 경기력 보완이 숙제로 남았다." },
+    { title: "\"{name} 혼자서는 이길 수 없었다\"", text: "{team}이(가) {opp}에게 졌다. 라인전 {laneWins}/{sets} 세트 우세를 기록한 {name}에게는 아쉬운 결과. 팬들은 구단의 보강을 요구하고 있다." },
+  ],
+};
