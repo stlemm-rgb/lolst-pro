@@ -18,6 +18,11 @@ const LADDER = {
   minChance: 0.1,
   maxChance: 0.9,
   pointsPerGame: [18, 22], // 다이아몬드부터 한 판에 오르내리는 점수
+  // 다른 선수(국내 1부·2부 구단 선수)도 매주 솔로 랭크를 함 → 대시보드 "리그 솔로 랭크" 순위
+  // 한 주 판 수 = npcGames 사이 무작위 × 선수마다 정해진 "솔랭 성향" (npcGrind 사이, 처음 한 번 정함)
+  npcGames: [2, 8],
+  npcGrind: [0.5, 1.6],
+  boardTop: 10,            // 대시보드에 보여 줄 상위 몇 명
   // 티어 (이 점수 이상이면 그 티어)
   tiers: [
     { min: 0,    name: "아이언" },

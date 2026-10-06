@@ -7,6 +7,55 @@ function ladderTier(points) {
   return tier.name;
 }
 
+// 랭크 한 판: 점수와 실력(종합 능력)으로 승패 → { points: 새 점수, won }
+// (나와 다른 선수 모두 같은 규칙. winBonus = 솔랭 중독자 승률 보너스)
+function ladderGame(points, skill, winBonus) {
+  const fast = points < LADDER.fastUntil; // 다이아몬드 아래: 프로라서 쉽게 이김
+  const skillHere = LADDER.skillBase + points / LADDER.skillPer;
+  let chance = Math.max(LADDER.minChance, Math.min(LADDER.maxChance, 0.5 + (skill - skillHere) / LADDER.winSpread));
+  if (fast) chance = Math.max(chance, LADDER.fastWinChance);
+  chance = Math.min(0.97, chance + (winBonus || 0));
+  const winRange = fast ? LADDER.fastPointsWin : LADDER.pointsPerGame;
+  const lossRange = fast ? LADDER.fastPointsLoss : LADDER.pointsPerGame;
+  if (Math.random() < chance) return { points: points + randInt(winRange[0], winRange[1]), won: true };
+  return { points: Math.max(0, points - randInt(lossRange[0], lossRange[1])), won: false };
+}
+
+// ----- 리그 솔로 랭크: 다른 선수들 (국내 1부·2부 구단 소속) -----
+function ladderPlayerIds() {
+  return Object.keys(state.league.players).filter(function (id) {
+    const p = state.league.players[id];
+    const t = p.teamId && findTeam(p.teamId);
+    return t && (t.tier === 1 || t.tier === 2);
+  });
+}
+
+// 다른 선수 솔로 랭크 정보 (없으면 새로 만듦): { points, peak, grind }
+function npcSolo(p) {
+  if (!p.solo) p.solo = { points: LADDER.startPoints, peak: LADDER.startPoints, grind: Math.round((LADDER.npcGrind[0] + Math.random() * (LADDER.npcGrind[1] - LADDER.npcGrind[0])) * 100) / 100 };
+  return p.solo;
+}
+
+// 매주: 다른 선수들도 랭크 게임 (main.js의 nextWeek에서 부름)
+function playNpcLadder() {
+  ladderPlayerIds().forEach(function (id) {
+    const p = state.league.players[id];
+    const so = npcSolo(p);
+    const games = Math.round(randInt(LADDER.npcGames[0], LADDER.npcGames[1]) * so.grind);
+    const skill = playerScore(id);
+    for (let i = 0; i < games; i++) so.points = ladderGame(so.points, skill, 0).points;
+    so.peak = Math.max(so.peak, so.points);
+  });
+}
+
+// 리그 솔로 랭크 순위표: [{ id, points }] 점수 높은 순 (나 포함)
+function leagueLadder() {
+  const rows = ladderPlayerIds().map(function (id) { return { id: id, points: npcSolo(state.league.players[id]).points }; });
+  rows.push({ id: USER_ID, points: (state.soloRank || { points: LADDER.startPoints }).points });
+  rows.sort(function (a, b) { return b.points - a.points || playerScore(b.id) - playerScore(a.id); });
+  return rows;
+}
+
 // 이번 주 훈련에 딸린 랭크 게임 진행. 결과 { games, wins, losses, delta }
 function playLadder(training) {
   if (!state.soloRank) state.soloRank = { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints };
@@ -16,15 +65,9 @@ function playLadder(training) {
   let wins = 0;
   const me = playerScore(USER_ID);
   for (let i = 0; i < games; i++) {
-    const fast = r.points < LADDER.fastUntil; // 다이아몬드 아래: 프로라서 쉽게 이김
-    const skillHere = LADDER.skillBase + r.points / LADDER.skillPer;
-    let chance = Math.max(LADDER.minChance, Math.min(LADDER.maxChance, 0.5 + (me - skillHere) / LADDER.winSpread));
-    if (fast) chance = Math.max(chance, LADDER.fastWinChance);
-    chance = Math.min(0.97, chance + traitEffectSum("ladderWin"));
-    const winRange = fast ? LADDER.fastPointsWin : LADDER.pointsPerGame;
-    const lossRange = fast ? LADDER.fastPointsLoss : LADDER.pointsPerGame;
-    if (Math.random() < chance) { r.points += randInt(winRange[0], winRange[1]); wins++; }
-    else r.points = Math.max(0, r.points - randInt(lossRange[0], lossRange[1]));
+    const g = ladderGame(r.points, me, traitEffectSum("ladderWin"));
+    r.points = g.points;
+    if (g.won) wins++;
   }
   r.patchPeak = Math.max(r.patchPeak || 0, r.points);
   // 랭크 틸트: 진 판이 더 많으면 컨디션 하락
@@ -140,6 +183,8 @@ function summaryRowHTML() {
   const score = playerScore(USER_ID);
   const pr = positionRank();
   const sr = state.soloRank || { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints };
+  const board = leagueLadder();
+  const myLadderRank = board.findIndex(function (x) { return x.id === USER_ID; }) + 1;
 
   return (
     '<div class="summary-row">' +
@@ -155,9 +200,47 @@ function summaryRowHTML() {
       "</div>" +
       '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="훈련할 때마다 랭크 게임을 하고, 승패에 따라 점수가 오르내려요. 솔로 랭크 훈련이 가장 많이 해요.">솔로 랭크</div>' +
         '<div class="sum-main">' + ladderTier(sr.points) + ' <span class="sum-points">' + sr.points.toLocaleString() + "점</span></div>" +
+        '<div class="sum-sub">리그 솔로 랭크 ' + board.length + "명 중 <b>" + myLadderRank + "위</b></div>" +
         '<div class="sum-sub">이번 패치 최고 ' + (sr.patchPeak || sr.points).toLocaleString() + "점 · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
         '<div class="sum-sub muted">역대 최고 ' + sr.peak.toLocaleString() + "점 (" + ladderTier(sr.peak) + ") · 패치마다 초기화</div>" +
       "</div>" +
+    "</div>"
+  );
+}
+
+// ----- 대시보드: 리그 솔로 랭크 순위표 (TOP 10 + 내 순위, [전체 보기]) -----
+let ladderShowAll = false;
+
+function leagueLadderHTML() {
+  const board = leagueLadder();
+  const myIdx = board.findIndex(function (x) { return x.id === USER_ID; });
+  const top = LADDER.boardTop;
+  // 보여 줄 줄 번호: 전체 / 또는 TOP 10 + 내 앞뒤 1명
+  let show = [];
+  if (ladderShowAll) {
+    show = board.map(function (_, i) { return i; });
+  } else {
+    for (let i = 0; i < Math.min(top, board.length); i++) show.push(i);
+    for (let i = myIdx - 1; i <= myIdx + 1; i++) if (i >= 0 && i < board.length && show.indexOf(i) === -1) show.push(i);
+  }
+  let rows = "", prev = -1;
+  show.forEach(function (i) {
+    if (prev !== -1 && i > prev + 1) rows += '<tr class="gap"><td colspan="6">···</td></tr>';
+    const x = board[i];
+    const me = x.id === USER_ID;
+    const team = me ? myTeam() : findTeam(findPlayer(x.id).teamId);
+    rows += "<tr" + (me ? ' class="me"' : "") + '><td class="r">' + (i + 1) + "</td>" +
+      "<td>" + (me ? "▶ <b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) + "</td>" +
+      '<td class="muted">' + escapeHTML(team ? team.short : "-") + "</td>" +
+      "<td>" + findPosition(playerPos(x.id)).name + "</td>" +
+      "<td>" + ladderTier(x.points) + "</td>" +
+      '<td class="r">' + x.points.toLocaleString() + "점</td></tr>";
+    prev = i;
+  });
+  return (
+    '<div class="card"><h2>🏆 리그 솔로 랭크 <span class="muted small">국내 1부·2부 선수 ' + board.length + "명 · 패치마다 초기화</span></h2>" +
+      '<table class="mini ladder-board"><tr><th class="r">순위</th><th>선수</th><th>팀</th><th>포지션</th><th>티어</th><th class="r">점수</th></tr>' + rows + "</table>" +
+      '<div class="buttons"><button data-ladderall>' + (ladderShowAll ? "접기" : "전체 보기") + "</button></div>" +
     "</div>"
   );
 }
@@ -169,6 +252,11 @@ function resetLadder() {
   const before = r.points;
   r.points = LADDER.resetPoints;
   r.patchPeak = r.points;
+  // 다른 선수들도 같이 초기화
+  Object.keys(state.league.players).forEach(function (id) {
+    const p = state.league.players[id];
+    if (p.solo) p.solo.points = LADDER.resetPoints;
+  });
   return before;
 }
 

@@ -337,6 +337,9 @@ table th { color: var(--muted); font-weight: normal; font-size: 13px; }
 td.r, th.r { text-align: right; }
 td.c { text-align: center; white-space: nowrap; }
 tr.me { background: rgba(59, 130, 246, 0.15); }
+table.ladder-board th { text-align: left; padding: 7px 8px; }
+table.ladder-board th.r { text-align: right; }
+table.ladder-board tr.gap td { color: var(--muted); text-align: center; padding: 2px; }
 .my-team { color: var(--accent); }
 .big-vs { font-size: 18px; font-weight: bold; margin: 6px 0; }
 table td.r, table th.r { text-align: right; }

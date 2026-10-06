@@ -159,6 +159,7 @@ pages.dashboard = function () {
     weekReportHTML() +
     upcomingHTML() +
     summaryRowHTML() +
+    leagueLadderHTML() +
     '<div class="grid">' +
       '<div class="card"><h2>프로필</h2>' +
         '<p class="profile-name">' + escapeHTML(p.name) + "</p>" +
@@ -629,6 +630,10 @@ function renderPage() {
   const focusSel = document.getElementById("focus-champ");
   if (focusSel) focusSel.onchange = function () { state.focusChamp = this.value; };
 
+  // 대시보드: 리그 솔로 랭크 [전체 보기]/[접기]
+  const ladderAll = page.querySelector("[data-ladderall]");
+  if (ladderAll) ladderAll.onclick = function () { ladderShowAll = !ladderShowAll; renderPage(); };
+
   // 나의 커리어: 포지션 탭
   page.querySelectorAll("[data-stab]").forEach(function (btn) {
     btn.onclick = function () { standingsTab = btn.getAttribute("data-stab"); renderPage(); };
@@ -720,6 +725,7 @@ function nextWeek(restWeek) {
   });
   // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
   startWeekReport(training, message, changes, playLadder(training));
+  playNpcLadder(); // 다른 선수들도 솔로 랭크 (리그 솔로 랭크 순위)
   progressQuests(training, changes); // 퀘스트 진행 (js/quests.js)
 
   // 이번 주 리그 경기 (훈련 다음에 진행), 연봉 1주치
