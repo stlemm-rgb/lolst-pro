@@ -259,6 +259,7 @@ function dashStripHTML() {
         (hasTrait(LADDER.kingTrait) ? '<div class="sum-sub king">👑 지난 랭크 시즌 1위 · 경기력 +3%</div>' : "") +
         '<div class="sum-sub">리그 ' + board.length + "명 중 <b>" + myLadderRank + "위</b> · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
         '<div class="sum-sub muted">이번 패치 최고 ' + (sr.patchPeak || sr.points).toLocaleString() + " · 역대 최고 " + sr.peak.toLocaleString() + "</div>" +
+        (isPrePatchWeek(state.week) ? '<div class="sum-sub warn-text">⚠️ 이번 주 끝에 초기화</div>' : "") +
       "</div>" +
       '<div class="card sum"><div class="sum-label">상태</div>' +
         miniBarHTML("체력", state.stamina, state.staminaMax, staminaCls) +
@@ -371,6 +372,21 @@ function leagueLadderHTML() {
   );
 }
 
+// 패치 바로 전 주인가? (이번 주가 끝나면 패치·솔로 랭크 초기화: 28주, 52주)
+function isPrePatchWeek(week) {
+  return MASTERY.patchWeeks.some(function (pw) { return (pw === 1 ? CREATION.weeksPerSeason : pw - 1) === week; });
+}
+
+// 이번 주 솔로 랭크 초기화 예고 줄 (대시보드 '이번 주'·솔로 랭크 칸)
+function ladderResetNoticeHTML() {
+  if (!isPrePatchWeek(state.week)) return "";
+  const r = myLadderRank();
+  const top = leagueLadder()[0];
+  const gap = top && top.id !== USER_ID ? top.points - (state.soloRank ? state.soloRank.points : 0) : 0;
+  return '<div class="rep-row ladder-reset"><span class="rep-tag rank">랭크</span>⚠️ 이번 주가 끝나면 패치로 <b>솔로 랭크 초기화</b> (' + LADDER.resetPoints.toLocaleString() + "점) · 지금 리그 <b>" + r + "위</b>" +
+    (r === 1 ? " · 이대로면 👑 솔랭 1위 칭호!" : gap > 0 ? " · 1위와 " + gap.toLocaleString() + "점 차이" : "") + "</div>";
+}
+
 // 랭크 시즌 1위 칭호: 지금 1위에게 주고, 예전 1위에게서는 뺌
 function crownLadderKing() {
   const id = LADDER.kingTrait;
@@ -434,6 +450,7 @@ function thisWeekHTML() {
     '<div class="card upcoming"><h2>▶ 이번 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + "</span></h2>" +
       trainHTML +
       matchHTML +
+      ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고
       compPlanHTML() + // 조합 전략 (js/comps.js)
       questsHTML(true) +
     "</div>"

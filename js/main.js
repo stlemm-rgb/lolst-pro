@@ -847,6 +847,14 @@ function nextWeek(restWeek) {
     if (top && !isMeta(top)) state.weekCtx.nerfChamp = top;
   }
 
+  // 패치 바로 전 주(28주·52주): 솔로 랭크 초기화 예고
+  if (isPrePatchWeek(state.week)) {
+    const r = myLadderRank();
+    const top = leagueLadder()[0];
+    addNews("랭크 초기화 예고", "이번 주가 끝나면 패치로 솔로 랭크가 " + LADDER.resetPoints.toLocaleString() + "점으로 초기화된다. 지금 리그 " + r + "위" +
+      (top ? " (1위 " + playerName(top.id) + " " + top.points.toLocaleString() + "점)" : "") + ". 이번 주 끝에 1위면 '" + findTrait(LADDER.kingTrait).name + "' 칭호!");
+  }
+
   // 2군행/승격 판정, 비시즌 시작이면 재계약·영입 제안
   checkBench();
   if (state.week === CONTRACT.windowStart) {

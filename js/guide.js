@@ -98,6 +98,12 @@ function weekAdvice() {
   } else if (hasMatch && state.stamina < TEAM_MATCH.lowStaminaLimit) {
     list.push({ text: "이번 주 경기가 있는데 체력 " + state.stamina + ". " + TEAM_MATCH.lowStaminaLimit + " 미만이면 경기력 −" + Math.round(TEAM_MATCH.lowStaminaCut * 100) + "%. 쉬면 경기 전에 회복돼요.", label: "휴식 주로 진행", act: { rest: true } });
   }
+  // 2-1) 패치 전 주: 솔로 랭크 초기화 예고 (이번 주만 의미 있으니 앞쪽에)
+  if (isPrePatchWeek(state.week)) {
+    const r = myLadderRank();
+    list.push({ text: "이번 주가 끝나면 솔로 랭크가 초기화돼요. 지금 리그 " + r + "위" + (r <= 3 ? " — 1위면 👑 칭호(경기력 +3%)!" : "."),
+      label: state.plan === "solo_rank" ? "솔로 랭크 선택됨" : "솔로 랭크로 선택", act: { plan: "solo_rank" } });
+  }
   // 3) 답하지 않은 연락
   const waiting = state.inbox.filter(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; }).length;
   if (waiting) list.push({ text: "답하지 않은 연락이 " + waiting + "개 있어요. 4주가 지나면 그냥 지나가요.", label: "SNS 열기", act: { sns: true } });
