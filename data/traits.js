@@ -1,5 +1,6 @@
 // 특성 목록
-// - type: "good"(좋은 특성), "bad"(나쁜 특성), "s"(S급 특성: 게임 중 큰 업적으로만 얻음, 아래 S_TRAIT_RULES)
+// - type: "good"(좋은 특성), "bad"(나쁜 특성), "s"(S급 특성: 게임 중 큰 업적으로만 얻음, 아래 S_TRAIT_RULES),
+//         "title"(칭호: 잠깐만 붙는 특성. 예: 솔랭 1위 — 랭크 초기화 때 다음 1위에게 넘어감)
 //   좋은 특성은 캐릭터 생성 때 직접 골라요(유형별 개수만큼). 나쁜 특성은 이벤트로만 생겨요(최대 5%). 나쁜 특성마다 극복 이벤트가 있어요.
 // - group: 캐릭터 생성 화면에서 묶어서 보여줄 분류 (좋은 특성만)
 // - npc: true면 다른 선수(NPC)도 가질 수 있음 (경기·성장·노화에 영향을 주는 특성만. 훈련·돈·인기 특성은 NPC에게 의미가 없어서 제외)
@@ -84,6 +85,9 @@ const TRAITS = [
   { id: "tilt",         type: "bad", name: "랭크 틸트",     desc: "솔로 랭크에서 진 판이 더 많은 주에 컨디션 −3",          effects: { tilt: 3 } },
   { id: "spender",      type: "bad", name: "낭비벽",       desc: "주급의 20%를 써 버림",                               effects: { spend: 0.2 } },
   { id: "night_owl",    type: "bad", name: "올빼미",       desc: "휴식 체력 회복 −30%",                                effects: { restBonus: -0.3 } },
+
+  // ===== 칭호 (잠깐만 붙는 특성) =====
+  { id: "ladder_king", type: "title", npc: true, name: "👑 솔랭 1위", desc: "지난 랭크 시즌 리그 솔로 랭크 1위. 모든 경기 경기력 +3% (다음 랭크 초기화 때 새 1위에게 넘어감)", effects: { power: 0.03 } },
 
   // ===== S급 특성 (게임 중 큰 업적으로만 얻음. 다른 선수도 조건을 채우면 얻음) =====
   { id: "s_emperor",   type: "s", npc: true, name: "황제",           desc: "모든 경기 경기력 +5%, 인기도 상승 +50%",                        effects: { power: 0.05, popularityGain: 0.5 } },

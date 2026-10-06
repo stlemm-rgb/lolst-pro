@@ -115,7 +115,7 @@ function traitChipHTML(id) {
 // 이름 옆에 붙이는 작은 특성 칩들 (S급 먼저)
 function traitChipsMini(id) {
   const list = traitsOf(id).slice().sort(function (a, b) {
-    const order = { s: 0, good: 1, bad: 2 };
+    const order = { title: -1, s: 0, good: 1, bad: 2 };
     return order[findTrait(a).type] - order[findTrait(b).type];
   });
   return list.length ? ' <span class="mini-chips">' + list.map(traitChipHTML).join("") + "</span>" : "";

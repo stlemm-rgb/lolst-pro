@@ -2,9 +2,42 @@
 
 // ----- 솔로 랭크 (가상 래더) -----
 function ladderTier(points) {
-  let tier = LADDER.tiers[0];
-  LADDER.tiers.forEach(function (t) { if (points >= t.min) tier = t; });
-  return tier.name;
+  return ladderTierInfo(points).name;
+}
+
+// 티어 정보 { min, name, color, index(0 = 아이언 ~ 9 = 챌린저) }
+function ladderTierInfo(points) {
+  let idx = 0;
+  LADDER.tiers.forEach(function (t, i) { if (points >= t.min) idx = i; });
+  return Object.assign({ index: idx }, LADDER.tiers[idx]);
+}
+
+// 티어 로고 (그림 파일 없이 SVG로 그림): 방패 + 보석, 마스터부터 날개, 그랜드마스터 큰 날개, 챌린저 왕관
+function tierEmblemSVG(points, size) {
+  const t = ladderTierInfo(points);
+  const c = t.color, i = t.index, id = "tg" + i;
+  let extra = "";
+  if (i >= 7) { // 날개
+    const w = i >= 8 ? 10 : 6;
+    extra += '<path d="M12 18 L' + (12 - w) + ' 24 L12 34 Z M52 18 L' + (52 + w) + ' 24 L52 34 Z" fill="' + c + '" opacity="0.85"/>';
+  }
+  if (i >= 9) { // 왕관
+    extra += '<path d="M22 9 L25 1 L29 7 L32 0 L35 7 L39 1 L42 9 Z" fill="' + c + '" stroke="#fff8" stroke-width="0.8"/>';
+  }
+  const pips = i <= 6 ? Array.apply(null, Array(Math.min(3, Math.floor(i / 2) + 1))).map(function (_, k, arr) {
+    const x = 32 + (k - (arr.length - 1) / 2) * 6;
+    return '<circle cx="' + x + '" cy="51" r="1.6" fill="#fff" opacity="0.8"/>';
+  }).join("") : "";
+  return (
+    '<svg class="tier-emblem" width="' + (size || 44) + '" height="' + (size || 44) + '" viewBox="-4 -2 72 68" aria-label="' + t.name + '">' +
+      '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c + '"/><stop offset="1" stop-color="' + c + '" stop-opacity="0.45"/></linearGradient></defs>' +
+      extra +
+      '<path d="M32 8 L52 16 L52 34 Q52 50 32 60 Q12 50 12 34 L12 16 Z" fill="url(#' + id + ')" stroke="' + c + '" stroke-width="2"/>' +
+      '<path d="M32 20 L41 33 L32 46 L23 33 Z" fill="#ffffff" opacity="' + (0.35 + i * 0.05).toFixed(2) + '"/>' +
+      '<path d="M32 20 L41 33 L32 33 Z" fill="#ffffff" opacity="0.35"/>' +
+      pips +
+    "</svg>"
+  );
 }
 
 // 랭크 한 판: 점수와 실력(종합 능력)으로 승패 → { points: 새 점수, won }
@@ -212,7 +245,9 @@ function dashStripHTML() {
         '<div class="sum-sub">리그 ' + findPosition(state.player.position).name + " " + pr.total + "명 중 <b>" + pr.rank + "위</b></div>" +
       "</div>" +
       '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="훈련할 때마다 랭크 게임을 하고, 승패에 따라 점수가 오르내려요. 솔로 랭크 훈련이 가장 많이 해요. 패치마다 초기화.">솔로 랭크</div>' +
-        '<div class="sum-main">' + ladderTier(sr.points) + ' <span class="sum-points">' + sr.points.toLocaleString() + "점</span></div>" +
+        '<div class="sum-tier">' + tierEmblemSVG(sr.points, 48) +
+          '<div><div class="sum-main" style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + '</div><div class="sum-points">' + sr.points.toLocaleString() + "점</div></div></div>" +
+        (hasTrait(LADDER.kingTrait) ? '<div class="sum-sub king">👑 지난 랭크 시즌 1위 · 경기력 +3%</div>' : "") +
         '<div class="sum-sub">리그 ' + board.length + "명 중 <b>" + myLadderRank + "위</b> · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
         '<div class="sum-sub muted">이번 패치 최고 ' + (sr.patchPeak || sr.points).toLocaleString() + " · 역대 최고 " + sr.peak.toLocaleString() + "</div>" +
       "</div>" +
@@ -311,7 +346,9 @@ function leagueLadderHTML() {
     const me = x.id === USER_ID;
     const team = me ? myTeam() : findTeam(findPlayer(x.id).teamId);
     rows += "<tr" + (me ? ' class="me"' : "") + ' title="' + ladderTier(x.points) + '"><td class="r">' + (i + 1) + "</td>" +
-      "<td>" + (me ? "<b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) + ' <span class="muted small">' + findPosition(playerPos(x.id)).name + "</span></td>" +
+      "<td>" + tierEmblemSVG(x.points, 18) + " " + (me ? "<b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) +
+        (traitsOf(x.id).indexOf(LADDER.kingTrait) !== -1 ? ' <span title="지난 랭크 시즌 1위">👑</span>' : "") +
+        ' <span class="muted small">' + findPosition(playerPos(x.id)).name + "</span></td>" +
       '<td class="muted small">' + escapeHTML(team ? team.short : "-") + "</td>" +
       '<td class="r">' + x.points.toLocaleString() + "</td></tr>";
     prev = i;
@@ -324,10 +361,28 @@ function leagueLadderHTML() {
   );
 }
 
+// 랭크 시즌 1위 칭호: 지금 1위에게 주고, 예전 1위에게서는 뺌
+function crownLadderKing() {
+  const id = LADDER.kingTrait;
+  const top = leagueLadder()[0];
+  // 예전 칭호 빼기 (나 + 모든 선수)
+  const drop = function (list) { const k = list.indexOf(id); if (k !== -1) list.splice(k, 1); };
+  drop(state.player.traits);
+  Object.keys(state.league.players).forEach(function (pid) { const p = state.league.players[pid]; if (p.traits) drop(p.traits); });
+  if (!top) return;
+  if (top.id !== USER_ID && !state.league.players[top.id].traits) state.league.players[top.id].traits = [];
+  (top.id === USER_ID ? state.player.traits : state.league.players[top.id].traits).push(id);
+  const team = top.id === USER_ID ? myTeam() : findTeam(findPlayer(top.id).teamId);
+  const who = playerName(top.id) + (team ? " (" + team.short + ")" : "");
+  addNews("👑 랭크 시즌 1위", who + " 선수가 리그 솔로 랭크 " + top.points.toLocaleString() + "점으로 1위! 다음 랭크 시즌까지 '" + findTrait(id).name + "' 칭호 (경기력 +3%)");
+  if (top.id === USER_ID) addMoment("👑", "리그 솔로 랭크 시즌 1위 (" + top.points.toLocaleString() + "점)");
+}
+
 // 패치 때 솔로 랭크 초기화 (main.js의 패치 처리에서 부름)
 function resetLadder() {
   const r = state.soloRank;
   if (!r) return;
+  crownLadderKing(); // 초기화 직전 1위에게 '솔랭 1위' 칭호
   const before = r.points;
   r.points = LADDER.resetPoints;
   r.patchPeak = r.points;

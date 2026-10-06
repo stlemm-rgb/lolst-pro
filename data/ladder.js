@@ -23,17 +23,20 @@ const LADDER = {
   npcGames: [2, 8],
   npcGrind: [0.5, 1.6],
   boardTop: 10,            // 대시보드에 보여 줄 상위 몇 명
-  // 티어 (이 점수 이상이면 그 티어)
+  // 티어 (이 점수 이상이면 그 티어). color = 대시보드 티어 로고 색
   tiers: [
-    { min: 0,    name: "아이언" },
-    { min: 800,  name: "브론즈" },
-    { min: 1100, name: "실버" },
-    { min: 1400, name: "골드" },
-    { min: 1700, name: "플래티넘" },
-    { min: 2000, name: "에메랄드" },
-    { min: 2300, name: "다이아몬드" },
-    { min: 2600, name: "마스터" },
-    { min: 2900, name: "그랜드마스터" },
-    { min: 3200, name: "챌린저" },
+    { min: 0,    name: "아이언",       color: "#7d7a78" },
+    { min: 800,  name: "브론즈",       color: "#b0703f" },
+    { min: 1100, name: "실버",         color: "#a9b6c6" },
+    { min: 1400, name: "골드",         color: "#e2b34c" },
+    { min: 1700, name: "플래티넘",     color: "#3fbfae" },
+    { min: 2000, name: "에메랄드",     color: "#2fbf71" },
+    { min: 2300, name: "다이아몬드",   color: "#6b9cff" },
+    { min: 2600, name: "마스터",       color: "#b569e8" },
+    { min: 2900, name: "그랜드마스터", color: "#e8524a" },
+    { min: 3200, name: "챌린저",       color: "#f4d35e" },
   ],
+  // 랭크 시즌 1위: 패치 전 주(랭크 초기화 직전) 리그 솔로 랭크 1위가 '솔랭 1위' 특성(data/traits.js ladder_king)을 받음
+  // 다음 초기화 때 다음 1위에게 넘어감
+  kingTrait: "ladder_king",
 };
