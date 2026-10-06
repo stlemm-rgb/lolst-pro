@@ -29,7 +29,9 @@ function rewardText(q) {
 function progressQuests(training, changes) {
   if (!state.quests) state.quests = [];
   repairQuests();
-  const practiced = Object.keys(changes).filter(function (k) { return k.indexOf("m:") === 0; }).map(function (k) { return k.slice(2); });
+  // 챔피언 연습 퀘스트는 챔피언 연습·집중 연습만 셈 (다른 훈련에 섞인 메타 숙련도 상승은 제외)
+  const champTraining = !!(training.effects.mastery || training.effects.masteryFocus);
+  const practiced = !champTraining ? [] : Object.keys(changes).filter(function (k) { return k.indexOf("m:") === 0; }).map(function (k) { return k.slice(2); });
   const myMeta = state.meta.champs[state.player.position];
   const done = [];
   state.quests.forEach(function (q) {

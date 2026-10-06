@@ -4,7 +4,8 @@
 // - effects: 일주일 뒤 바뀌는 값. [최소, 최대] 사이에서 무작위로 정해집니다.
 //     스탯 id(accuracy, laning, ... data/stats.js 참고) 또는
 //     stamina(체력), condition(컨디션), popularity(인기도), reputation(평판),
-//     mastery(챔피언 숙련도, 여러 명), masteryFocus(고른 챔피언 1명 숙련도)를 쓸 수 있어요.
+//     mastery(챔피언 숙련도, 여러 명), masteryFocus(고른 챔피언 1명 숙련도),
+//     masteryMeta(메타 챔피언 중 숙련도가 가장 낮은 1명 — 다른 훈련도 메타 챔피언으로 하니까 조금씩)를 쓸 수 있어요.
 //     스탯 상승에는 포지션 가산점·시작 유형·특성 보너스가 붙습니다.
 // - ladderGames: 그 주에 솔로 랭크(가상 래더)를 몇 판 하는지. 승패에 따라 래더 점수가 오르내려요.
 // - messages: 결과 문장 후보. 이 중 하나가 무작위로 나옵니다.
@@ -18,6 +19,7 @@ const TRAININGS = [
       accuracy: [1, 2],
       reaction: [1, 2],
       laning:   [1, 2],
+      masteryMeta: [1, 3],  // 랭크도 메타 챔피언으로 (메타 챔피언 1명 숙련도 조금)
       stamina:  [-8, -5],
     },
     messages: [
@@ -35,6 +37,7 @@ const TRAININGS = [
       teamfight: [1, 2],
       macro:     [1, 2],
       shotcall:  [1, 2],
+      masteryMeta: [1, 3],  // 스크림도 메타 챔피언으로
       stamina:   [-8, -5],
     },
     messages: [
@@ -52,6 +55,7 @@ const TRAININGS = [
       vision:  [1, 2],
       spacing: [1, 2],
       focus:   [1, 2],
+      masteryMeta: [1, 2],  // 메타 챔피언 경기를 보며 공부
       stamina: [-4, -3],
     },
     messages: [

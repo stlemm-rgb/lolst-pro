@@ -88,6 +88,7 @@ function findTraining(id) {
 function statName(id) {
   if (id === "mastery") return "챔피언 숙련도";
   if (id === "masteryFocus") return "고른 챔피언 숙련도";
+  if (id === "masteryMeta") return "메타 챔피언 1명 숙련도";
   if (id === "staminaMax") return "체력 최대치";
   if (id.indexOf("m:") === 0) return id.slice(2) + " 숙련도";
   const found = STATS.concat(GAUGES).find(function (s) { return s.id === id; });
@@ -358,6 +359,7 @@ pages.training = function () {
       if (id === "popularity" && r[1] > 0) extra = popularityMultiplier() - 1;
       if (id === "mastery") extra = masteryGrowthMultiplier() - 1;
       if (id === "masteryFocus") extra = masteryGrowthMultiplier(focusChamp()) - 1;
+      if (id === "masteryMeta") extra = masteryGrowthMultiplier(mySMeta()) - 1;
       if (Math.abs(extra) > 0.001) text += ' <span class="' + (extra > 0 === (id !== "stamina") ? "up" : "down") + '">(' + percentText(extra) + ")</span>";
       return text;
     }).join("<br>");
@@ -752,6 +754,17 @@ function nextWeek(restWeek) {
       if (tired) gain *= 0.5;
       state.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
       changes["m:" + name] = state.mastery[name] - now;
+    } else if (id === "masteryMeta") {
+      // 다른 훈련에 섞인 메타 챔피언 연습: 내 포지션 메타 챔피언 중 숙련도가 가장 낮은 1명
+      const name = myPositionChampions().filter(function (n) { return isMeta(n); })
+        .sort(function (a, b) { return state.mastery[a] - state.mastery[b]; })[0];
+      if (name) {
+        const now = state.mastery[name];
+        let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
+        if (tired) gain *= 0.5;
+        state.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
+        changes["m:" + name] = state.mastery[name] - now;
+      }
     } else if (id === "mastery") {
       // 챔피언 숙련도: 고른 챔피언(또는 자동으로 고른 챔피언)들에게
       const gained = practiceChampions(range, tired);
