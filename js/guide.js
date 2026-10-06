@@ -96,7 +96,7 @@ function weekAdvice() {
   if (state.stamina < TIRED_LIMIT) {
     list.push({ text: "체력 " + state.stamina + " → 20 아래라서 훈련 효과가 절반이에요" + (hasMatch ? " (이번 주 경기도 있어요)" : "") + ".", label: "휴식 주로 진행", act: { rest: true } });
   } else if (hasMatch && state.stamina < TEAM_MATCH.lowStaminaLimit) {
-    list.push({ text: "이번 주 경기가 있는데 체력 " + state.stamina + ". " + TEAM_MATCH.lowStaminaLimit + " 미만이면 경기력 −" + Math.round(TEAM_MATCH.lowStaminaCut * 100) + "%.", label: "상점에서 회복", act: { go: "shop" } });
+    list.push({ text: "이번 주 경기가 있는데 체력 " + state.stamina + ". " + TEAM_MATCH.lowStaminaLimit + " 미만이면 경기력 −" + Math.round(TEAM_MATCH.lowStaminaCut * 100) + "%. 쉬면 경기 전에 회복돼요.", label: "휴식 주로 진행", act: { rest: true } });
   }
   // 3) 답하지 않은 연락
   const waiting = state.inbox.filter(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; }).length;
@@ -111,7 +111,7 @@ function weekAdvice() {
     list.push({ text: "이번 패치 메타 챔피언 숙련도 평균 " + Math.round(avg) + " → 경기력이 깎여요 (" + MATCH.metaPenaltyBase + " 이상이면 괜찮아요).", label: "챔피언 연습으로 선택", act: { plan: "champion" } });
   }
   // 6) 컨디션
-  if (state.condition < 40) list.push({ text: "컨디션 " + state.condition + " → 낮으면 경기력이 떨어져요.", label: "상점에서 회복", act: { go: "shop" } });
+  if (state.condition < 40) list.push({ text: "컨디션 " + state.condition + " → 낮으면 경기력이 떨어져요. 쉬거나 이기면 올라요.", label: "휴식 주로 진행", act: { rest: true } });
   // 7) 돈이 쌓였는데 장비가 없음
   const s = state.shop || {};
   const gearCount = Object.keys(s.gear || {}).filter(function (k) { return s.gear[k] > 0; }).length;

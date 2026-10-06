@@ -49,15 +49,6 @@ const SHOP_STAFF = [
   { id: "nutrition", icon: "🥗", name: "영양사",       weekly: 150000, desc: "노화로 줄어드는 양 −20%",           effects: { agingCut: 0.2 } },
 ];
 
-// ----- 회복·힐링: 바로 효과. 횟수 제한 없음 (돈만 있으면 언제든) -----
-// offseason: true → 우리 팀 시즌이 끝난 뒤(비시즌)에만
-const SHOP_CARE = [
-  { id: "massage", icon: "💆", name: "마사지·한의원", price: 500000,  desc: "체력 +15",                 effects: { stamina: 15 } },
-  { id: "dinner",  icon: "🍖", name: "맛집 회식",     price: 300000,  desc: "컨디션 +10",               effects: { condition: 10 } },
-  { id: "trip",    icon: "🚗", name: "주말 여행",     price: 1500000, desc: "체력 +10, 컨디션 +15",     effects: { stamina: 10, condition: 15 } },
-  { id: "abroad",  icon: "✈️", name: "해외여행",      price: 5000000, desc: "컨디션 +40, 멘탈 +1 (머리를 식히고 옴 · 비시즌만)", effects: { condition: 40, mental: 1 }, offseason: true },
-];
-
 // ----- 팬·명성 -----
 // perSeason: 한 시즌에 몇 번까지 / once: 한 번만 사면 영구 / 둘 다 없으면 제한 없음
 const SHOP_FAME = [

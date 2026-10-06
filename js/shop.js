@@ -1,4 +1,4 @@
-// ===== 상점: 장비 · 개인 고용 · 회복 · 팬/명성 (규칙과 값은 data/shop.js) =====
+// ===== 상점: 장비 · 개인 고용 · 투자 · 팬/명성 (규칙과 값은 data/shop.js) =====
 // state.shop = {
 //   gear: { keyboard: 2, ... }        장비 단계 (0 = 없음)
 //   staff: { analyst: true, ... }     고용 중인 사람
@@ -8,7 +8,7 @@
 // }
 
 function shopState() {
-  if (!state.shop) state.shop = { gear: {}, staff: {}, careWeek: -1, fame: {} };
+  if (!state.shop) state.shop = { gear: {}, staff: {}, fame: {} };
   const s = state.shop;
   s.gear = s.gear || {}; s.staff = s.staff || {}; s.fame = s.fame || {};
   s.invest = s.invest || []; s.investProfit = s.investProfit || 0;
@@ -85,26 +85,6 @@ function toggleStaff(id) {
   if (state.money < st.weekly) return;
   s.staff[id] = true;
   shopNotice(st.icon + " " + st.name + "을(를) 고용했어요. 다음 주부터 매주 " + moneyText(st.weekly) + "씩 나가요.");
-}
-
-// 비시즌인가? (우리 팀 경기가 모두 끝난 뒤)
-function isOffseasonNow() {
-  return state.career && state.career.seasonOverYear === state.year;
-}
-
-function careAvailable(c) {
-  const s = shopState();
-  if (c.offseason && !isOffseasonNow()) return "비시즌에만 갈 수 있어요";
-  if (state.money < c.price) return "자금이 부족해요";
-  return "";
-}
-
-function buyCare(id) {
-  const c = SHOP_CARE.find(function (x) { return x.id === id; });
-  if (!c || careAvailable(c)) return;
-  state.money -= c.price;
-  const r = applyEffects(c.effects, {});
-  shopNotice(c.icon + " " + c.name + " (" + moneyText(c.price) + ") → " + (changesText(r.changes) || "변화 없음"));
 }
 
 function fameAvailable(f) {
@@ -224,11 +204,6 @@ pages.shop = function () {
           : btn(' data-staff="' + st.id + '"', "고용", state.money < st.weekly ? "자금이 부족해요" : "")) + "</td></tr>";
   }).join("");
 
-  const careRows = SHOP_CARE.map(function (c) {
-    return "<tr><td>" + c.icon + " <b>" + c.name + "</b></td><td>" + c.desc + '</td><td class="r">' + moneyText(c.price) + "</td><td>" +
-      btn(' data-care="' + c.id + '"', "하기", careAvailable(c)) + "</td></tr>";
-  }).join("");
-
   const fameRows = SHOP_FAME.map(function (f) {
     const limit = f.once ? "한 번 (영구)" : f.perSeason ? "시즌 " + f.perSeason + "번" : "제한 없음";
     return "<tr><td>" + f.icon + " <b>" + f.name + "</b></td><td>" + f.desc + ' <span class="muted small">· ' + limit + '</span></td><td class="r">' + moneyText(f.price) + "</td><td>" +
@@ -244,8 +219,6 @@ pages.shop = function () {
       '<table class="roster shop-table"><tr><th>장비</th><th class="c">단계</th><th>지금 효과</th><th>다음 단계</th></tr>' + gearRows + "</table></div>" +
     '<div class="card"><h2>🧑‍🏫 개인 고용 <span class="muted small">매주 비용이 나가는 동안만 효과 · 자금이 모자라면 자동 해지</span></h2>' +
       '<table class="roster shop-table">' + staffRows + "</table></div>" +
-    '<div class="card"><h2>💆 회복·힐링 <span class="muted small">바로 효과 · 횟수 제한 없음</span></h2>' +
-      '<table class="roster shop-table">' + careRows + "</table></div>" +
     investCardHTML() +
     '<div class="card"><h2>🌟 팬·명성</h2>' +
       '<table class="roster shop-table">' + fameRows + "</table></div>"
@@ -294,7 +267,6 @@ function activitiesCardHTML() {
 function bindShop(page) {
   page.querySelectorAll("[data-buygear]").forEach(function (b) { b.onclick = function () { buyGear(b.getAttribute("data-buygear")); }; });
   page.querySelectorAll("[data-staff]").forEach(function (b) { b.onclick = function () { toggleStaff(b.getAttribute("data-staff")); }; });
-  page.querySelectorAll("[data-care]").forEach(function (b) { b.onclick = function () { buyCare(b.getAttribute("data-care")); }; });
   page.querySelectorAll("[data-fame]").forEach(function (b) { b.onclick = function () { buyFame(b.getAttribute("data-fame")); }; });
   page.querySelectorAll("[data-invest]").forEach(function (b) {
     b.onclick = function () { const v = b.getAttribute("data-invest").split(":"); invest(v[0], Number(v[1])); };
