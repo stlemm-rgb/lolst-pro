@@ -373,6 +373,11 @@ table td.c { text-align: center; }
 .msg-notes { font-size: 14px; color: var(--gold); }
 .post { padding: 10px 4px; border-bottom: 1px solid var(--border); }
 .post-author { font-weight: bold; color: var(--accent); }
+/* 내 선수를 언급한 SNS 글 */
+.post.mention { border-left: 3px solid #f59e0b; padding-left: 10px; }
+.post.unread { background: rgba(245, 158, 11, 0.08); }
+.post .dot { display: inline-block; margin-right: 6px; background: #f59e0b; }
+.mention-tag { font-size: 11px; color: #f59e0b; border: 1px solid #f59e0b; border-radius: 999px; padding: 0 6px; }
 
 /* 선수 검색·구단 탐색 */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }

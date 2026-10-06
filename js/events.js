@@ -41,6 +41,7 @@ function fillText(text, ctx) {
     .replace(/\{team\}/g, myTeam().name)
     .replace(/\{pos\}/g, findPosition(state.player.position).name)
     .replace(/\{champ\}/g, c.champ || "")
+    .replace(/\{cup\}/g, c.cup || "대회")
     .replace(/\{opp\}/g, c.opp || "상대 팀");
 }
 
@@ -230,7 +231,7 @@ function runWeeklyEvents() {
   }
 
   checkTraitGains();
-  postSocial();
+  state.newMentions = postSocial();
   autoIgnore();
 }
 
@@ -255,19 +256,47 @@ function checkTraitGains() {
   sTraitsWeeklyUser(); // 내 선수만 얻는 S급 특성 (js/straits.js)
 }
 
-// 선수 SNS (분위기용 글)
+// 선수 SNS (분위기용 글, 글은 data/social_posts.js)
+// - 상황에 맞는 분류에서 글을 고름. 내 선수 이름({name})이 들어간 글은 "멘션" → 안 읽음으로 올려서 알림
+// - 돌려주는 값: 이번 주 새 멘션 수
 function postSocial() {
   const w = state.weekCtx;
-  const ctx = { opp: w.opp ? teamName(w.opp) : "" };
+  const R = SOCIAL_RULES;
+  const ctx = { opp: w.opp ? teamName(w.opp) : "", cup: w.champion || "" };
   const author = function () {
     const ids = Object.keys(state.league.players);
-    return Math.random() < 0.5 && ids.length ? "@" + state.league.players[pick(ids)].name : "@팬" + randInt(1000, 9999);
+    if (Math.random() < R.proAuthorRate && ids.length) return "@" + state.league.players[pick(ids)].name;
+    const fans = SOCIAL_FAN_NAMES.length ? SOCIAL_FAN_NAMES : ["팬"];
+    return "@" + pick(fans) + randInt(1000, 9999);
   };
-  if (w.wins || w.losses) {
-    const list = w.wins >= w.losses ? SOCIAL_POSTS.win : SOCIAL_POSTS.loss;
-    postMessage("social", author(), fillText(pick(list), ctx), { read: true });
-  }
-  if (Math.random() < 0.3) postMessage("social", author(), fillText(pick(SOCIAL_POSTS.general), ctx), { read: true });
+
+  // 이번 주 조건이 맞는 분류 (앞쪽이 먼저)
+  const cats = [];
+  if (w.champion) cats.push("champion");
+  if (w.wins || w.losses) cats.push(w.wins >= w.losses ? "win" : "loss");
+  if (w.solos > 0) cats.push("soloKill");
+  if (w.losses > 0 && loseStreak() >= 3) cats.push("loseStreak");
+  if (w.patch) cats.push("patch");
+  if (state.benched) cats.push("benched");
+  if (state.popularity >= 70) cats.push("popular");
+  if (state.player.age <= 18) cats.push("rookie");
+  if (state.player.age >= 29) cats.push("veteran");
+  cats.push("general");
+
+  let posted = 0, mentions = 0;
+  cats.forEach(function (cat) {
+    const list = SOCIAL_POSTS[cat];
+    if (!list || !list.length || posted >= R.maxPerWeek) return;
+    const always = cat === "win" || cat === "loss";
+    if (!always && Math.random() >= (R.chance[cat] === undefined ? 0.3 : R.chance[cat])) return;
+    const raw = pick(list);
+    const mention = raw.indexOf("{name}") !== -1;
+    const c = Object.assign({}, ctx, cat === "patch" ? { champ: mySMeta() } : {});
+    postMessage("social", author(), fillText(raw, c), { read: !mention, mention: mention });
+    posted++;
+    if (mention) mentions++;
+  });
+  return mentions;
 }
 
 // 오래 답하지 않은 연락은 "무시"로, 오래 안 읽은 소식·연락은 "읽음"으로 (알림 배지에서 빠짐)
@@ -315,11 +344,11 @@ function answerMessage(msgId, index) {
   state.log = state.log.slice(0, 30);
 }
 
-// 메뉴 배지: 안 읽었거나 답하지 않은 받은 연락 + 안 읽은 소식
+// 알림 수: 안 읽었거나 답하지 않은 받은 연락 + 안 읽은 소식 + 안 읽은 멘션(선수 SNS)
 function unreadCount(tab) {
   return state.inbox.filter(function (m) {
     if (tab && m.tab !== tab) return false;
-    if (m.tab === "social") return false;
+    if (m.tab === "social") return !!m.mention && !m.read; // 나를 언급한 글만 알림
     return !m.read || (m.choices && m.answered === null);
   }).length;
 }

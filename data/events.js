@@ -382,25 +382,5 @@ const TRAIT_GAINS = [
   { id: "gain_star",      trait: "star_power",  when: "popularity60", chance: 0.25, text: "카메라가 켜지면 더 힘이 난다." },
 ];
 
-// 선수 SNS 글 (분위기용). {name} 내 선수, {team} 내 팀, {opp} 상대 팀
-const SOCIAL_POSTS = {
-  win: [
-    "오늘 {team} 경기 봤냐 ㄷㄷ {name} 폼 미쳤다",
-    "{opp} 상대로 저렇게 이기네… {team} 이번 시즌 기대된다",
-    "{name} 오늘 MVP 줘야 함",
-    "직관 갔는데 {name} 플레이 보고 소리 질렀음",
-  ],
-  loss: [
-    "{team} 오늘은 좀 아쉽네",
-    "{name} 오늘 컨디션 안 좋아 보이던데",
-    "{opp} 진짜 잘한다… 인정",
-    "다음 경기는 이기자 {team} 화이팅",
-  ],
-  general: [
-    "요즘 솔랭에서 {name} 만났는데 진짜 잘하더라",
-    "이번 패치 메타 너무 어렵다",
-    "{team} 유니폼 새로 샀다 ㅎㅎ",
-    "프로들은 하루에 몇 시간 연습하는 거지",
-    "{name} 팬미팅 언제 하나요",
-  ],
-};
+// 선수 SNS 글은 data/social_posts.js 로 옮겼어요.
+

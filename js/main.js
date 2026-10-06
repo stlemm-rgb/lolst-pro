@@ -534,8 +534,8 @@ function renderMenu() {
   MENUS.forEach(function (item) {
     const li = document.createElement("li");
     li.textContent = item.name;
-    // SNS: 안 읽었거나 답하지 않은 받은 연락 수
-    const badge = item.id === "sns" ? unreadCount("inbox") : 0;
+    // SNS: 안 읽었거나 답하지 않은 받은 연락 수 + 나를 언급한 안 읽은 선수 SNS 글
+    const badge = item.id === "sns" ? unreadCount("inbox") + unreadCount("social") : 0;
     if (badge) {
       const b = document.createElement("span");
       b.className = "badge";
@@ -789,7 +789,10 @@ function nextWeek(restWeek) {
   updateQuests();
   state.log = state.log.slice(0, 30);
   state.currentMenu = "dashboard";
-  state.notice = "";
+  state.notice = state.newMentions
+    ? "📣 선수 SNS에서 " + escapeHTML(state.player.name) + " 선수를 언급한 글이 " + state.newMentions + "개 올라왔어요. [SNS] → 💬 선수 SNS에서 확인하세요."
+    : "";
+  state.newMentions = 0;
   if (state.settings.autoSave) saveGame();
   renderAll();
 }

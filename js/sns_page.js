@@ -8,7 +8,7 @@ let openMsgId = null; // 펼쳐 둔 메시지
 pages.sns = function () {
   const tabs = [["inbox", "📩 받은 연락"], ["news", "📰 소식"], ["social", "💬 선수 SNS"]];
   const tabHTML = tabs.map(function (t) {
-    const n = t[0] === "social" ? 0 : unreadCount(t[0]);
+    const n = unreadCount(t[0]);
     return '<button data-snstab="' + t[0] + '"' + (snsTab === t[0] ? ' class="primary"' : "") + ">" + t[1] +
       (n ? ' <span class="badge inline">' + n + "</span>" : "") + "</button>";
   }).join("");
@@ -19,8 +19,13 @@ pages.sns = function () {
     body = '<p class="muted">아직 메시지가 없어요. 주를 진행하면 연락과 소식이 와요.</p>';
   } else if (snsTab === "social") {
     body = list.map(function (m) {
-      return '<div class="post"><span class="post-author">' + escapeHTML(m.title) + '</span> <span class="muted small">' +
-        m.year + "년 " + m.week + "주차</span><div>" + escapeHTML(m.text) + "</div></div>";
+      const fresh = m.mention && !m.read;
+      return '<div class="post' + (m.mention ? " mention" : "") + (fresh ? " unread" : "") + '">' +
+        (fresh ? '<span class="dot"></span>' : "") +
+        '<span class="post-author">' + escapeHTML(m.title) + '</span> <span class="muted small">' +
+        m.year + "년 " + m.week + "주차</span>" +
+        (m.mention ? ' <span class="mention-tag">📣 나를 언급</span>' : "") +
+        "<div>" + escapeHTML(m.text) + "</div></div>";
     }).join("");
   } else {
     body = list.map(messageHTML).join("");
@@ -35,7 +40,7 @@ pages.sns = function () {
       '<p class="muted small">' +
         (snsTab === "inbox" ? "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. ⚠️는 낮은 확률로 나쁜 특성, 💚는 나쁜 특성 극복이에요."
           : snsTab === "news" ? "기사와 커뮤니티 소식이에요. 읽기만 하면 돼요."
-          : "선수와 팬들의 글이에요.") +
+          : "선수와 팬들의 글이에요. 📣 표시는 내 선수를 언급한 글이에요 (보면 읽음 처리).") +
       "</p>" +
       '<div class="messages">' + body + "</div>" +
     "</div>"
@@ -84,6 +89,11 @@ function messageHTML(m) {
 
 // SNS 화면 버튼 연결 (main.js의 renderPage에서 부름)
 function bindSns(page) {
+  // 선수 SNS 탭을 보면 멘션 알림은 읽음 처리 (이번 화면에서는 새 글 표시가 그대로 보임)
+  if (snsTab === "social" && unreadCount("social")) {
+    state.inbox.forEach(function (m) { if (m.tab === "social") m.read = true; });
+    renderMenu();
+  }
   page.querySelectorAll("[data-snstab]").forEach(function (btn) {
     btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; renderPage(); };
   });
