@@ -614,3 +614,5 @@ ul.howto li { margin: 4px 0; font-size: 14px; }
 .chip.named { border-color: #f59e0b; color: #f59e0b; font-weight: bold; }
 .plan-badge { font-size: 14px; white-space: nowrap; border-color: var(--accent); }
 .plan-badge.none { border-color: var(--bad); color: var(--bad); }
+.salary-details summary { cursor: pointer; color: var(--accent); font-size: 13px; margin: 2px 0 4px; }
+.salary-details .salary-breakdown { font-size: 13px; color: var(--muted); white-space: pre-line; }

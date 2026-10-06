@@ -73,7 +73,10 @@ function messageHTML(m) {
 
   let inner = "";
   if (open) {
-    inner += '<div class="msg-text">' + escapeHTML(m.text) + "</div>";
+    // 계약 제안: 기본은 계약·연봉만, 연봉 계산 내역은 접는 칸 (js/contracts.js)
+    const text = m.kind === "offer" && m.offer ? offerText(m.offer) : m.text;
+    inner += '<div class="msg-text">' + escapeHTML(text) + "</div>";
+    if (m.kind === "offer" && m.offer) inner += '<div class="msg-text">' + offerBreakdownHTML(m.offer) + "</div>";
     if (waiting) {
       inner += '<div class="msg-choices">' + m.choices.map(function (c, i) {
         const poor = choiceTooExpensive(m, i);

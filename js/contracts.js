@@ -60,6 +60,13 @@ function pctText(p) {
   return (p >= 0 ? "+" : "−") + Math.abs(Math.round(p * 100)) + "%";
 }
 
+// 제안 연락 아래 접는 칸: 연봉 계산 내역 (SNS 화면에서 눌러야 펼쳐짐)
+function offerBreakdownHTML(o) {
+  if (!o || !o.breakdown) return "";
+  return '<details class="salary-details"><summary>💰 연봉 계산 내역 보기</summary><div class="salary-breakdown">' +
+    escapeHTML(salaryBreakdownText(o.breakdown, o.clubPct)) + (o.raised ? "\n  └ 연봉 인상 협상 성공 → " + moneyText(o.salary) : "") + "</div></details>";
+}
+
 // 계산 내역 글 (제안 글·이적 시장 화면)
 function salaryBreakdownText(b, clubPct) {
   const lines = [];
@@ -196,7 +203,6 @@ function offerText(o) {
     .map(function (t) { return t.id; }).indexOf(team.id) + 1;
   return (o.renewal ? "\"계속 함께하고 싶습니다.\" " : "\"주전 " + findPosition(state.player.position).name + " 자리를 맡아 주셨으면 합니다.\" ") +
     "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) + (o.raised ? " (인상 반영)" : "") +
-    (o.breakdown ? "\n" + salaryBreakdownText(o.breakdown, o.clubPct) : "") +
     "\n· 출전 보장: " + (o.guarantee ? "시즌 " + o.guarantee + "경기" : "없음") +
     "\n· " + team.name + " (" + tierName(team.tier) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
 }
