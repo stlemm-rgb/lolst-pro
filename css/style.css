@@ -380,6 +380,8 @@ table td.c { text-align: center; }
 .post.mention { border-left: 3px solid #f59e0b; padding-left: 10px; }
 .post.unread { background: rgba(245, 158, 11, 0.08); }
 .post .dot { display: inline-block; margin-right: 6px; background: #f59e0b; }
+.post-author.pro { color: #a78bfa; }
+.pro-tag { font-size: 11px; color: #a78bfa; border: 1px solid #a78bfa; border-radius: 999px; padding: 0 6px; }
 .mention-tag { font-size: 11px; color: #f59e0b; border: 1px solid #f59e0b; border-radius: 999px; padding: 0 6px; }
 
 /* 선수 검색·구단 탐색 */

@@ -18,11 +18,18 @@ pages.sns = function () {
   if (!list.length) {
     body = '<p class="muted">아직 메시지가 없어요. 주를 진행하면 연락과 소식이 와요.</p>';
   } else if (snsTab === "social") {
+    // 예전 글(선수 id 없이 저장됨)은 이름으로 선수인지 찾기
+    const byName = {};
+    Object.keys(state.league.players).forEach(function (id) { byName["@" + state.league.players[id].name] = id; });
     body = list.map(function (m) {
       const fresh = m.mention && !m.read;
+      const proId = m.proId || byName[m.title];
+      const pro = proId && state.league.players[proId];
       return '<div class="post' + (m.mention ? " mention" : "") + (fresh ? " unread" : "") + '">' +
         (fresh ? '<span class="dot"></span>' : "") +
-        '<span class="post-author">' + escapeHTML(m.title) + '</span> <span class="muted small">' +
+        '<span class="post-author' + (pro ? " pro" : "") + '">' + escapeHTML(m.title) + "</span>" +
+        (pro ? ' <span class="pro-tag">🎮 선수</span> <span class="muted small">' + escapeHTML(proTeamText(pro)) + "</span>" : "") +
+        ' <span class="muted small">' +
         m.year + "년 " + m.week + "주차</span>" +
         (m.mention ? ' <span class="mention-tag">📣 나를 언급</span>' : "") +
         "<div>" + escapeHTML(m.text) + "</div></div>";
@@ -40,12 +47,18 @@ pages.sns = function () {
       '<p class="muted small">' +
         (snsTab === "inbox" ? "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. ⚠️는 낮은 확률로 나쁜 특성, 💚는 나쁜 특성 극복이에요."
           : snsTab === "news" ? "기사와 커뮤니티 소식이에요. 읽기만 하면 돼요."
-          : "선수와 팬들의 글이에요. 📣 표시는 내 선수를 언급한 글이에요 (보면 읽음 처리).") +
+          : "선수와 팬들의 글이에요. 🎮 선수 = 리그 프로 선수의 글, 📣 = 내 선수를 언급한 글 (보면 읽음 처리).") +
       "</p>" +
       '<div class="messages">' + body + "</div>" +
     "</div>"
   );
 };
+
+// 선수 SNS 글쓴이가 프로 선수일 때: "T1 · 미드" (팀이 없으면 "FA")
+function proTeamText(p) {
+  const t = p.teamId && findTeam(p.teamId);
+  return (t ? t.short : "FA") + " · " + findPosition(p.pos).name;
+}
 
 // 메시지 하나 (받은 연락·소식)
 function messageHTML(m) {

@@ -263,11 +263,15 @@ function postSocial() {
   const w = state.weekCtx;
   const R = SOCIAL_RULES;
   const ctx = { opp: w.opp ? teamName(w.opp) : "", cup: w.champion || "" };
+  // 글쓴이: { title: "@이름", proId: 프로 선수면 선수 id }
   const author = function () {
     const ids = Object.keys(state.league.players);
-    if (Math.random() < R.proAuthorRate && ids.length) return "@" + state.league.players[pick(ids)].name;
+    if (Math.random() < R.proAuthorRate && ids.length) {
+      const id = pick(ids);
+      return { title: "@" + state.league.players[id].name, proId: id };
+    }
     const fans = SOCIAL_FAN_NAMES.length ? SOCIAL_FAN_NAMES : ["팬"];
-    return "@" + pick(fans) + randInt(1000, 9999);
+    return { title: "@" + pick(fans) + randInt(1000, 9999), proId: null };
   };
 
   // 이번 주 조건이 맞는 분류 (앞쪽이 먼저)
@@ -292,7 +296,8 @@ function postSocial() {
     const raw = pick(list);
     const mention = raw.indexOf("{name}") !== -1;
     const c = Object.assign({}, ctx, cat === "patch" ? { champ: mySMeta() } : {});
-    postMessage("social", author(), fillText(raw, c), { read: !mention, mention: mention });
+    const who = author();
+    postMessage("social", who.title, fillText(raw, c), { read: !mention, mention: mention, proId: who.proId });
     posted++;
     if (mention) mentions++;
   });
