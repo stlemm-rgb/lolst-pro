@@ -629,3 +629,8 @@ table.calc.mastery-table td:last-child { text-align: center; }
 /* 선수·구단 이름 링크 (js/links.js) */
 .glink { cursor: pointer; text-decoration: underline dotted rgba(139, 147, 167, 0.6); text-underline-offset: 3px; }
 .glink:hover, .glink:focus { color: var(--accent); text-decoration-color: var(--accent); outline: none; }
+/* 컨디션 막대: 거주지 상한 위쪽은 빗금 (js/dashboard.js conditionBarHTML) */
+.bar.capped { position: relative; }
+.bar .cap-zone { position: absolute; right: 0; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, rgba(251, 191, 36, 0.45) 0 3px, transparent 3px 6px); }
+.home-line { margin-top: 8px; font-size: 12px; color: var(--gold); }
+.home-line.muted { color: var(--muted); }
