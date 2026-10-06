@@ -70,6 +70,7 @@
 44. (커밋 필요) 비시즌: 우리 팀 경기가 모두 끝난 주(2부 33주·플레이인/1라운드 탈락·승강전 뒤·월드 조별 탈락 43주·월드 토너먼트 탈락/결승 뒤)에 '비시즌' 시작 → 새 퀘스트는 '비시즌 솔랭 TOP 10'만 (기한 52주차, 달성 시 반응속도·입력 정확도·라인전 +1, [솔로 랭크] 선택 버튼, 진행 = 지금 리그 순위). 시즌이 넘어갈 때 달성 여부와 상관없이 체력 +20. 규칙은 data/quests.js OFFSEASON, 판정은 js/matchsim.js userSeasonOver
 45. (커밋 필요) 비시즌 솔랭 퀘스트 목표를 내 실력에 맞춤: 'TOP 10' → '비시즌 솔랭 순위 올리기' (받을 때 순위에서 20계단 위, 상위권은 지금 순위의 절반까지: 103→83, 50→30, 30→15, 10→5, 1→1). 진행 칸에 "지금 순위 → 목표 순위" (data/quests.js OFFSEASON.climb)
 46. (커밋 필요) 왼쪽 메뉴 정리: 16개 한 줄 → 묶음 4개(내 선수·경기·이적·기록) + 맨 아래 ⚙ 설정·저장. 합친 메뉴 3개는 화면 위 탭: 일정[시즌 일정|대회 일정], 이적 시장[이적 시장|선수 검색|구단 탐색], 기록실[개인 시상|역사관|리그 생태계]. 마지막에 본 탭 기억. data/menus.js가 MENU_GROUPS·MENU_BOTTOM 구조로 바뀜 (MENUS는 화면 이름 찾기용으로 자동 생성)
+47. (커밋 필요) 선수 SNS 확장: 프로 선수 글은 새 파일 data/social_posts_pro.js(SOCIAL_PRO_POSTS, 점잖은 말투, 빈칸 {proteam} = 글쓴 선수의 팀, 우리 팀 동료는 글쓴이에서 제외)에서, 팬 글은 data/social_posts.js에서. 새 분류: 경기 결과 세부(winSweep·winClose·lossSweep·lossClose, win/loss 글과 섞임)·pog(내 선수 POG)·이번 주 훈련(train_solo_rank·scrim·replay·champion·champ_focus·rest). 한 주 최대 글 3→4. 새 분류는 예시 글 1~2개씩만 넣어 둠 → 다른 AI로 보충 예정. '{cup} 우승'이 '리그 우승 우승'으로 나오던 문제 수정
 
 ## 파일 구성
 
@@ -99,7 +100,8 @@
 - `js/league_pages.js` — 소속팀·리그 순위·대회 일정 화면, 대시보드 경기 카드
 - `js/start.js` — 게임 시작 (맨 마지막에 실행)
 - `data/events.js` — 이벤트 문장·선택지·효과
-- `data/social_posts.js` — 선수 SNS 글 (상황별 분류, 팬 닉네임, 확률). 다른 AI로 글을 보충할 때 이 파일만 바꾸면 됨
+- `data/social_posts.js` — 선수 SNS 팬 글 (상황별 분류, 팬 닉네임, 확률). 다른 AI로 글을 보충할 때 이 파일만 바꾸면 됨
+- `data/social_posts_pro.js` — 선수 SNS 프로 선수 글 (같은 분류, 점잖은 말투)
 - `js/events.js` — 이벤트 조건 감지, 효과 적용, 특성 얻기/극복
 - `js/sns_page.js` — SNS 화면
 - `data/contracts.js` — 연봉 공식, 예산, 계약·이적·2군행 규칙, 감독 메시지 문장

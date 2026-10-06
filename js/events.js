@@ -18,7 +18,7 @@ function hasTrait(id) {
 
 // ----- 이번 주에 일어난 일 (이벤트 조건 판단용, 저장 안 함) -----
 function resetWeekCtx() {
-  state.weekCtx = { wins: 0, losses: 0, solos: 0, opp: null, champion: null, wonSemi: false, newChamps: [], patch: false, nerfChamp: null };
+  state.weekCtx = { wins: 0, losses: 0, solos: 0, opp: null, champion: null, wonSemi: false, newChamps: [], patch: false, nerfChamp: null, results: [], training: null };
 }
 
 // 최근 연패 수
@@ -42,6 +42,7 @@ function fillText(text, ctx) {
     .replace(/\{pos\}/g, findPosition(state.player.position).name)
     .replace(/\{champ\}/g, c.champ || "")
     .replace(/\{cup\}/g, c.cup || "대회")
+    .replace(/\{proteam\}/g, c.proteam || "저희 팀")
     .replace(/\{opp\}/g, c.opp || "상대 팀");
 }
 
@@ -256,30 +257,51 @@ function checkTraitGains() {
   sTraitsWeeklyUser(); // 내 선수만 얻는 S급 특성 (js/straits.js)
 }
 
-// 선수 SNS (분위기용 글, 글은 data/social_posts.js)
-// - 상황에 맞는 분류에서 글을 고름. 내 선수 이름({name})이 들어간 글은 "멘션" → 안 읽음으로 올려서 알림
+// 선수 SNS (분위기용 글)
+// - 글: 팬 = data/social_posts.js (SOCIAL_POSTS), 프로 선수 = data/social_posts_pro.js (SOCIAL_PRO_POSTS, 점잖은 말투)
+// - 이번 주 상황에 맞는 분류에서 글을 고름 (경기 결과·훈련·솔로킬·패치 등)
+// - 내 선수 이름({name})이 들어간 글은 "멘션" → 안 읽음으로 올려서 알림
 // - 돌려주는 값: 이번 주 새 멘션 수
 function postSocial() {
   const w = state.weekCtx;
   const R = SOCIAL_RULES;
-  const ctx = { opp: w.opp ? teamName(w.opp) : "", cup: w.champion || "" };
-  // 글쓴이: { title: "@이름", proId: 프로 선수면 선수 id }
-  const author = function () {
-    const ids = Object.keys(state.league.players);
-    if (Math.random() < R.proAuthorRate && ids.length) {
+  const ctx = { opp: w.opp ? teamName(w.opp) : "", cup: (w.champion || "").replace(/ 우승$/, "") }; // "리그 우승" → "리그"
+  const proLists = typeof SOCIAL_PRO_POSTS !== "undefined" ? SOCIAL_PRO_POSTS : {};
+
+  // 분류 cat의 글 목록 (경기 결과 세부 분류는 win/loss 글도 같이 섞어서)
+  const listOf = function (posts, cat) {
+    const base = posts[cat] || [];
+    if (cat === "winSweep" || cat === "winClose") return base.concat(posts.win || []);
+    if (cat === "lossSweep" || cat === "lossClose") return base.concat(posts.loss || []);
+    return base;
+  };
+  // 글쓴이 정하기: 프로 선수(그 분류에 프로 글이 있을 때) 또는 팬
+  const author = function (cat) {
+    // 프로 글쓴이: 팀이 있는 다른 팀 선수 (우리 팀 동료는 빼요)
+    const mineId = myTeam() ? myTeam().id : null;
+    const ids = Object.keys(state.league.players).filter(function (id) { const t = state.league.players[id].teamId; return t && t !== mineId; });
+    if (Math.random() < R.proAuthorRate && ids.length && listOf(proLists, cat).length) {
       const id = pick(ids);
-      return { title: "@" + state.league.players[id].name, proId: id };
+      const t = findTeam(state.league.players[id].teamId);
+      return { title: "@" + state.league.players[id].name, proId: id, posts: proLists, proteam: t ? t.short : "" };
     }
     const fans = SOCIAL_FAN_NAMES.length ? SOCIAL_FAN_NAMES : ["팬"];
-    return { title: "@" + pick(fans) + randInt(1000, 9999), proId: null };
+    return { title: "@" + pick(fans) + randInt(1000, 9999), proId: null, posts: SOCIAL_POSTS, proteam: "" };
   };
+
+  // 이번 주 경기 결과: 마지막 경기 기준 완승/접전 승/접전 패/완패
+  const last = w.results.length ? w.results[w.results.length - 1] : null;
+  const resultCat = last ? (last.won ? (last.sweep ? "winSweep" : "winClose") : (last.sweep ? "lossSweep" : "lossClose")) : null;
+  if (last) ctx.opp = last.opp || ctx.opp;
 
   // 이번 주 조건이 맞는 분류 (앞쪽이 먼저)
   const cats = [];
   if (w.champion) cats.push("champion");
-  if (w.wins || w.losses) cats.push(w.wins >= w.losses ? "win" : "loss");
+  if (resultCat) cats.push(resultCat);
+  if (w.results.some(function (r) { return r.pog; })) cats.push("pog");
   if (w.solos > 0) cats.push("soloKill");
   if (w.losses > 0 && loseStreak() >= 3) cats.push("loseStreak");
+  if (w.training) cats.push("train_" + w.training);
   if (w.patch) cats.push("patch");
   if (state.benched) cats.push("benched");
   if (state.popularity >= 70) cats.push("popular");
@@ -289,14 +311,16 @@ function postSocial() {
 
   let posted = 0, mentions = 0;
   cats.forEach(function (cat) {
-    const list = SOCIAL_POSTS[cat];
-    if (!list || !list.length || posted >= R.maxPerWeek) return;
-    const always = cat === "win" || cat === "loss";
-    if (!always && Math.random() >= (R.chance[cat] === undefined ? 0.3 : R.chance[cat])) return;
+    if (posted >= R.maxPerWeek) return;
+    const always = cat === resultCat; // 경기가 있으면 결과 글은 항상 1개
+    const chance = R.chance[cat] !== undefined ? R.chance[cat] : cat.indexOf("train_") === 0 ? R.chance.training : 0.3;
+    if (!always && Math.random() >= chance) return;
+    const who = author(cat);
+    const list = listOf(who.posts, cat);
+    if (!list.length) return;
     const raw = pick(list);
     const mention = raw.indexOf("{name}") !== -1;
-    const c = Object.assign({}, ctx, cat === "patch" ? { champ: mySMeta() } : {});
-    const who = author();
+    const c = Object.assign({}, ctx, { proteam: who.proteam }, cat === "patch" ? { champ: mySMeta() } : {});
     postMessage("social", who.title, fillText(raw, c), { read: !mention, mention: mention, proId: who.proId });
     posted++;
     if (mention) mentions++;

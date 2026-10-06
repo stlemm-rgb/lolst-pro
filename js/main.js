@@ -689,6 +689,7 @@ function nextWeek(restWeek) {
   // 훈련 효과 적용 (이벤트로 "쉰다"를 골랐으면 이번 주는 휴식)
   const training = (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
   state.skipTraining = false;
+  state.weekCtx.training = training.id; // 선수 SNS용 (이번 주 훈련 글)
   const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
   const changes = {};
   Object.keys(training.effects).forEach(function (id) {

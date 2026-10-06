@@ -290,6 +290,8 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
     w.opp = oppId;
     w.solos += lanes.filter(function (l) { return l.won && l.solo; }).length;
     if (won && m.label.indexOf("4강") !== -1 && m.comp !== "cup_po") w.wonSemi = true;
+    // 선수 SNS용: 이번 주 경기 결과 (완승 = 상대가 한 세트도 못 땀, 내 선수 POG)
+    if (w.results) w.results.push({ won: won, sweep: Math.min(m.score[0], m.score[1]) === 0, pog: m.pog === USER_ID, opp: teamName(oppId) });
   }
 
   const cost = m.bo >= 5 ? TEAM_MATCH.staminaCostBo5 : TEAM_MATCH.staminaCostBo3;
