@@ -105,3 +105,24 @@ const SUMMER_MARKET = {
   offerChance: 0.35,       // 내게 영입 제안이 올 확률 (주전일 때)
   benchedOfferChance: 0.8, // 후보(2군)일 때 임대 제안이 올 확률
 };
+
+// ----- 이적 소식 요약 (js/club_market.js transferSummary) -----
+// 영입 소식 뒤에 붙는 짧은 기사: 기존 주전과 새 선수의 포지션 점수(그 포지션 기준 스탯 점수) 비교
+// 글자: {pos} 포지션, {old} 기존 주전, {oldScore} 기존 주전 점수, {new} 새 선수, {newScore} 새 선수 점수, {diff} 점수 차
+const TRANSFER_NEWS = {
+  bigFrom: 6,   // 점수 차가 이 이상이면 big
+  midFrom: 3,   // 이 이상이면 mid, 아래면 small
+  big: [
+    "{pos} 라인이 확 달라졌다. 기존 {old}({oldScore}) 자리에 {new}({newScore})이(가) 들어와 +{diff}.",
+    "확실한 보강. {new}({newScore})은(는) 기존 {old}({oldScore})보다 {diff}점 높다.",
+  ],
+  mid: [
+    "{pos} 보강. {old}({oldScore})보다 {diff}점 높은 {new}({newScore}) 합류.",
+    "{new}({newScore}) 영입으로 {pos} 전력 +{diff}. 기존 {old}({oldScore})은(는) 경쟁 또는 후보로.",
+  ],
+  small: [
+    "주전 경쟁 체제. {new}({newScore})과(와) 기존 {old}({oldScore})의 차이는 {diff}점.",
+    "소폭 보강 (+{diff}). {new}({newScore})이(가) 기존 {old}({oldScore})와 주전 자리를 다툰다.",
+  ],
+  empty: "비어 있던 {pos} 자리를 {new}({newScore})이(가) 채웠다.",
+};

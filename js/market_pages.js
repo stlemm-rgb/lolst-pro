@@ -99,13 +99,25 @@ function playerDetailHTML(id) {
   return (
     '<div class="card detail">' +
       "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.pos).name + " · " + p.age + "세 · " +
-        (team ? escapeHTML(team.name) : "FA") + " · 스탯 점수 " + playerScore(id).toFixed(1) + "</span></h2>" +
+        (team ? escapeHTML(team.name) : "FA") + '</span> <span class="detail-score">스탯 점수 <b>' + playerScore(id).toFixed(1) + "</b></span></h2>" +
+      posScoresHTML(id, p) +
       '<div class="chips">' + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
       champLineHTML(id) +
       '<div class="stat-columns">' + bars + "</div>" +
       '<p class="muted small">숫자 옆 /값은 스탯 상한선이에요.</p>' +
     "</div>"
   );
+}
+
+// 포지션별 점수: 그 포지션 가산점 스탯(★)을 1.5배로 쳤을 때의 스탯 점수 (지금 포지션은 굵게)
+function posScoresHTML(id, p) {
+  const best = POSITION_IDS.slice().sort(function (a, b) { return statScoreFor(p.stats, b) - statScoreFor(p.stats, a); })[0];
+  const parts = POSITION_IDS.map(function (pos) {
+    const v = statScoreFor(p.stats, pos).toFixed(1);
+    const name = findPosition(pos).name;
+    return pos === p.pos ? '<b class="pos-now">' + name + " " + v + "</b>" : name + " " + v + (pos === best ? ' <span class="up small">▲최고</span>' : "");
+  });
+  return '<p class="small pos-scores"><span class="tip" tabindex="0" data-tip="포지션마다 가산점 스탯(★)이 달라서, 같은 스탯이라도 포지션에 따라 점수가 달라요. 굵은 글씨 = 지금 포지션">📐 포지션별 점수</span>: ' + parts.join(" · ") + "</p>";
 }
 
 // 주력 챔피언(숙련도 상위 3) + 이번 패치 메타 챔피언 평균 숙련도 (js/npc_mastery.js)

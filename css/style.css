@@ -646,3 +646,10 @@ table.calc.mastery-table td:last-child { text-align: center; }
 .rep-fold summary { cursor: pointer; font-size: 13px; color: var(--muted); padding: 3px 0; }
 .rep-fold summary:hover { color: var(--text); }
 .rep-fold .rep-news { padding-left: 4px; font-size: 13px; }
+/* 선수 상세: 스탯 점수 굵게, 포지션별 점수 */
+.detail-score { font-size: 15px; margin-left: 6px; }
+.detail-score b { font-size: 18px; color: var(--accent); }
+.pos-scores { margin: 4px 0 6px; }
+.pos-now { color: var(--text); }
+/* 이름 링크로 이동할 때 위쪽 상단바에 가리지 않게 (js/links.js) */
+.card.detail, .club { scroll-margin-top: 80px; }

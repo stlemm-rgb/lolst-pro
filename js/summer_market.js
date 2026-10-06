@@ -104,7 +104,7 @@ function tryLoan(t, pos, margin, moved) {
     releaseToFA(w);
   }
   moved[best] = true;
-  return "🤝 " + t.name + ", " + from.name + "의 " + p.name + "(" + findPosition(pos).name + ") 임대 (시즌 끝까지)";
+  return "🤝 " + t.name + ", " + from.name + "의 " + p.name + "(" + findPosition(pos).name + ") 임대 (시즌 끝까지) — " + transferSummary(pos, starter, best);
 }
 
 // 내 선수: 여름에 합의한 이적·임대 반영

@@ -192,7 +192,23 @@ function tryBuy(t, pos, margin, moved) {
   npcTransfer(best.id, t, best.fee, best.salary);
   moved[best.id] = true;
   return "🔁 " + t.name + ", " + (from ? from.name + "의 " : "FA ") + p.name + "(" + findPosition(pos).name + ") 영입" +
-    (best.fee ? " · 이적료 " + moneyText(best.fee) : "");
+    (best.fee ? " · 이적료 " + moneyText(best.fee) : "") + " — " + transferSummary(pos, starter, best.id);
+}
+
+// 이적 소식 짧은 기사: 기존 주전 vs 새 선수 포지션 점수 (data/contracts.js TRANSFER_NEWS)
+function transferSummary(pos, oldId, newId) {
+  const N = TRANSFER_NEWS;
+  const newScore = playerScore(newId);
+  const v = { pos: findPosition(pos).name, new: playerName(newId), newScore: newScore.toFixed(1) };
+  let text;
+  if (!oldId || oldId === newId) text = N.empty;
+  else {
+    const oldScore = playerScore(oldId);
+    const diff = newScore - oldScore;
+    v.old = playerName(oldId); v.oldScore = oldScore.toFixed(1); v.diff = diff.toFixed(1);
+    text = pick(diff >= N.bigFrom ? N.big : diff >= N.midFrom ? N.mid : N.small);
+  }
+  return text.replace(/\{(\w+)\}/g, function (all, k) { return v[k] !== undefined ? v[k] : all; });
 }
 
 // [구단 탐색]용: 자금 한 줄
