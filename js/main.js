@@ -500,7 +500,7 @@ function showNotice(text) {
 // 게임 상태를 통째로 바꾸기 (불러오기, 새 게임 등)
 function replaceState(newState, menu, message) {
   state = newState;
-  if (state.league && !state.league.namedAdded) placeNamedPlayers(); // 예전 세이브에도 네임드 선수 한 번 추가
+  if (state.league && state.player) placeNamedPlayers(); // 예전 세이브에도 네임드 선수 추가 (선수마다 한 번)
   state.currentMenu = menu;
   state.notice = message;
   renderAll();

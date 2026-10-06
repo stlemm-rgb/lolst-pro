@@ -173,17 +173,23 @@ function makeLeague(defs, chosenIndex) {
 }
 
 // ----- 네임드 선수 (data/named_players.js): 1부 강팀 주전 자리에 넣기 -----
-// 그 자리에 있던 선수를 네임드 선수로 바꿔요 (이름·나이·스탯·특성). 한 번만 (state.league.namedAdded)
+// 그 자리에 있던 선수를 네임드 선수로 바꿔요 (이름·나이·스탯·특성). 선수마다 한 번만 (state.league.namedDone)
+// 목록에 나중에 추가한 선수는 예전 세이브를 불러올 때 들어와요
 function placeNamedPlayers() {
-  if (state.league.namedAdded) return;
-  state.league.namedAdded = true;
+  const L = state.league;
+  if (!L.namedDone) L.namedDone = L.namedAdded ? ["Ego", "Chen", "Sking", "Hwansam"] : []; // 이전 버전(4명) 세이브
+  L.namedAdded = true;
+  const todo = NAMED_PLAYERS.filter(function (n) { return L.namedDone.indexOf(n.name) === -1; });
+  if (!todo.length) return;
   const mine = myTeam();
   const pool = tierTeams(1).filter(function (t) { return !mine || t.id !== mine.id; })
     .sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); }).slice(0, NAMED_RULES.teamPool);
   const teams = shuffled(pool);
-  NAMED_PLAYERS.forEach(function (n, i) {
-    // 이미 같은 이름이 있으면 (예전 세이브) 건너뛰기
-    if (Object.keys(state.league.players).some(function (id) { return state.league.players[id].name === n.name && state.league.players[id].named; })) return;
+  // 이미 네임드 선수가 있는 팀은 뒤로 (서로 다른 팀에 가도록)
+  const hasNamed = function (t) { return t.roster.some(function (id) { const p = findPlayer(id); return p && p.named; }); };
+  teams.sort(function (a, b) { return hasNamed(a) - hasNamed(b); });
+  todo.forEach(function (n, i) {
+    L.namedDone.push(n.name);
     const team = teams[i % teams.length];
     if (!team) return;
     const id = starterAt(team.id, n.pos);

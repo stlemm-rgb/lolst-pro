@@ -4,12 +4,13 @@
 // - 실력(종합 능력): 나이에 따라 score 범위에서 정해요. 어릴수록 낮게 시작해서 성장해요
 // - 좋은 특성 traits개 (다른 선수가 가질 수 있는 특성 중 무작위). 나쁜 특성은 없음
 // - 다른 선수처럼 성장하고 늙고 은퇴해요
-// - 예전 세이브를 불러와도 한 번은 들어와요
+// - 예전 세이브를 불러와도 한 번은 들어와요 (목록에 새로 넣은 선수도 다음에 불러올 때 들어와요)
 const NAMED_PLAYERS = [
   { name: "Ego",     pos: "top" },
   { name: "Chen",    pos: "jungle" },
   { name: "Sking",   pos: "mid" },
   { name: "Hwansam", pos: "adc" },
+  { name: "Runa",    pos: "support" },
 ];
 
 const NAMED_RULES = {
