@@ -398,9 +398,9 @@ function resetLadder() {
 function thisWeekHTML() {
   const mine = myTeam();
   const week = state.week;
-  const matches = state.league.season.matches.filter(function (m) {
-    return m.week === week && !m.winner && (m.a === mine.id || m.b === mine.id);
-  });
+  // 이미 잡힌 경기 + 토너먼트는 이번 주에 정해질 대진을 미리 계산 (js/matchsim.js userWeekMatches)
+  const wk = userWeekMatches(week);
+  const matches = wk.matches.concat(wk.preview);
   let matchHTML;
   if (matches.length) {
     matchHTML = matches.map(function (m) {
@@ -408,12 +408,13 @@ function thisWeekHTML() {
       return '<div class="rep-row"><span class="rep-tag win">경기</span>' + escapeHTML(m.label) + " · vs <b>" + escapeHTML(teamName(opp)) + "</b>" +
         ' <span class="muted small">(' + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승 · 전력 우리 " + teamStrength(mine.id).toFixed(1) + " / 상대 " + strengthOf(opp).toFixed(1) + ")</span>" +
         (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : "") + "</div>";
-    }).join("");
+    }).join("") +
+    (wk.sameWeekFinal ? '<div class="rep-row muted small">4강을 이기면 같은 주에 컵 대회 결승 (' + LEAGUE.bestOf.cup_final + "판 " + Math.ceil(LEAGUE.bestOf.cup_final / 2) + "선승)도 치러요.</div>" : "");
   } else {
     const later = nextUserMatch();
     const ko = ["cup_po", "playin", "playoffs", "promotion", "worlds"].some(function (id) { return scheduleOfWeek(week).id.indexOf(id) === 0; });
     matchHTML = '<div class="rep-row muted"><span class="rep-tag">경기</span>이번 주는 잡힌 경기가 없어요' +
-      (ko ? " (토너먼트 대진은 경기 주에 정해져요)" : "") +
+      (ko ? " (우리 팀은 이번 라운드에 나가지 않아요)" : "") +
       (later ? ". 다음 경기: " + later.week + "주차 " + escapeHTML(later.label) + " vs " + escapeHTML(teamName(later.a === mine.id ? later.b : later.a)) : "") + ".</div>";
   }
   const plan = state.plan ? findTraining(state.plan).name : '<span class="down">아직 안 정함</span>';

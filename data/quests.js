@@ -3,7 +3,7 @@
 // - kind: "training"  → training(훈련 id)을 {need}회
 //         "metaS"     → 이번 패치 내 포지션 S급 메타 챔피언({champ})을 {need}회 연습 (챔피언 연습·집중 연습으로 숙련도가 오른 주)
 //         "metaAny"   → 내 포지션 메타 챔피언 아무나 {need}회 연습
-//         "ladderTop" → 리그 솔로 랭크 {need}위 안에 들기 (진행 = 지금 순위)
+//         "ladderTop" → 리그 솔로 랭크 {need}위 안에 들기 (진행 = 지금 순위, {start} = 받을 때 순위)
 // - offseason: true → 평소에는 안 나오고, 우리 팀 시즌이 끝난 주에 바로 받음 (기한: 그 시즌 마지막 주)
 // - need: [최소, 최대] 횟수 (없으면 QUEST_RULES.need)
 // - reward: 완료 보상 (data/events.js의 효과 이름과 같음: 스탯 id, condition, masteryChamp, masteryMetaAll ...)
@@ -17,9 +17,12 @@ const QUEST_RULES = {
 };
 
 // 시즌 마무리: 비시즌 퀘스트를 받은 시즌이 끝날 때(52주차 다음) 체력 회복 (퀘스트 달성 여부와 상관없이)
+// 비시즌 솔랭 퀘스트 목표 = 받을 때 순위에서 climb 계단 위 (내 실력에 맞춤)
+//   단, 상위권은 지금 순위의 절반까지만 (예: 103위 → 83위, 50위 → 30위, 30위 → 15위, 10위 → 5위, 1위 → 1위)
 const OFFSEASON = {
   quest: "q_offseason_ladder",
   staminaRecover: 20,
+  climb: 20,
 };
 
 const QUEST_GIVERS = { coach: "🧑‍🏫 코치", manager: "👔 감독" };
@@ -31,6 +34,6 @@ const QUESTS = [
   { id: "q_focus", giver: "coach",   kind: "training", training: "champ_focus", title: "주력 챔피언 만들기",     desc: "챔피언 집중 연습을 {need}회 해라.",          reward: { accuracy: 1, spacing: 1, pool: 1 } },
   { id: "q_meta_s", giver: "manager", kind: "metaS",                            title: "S급 메타 장악",           desc: "이번 패치 S급 '{champ}'을(를) {need}회 연습해라.", reward: { masteryChamp: 5, adapt: 2 } },
   { id: "q_meta_any", giver: "coach", kind: "metaAny",                          title: "메타 챔피언 준비",        desc: "{pos} 메타 챔피언을 {need}회 연습해라.",     reward: { masteryMetaAll: 2, pool: 2 } },
-  { id: "q_offseason_ladder", giver: "coach", kind: "ladderTop", offseason: true, need: [10, 10], title: "비시즌 솔랭 TOP 10", desc: "시즌은 끝났지만 손은 놀리지 마라. 시즌 마지막 주까지 리그 솔로 랭크 {need}위 안에 들어라.", reward: { reaction: 1, accuracy: 1, laning: 1 } },
+  { id: "q_offseason_ladder", giver: "coach", kind: "ladderTop", offseason: true, title: "비시즌 솔랭 순위 올리기", desc: "시즌은 끝났지만 손은 놀리지 마라. 시즌 마지막 주까지 리그 솔로 랭크 {need}위 안에 들어라. (지금 {start}위)", reward: { reaction: 1, accuracy: 1, laning: 1 } },
   { id: "q_rest",  giver: "manager", kind: "training", training: "rest", need: [2, 3], title: "컨디션 관리", desc: "무리하지 말고 {need}회 쉬어라.",           reward: { mental: 2, condition: 8 } },
 ];

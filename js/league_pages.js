@@ -147,32 +147,121 @@ pages.standings = function () {
 // ----- 대회 일정 (토너먼트 결과) -----
 pages.tournament = function () {
   const season = seasonOf();
-  const sections = [
-    ["컵 대회 플레이오프", ["cup_po"]],
-    ["플레이인 · 플레이오프", ["playin", "playoffs"]],
-    ["승강전", ["promotion"]],
-    ["월드 챔피언십 토너먼트", ["worlds_ko"]],
-  ];
   const champ = season.champions;
   const champHTML = [["cup", "컵 대회"], ["playoffs", "리그 (플레이오프)"], ["worlds", "월드 챔피언십"]].map(function (c) {
     return "<tr><td>" + c[1] + "</td><td>" + (champ[c[0]] ? "🏆 " + teamLabel(champ[c[0]]) : '<span class="muted">미정</span>') + "</td></tr>";
   }).join("");
 
-  const body = sections.map(function (s) {
-    const list = season.matches.filter(function (m) { return s[1].indexOf(m.comp) !== -1; });
-    const inner = list.length
-      ? '<table class="matches">' + list.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
-      : '<p class="muted small">아직 대진이 정해지지 않았어요.</p>';
-    return '<div class="card"><h2>' + s[0] + "</h2>" + inner + "</div>";
-  }).join("");
+  // 토너먼트 대회는 대진표, 승강전은 경기 목록
+  const promo = season.matches.filter(function (m) { return m.comp === "promotion"; });
+  const promoHTML = '<div class="card"><h2>승강전 <span class="muted small">1부 9·10위 vs 2부 1·2위 · 5판 3선승</span></h2>' +
+    (promo.length ? '<table class="matches">' + promo.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
+      : '<p class="muted small">아직 대진이 정해지지 않았어요. (39·40주차)</p>') + "</div>";
 
   return (
     "<h1>대회 일정</h1>" +
     '<div class="card"><h2>' + state.year + '년 우승</h2><table class="mini">' + champHTML + "</table></div>" +
-    body + competitionGuideHTML() +
+    TOURNAMENT_BRACKETS.map(bracketHTML).join("") +
+    promoHTML + competitionGuideHTML() +
     '<p class="muted small">역대 우승 기록은 [역사관]에서 볼 수 있어요.</p>'
   );
 };
+
+// ----- 토너먼트 대진표 -----
+// 대회마다 라운드(열) 목록. 아직 열리지 않은 경기는 "미정" 칸으로 보여 줌
+// - pick(season): 그 라운드 경기들 (보여 줄 순서대로)
+// - slots(season): 아직 경기가 없을 때 칸에 미리 넣을 팀 [[팀 id 또는 null, 팀 id 또는 null], ...]
+const TOURNAMENT_BRACKETS = [
+  {
+    title: "컵 대회 플레이오프", sub: "조별 리그 상위 6팀 · 1·2위는 4강 직행 · 결승 5판 3선승", champKey: "cup", when: "8주차",
+    seeds: function (s) { return s.cupSeeds; },
+    rounds: [
+      { name: "1라운드", pick: function (s) { return koMatches(s, "cup_po", "1라운드"); }, size: 2,
+        slots: function (s, seeds) { return seeds ? [[seeds[2], seeds[5]], [seeds[3], seeds[4]]] : null; } },
+      { name: "4강", pick: function (s) { return koMatches(s, "cup_po", "4강"); }, size: 2,
+        slots: function (s, seeds) { return seeds ? [[seeds[0], null], [seeds[1], null]] : null; } },
+      { name: "결승", pick: function (s) { return koMatches(s, "cup_po", "결승"); }, size: 1 },
+    ],
+  },
+  {
+    title: "플레이인 · 플레이오프", sub: "1부 최종 순위 · 1~4위 직행, 5~8위 플레이인 · 5판 3선승", champKey: "playoffs", when: "35주차",
+    seeds: function (s) { return s.seeds || s.finalOrder; },
+    rounds: [
+      { name: "플레이인", pick: function (s) { return koMatches(s, "playin", "").slice().reverse(); }, size: 2,
+        slots: function (s) { const o = s.finalOrder; return o ? [[o[5], o[6]], [o[4], o[7]]] : null; } },
+      { name: "1라운드", pick: function (s) { return koMatches(s, "playoffs", "1라운드"); }, size: 2,
+        slots: function (s) { const o = s.finalOrder; return o ? [[o[2], null], [o[3], null]] : null; } },
+      { name: "4강", pick: function (s) { return koMatches(s, "playoffs", "4강"); }, size: 2,
+        slots: function (s) { const o = s.finalOrder; return o ? [[o[0], null], [o[1], null]] : null; } },
+      { name: "결승", pick: function (s) { return koMatches(s, "playoffs", "결승"); }, size: 1 },
+    ],
+  },
+  {
+    title: "월드 챔피언십 토너먼트", sub: "조별 리그 각 조 1·2위 8팀 · 5판 3선승", champKey: "worlds", when: "44주차",
+    seeds: function () { return null; },
+    rounds: [
+      { name: "8강", size: 4, pick: function (s) {
+        const q = koMatches(s, "worlds_ko", "8강");
+        return q.length === 4 ? [q[0], q[2], q[1], q[3]] : q; // 4강에서 만나는 경기끼리 붙여서
+      } },
+      { name: "4강", pick: function (s) { return koMatches(s, "worlds_ko", "4강"); }, size: 2 },
+      { name: "결승", pick: function (s) { return koMatches(s, "worlds_ko", "결승"); }, size: 1 },
+    ],
+  },
+];
+
+// 대회(comp)에서 이름에 word가 들어간 경기
+function koMatches(season, comp, word) {
+  return season.matches.filter(function (m) { return m.comp === comp && (!word || m.label.indexOf(word) !== -1); });
+}
+
+// 대진표 칸 안의 팀 한 줄
+function bracketTeamHTML(id, m, side, seeds) {
+  const mine = myTeam();
+  if (!id) return '<div class="bk-team tbd"><span class="bk-name">미정</span></div>';
+  const won = m && m.winner === id, lost = m && m.winner && m.winner !== id;
+  const seed = seeds ? seeds.indexOf(id) : -1;
+  return '<div class="bk-team' + (won ? " won" : "") + (lost ? " lost" : "") + (mine && mine.id === id ? " mine" : "") + '">' +
+    (seed !== -1 ? '<span class="bk-seed">' + (seed + 1) + "</span>" : "") +
+    '<span class="bk-name">' + escapeHTML(teamName(id)) + "</span>" +
+    '<span class="bk-score">' + (m && m.winner ? m.score[side] : "") + "</span></div>";
+}
+
+function bracketHTML(def) {
+  const season = seasonOf();
+  const seeds = def.seeds(season);
+  const started = def.rounds.some(function (r) { return r.pick(season).length; }) || (def.rounds[0].slots && def.rounds[0].slots(season, seeds));
+  if (!started) {
+    return '<div class="card"><h2>' + def.title + ' <span class="muted small">' + def.sub + "</span></h2>" +
+      '<p class="muted small">아직 대진이 정해지지 않았어요. (' + def.when + "에 정해져요)</p></div>";
+  }
+  const cols = def.rounds.map(function (r) {
+    const list = r.pick(season);
+    const pre = r.slots ? r.slots(season, seeds) : null;
+    const boxes = [];
+    for (let i = 0; i < r.size; i++) {
+      const m = list[i];
+      if (m) {
+        boxes.push('<div class="bk-match' + (m.detail ? " has-detail" : "") + '"' + (m.detail ? ' data-mdetail="' + matchKey(m) + '" title="눌러서 경기 결과 보기"' : "") + ">" +
+          bracketTeamHTML(m.a, m, 0, seeds) + bracketTeamHTML(m.b, m, 1, seeds) +
+          '<div class="bk-info">' + m.week + "주차 · " + m.bo + "판" + (m.winner ? "" : " · 예정") + "</div></div>");
+      } else {
+        const p = (pre && pre[i]) || [null, null];
+        boxes.push('<div class="bk-match tbd">' + bracketTeamHTML(p[0], null, 0, seeds) + bracketTeamHTML(p[1], null, 1, seeds) + "</div>");
+      }
+    }
+    return '<div class="bk-col"><div class="bk-round">' + r.name + '</div><div class="bk-boxes">' + boxes.join("") + "</div></div>";
+  });
+  const winner = season.champions[def.champKey];
+  cols.push('<div class="bk-col bk-champ-col"><div class="bk-round">우승</div><div class="bk-boxes"><div class="bk-champ' + (winner ? "" : " tbd") + '">' +
+    (winner ? "🏆 " + teamLabel(winner) : "🏆 ?") + "</div></div></div>");
+  return (
+    '<div class="card"><h2>' + def.title + ' <span class="muted small">' + def.sub + "</span></h2>" +
+      '<div class="bracket">' + cols.join("") + "</div>" +
+      '<p class="muted small">숫자 = 시드 · 굵은 글씨 = 이긴 팀 · 파란 테두리 = 우리 팀 · 우리 팀 경기와 결승은 눌러서 경기 결과를 볼 수 있어요.</p>' +
+    "</div>"
+  );
+}
 
 // 시즌 일정 화면 아래에 붙는 "우리 팀 경기" 표
 function userScheduleHTML() {

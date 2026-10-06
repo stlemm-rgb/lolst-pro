@@ -28,6 +28,7 @@ function rewardText(q) {
 // training: 이번 주 훈련, changes: 훈련 결과 변화 ("m:챔피언" 숙련도 포함)
 function progressQuests(training, changes) {
   if (!state.quests) state.quests = [];
+  repairQuests();
   const practiced = Object.keys(changes).filter(function (k) { return k.indexOf("m:") === 0; }).map(function (k) { return k.slice(2); });
   const myMeta = state.meta.champs[state.player.position];
   const done = [];
@@ -176,6 +177,22 @@ function startOffseason() {
   addNews("시즌 종료", myTeam().name + "의 " + state.year + "년 경기 일정이 모두 끝났다. 이제 비시즌!");
 }
 
+// 예전 버전 파일 때문에 목표 순위가 숫자가 아니게(NaN → 저장하면 null) 저장된 비시즌 퀘스트 고치기
+function repairQuests() {
+  (state.quests || []).forEach(function (q) {
+    const tpl = findQuest(q.id);
+    if (!tpl || tpl.kind !== "ladderTop" || q.need > 0) return;
+    q.startRank = q.startRank > 0 ? q.startRank : (q.rank > 0 ? q.rank : myLadderRank());
+    q.need = offseasonTarget(q.startRank);
+    // 받은 연락의 글자도 고쳐 줌
+    state.inbox.forEach(function (m) {
+      if (m.text && m.text.indexOf("NaN위") !== -1) {
+        m.text = String(m.text).replace(/NaN위 안에 들어라\.( \(지금 [^)]*\))?/, q.need + "위 안에 들어라. (지금 " + q.startRank + "위)");
+      }
+    });
+  });
+}
+
 // 비시즌 솔랭 목표 순위: 지금 순위보다 climb 계단 위, 단 상위권은 지금 순위의 절반까지만
 function offseasonTarget(rank) {
   return Math.max(1, rank - OFFSEASON.climb, Math.floor(rank / 2));
@@ -196,6 +213,7 @@ function myLadderRank() {
 
 // 퀘스트 카드 (훈련 화면·대시보드)
 function questsHTML(compact) {
+  repairQuests();
   const list = state.quests || [];
   if (!list.length) return compact ? "" : '<div class="card"><h2>📋 퀘스트</h2><p class="muted">지금 받은 퀘스트가 없어요. 코치와 감독이 곧 과제를 줄 거예요.</p></div>';
   const now = absWeek();

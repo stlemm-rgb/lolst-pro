@@ -72,6 +72,8 @@
 46. (커밋 필요) 왼쪽 메뉴 정리: 16개 한 줄 → 묶음 4개(내 선수·경기·이적·기록) + 맨 아래 ⚙ 설정·저장. 합친 메뉴 3개는 화면 위 탭: 일정[시즌 일정|대회 일정], 이적 시장[이적 시장|선수 검색|구단 탐색], 기록실[개인 시상|역사관|리그 생태계]. 마지막에 본 탭 기억. data/menus.js가 MENU_GROUPS·MENU_BOTTOM 구조로 바뀜 (MENUS는 화면 이름 찾기용으로 자동 생성)
 47. (커밋 필요) 선수 SNS 확장: 프로 선수 글은 새 파일 data/social_posts_pro.js(SOCIAL_PRO_POSTS, 점잖은 말투, 빈칸 {proteam} = 글쓴 선수의 팀, 우리 팀 동료는 글쓴이에서 제외)에서, 팬 글은 data/social_posts.js에서. 새 분류: 경기 결과 세부(winSweep·winClose·lossSweep·lossClose, win/loss 글과 섞임)·pog(내 선수 POG)·이번 주 훈련(train_solo_rank·scrim·replay·champion·champ_focus·rest). 한 주 최대 글 3→4. 새 분류는 예시 글 1~2개씩만 넣어 둠 → 다른 AI로 보충 예정. '{cup} 우승'이 '리그 우승 우승'으로 나오던 문제 수정
 48. (커밋 필요) 팬 SNS 새 분류 보충 (다른 AI 작성): 경기 결과 세부 4종·POG·훈련 6종을 15개씩. 프로 선수 글(data/social_posts_pro.js)도 보충 완료 (분류마다 12개, 다른 AI 작성)
+49. (커밋 필요) 버그 수정: 토너먼트 경기(컵 플레이오프·플레이인·플레이오프·승강전·월드 토너먼트)는 그 주를 진행할 때 대진이 만들어져서, 대시보드 '이번 주'에 "잡힌 경기가 없어요"라고 나온 뒤 경기를 치르던 문제 → 이전 라운드 결과로 이번 주 대진을 미리 계산(js/matchsim.js koPreview·userWeekMatches)해서 표시. 3시즌 33개 토너먼트 주에서 미리 본 대진 = 실제 대진 확인. 컵 4강 주에는 '이기면 같은 주에 결승' 안내
+50. (커밋 필요) 버그 수정: 비시즌 퀘스트 목표가 'NaN위'로 나오던 문제. 원인 = 내 컴퓨터 게임 폴더에 파일 7개(data/quests.js·social_posts.js·social_posts_pro.js·js/dashboard.js·league_pages.js·matchsim.js·PROGRESS.md)가 옛 버전으로 남아 있었음(파일 전달이 일부 안 됨) → 다시 넣고 51개 파일 모두 같은지 확인. 이미 저장된 NaN 퀘스트는 불러올 때 자동으로 고침(js/quests.js repairQuests, 받은 연락 글자도 고침)
 
 ## 파일 구성
 

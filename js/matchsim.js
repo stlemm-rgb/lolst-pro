@@ -519,6 +519,79 @@ function playLeagueWeek(week) {
   playDue(week);
 }
 
+// ----- 토너먼트 대진 미리 보기 (부작용 없음) -----
+// 토너먼트 경기는 그 주를 진행할 때(WEEK_EVENTS) 만들어져서, 진행 전에는 일정에 없음.
+// 이전 라운드 결과로 이번 주 대진을 미리 계산해서 [{ comp, label, a, b, bo }] 로 돌려줌 (아직 알 수 없으면 빈 목록)
+// ※ WEEK_EVENTS의 대진 규칙을 바꾸면 여기도 같이 바꿔 주세요
+function koPreview(week) {
+  const s = seasonOf();
+  const done = function (comp, w) { return s.matches.filter(function (m) { return m.comp === comp && m.week === w; }); };
+  const allPlayed = function (list) { return list.length && list.every(function (m) { return m.winner; }); };
+  const semisFrom = function (comp, label, seeds, r1, bo) {
+    if (!seeds || !allPlayed(r1)) return [];
+    const winners = r1.map(function (m) { return m.winner; }).sort(function (x, y) { return seeds.indexOf(y) - seeds.indexOf(x); });
+    return [{ comp: comp, label: label, a: seeds[0], b: winners[0], bo: bo }, { comp: comp, label: label, a: seeds[1], b: winners[1], bo: bo }];
+  };
+  const finalFrom = function (comp, label, semis, bo) {
+    return allPlayed(semis) && semis.length === 2 ? [{ comp: comp, label: label, a: semis[0].winner, b: semis[1].winner, bo: bo }] : [];
+  };
+  const B = LEAGUE.bestOf;
+  if (week === 8) {
+    if (s.matches.some(function (m) { return m.comp === "cup" && !m.winner; })) return [];
+    const seeds = standings("cup", tier1Ids()).slice(0, 6).map(function (r) { return r.id; });
+    return [{ comp: "cup_po", label: "컵 플레이오프 1라운드", a: seeds[2], b: seeds[5], bo: B.cup_po },
+            { comp: "cup_po", label: "컵 플레이오프 1라운드", a: seeds[3], b: seeds[4], bo: B.cup_po }];
+  }
+  if (week === 9) return semisFrom("cup_po", "컵 플레이오프 4강", s.cupSeeds, done("cup_po", 8), B.cup_po);
+  if (week === 35) {
+    if (s.matches.some(function (m) { return m.comp === "split2" && !m.winner; })) return [];
+    const o = tier1FinalOrder();
+    return [{ comp: "playin", label: "플레이인", a: o[4], b: o[7], bo: B.playin }, { comp: "playin", label: "플레이인", a: o[5], b: o[6], bo: B.playin }];
+  }
+  if (week === 36) {
+    const pi = done("playin", 35), o = s.finalOrder;
+    if (!o || !allPlayed(pi)) return [];
+    const seeds = o.slice(0, 4).concat([pi[0].winner, pi[1].winner]);
+    return [{ comp: "playoffs", label: "플레이오프 1라운드", a: seeds[2], b: seeds[5], bo: B.playoffs },
+            { comp: "playoffs", label: "플레이오프 1라운드", a: seeds[3], b: seeds[4], bo: B.playoffs }];
+  }
+  if (week === 37) return semisFrom("playoffs", "플레이오프 4강", s.seeds, done("playoffs", 36), B.playoffs);
+  if (week === 38) return finalFrom("playoffs", "결승전", done("playoffs", 37), B.playoffs);
+  if (week === 39 || week === 40) {
+    const o = s.finalOrder;
+    if (!o) return [];
+    const t2 = standings(["tier2", "tier2b"], tier2Ids());
+    const i = week === 39 ? 0 : 1;
+    return [{ comp: "promotion", label: "승강전", a: o[week === 39 ? 9 : 8], b: t2[i].id, bo: B.promotion }];
+  }
+  if (week === 44) {
+    if (!s.worlds || s.matches.some(function (m) { return m.comp === "worlds_group" && !m.winner; })) return [];
+    const top = s.worlds.groups.map(function (ids) { return standings("worlds_group", ids).map(function (r) { return r.id; }); });
+    return [[0, 0, 1, 1], [1, 0, 0, 1], [2, 0, 3, 1], [3, 0, 2, 1]].map(function (x) {
+      return { comp: "worlds_ko", label: "월드 8강", a: top[x[0]][x[1]], b: top[x[2]][x[3]], bo: B.worlds_ko };
+    });
+  }
+  if (week === 45) {
+    const qf = done("worlds_ko", 44);
+    if (!allPlayed(qf) || qf.length !== 4) return [];
+    return [{ comp: "worlds_ko", label: "월드 4강", a: qf[0].winner, b: qf[2].winner, bo: B.worlds_ko },
+            { comp: "worlds_ko", label: "월드 4강", a: qf[1].winner, b: qf[3].winner, bo: B.worlds_ko }];
+  }
+  if (week === 46) return finalFrom("worlds_ko", "월드 결승", done("worlds_ko", 45), B.worlds_ko);
+  return [];
+}
+
+// 이번 주 우리 팀 경기 (이미 잡힌 경기 + 이번 주에 정해질 토너먼트 대진)
+// 돌려주는 값: { matches: [잡힌 경기], preview: [미리 본 대진], sameWeekFinal: 컵 4강을 이기면 같은 주에 결승인가 }
+function userWeekMatches(week) {
+  const mine = myTeam();
+  const s = seasonOf();
+  const involves = function (m) { return m.a === mine.id || m.b === mine.id; };
+  const matches = s.matches.filter(function (m) { return m.week === week && !m.winner && involves(m); });
+  const preview = matches.length ? [] : koPreview(week).filter(involves);
+  return { matches: matches, preview: preview, sameWeekFinal: week === 9 && preview.length > 0 };
+}
+
 // 우리 팀의 이번 시즌 경기가 모두 끝났나? (week = 방금 끝난 주)
 // - 앞으로 잡힌 경기가 있으면 아직
 // - 2부: 후반기(33주) 뒤, 2부 1·2위는 승강전을 치른 뒤
