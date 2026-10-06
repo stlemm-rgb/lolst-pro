@@ -47,8 +47,10 @@ function tutorialCardHTML() {
     const ok = !!t.done[s.check];
     if (!ok && current === -1) current = i;
     const now = !ok && current === i;
+    // 아직 안 한 단계는 모두 설명과 [열기] 버튼 (지금 단계는 진하게)
+    const go = s.go ? ' <button class="small-btn" data-tutgo="' + s.go + '">' + s.goLabel + " ▶</button>" : "";
     return '<li class="' + (ok ? "done" : now ? "now" : "") + '">' + (ok ? "✅" : now ? "▶" : "⬜") + " " + s.title +
-      (now ? '<div class="tut-hint">' + s.hint + "</div>" : "") + "</li>";
+      (!ok ? '<div class="tut-hint' + (now ? "" : " later") + '">' + s.hint + go + "</div>" : "") + "</li>";
   }).join("");
   const doneCount = TUTORIAL_STEPS.filter(function (s) { return t.done[s.check]; }).length;
   return '<div class="card tutorial"><h2>📘 처음이라면 <span class="muted small">' + doneCount + " / " + TUTORIAL_STEPS.length + "</span>" +
@@ -167,6 +169,9 @@ function bindGuide(page) {
         renderPage();
       }
     };
+  });
+  page.querySelectorAll("[data-tutgo]").forEach(function (btn) {
+    btn.onclick = function () { selectMenu(btn.getAttribute("data-tutgo")); };
   });
   const off = page.querySelector("[data-tutorial]");
   if (off) off.onclick = function () {

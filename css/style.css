@@ -624,3 +624,8 @@ ul.howto li { margin: 4px 0; font-size: 14px; }
 .mastery-table th, .mastery-table td { text-align: center; }
 .mastery-table td:first-child { text-align: left; white-space: nowrap; }
 table.calc.mastery-table td:last-child { text-align: center; }
+/* 처음 안내: 아직 차례가 아닌 단계 설명은 흐리게 */
+.tut-hint.later { background: rgba(255, 255, 255, 0.04); color: var(--muted); }
+/* 선수·구단 이름 링크 (js/links.js) */
+.glink { cursor: pointer; text-decoration: underline dotted rgba(139, 147, 167, 0.6); text-underline-offset: 3px; }
+.glink:hover, .glink:focus { color: var(--accent); text-decoration-color: var(--accent); outline: none; }

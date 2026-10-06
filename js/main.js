@@ -643,6 +643,7 @@ function renderPage() {
     html = '<div class="notice">' + state.notice + "</div>" + html;
   }
   page.innerHTML = html;
+  linkifyNames(page); // 선수·구단 이름을 누르면 선수 검색·구단 탐색으로 (js/links.js)
   page.querySelectorAll("[data-subtab]").forEach(function (btn) {
     btn.onclick = function () { selectMenu(btn.getAttribute("data-subtab")); };
   });

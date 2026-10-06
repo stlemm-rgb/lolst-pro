@@ -62,6 +62,7 @@ pages.search = function () {
         "<td>" + escapeHTML(p.name) + (id !== USER_ID && findPlayer(id) && findPlayer(id).named ? ' <span title="네임드 선수">⭐</span>' : "") + "</td>" +
         "<td>" + findPosition(p.pos).name + "</td>" +
         "<td>" + (team ? escapeHTML(team.name) + ' <span class="muted small">' + tierName(team.tier) + "</span>" : '<span class="muted">FA</span>') + "</td>" +
+        '<td class="small">' + topChampList(id, 2).map(function (c) { return escapeHTML(c.name) + ' <span class="muted">' + c.v + "</span>"; }).join(" · ") + "</td>" +
         '<td class="r">' + p.age + "</td>" +
         '<td class="r"><b>' + playerScore(id).toFixed(1) + "</b></td>" +
         '<td class="r">' + (p.salary ? moneyText(p.salary) : "-") + "</td>" +
@@ -81,7 +82,7 @@ pages.search = function () {
       "</div>" +
       '<p class="muted small">' + total + "명" + (total > 80 ? " 중 80명 표시" : "") + " · 줄을 누르면 상세 스탯이 나와요.</p>" +
       (selectedPlayer && (selectedPlayer === USER_ID || findPlayer(selectedPlayer)) ? playerDetailHTML(selectedPlayer) : "") +
-      '<table class="roster"><tr><th>이름</th><th>포지션</th><th>소속</th><th class="r">나이</th><th class="r">스탯 점수</th><th class="r">연봉</th><th class="r">계약 만료</th></tr>' + rows + "</table>" +
+      '<table class="roster"><tr><th>이름</th><th>포지션</th><th>소속</th><th>주력 챔피언</th><th class="r">나이</th><th class="r">스탯 점수</th><th class="r">연봉</th><th class="r">계약 만료</th></tr>' + rows + "</table>" +
     "</div>"
   );
 };
