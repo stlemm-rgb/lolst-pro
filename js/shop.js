@@ -195,6 +195,7 @@ pages.shop = function () {
     "<h1>상점</h1>" +
     '<div class="card"><div class="shop-money">💰 자금 <b>' + moneyText(state.money) + "</b>" +
       ' <span class="muted small">· 매주 연봉 +' + moneyText(weeklyIn) + (weeklyOut ? " · 개인 고용 −" + moneyText(weeklyOut) : "") + "</span></div></div>" +
+    activitiesCardHTML() +
     '<div class="card"><h2>🛒 장비 <span class="muted small">한 번 사면 계속 · 단계가 오를수록 효과가 커져요</span></h2>' +
       '<table class="roster shop-table"><tr><th>장비</th><th class="c">단계</th><th>지금 효과</th><th>다음 단계</th></tr>' + gearRows + "</table></div>" +
     '<div class="card"><h2>🧑‍🏫 개인 고용 <span class="muted small">매주 비용이 나가는 동안만 효과 · 자금이 모자라면 자동 해지</span></h2>' +
@@ -206,10 +207,27 @@ pages.shop = function () {
   );
 };
 
+// 진행 중인 계약·활동 (SNS 받은 연락에서 시작한 것)
+function activitiesCardHTML() {
+  const list = state.activities || [];
+  const rows = list.map(function (a) {
+    const def = ACTIVITIES[a.id];
+    if (!def) return "";
+    return "<tr><td>" + def.icon + " <b>" + def.name + "</b>" + (a.ctx && a.ctx.player ? ' <span class="muted small">vs ' + escapeHTML(a.ctx.player) + "</span>" : "") +
+      "</td><td>" + escapeHTML(fillText(def.desc, a.ctx || {})) + '</td><td class="muted small">' + a.year + "년부터</td><td>" +
+      (def.stoppable ? '<button class="small-btn" data-stopact="' + a.id + '">그만두기</button>' : '<span class="muted small">' + (def.untilSeasonEnd ? "시즌 끝까지" : "") + "</span>") + "</td></tr>";
+  }).join("");
+  return '<div class="card"><h2>📋 진행 중인 계약·활동 <span class="muted small">SNS 받은 연락에서 시작한 스폰서·개인 방송·라이벌</span></h2>' +
+    (rows ? '<table class="roster shop-table">' + rows + "</table>" : '<p class="muted small">지금은 없어요. SNS 받은 연락으로 제안이 오면 시작할 수 있어요.</p>') + "</div>";
+}
+
 // 버튼 연결 (main.js renderPage에서 부름)
 function bindShop(page) {
   page.querySelectorAll("[data-buygear]").forEach(function (b) { b.onclick = function () { buyGear(b.getAttribute("data-buygear")); }; });
   page.querySelectorAll("[data-staff]").forEach(function (b) { b.onclick = function () { toggleStaff(b.getAttribute("data-staff")); }; });
   page.querySelectorAll("[data-care]").forEach(function (b) { b.onclick = function () { buyCare(b.getAttribute("data-care")); }; });
   page.querySelectorAll("[data-fame]").forEach(function (b) { b.onclick = function () { buyFame(b.getAttribute("data-fame")); }; });
+  page.querySelectorAll("[data-stopact]").forEach(function (b) {
+    b.onclick = function () { stopActivity(b.getAttribute("data-stopact")); shopNotice("그만뒀어요."); };
+  });
 }

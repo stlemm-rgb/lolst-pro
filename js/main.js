@@ -25,6 +25,8 @@ function createNewState() {
     career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0, earned: 0, moments: [] }, // 커리어 기록
     retirePlanned: false,         // true면 이번 시즌이 끝날 때 은퇴 (js/retire.js)
     shop: { gear: {}, staff: {}, careWeek: -1, fame: {} }, // 상점 (js/shop.js)
+    activities: [],               // 오래 가는 계약·활동 (스폰서·개인 방송·라이벌, js/events.js)
+    pendingEvents: [],            // 몇 주 뒤에 올 후속 연락
     compPlan: "auto",             // 조합 전략: meta / counter / auto (js/comps.js)
     retired: null,                // 은퇴 후 엔딩 요약 (있으면 엔딩 화면)
     contract: null,               // 내 계약 { teamId, salary, endYear, guarantee } (js/contracts.js)
@@ -767,6 +769,7 @@ function nextWeek(restWeek) {
   if (state.career.seasonOverYear !== state.year && userSeasonOver(playedWeek)) startOffseason();
   paySalary();
   payStaff(); // 상점 개인 고용 비용 (js/shop.js)
+  runActivities(); // 스폰서·개인 방송 등 매주 효과 (js/events.js)
   // 회복력: 매주 체력 자연 회복
   const regen = traitEffectSum("staminaRegen");
   if (regen) state.stamina = Math.min(state.staminaMax, state.stamina + regen);
@@ -776,6 +779,7 @@ function nextWeek(restWeek) {
   if (state.week > CREATION.weeksPerSeason) {
     // 새해 = 새 시즌. 나이 +1, 승강·선수 성장/은퇴
     offseasonRecover(state.year); // 시즌 마무리 체력 회복 (비시즌 퀘스트를 받은 시즌)
+    endSeasonActivities(); // 시즌 끝까지인 계약·활동 종료
     saveSeasonHistory();
     // 은퇴 (스스로 결정 / 최대 나이 / 받아 줄 팀 없음) → 엔딩
     const retireReason = seasonEndRetireReason();

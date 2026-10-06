@@ -43,6 +43,9 @@ function fillText(text, ctx) {
     .replace(/\{champ\}/g, c.champ || "")
     .replace(/\{cup\}/g, c.cup || "대회")
     .replace(/\{proteam\}/g, c.proteam || "저희 팀")
+    .replace(/\{player\}/g, c.player || "")
+    .replace(/\{pteam\}/g, c.pteam || "")
+    .replace(/\{trait\}/g, c.traitName || "")
     .replace(/\{opp\}/g, c.opp || "상대 팀");
 }
 
@@ -57,6 +60,15 @@ function postMessage(tab, title, text, extra) {
   state.inbox.unshift(msg);
   state.inbox = state.inbox.slice(0, EVENT_RULES.keepMessages);
   return msg;
+}
+
+// ----- 이벤트 돈: 데이터 값은 "연봉 3,000만 원 기준" → 내 연봉에 맞게 키움 (10만 원 단위) -----
+function eventMoneyScale() {
+  const salary = state.contract ? state.contract.salary : 0;
+  return Math.max(1, salary / EVENT_RULES.moneyBaseSalary);
+}
+function eventMoney(v) {
+  return Math.round(v * eventMoneyScale() / 100000) * 100000;
 }
 
 // ----- 효과 적용 -----
@@ -88,8 +100,32 @@ function applyEffects(eff, ctx) {
       state.reputation = Math.max(-100, Math.min(100, state.reputation + v));
       add(key, state.reputation - before);
     } else if (key === "money") {
-      state.money += v;
-      notes.push("자금 " + (v > 0 ? "+" : "−") + Math.abs(v / 10000).toLocaleString() + "만 원");
+      const m = eventMoney(v);
+      state.money += m;
+      notes.push("자금 " + (m > 0 ? "+" : "−") + Math.abs(m / 10000).toLocaleString() + "만 원");
+    } else if (key === "activity") {
+      startActivity(v, ctx, notes);
+    } else if (key === "cureOther") {
+      // 나온 선수의 나쁜 특성 없애 주기
+      const p = ctx && ctx.pid && state.league.players[ctx.pid];
+      if (p && p.traits && p.traits.indexOf(ctx.trait) !== -1) {
+        if (Math.random() < v) {
+          p.traits.splice(p.traits.indexOf(ctx.trait), 1);
+          notes.push("💚 " + p.name + " 선수가 '" + findTrait(ctx.trait).name + "'을(를) 이겨냈다!");
+          addNews("동료의 극복", p.name + " 선수가 " + state.player.name + "의 도움으로 '" + findTrait(ctx.trait).name + "'을(를) 이겨냈다.");
+        } else notes.push(p.name + " 선수는 아직 '" + findTrait(ctx.trait).name + "'을(를) 완전히 이겨내지 못했다");
+      }
+    } else if (key === "otherRisk") {
+      // 사고를 막지 못함: 나온 선수에게 나쁜 특성
+      const p = ctx && ctx.pid && state.league.players[ctx.pid];
+      if (p && Math.random() < v.chance) {
+        if (!p.traits) p.traits = [];
+        if (p.traits.indexOf(v.trait) === -1) p.traits.push(v.trait);
+        const mine = myTeam() && p.teamId === myTeam().id;
+        notes.push("⚠️ " + p.name + " 선수가 결국 사고를 쳤다 ('" + findTrait(v.trait).name + "')" + (mine ? " · 팀 이미지도 나빠졌다" : ""));
+        addNews("선수 구설수", p.name + " (" + teamName(p.teamId) + ") 선수의 부적절한 발언이 논란이 되고 있다.");
+        if (mine) { before = state.reputation; state.reputation = Math.max(-100, state.reputation - 2); add("reputation", state.reputation - before); }
+      } else if (p) notes.push(p.name + " 선수에게 별일은 없었다");
     } else if (key === "masteryMetaAll" || key === "masteryMetaOne" || key === "masteryChamp") {
       let targets = [];
       if (key === "masteryChamp") targets = ctx && ctx.champ ? [ctx.champ] : [];
@@ -144,9 +180,13 @@ function rollTraitEffects(choice, notes) {
 }
 
 // 선택지 옆에 보여 줄 위험·극복 안내
-function choiceHint(choice) {
+function choiceHint(choice, ctx) {
   const parts = [];
   if (choice.note) parts.push(choice.note);
+  const e = choice.effects || {};
+  if (e.money) parts.push("자금 " + (e.money > 0 ? "+" : "−") + moneyText(Math.abs(eventMoney(e.money))));
+  if (e.activity && ACTIVITIES[e.activity] && !choice.note) parts.push(ACTIVITIES[e.activity].icon + " " + fillText(ACTIVITIES[e.activity].desc, ctx));
+  if (e.cureOther) parts.push("💚 " + Math.round(e.cureOther * 100) + "% 확률로 동료의 나쁜 특성 극복");
   if (choice.risk) parts.push("⚠️ 낮은 확률(" + Math.round(Math.min(EVENT_RULES.maxRisk, choice.risk.chance) * 100) + "%)로 나쁜 특성 '" + findTrait(choice.risk.trait).name + "'");
   if (choice.cure) parts.push("💚 " + Math.round(choice.cure.chance * 100) + "% 확률로 '" + findTrait(choice.cure.trait).name + "' 극복");
   return parts.join(" · ");
@@ -178,7 +218,7 @@ function fireEvent(ev, ctx) {
   } else {
     postMessage("inbox", title, text, {
       eventId: ev.id, ctx: ctx || {},
-      choices: ev.choices.map(function (c) { return { label: c.label, hint: choiceHint(c) }; }),
+      choices: ev.choices.map(function (c) { return { label: c.label, hint: choiceHint(c, ctx || {}) }; }),
     });
   }
 }
@@ -226,10 +266,15 @@ function runWeeklyEvents() {
     const pool = [];
     EVENTS.forEach(function (ev) {
       if (ev.trigger !== "random" || !eventReady(ev)) return;
+      if (ev.who && !whoContext(ev.who)) return; // 나올 선수가 없으면 빼기
       for (let i = 0; i < traitWeight(ev); i++) pool.push(ev);
     });
-    if (pool.length) fireEvent(pick(pool), {});
+    if (pool.length) {
+      const ev = pick(pool);
+      fireEvent(ev, ev.who ? whoContext(ev.who) : {});
+    }
   }
+  firePendingEvents(); // 후속 연락
 
   checkTraitGains();
   state.newMentions = postSocial();
@@ -357,7 +402,7 @@ function autoIgnore() {
 function choiceTooExpensive(msg, index) {
   const ev = findEvent(msg.eventId);
   const c = ev && ev.choices[index];
-  return !!(c && c.effects && c.effects.money < 0 && state.money < -c.effects.money);
+  return !!(c && c.effects && c.effects.money < 0 && state.money < -eventMoney(c.effects.money));
 }
 
 // ----- 선택하기 -----
@@ -367,10 +412,15 @@ function answerMessage(msgId, index) {
   if (msg.kind === "offer") { answerOffer(msg, index); return; } // 계약 제안 (js/contracts.js)
   if (msg.kind === "retire") { answerRetire(msg, index); return; } // 은퇴 권유 (js/retire.js)
   const ev = findEvent(msg.eventId);
-  const choice = ev && ev.choices[index];
+  let choice = ev && ev.choices[index];
+  // 예전에 온 연락이라 선택지 순서가 바뀌었으면 글자로 찾기
+  if (ev && msg.choices && msg.choices[index] && choice && choice.label !== msg.choices[index].label) {
+    choice = ev.choices.find(function (c) { return c.label === msg.choices[index].label; }) || null;
+  }
   if (!choice || choiceTooExpensive(msg, index)) return;
   const r = applyEffects(choice.effects, msg.ctx);
   rollTraitEffects(choice, r.notes);
+  scheduleFollowUps(choice.followUp, msg.ctx); // 몇 주 뒤 후속 연락
   msg.answered = index;
   msg.read = true;
   msg.changes = r.changes;
@@ -391,4 +441,123 @@ function unreadCount(tab) {
     if (m.tab === "social") return !!m.mention && !m.read; // 나를 언급한 글만 알림
     return !m.read || (m.choices && m.answered === null);
   }).length;
+}
+
+// ===== 다른 선수가 나오는 연락: who → { pid, player, pteam, trait, traitName } =====
+const TEAMMATE_BAD_TRAITS = ["lazy", "stage_fright", "inconsistent", "slow_starter"];
+function whoContext(who) {
+  const mine = myTeam();
+  if (!mine) return null;
+  const P = state.league.players;
+  const make = function (id, trait) {
+    const p = P[id];
+    const t = findTeam(p.teamId);
+    return { pid: id, player: p.name, pteam: t ? t.name : "", trait: trait || null, traitName: trait ? findTrait(trait).name : "" };
+  };
+  const others = Object.keys(P).filter(function (id) { const t = P[id].teamId && findTeam(P[id].teamId); return t && t.id !== mine.id && (t.tier === 1 || t.tier === 2); });
+  const mates = mine.roster.filter(function (id) { return id !== USER_ID && P[id]; });
+  if (who === "rival") {
+    if (state.activities && state.activities.some(function (a) { return a.id === "rival"; })) return null; // 이미 라이벌이 있음
+    const same = others.filter(function (id) { return P[id].pos === state.player.position && findTeam(P[id].teamId).tier === mine.tier; })
+      .sort(function (a, b) { return playerScore(b) - playerScore(a); });
+    return same.length ? make(same[0]) : null;
+  }
+  if (who === "otherPro") return others.length ? make(pick(others)) : null;
+  if (who === "teammate") return mates.length ? make(pick(mates)) : null;
+  if (who === "teammateBad") {
+    const bad = [];
+    mates.forEach(function (id) { (P[id].traits || []).forEach(function (t) { if (TEAMMATE_BAD_TRAITS.indexOf(t) !== -1) bad.push([id, t]); }); });
+    if (!bad.length) return null;
+    const b = pick(bad);
+    return make(b[0], b[1]);
+  }
+  return null;
+}
+
+// ===== 후속 연락: 선택지의 followUp → 몇 주 뒤 =====
+function scheduleFollowUps(f, ctx) {
+  if (!f) return;
+  (Array.isArray(f) ? f : [f]).forEach(function (x) {
+    if (Math.random() >= (x.chance === undefined ? 1 : x.chance)) return;
+    if (!state.pendingEvents) state.pendingEvents = [];
+    state.pendingEvents.push({ event: x.event, at: absWeek() + randInt(x.weeks[0], x.weeks[1]), ctx: ctx || {} });
+  });
+}
+
+function firePendingEvents() {
+  if (!state.pendingEvents || !state.pendingEvents.length) return;
+  const now = absWeek();
+  state.pendingEvents = state.pendingEvents.filter(function (p) {
+    if (p.at > now) return true;
+    const ev = findEvent(p.event);
+    // 방송 관련 후속은 방송을 그만뒀으면 안 옴
+    if (ev && (p.event.indexOf("stream_") !== 0 || hasActivity("stream"))) fireEvent(ev, p.ctx);
+    return false;
+  });
+}
+
+// ===== 오래 가는 계약·활동 (data/events.js ACTIVITIES) =====
+// state.activities = [{ id, year(시작한 해), ctx: { pid, player, pteam, teamId } }]
+function hasActivity(id) {
+  return !!(state.activities || []).some(function (a) { return a.id === id; });
+}
+
+function startActivity(id, ctx, notes) {
+  const def = ACTIVITIES[id];
+  if (!def) return;
+  if (!state.activities) state.activities = [];
+  if (hasActivity(id)) { notes.push("이미 " + def.name + " 중이다"); return; }
+  const c = Object.assign({}, ctx || {});
+  if (c.pid && state.league.players[c.pid]) c.teamId = state.league.players[c.pid].teamId;
+  state.activities.push({ id: id, year: state.year, ctx: c });
+  notes.push(def.icon + " " + def.name + " 시작: " + fillText(def.desc, c));
+}
+
+function stopActivity(id, reason) {
+  const def = ACTIVITIES[id];
+  state.activities = (state.activities || []).filter(function (a) { return a.id !== id; });
+  if (def && reason) addNews(def.icon + " " + def.name + " 종료", reason);
+}
+
+// 매주 (main.js nextWeek에서 연봉 다음에): 활동 효과와 해지 조건
+function runActivities() {
+  (state.activities || []).slice().forEach(function (a) {
+    const def = ACTIVITIES[a.id];
+    if (!def) return;
+    if (def.failIf && def.failIf.popularityBelow !== undefined && state.popularity < def.failIf.popularityBelow) {
+      applyEffects(def.failEffects || {}, a.ctx);
+      stopActivity(a.id, "인기도가 " + def.failIf.popularityBelow + " 아래로 떨어져 계약이 해지됐다." + (def.failEffects && def.failEffects.reputation ? " (평판 " + def.failEffects.reputation + ")" : ""));
+      return;
+    }
+    const w = def.weekly || {};
+    if (w.moneySalaryPct && state.contract) {
+      const m = Math.round(state.contract.salary * w.moneySalaryPct);
+      state.money += m;
+      if (state.weekReport) state.weekReport.activityIncome = (state.weekReport.activityIncome || 0) + m;
+    }
+    const rest = {};
+    Object.keys(w).forEach(function (k) { if (k !== "moneySalaryPct") rest[k] = w[k]; });
+    applyEffects(rest, a.ctx);
+  });
+}
+
+// 시즌이 넘어갈 때: 시즌 끝까지인 활동 종료
+function endSeasonActivities() {
+  (state.activities || []).slice().forEach(function (a) {
+    const def = ACTIVITIES[a.id];
+    if (def && def.untilSeasonEnd) stopActivity(a.id, "시즌이 끝나 " + def.name + "이(가) 끝났다.");
+  });
+}
+
+// 경기력 보너스: 라이벌 팀과 경기 (matchsim.js userMatchContext에서 부름)
+function activityMatchBoost(match) {
+  const mine = myTeam();
+  if (!mine || !match) return 0;
+  const opp = match.a === mine.id ? match.b : match.a;
+  let b = 0;
+  (state.activities || []).forEach(function (a) {
+    const def = ACTIVITIES[a.id];
+    if (def && def.matchBoostVs && a.ctx && a.ctx.teamId === opp) b += def.matchBoostVs;
+  });
+  return b;
 }

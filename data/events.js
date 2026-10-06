@@ -21,7 +21,14 @@
 // - need: 추가 조건 { minPopularity, minAge, minWeek(이 주차 이후), trait(이 특성이 있어야), noTrait(이 특성이 없어야) }
 // - cooldown: 같은 이벤트가 다시 오기까지 쉬는 주 (없으면 EVENT_RULES.cooldown)
 // - effects: (소식) 읽으면 바로 적용되는 효과
-// - choices: (받은 연락) 선택지 [{ label, effects, risk, cure, note }]
+// - choices: (받은 연락) 선택지 [{ label, effects, risk, cure, note, followUp }]
+// - who: 다른 선수가 나오는 연락 (2026-10-06). 맞는 선수가 없으면 이 연락은 안 와요
+//     "rival"       다른 팀의 같은 포지션 선수 중 가장 잘하는 선수 (같은 리그)
+//     "otherPro"    다른 팀 선수 아무나
+//     "teammate"    우리 팀 동료 아무나
+//     "teammateBad" 나쁜 특성(게으름·무대 공포증·기복·슬로 스타터)이 있는 우리 팀 동료
+//   글자: {player} 그 선수 이름, {pteam} 그 선수 팀, {trait} 그 선수의 나쁜 특성 이름
+// - trigger "followUp": 다른 연락의 선택지(followUp)로만 몇 주 뒤에 오는 후속 연락
 //
 // 효과(effects)에 쓸 수 있는 것
 //   스탯 id(accuracy, laning, ... mental ...), stamina, condition, popularity, reputation
@@ -32,6 +39,11 @@
 //   skipTraining: true  → 다음 주 훈련 없음 (쉼)
 //   matchBoost: 0.05    → 다음 경기 경기력 +5%
 //   transferListed: true → 비시즌 이적 제안이 늘어남
+//   ※ money는 "연봉 3,000만 원 선수" 기준 값이에요. 연봉이 더 높으면 그만큼 커져요 (EVENT_RULES.moneyBaseSalary)
+//   activity: "sponsor" → 오래 가는 계약·활동 시작 (아래 ACTIVITIES)
+//   cureOther: 0.4     → 나온 선수({player})의 나쁜 특성을 40% 확률로 없애 줌
+//   otherRisk: { trait, chance } → 나온 선수에게 나쁜 특성이 생길 확률 (사고를 못 막음)
+// followUp: { event, weeks: [최소, 최대], chance } → 몇 주 뒤 후속 연락 (여러 개면 배열)
 // risk: { trait, chance }  나쁜 특성이 생길 확률 (⚠️ 최대 0.05)
 // cure: { trait, chance }  나쁜 특성이 없어질 확률 (💚)
 // gain: { trait, chance }  좋은 특성을 얻을 확률
@@ -43,6 +55,22 @@ const EVENT_RULES = {
   readAfterWeeks: 4,    // 안 읽은 소식·연락은 이 주 뒤에 자동으로 "읽음" (알림 배지에서 빠짐)
   maxRisk: 0.05,        // 나쁜 특성 확률 상한 (데이터에 더 높게 적어도 이 값으로 잘림)
   keepMessages: 120,    // SNS에 남겨 둘 메시지 수
+  moneyBaseSalary: 30000000, // 이벤트의 money 값 기준 연봉. 내 연봉이 이보다 높으면 money를 그 비율만큼 키움 (1억 → 약 3.3배)
+};
+
+// ===== 오래 가는 계약·활동 (이벤트 선택지 activity로 시작, [상점] 화면에서 확인·그만두기) =====
+// - weekly: 매주 효과 (moneySalaryPct: 연봉의 n를 매주 받음)
+// - untilSeasonEnd: true → 시즌이 끝나면(52주차 다음) 자동 종료
+// - stoppable: true → 내가 언제든 그만둘 수 있음
+// - failIf: { popularityBelow } → 조건이 깨지면 끝나고 failEffects 적용
+// - matchBoostVs: 그 선수의 팀과 경기할 때 경기력 +n (rival)
+const ACTIVITIES = {
+  sponsor: { icon: "🤝", name: "스폰서 계약", desc: "시즌 끝까지 매주 연봉의 0.4% 수입 · 인기도 50 아래로 떨어지면 해지(평판 −5)",
+    weekly: { moneySalaryPct: 0.004 }, untilSeasonEnd: true, failIf: { popularityBelow: 50 }, failEffects: { reputation: -5 } },
+  stream: { icon: "🎥", name: "개인 방송", desc: "매주 인기도 +1, 체력 −2 · 언제든 그만둘 수 있음",
+    weekly: { popularity: 1, stamina: -2 }, stoppable: true },
+  rival: { icon: "🔥", name: "라이벌 선언", desc: "시즌 끝까지 {player}({pteam})의 팀과 경기할 때 경기력 +5%",
+    matchBoostVs: 0.05, untilSeasonEnd: true },
 };
 
 const EVENTS = [
@@ -177,7 +205,9 @@ const EVENTS = [
     title: "개인 방송 제안",
     text: "방송 플랫폼에서 개인 방송을 해 보지 않겠냐는 연락이 왔다.",
     choices: [
-      { label: "해 본다", effects: { popularity: 5, stamina: -8 }, risk: { trait: "scandal", chance: 0.02 } },
+      { label: "해 본다 (꾸준히)", effects: { popularity: 3, activity: "stream" }, risk: { trait: "scandal", chance: 0.02 },
+        followUp: [{ event: "stream_milestone", weeks: [8, 14], chance: 0.6 }, { event: "stream_accident", weeks: [5, 12], chance: 0.25 }] },
+      { label: "한 번만 해 본다", effects: { popularity: 5, stamina: -8 } },
       { label: "하지 않는다", effects: {} },
     ],
   },
@@ -193,8 +223,8 @@ const EVENTS = [
     text: "{name}에 대한 근거 없는 루머가 커뮤니티에 퍼지고 있다.",
     choices: [
       { label: "직접 해명한다", effects: { reputation: 2, condition: -3 } },
-      { label: "무시한다", effects: { reputation: -3 } },
-      { label: "법적 대응한다 (자금 −100만)", effects: { money: -1000000, reputation: 5 } },
+      { label: "무시한다", effects: { reputation: -3 }, followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } },
+      { label: "법적 대응한다", effects: { money: -1000000, reputation: 5 } },
     ],
   },
   {
@@ -279,7 +309,7 @@ const EVENTS = [
     title: "멘탈 상담 프로그램",
     text: "구단 심리 상담사가 멘탈 관리 프로그램을 권했다.",
     choices: [
-      { label: "참여한다 (자금 −200만)", effects: { money: -2000000 }, cure: { trait: "glass_mental", chance: 0.4 } },
+      { label: "참여한다", effects: { money: -2000000 }, cure: { trait: "glass_mental", chance: 0.4 } },
       { label: "괜찮다", effects: {} },
     ],
   },
@@ -333,7 +363,7 @@ const EVENTS = [
     title: "비시즌 개인 훈련 캠프",
     text: "시즌 초에 몸이 늦게 풀리는 문제를 잡아 주는 캠프가 있다.",
     choices: [
-      { label: "참가한다 (자금 −100만)", effects: { money: -1000000, stamina: -5 }, cure: { trait: "slow_starter", chance: 0.4 } },
+      { label: "참가한다", effects: { money: -1000000, stamina: -5 }, cure: { trait: "slow_starter", chance: 0.4 } },
       { label: "괜찮다", effects: {} },
     ],
   },
@@ -360,7 +390,7 @@ const EVENTS = [
     title: "수면 클리닉",
     text: "수면 패턴을 바로잡아 주는 클리닉을 소개받았다.",
     choices: [
-      { label: "다닌다 (자금 −50만)", effects: { money: -500000 }, cure: { trait: "night_owl", chance: 0.4 } },
+      { label: "다닌다", effects: { money: -500000 }, cure: { trait: "night_owl", chance: 0.4 } },
       { label: "괜찮다", effects: {} },
     ],
   },
@@ -369,6 +399,92 @@ const EVENTS = [
     title: "큰 무대를 이겨냈다",
     text: "결승 무대를 겪고 나니 긴장이 한결 덜하다.",
     effects: {}, cure: { trait: "stage_fright", chance: 0.5 },
+  },
+
+  // ===== G. 오래 가는 계약·활동 / 후속 연락 (2026-10-06) =====
+  {
+    id: "sponsor_offer", tab: "inbox", trigger: "random", need: { minPopularity: 50 }, cooldown: 26,
+    title: "개인 스폰서 제안",
+    text: "게이밍 기어 회사에서 {name}에게 시즌 스폰서 계약을 제안했다. \"인기만 유지해 주시면 됩니다.\"",
+    choices: [
+      { label: "계약한다", effects: { activity: "sponsor", popularity: 2 } },
+      { label: "거절한다", effects: { reputation: 1 } },
+    ],
+  },
+  {
+    id: "stream_milestone", tab: "news", trigger: "followUp",
+    title: "📺 방송 구독자 10만 돌파!",
+    text: "{name}의 개인 방송 구독자가 10만 명을 넘었다. 후원금도 꽤 들어왔다.",
+    effects: { popularity: 5, money: 2000000 },
+  },
+  {
+    id: "stream_accident", tab: "inbox", trigger: "followUp",
+    title: "방송 사고",
+    text: "방송 중 무심코 한 말이 커뮤니티에 퍼지고 있다.",
+    choices: [
+      { label: "바로 사과 방송을 한다", effects: { reputation: -2, condition: -5 } },
+      { label: "별일 아니라며 넘긴다", effects: { reputation: -6 }, risk: { trait: "scandal", chance: 0.05 } },
+    ],
+  },
+  {
+    id: "rumor_spread", tab: "inbox", trigger: "followUp",
+    title: "루머가 더 퍼졌다",
+    text: "무시했던 루머가 기사로까지 나왔다. 팬들이 해명을 기다리고 있다.",
+    choices: [
+      { label: "지금이라도 해명한다", effects: { reputation: 1, condition: -5 } },
+      { label: "법적 대응한다", effects: { money: -2000000, reputation: 4 } },
+      { label: "계속 무시한다", effects: { reputation: -5, popularity: -3 } },
+    ],
+  },
+
+  // ===== H. 다른 선수가 나오는 연락 (2026-10-06) =====
+  {
+    id: "rival_taunt", tab: "inbox", trigger: "random", who: "rival", need: { minWeek: 13 }, cooldown: 26,
+    title: "{player}의 도발",
+    text: "{pteam}의 {player} 선수가 인터뷰에서 말했다. \"{name} 선수랑 붙으면 라인전은 제가 이길 것 같네요.\"",
+    choices: [
+      { label: "맞받아친다 (라이벌 선언)", effects: { activity: "rival", popularity: 3 }, note: "시즌 끝까지 그 팀과 경기할 때 경기력 +5%" },
+      { label: "점잖게 넘긴다", effects: { reputation: 2 } },
+    ],
+  },
+  {
+    id: "duo_offer", tab: "inbox", trigger: "random", who: "otherPro",
+    title: "{player}의 솔랭 듀오 제안",
+    text: "{pteam}의 {player} 선수가 솔로 랭크 듀오를 하자고 연락해 왔다.",
+    choices: [
+      { label: "같이 한다", effects: { reaction: 1, popularity: 2, stamina: -5 } },
+      { label: "같이 하면서 메타 이야기도 나눈다", effects: { masteryMetaOne: 3, stamina: -8 } },
+      { label: "정중히 거절한다", effects: {} },
+    ],
+  },
+  {
+    id: "teammate_slump", tab: "inbox", trigger: "random", who: "teammateBad",
+    title: "{player} 선수의 고민",
+    text: "같은 팀 {player} 선수가 요즘 '{trait}' 때문에 힘들어한다. 팀 성적에도 영향이 있는 것 같다.",
+    choices: [
+      { label: "따로 시간을 내서 돕는다", effects: { cureOther: 0.4, stamina: -10, reputation: 3 } },
+      { label: "감독님께 이야기한다", effects: { cureOther: 0.2 } },
+      { label: "내 연습에 집중한다", effects: {} },
+    ],
+  },
+  {
+    id: "teammate_trouble", tab: "inbox", trigger: "random", who: "teammate", cooldown: 16,
+    title: "{player} 선수가 사고를 칠 것 같다",
+    text: "새벽에 술을 마신 {player} 선수가 방송을 켜서 다른 팀 험담을 하겠다고 한다.",
+    choices: [
+      { label: "말린다", effects: { reputation: 4, condition: -2 } },
+      { label: "같이 어울린다", effects: { condition: 5, otherRisk: { trait: "scandal", chance: 0.6 } }, risk: { trait: "scandal", chance: 0.04 } },
+      { label: "모른 척한다", effects: { otherRisk: { trait: "scandal", chance: 0.5 } } },
+    ],
+  },
+  {
+    id: "friend_trouble", tab: "inbox", trigger: "random", who: "otherPro", cooldown: 16,
+    title: "{player} 선수에게서 온 메시지",
+    text: "친분이 있는 {pteam}의 {player} 선수가 심판 판정을 비난하는 글을 올리려 한다며 의견을 물어 왔다.",
+    choices: [
+      { label: "올리지 말라고 설득한다", effects: { reputation: 3 } },
+      { label: "알아서 하라고 한다", effects: { otherRisk: { trait: "scandal", chance: 0.5 } } },
+    ],
   },
 ];
 
