@@ -222,9 +222,10 @@ const EVENTS = [
     title: "악성 루머",
     text: "{name}에 대한 근거 없는 루머가 커뮤니티에 퍼지고 있다.",
     choices: [
-      { label: "직접 해명한다", effects: { reputation: 2, condition: -3 } },
+      { label: "직접 해명한다", effects: { reputation: 2, condition: -3 }, followUp: { event: "rumor_apology", weeks: [2, 5], chance: 0.3 } },
       { label: "무시한다", effects: { reputation: -3 }, followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } },
-      { label: "법적 대응한다", effects: { money: -1000000, reputation: 5 } },
+      { label: "법적 대응한다", effects: { money: -1000000, reputation: 5 }, note: "몇 주 뒤 결과가 와요 (사과문·합의금)",
+        followUp: [{ event: "rumor_apology", weeks: [3, 6], chance: 0.6 }, { event: "rumor_settlement", weeks: [6, 10], chance: 0.5 }] },
     ],
   },
   {
@@ -432,9 +433,23 @@ const EVENTS = [
     text: "무시했던 루머가 기사로까지 나왔다. 팬들이 해명을 기다리고 있다.",
     choices: [
       { label: "지금이라도 해명한다", effects: { reputation: 1, condition: -5 } },
-      { label: "법적 대응한다", effects: { money: -2000000, reputation: 4 } },
+      { label: "법적 대응한다", effects: { money: -2000000, reputation: 4 }, note: "몇 주 뒤 결과가 와요 (사과문·합의금)",
+        followUp: [{ event: "rumor_apology", weeks: [3, 6], chance: 0.7 }, { event: "rumor_settlement", weeks: [6, 10], chance: 0.6 }] },
       { label: "계속 무시한다", effects: { reputation: -5, popularity: -3 } },
     ],
+  },
+
+  {
+    id: "rumor_apology", tab: "news", trigger: "followUp",
+    title: "📝 루머 유포자의 사과문",
+    text: "{name}에 대한 루머를 처음 퍼뜨린 사람이 커뮤니티에 사과문을 올렸다. \"사실이 아닌 이야기를 퍼뜨려 죄송합니다.\"",
+    effects: { reputation: 4, condition: 5 },
+  },
+  {
+    id: "rumor_settlement", tab: "news", trigger: "followUp",
+    title: "⚖️ 루머 소송 합의",
+    text: "악성 루머 소송이 마무리됐다. 유포자 측이 잘못을 인정하고 합의금을 냈다.",
+    effects: { money: 3000000, reputation: 2 },
   },
 
   // ===== H. 다른 선수가 나오는 연락 (2026-10-06) =====

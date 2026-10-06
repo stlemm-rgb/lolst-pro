@@ -454,6 +454,9 @@ const SOCIAL_FAN_NAMES = [
 
 const SOCIAL_RULES = {
   maxPerWeek: 4,        // 한 주에 올라오는 글 최대 개수
+  // 리그 우승·월드 우승 주: 우승(champion) 글을 이만큼 꼭 올림 (최대 개수와 따로). 컵 대회는 해당 없음
+  bigTitleWords: ["리그", "월드"],
+  bigTitlePosts: [2, 3],
   proAuthorRate: 0.5,   // 글쓴이가 다른 프로 선수일 확률 (나머지는 팬)
   // 내 선수 언급({name})이 얼마나 나오는지: 인기도가 낮으면 언급 없는 글 위주 (2026-10-06)
   //   언급 가능 비율 = minRate + (1 − minRate) × 인기도 ÷ fullAt  (fullAt 이상이면 100% = 글 목록 그대로)

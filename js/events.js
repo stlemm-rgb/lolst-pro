@@ -364,6 +364,22 @@ function postSocial() {
   cats.push("general");
 
   let posted = 0, mentions = 0;
+  // 리그 우승·월드 우승 주에는 우승 글을 2~3개 꼭 올림 (한 주 최대 개수와 따로)
+  if (w.champion && R.bigTitleWords && R.bigTitleWords.some(function (t) { return w.champion.indexOf(t) !== -1; })) {
+    const count = randInt(R.bigTitlePosts[0], R.bigTitlePosts[1]);
+    const used = [];
+    for (let i = 0; i < count; i++) {
+      const who = author("champion");
+      const list = listOf(who.posts, "champion").filter(function (t) { return used.indexOf(t) === -1; });
+      if (!list.length) break;
+      const raw = pick(list);
+      used.push(raw);
+      const mention = raw.indexOf("{name}") !== -1;
+      postMessage("social", who.title, fillText(raw, Object.assign({}, ctx, { proteam: who.proteam })), { read: !mention, mention: mention, proId: who.proId });
+      if (mention) mentions++;
+    }
+    cats.splice(cats.indexOf("champion"), 1); // 아래에서 또 올리지 않게
+  }
   cats.forEach(function (cat) {
     if (posted >= R.maxPerWeek) return;
     const always = cat === resultCat; // 경기가 있으면 결과 글은 항상 1개
