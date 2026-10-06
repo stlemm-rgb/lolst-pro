@@ -496,13 +496,34 @@ function replaceState(newState, menu, message) {
   renderAll();
 }
 
-// ===== 좌측 메뉴 =====
+// ===== 좌측 메뉴 (data/menus.js) =====
+// 합친 메뉴(tabs)마다 마지막에 본 탭 (저장 안 함)
+const lastMenuTab = {};
+
+// 메뉴 칸(item)이 지금 화면을 포함하나? (합친 메뉴는 탭 중 하나면 해당)
+function menuItemActive(item) {
+  if (item.id === state.currentMenu) return true;
+  return !!(item.tabs && item.tabs.some(function (t) { return t.id === state.currentMenu; }));
+}
+
+// 지금 화면이 들어 있는 합친 메뉴 (없으면 null)
+function parentMenuOf(pageId) {
+  let found = null;
+  MENU_GROUPS.forEach(function (g) {
+    g.items.forEach(function (item) {
+      if (item.tabs && item.tabs.some(function (t) { return t.id === pageId; })) found = item;
+    });
+  });
+  return found;
+}
+
 function renderMenu() {
   const menu = document.getElementById("menu");
   menu.innerHTML = "";
-  MENUS.forEach(function (item) {
+  const addItem = function (item, extraClass) {
     const li = document.createElement("li");
     li.textContent = item.name;
+    if (extraClass) li.className = extraClass;
     // SNS: 안 읽었거나 답하지 않은 받은 연락 수 + 나를 언급한 안 읽은 선수 SNS 글
     const badge = item.id === "sns" ? unreadCount("inbox") + unreadCount("social") : 0;
     if (badge) {
@@ -511,17 +532,39 @@ function renderMenu() {
       b.textContent = badge;
       li.appendChild(b);
     }
-    if (item.id === state.currentMenu) li.classList.add("active");
+    if (menuItemActive(item)) li.classList.add("active");
     li.onclick = function () { selectMenu(item.id); };
     menu.appendChild(li);
+  };
+  MENU_GROUPS.forEach(function (g) {
+    const head = document.createElement("li");
+    head.className = "menu-group";
+    head.textContent = g.title;
+    menu.appendChild(head);
+    g.items.forEach(function (item) { addItem(item); });
   });
+  MENU_BOTTOM.forEach(function (item, i) { addItem(item, i === 0 ? "menu-bottom" : ""); });
 }
 
+// id: 화면 id 또는 합친 메뉴 id (합친 메뉴면 마지막에 본 탭, 처음이면 첫 탭)
 function selectMenu(id) {
+  MENU_GROUPS.forEach(function (g) {
+    g.items.forEach(function (item) {
+      if (item.id === id && item.tabs) id = lastMenuTab[item.id] || item.tabs[0].id;
+    });
+  });
   state.currentMenu = id;
   state.notice = "";
   renderMenu();
   renderPage();
+}
+
+// 합친 메뉴의 화면 위 탭 버튼 + 제목
+function subTabsHTML(parent) {
+  return "<h1>" + parent.name + "</h1>" +
+    '<div class="subtabs">' + parent.tabs.map(function (t) {
+      return '<button data-subtab="' + t.id + '"' + (t.id === state.currentMenu ? ' class="primary"' : "") + ">" + t.name + "</button>";
+    }).join("") + "</div>";
 }
 
 // ===== 상단바 =====
@@ -563,10 +606,19 @@ function renderPage() {
     const menu = MENUS.find(function (m) { return m.id === state.currentMenu; });
     html = "<h1>" + menu.name + "</h1>" + '<div class="card placeholder">준비 중입니다.</div>';
   }
+  // 합친 메뉴(일정·이적 시장·기록실): 화면 제목 대신 메뉴 제목 + 탭 버튼
+  const parent = parentMenuOf(state.currentMenu);
+  if (parent) {
+    lastMenuTab[parent.id] = state.currentMenu;
+    html = subTabsHTML(parent) + html.replace(/^\s*<h1>[\s\S]*?<\/h1>/, "");
+  }
   if (state.notice) {
     html = '<div class="notice">' + state.notice + "</div>" + html;
   }
   page.innerHTML = html;
+  page.querySelectorAll("[data-subtab]").forEach(function (btn) {
+    btn.onclick = function () { selectMenu(btn.getAttribute("data-subtab")); };
+  });
 
   // 훈련 선택 버튼 연결
   page.querySelectorAll("[data-plan]").forEach(function (btn) {

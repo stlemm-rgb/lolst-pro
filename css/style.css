@@ -42,6 +42,8 @@ body {
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .logo {
@@ -52,10 +54,21 @@ body {
   word-break: keep-all; /* 메뉴가 좁을 때 단어 중간에서 줄이 바뀌지 않게 */
 }
 
-#menu { list-style: none; margin: 0; padding: 0; }
+#menu { list-style: none; margin: 0; padding: 0 0 8px; flex: 1; display: flex; flex-direction: column; }
+/* 메뉴 묶음 제목 (누를 수 없음) */
+#menu li.menu-group {
+  cursor: default; font-size: 11px; font-weight: bold; color: #5d6679; letter-spacing: 0.05em;
+  padding: 14px 16px 4px; border-left: none;
+}
+#menu li.menu-group:first-child { padding-top: 4px; }
+#menu li.menu-group:hover { background: none; }
+/* 설정은 맨 아래 */
+#menu li.menu-bottom { margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.06); }
+/* 합친 메뉴의 화면 위 탭 */
+.subtabs { display: flex; gap: 8px; flex-wrap: wrap; margin: -6px 0 16px; }
 
 #menu li {
-  padding: 11px 16px;
+  padding: 9px 16px;
   cursor: pointer;
   white-space: nowrap;
   border-left: 4px solid transparent;
