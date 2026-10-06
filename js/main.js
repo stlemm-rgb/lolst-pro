@@ -121,75 +121,42 @@ function changesText(changes) {
 const pages = {};
 
 pages.dashboard = function () {
-  const p = state.player;
-  const pos = findPosition(p.position);
-  const arch = findArchetype(p.archetype);
-
-  const traitsHTML = p.traits.map(traitChipHTML).join("") || '<span class="muted">없음</span>';
-
-  // 챔피언: 내 포지션 메타 + 숙련도 상위 5
-  const metaMine = state.meta.champs[p.position].map(function (name) {
-    return '<span class="chip meta tier-' + metaTier(name) + '">' + metaTier(name) + " " + name + " " + (state.mastery[name] || 1) + "</span>";
-  }).join("");
-  const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
-  const topHTML = top5.map(function (name) { return masteryRowHTML(name); }).join("");
-
-  let statsHTML = "";
-  STATS.forEach(function (s) {
-    statsHTML += barHTML(s.name, state.stats[s.id], s.desc + " (상한선 " + userStatCap(s.id) + ") · " + (s.roles || []).join(" · "), isBonusStat(s.id), userStatCap(s.id)); // 값/상한선
-  });
-
-  const plan = state.plan ? findTraining(state.plan).name : "아직 안 정함";
-
-  let logHTML = '<p class="placeholder">아직 기록이 없습니다. 훈련을 고르고 [다음 주로 진행]을 눌러 보세요.</p>';
-  if (state.log.length > 0) {
-    logHTML = state.log.map(function (entry) {
-      return (
-        '<div class="log-entry">' +
-          '<div class="log-head">' + escapeHTML(entry.when) + " · " + escapeHTML(entry.training) + "</div>" +
-          "<div>" + escapeHTML(entry.message) + "</div>" +
-          '<div class="log-changes">' + changesText(entry.changes) + "</div>" +
-        "</div>"
-      );
-    }).join("");
-  }
-
+  // 대시보드 (2026-10-06 리뉴얼)
+  // 맨 위 요약 4칸 → 왼쪽(이번 주 할 일: 지난주 결과·이번 주·최근 경기) / 오른쪽(내 선수: 프로필·챔피언·솔로 랭크) → 맨 아래 내 스탯
+  // 조각들은 js/dashboard.js
   return (
     "<h1>대시보드</h1>" +
-    weekReportHTML() +
-    upcomingHTML() +
-    summaryRowHTML() +
-    leagueLadderHTML() +
-    '<div class="grid">' +
-      '<div class="card"><h2>프로필</h2>' +
-        '<p class="profile-name">' + escapeHTML(p.name) + "</p>" +
-        '<p class="muted">' + p.age + "세 · " + pos.name + " · " + arch.name + "</p>" +
-        '<h2 class="sub">특성</h2><div class="chips">' + traitsHTML + "</div>" +
+    dashStripHTML() +
+    '<div class="dash">' +
+      '<div class="dash-main">' +
+        weekReportHTML() +
+        thisWeekHTML() +
+        recentMatchesHTML() +
       "</div>" +
-      '<div class="card"><h2>상태</h2>' +
-        barHTML("체력", state.stamina, "훈련·경기로 줄고 휴식으로 회복", false, state.staminaMax) +
-        barHTML("컨디션", state.condition, "이번 주의 몸과 마음 상태") +
-        barHTML("인기도", state.popularity, "팬과 업계의 관심") +
-        reputationBarHTML() +
-        '<h2 class="sub">이번 주 할 일</h2><p>훈련: <b>' + plan + "</b></p>" +
+      '<div class="dash-side">' +
+        profileCardHTML() +
+        championCardHTML() +
+        leagueLadderHTML() +
       "</div>" +
     "</div>" +
-    '<div class="card"><h2>내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점</span></h2>' +
-      '<div class="stat-columns">' + statsHTML + "</div>" +
-      statGuideHTML(p.position) +
-      '<h2 class="sub">유형 스탯 <span class="muted small">높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)</span></h2>' +
-      '<div class="stat-columns type-stats">' + typeScoresHTML() + "</div>" +
-    "</div>" +
-    leagueDashboardHTML() +
-    '<div class="card"><h2>챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
-      '<p class="muted small">이번 패치 ' + pos.name + " 메타 챔피언 (숫자는 내 숙련도)</p>" +
-      '<div class="chips">' + metaMine + "</div>" +
-      '<h2 class="sub">내 숙련도 상위 5</h2>' + topHTML +
-      '<p class="muted small">전체 목록은 [나의 커리어]에서 볼 수 있어요.</p>' +
-    "</div>" +
-    '<div class="card"><h2>최근 기록</h2>' + logHTML + "</div>"
+    statsCardHTML()
   );
 };
+
+// 최근 기록 (훈련·경기·소식 30개) — [나의 커리어] 맨 아래
+function recentLogHTML() {
+  if (!state.log.length) return "";
+  const items = state.log.map(function (entry) {
+    return (
+      '<div class="log-entry">' +
+        '<div class="log-head">' + escapeHTML(entry.when) + " · " + escapeHTML(entry.training) + "</div>" +
+        "<div>" + escapeHTML(entry.message) + "</div>" +
+        '<div class="log-changes">' + changesText(entry.changes) + "</div>" +
+      "</div>"
+    );
+  }).join("");
+  return '<details class="card log-card"><summary><h2>최근 기록 <span class="muted small">주마다 훈련·경기 기록 ' + state.log.length + "개 · 눌러서 펼치기</span></h2></summary>" + items + "</details>";
+}
 
 // 유형 스탯 4개 막대
 function typeScoresHTML() {
@@ -310,7 +277,8 @@ pages.career = function () {
       '<div class="buttons">' + tabs + "</div>" +
       '<div class="stat-columns mastery-list">' + rows + "</div>" +
     "</div>" +
-    retireCardHTML()
+    retireCardHTML() +
+    recentLogHTML()
   );
 };
 
@@ -629,6 +597,11 @@ function renderPage() {
   if (practice) practice.onchange = function () { state.practiceChamp = this.value; };
   const focusSel = document.getElementById("focus-champ");
   if (focusSel) focusSel.onchange = function () { state.focusChamp = this.value; };
+
+  // 다른 메뉴로 가는 버튼 (예: 대시보드 [훈련 바꾸기])
+  page.querySelectorAll("[data-go]").forEach(function (btn) {
+    btn.onclick = function () { selectMenu(btn.getAttribute("data-go")); };
+  });
 
   // 대시보드: 리그 솔로 랭크 [전체 보기]/[접기]
   const ladderAll = page.querySelector("[data-ladderall]");

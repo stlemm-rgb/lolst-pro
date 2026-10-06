@@ -34,32 +34,6 @@ function matchRowHTML(m, showWeek) {
   );
 }
 
-// ----- 대시보드 카드 -----
-function leagueDashboardHTML() {
-  const mine = myTeam();
-  const next = nextUserMatch();
-  let nextHTML = '<p class="muted">잡힌 경기가 없어요. (' + escapeHTML(scheduleOfWeek(state.week).name) + ")</p>";
-  if (next) {
-    const opp = next.a === mine.id ? next.b : next.a;
-    nextHTML =
-      "<p><b>" + next.week + "주차</b> · " + escapeHTML(next.label) + " (" + next.bo + "판 " + Math.ceil(next.bo / 2) + "선승)</p>" +
-      '<p class="big-vs">' + escapeHTML(mine.name) + ' <span class="muted">vs</span> ' + escapeHTML(teamName(opp)) + "</p>" +
-      '<p class="muted small">팀 전력 ' + teamStrength(mine.id).toFixed(1) + " vs " + strengthOf(opp).toFixed(1) +
-        (next.week === state.week ? " · <b>이번 주 경기!</b>" : "") + "</p>";
-  }
-  const done = userMatches().filter(function (m) { return m.winner; }).slice(-5).reverse();
-  const recent = done.length
-    ? '<table class="matches">' + done.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
-    : '<p class="muted">아직 경기를 하지 않았어요.</p>';
-  return (
-    '<div class="card"><h2>경기 <span class="muted small">' + escapeHTML(mine.name) + " (" + tierName(mine.tier) + ")</span></h2>" +
-      contractSummaryHTML() +
-      '<h2 class="sub">다음 경기</h2>' + nextHTML + (state.benched && next ? '<p class="down small">후보라서 이 경기에는 나가지 않아요.</p>' : "") +
-      '<h2 class="sub">최근 결과</h2>' + recent +
-    "</div>"
-  );
-}
-
 // ----- 소속팀 -----
 pages.team = function () {
   const team = myTeam();

@@ -509,3 +509,27 @@ table.box td, table.box th { white-space: nowrap; font-size: 13px; }
 .stat-guide { margin-top: 12px; }
 .stat-guide summary { cursor: pointer; color: var(--accent); font-size: 14px; }
 .stat-guide table td { vertical-align: top; }
+
+/* ===== 대시보드 (2026-10-06 리뉴얼) ===== */
+/* 맨 위 요약 4칸 */
+.dash-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 16px; }
+@media (max-width: 1000px) { .dash-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.dash-strip .card { margin-bottom: 0; }
+/* 왼쪽(이번 주) 넓게 · 오른쪽(내 선수) 좁게. 화면이 좁으면 한 줄로 */
+.dash { display: grid; grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); gap: 16px; align-items: start; }
+.dash-main, .dash-side { min-width: 0; }
+@media (max-width: 1100px) { .dash { grid-template-columns: 1fr; } }
+/* 요약 칸의 작은 막대 */
+.mini-bar { display: grid; grid-template-columns: 48px 1fr 52px; align-items: center; gap: 8px; font-size: 13px; margin: 5px 0; }
+.mini-bar .bar { height: 7px; position: relative; display: block; }
+.mini-bar .bar-fill { display: block; height: 100%; }
+.mini-label { color: var(--muted); }
+.mini-value { text-align: right; font-weight: bold; }
+.bar-fill.warn { background: var(--gold); }
+/* 접는 칸 */
+details.other-meta summary { cursor: pointer; margin: 4px 0; }
+details.log-card summary { cursor: pointer; list-style: none; }
+details.log-card summary h2 { display: inline; }
+details.log-card[open] summary { margin-bottom: 12px; }
+/* 오른쪽 칸의 숙련도 줄: 이름 칸을 넓게, 막대는 짧게 */
+.dash-side .stat.mastery-row { grid-template-columns: minmax(0, 1fr) 70px 30px; }

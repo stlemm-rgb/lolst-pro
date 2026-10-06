@@ -164,7 +164,9 @@ function weekReportHTML() {
   return '<div class="card report"><h2>📅 지난주 결과 <span class="muted small">' + escapeHTML(r.when) + "</span></h2>" + html + "</div>";
 }
 
-// ----- 커리어 단계 · 종합 능력 · 솔로 랭크 -----
+// ===== 대시보드 조각들 (main.js의 pages.dashboard에서 조립) =====
+
+// 리그 같은 포지션 안에서 내 종합 능력 순위
 function positionRank() {
   const pos = state.player.position;
   const ids = [USER_ID].concat(Object.keys(state.league.players).filter(function (id) {
@@ -175,40 +177,119 @@ function positionRank() {
   return { rank: ids.indexOf(USER_ID) + 1, total: ids.length };
 }
 
-function summaryRowHTML() {
+// 작은 막대 (요약 칸의 체력·컨디션 등)
+function miniBarHTML(label, value, max, cls) {
+  const pct = Math.max(0, Math.min(100, value / (max || 100) * 100));
+  return '<div class="mini-bar"><span class="mini-label">' + label + '</span>' +
+    '<span class="bar"><span class="bar-fill ' + (cls || "") + '" style="width:' + pct + '%"></span></span>' +
+    '<span class="mini-value">' + value + (max && max !== 100 ? '<span class="muted">/' + max + "</span>" : "") + "</span></div>";
+}
+
+// ----- 맨 위 요약 4칸: 소속 · 종합 능력 · 솔로 랭크 · 상태 -----
+function dashStripHTML() {
   const team = myTeam();
   const rankList = team.tier === 1 ? tier1FinalOrder() : standings(["tier2", "tier2b"], tier2Ids()).map(function (x) { return x.id; });
   const leagueRank = rankList.indexOf(team.id) + 1;
   const role = state.benched ? '<span class="down">2군 (후보)</span>' : '<span class="up">1군 (주전)</span>';
+  const c = state.contract;
   const score = playerScore(USER_ID);
   const pr = positionRank();
   const sr = state.soloRank || { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints };
   const board = leagueLadder();
   const myLadderRank = board.findIndex(function (x) { return x.id === USER_ID; }) + 1;
+  const staminaCls = state.stamina < 20 ? "neg" : state.stamina < 30 ? "warn" : "";
+  const v = state.reputation;
 
   return (
-    '<div class="summary-row">' +
-      '<div class="card sum"><div class="sum-label">커리어 단계</div>' +
+    '<div class="dash-strip">' +
+      '<div class="card sum"><div class="sum-label">소속</div>' +
         '<div class="sum-main">' + escapeHTML(team.name) + "</div>" +
-        '<div class="sum-sub">' + tierName(team.tier) + " 리그 · " + role + " · 팀 순위 " + leagueRank + "위</div>" +
-        '<div class="sum-sub muted">' + state.player.age + "세 · " + findPosition(state.player.position).name + " · 연봉 " +
-          (state.contract ? moneyText(state.contract.salary) : "-") + "</div>" +
+        '<div class="sum-sub">' + tierName(team.tier) + " 리그 · " + role + " · 팀 순위 <b>" + leagueRank + "위</b></div>" +
+        '<div class="sum-sub muted">' + (c ? "연봉 " + moneyText(c.salary) + " · 계약 " + c.endYear + "년까지" + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : "계약 없음") + "</div>" +
       "</div>" +
       '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="스탯 12개 평균 (포지션 가산점 스탯은 1.5배). 경기력의 바탕이 돼요.">종합 능력</div>' +
         '<div class="sum-main big">' + score.toFixed(1) + "</div>" +
         '<div class="sum-sub">리그 ' + findPosition(state.player.position).name + " " + pr.total + "명 중 <b>" + pr.rank + "위</b></div>" +
       "</div>" +
-      '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="훈련할 때마다 랭크 게임을 하고, 승패에 따라 점수가 오르내려요. 솔로 랭크 훈련이 가장 많이 해요.">솔로 랭크</div>' +
+      '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="훈련할 때마다 랭크 게임을 하고, 승패에 따라 점수가 오르내려요. 솔로 랭크 훈련이 가장 많이 해요. 패치마다 초기화.">솔로 랭크</div>' +
         '<div class="sum-main">' + ladderTier(sr.points) + ' <span class="sum-points">' + sr.points.toLocaleString() + "점</span></div>" +
-        '<div class="sum-sub">리그 솔로 랭크 ' + board.length + "명 중 <b>" + myLadderRank + "위</b></div>" +
-        '<div class="sum-sub">이번 패치 최고 ' + (sr.patchPeak || sr.points).toLocaleString() + "점 · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
-        '<div class="sum-sub muted">역대 최고 ' + sr.peak.toLocaleString() + "점 (" + ladderTier(sr.peak) + ") · 패치마다 초기화</div>" +
+        '<div class="sum-sub">리그 ' + board.length + "명 중 <b>" + myLadderRank + "위</b> · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
+        '<div class="sum-sub muted">이번 패치 최고 ' + (sr.patchPeak || sr.points).toLocaleString() + " · 역대 최고 " + sr.peak.toLocaleString() + "</div>" +
+      "</div>" +
+      '<div class="card sum"><div class="sum-label">상태</div>' +
+        miniBarHTML("체력", state.stamina, state.staminaMax, staminaCls) +
+        miniBarHTML("컨디션", state.condition) +
+        miniBarHTML("인기도", state.popularity) +
+        '<div class="mini-bar"><span class="mini-label tip" tabindex="0" data-tip="-100 ~ +100. 좋은 이미지인지 나쁜 이미지인지. 구단 제안·이적에 영향">평판</span>' +
+          '<span class="bar rep-bar"><span class="rep-mid"></span><span class="bar-fill ' + (v < 0 ? "neg" : "pos") + '" style="margin-left:' + (v < 0 ? 50 + v / 2 : 50) + "%;width:" + Math.abs(v) / 2 + '%"></span></span>' +
+          '<span class="mini-value ' + (v < 0 ? "down" : v > 0 ? "up" : "") + '">' + (v > 0 ? "+" : "") + v + "</span></div>" +
       "</div>" +
     "</div>"
   );
 }
 
-// ----- 대시보드: 리그 솔로 랭크 순위표 (TOP 10 + 내 순위, [전체 보기]) -----
+// ----- 오른쪽: 프로필 (이름·나이·포지션·유형·특성) -----
+function profileCardHTML() {
+  const p = state.player;
+  const traits = p.traits.map(traitChipHTML).join("") || '<span class="muted">없음</span>';
+  return (
+    '<div class="card"><h2>👤 ' + escapeHTML(p.name) + ' <span class="muted small">' + p.age + "세 · " + findPosition(p.position).name + " · " + findArchetype(p.archetype).name + "</span></h2>" +
+      '<div class="chips">' + traits + "</div>" +
+    "</div>"
+  );
+}
+
+// ----- 오른쪽: 챔피언 (이번 패치 메타 + 내 숙련도 상위 5) -----
+function championCardHTML() {
+  const myPos = state.player.position;
+  const myMeta = state.meta.champs[myPos].slice().sort(function (a, b) { return (metaTier(b) === "S") - (metaTier(a) === "S"); }).map(function (name) {
+    const v = state.mastery[name] || 1;
+    const t = metaTier(name);
+    return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + t + "</span> " + name + " <b>" + v + "</b>" + champComps(name).map(function (id) { return " " + findComp(id).icon; }).join("") + "</span>";
+  }).join("");
+  const others = POSITION_IDS.filter(function (p) { return p !== myPos; }).map(function (p) {
+    const sName = (state.meta.s && state.meta.s[p]) || state.meta.champs[p][0];
+    return "<div>" + findPosition(p).name + ": " + state.meta.champs[p].map(function (n) { return n === sName ? n + "(S)" : n; }).join(", ") + "</div>";
+  }).join("");
+  const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
+  return (
+    '<div class="card"><h2>⚔️ 챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
+      '<p class="muted small">' + findPosition(myPos).name + " 메타 챔피언 · 숫자 = 내 숙련도</p>" +
+      '<div class="chips">' + myMeta + "</div>" +
+      '<p class="muted small">S급: 픽 우선 +' + MATCH.metaPickBonus.S + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.S * 100) + "% · A급: 픽 우선 +" + MATCH.metaPickBonus.A + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.A * 100) + "%</p>" +
+      '<details class="other-meta"><summary class="muted small">다른 포지션 메타 보기</summary><div class="muted small">' + others + "</div></details>" +
+      '<h2 class="sub">내 숙련도 상위 5</h2>' + top5.map(function (n) { return masteryRowHTML(n); }).join("") +
+      '<p class="muted small">전체 목록은 [나의 커리어]에서 볼 수 있어요.</p>' +
+    "</div>"
+  );
+}
+
+// ----- 맨 아래: 내 스탯 (12개 + 유형 스탯 + 스탯 설명) -----
+function statsCardHTML() {
+  let statsHTML = "";
+  STATS.forEach(function (s) {
+    statsHTML += barHTML(s.name, state.stats[s.id], s.desc + " (상한선 " + userStatCap(s.id) + ") · " + (s.roles || []).join(" · "), isBonusStat(s.id), userStatCap(s.id)); // 값/상한선
+  });
+  return (
+    '<div class="card"><h2>📊 내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점 · 숫자/상한선</span></h2>' +
+      '<div class="stat-columns">' + statsHTML + "</div>" +
+      statGuideHTML(state.player.position) +
+      '<h2 class="sub">유형 스탯 <span class="muted small">높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)</span></h2>' +
+      '<div class="stat-columns type-stats">' + typeScoresHTML() + "</div>" +
+    "</div>"
+  );
+}
+
+// ----- 왼쪽: 최근 경기 5개 -----
+function recentMatchesHTML() {
+  const done = userMatches().filter(function (m) { return m.winner; }).slice(-5).reverse();
+  const body = done.length
+    ? '<table class="matches">' + done.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
+    : '<p class="muted">아직 경기를 하지 않았어요.</p>';
+  return '<div class="card"><h2>🗂️ 최근 경기 <span class="muted small">' + escapeHTML(myTeam().name) + " · 전체 기록은 [경기 결과]</span></h2>" + body + "</div>";
+}
+
+// ----- 오른쪽: 리그 솔로 랭크 순위표 (TOP 10 + 내 순위, [전체 보기]) -----
 let ladderShowAll = false;
 
 function leagueLadderHTML() {
@@ -225,22 +306,20 @@ function leagueLadderHTML() {
   }
   let rows = "", prev = -1;
   show.forEach(function (i) {
-    if (prev !== -1 && i > prev + 1) rows += '<tr class="gap"><td colspan="6">···</td></tr>';
+    if (prev !== -1 && i > prev + 1) rows += '<tr class="gap"><td colspan="4">···</td></tr>';
     const x = board[i];
     const me = x.id === USER_ID;
     const team = me ? myTeam() : findTeam(findPlayer(x.id).teamId);
-    rows += "<tr" + (me ? ' class="me"' : "") + '><td class="r">' + (i + 1) + "</td>" +
-      "<td>" + (me ? "▶ <b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) + "</td>" +
-      '<td class="muted">' + escapeHTML(team ? team.short : "-") + "</td>" +
-      "<td>" + findPosition(playerPos(x.id)).name + "</td>" +
-      "<td>" + ladderTier(x.points) + "</td>" +
-      '<td class="r">' + x.points.toLocaleString() + "점</td></tr>";
+    rows += "<tr" + (me ? ' class="me"' : "") + ' title="' + ladderTier(x.points) + '"><td class="r">' + (i + 1) + "</td>" +
+      "<td>" + (me ? "<b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) + ' <span class="muted small">' + findPosition(playerPos(x.id)).name + "</span></td>" +
+      '<td class="muted small">' + escapeHTML(team ? team.short : "-") + "</td>" +
+      '<td class="r">' + x.points.toLocaleString() + "</td></tr>";
     prev = i;
   });
   return (
-    '<div class="card"><h2>🏆 리그 솔로 랭크 <span class="muted small">국내 1부·2부 선수 ' + board.length + "명 · 패치마다 초기화</span></h2>" +
-      '<table class="mini ladder-board"><tr><th class="r">순위</th><th>선수</th><th>팀</th><th>포지션</th><th>티어</th><th class="r">점수</th></tr>' + rows + "</table>" +
-      '<div class="buttons"><button data-ladderall>' + (ladderShowAll ? "접기" : "전체 보기") + "</button></div>" +
+    '<div class="card"><h2>🏆 리그 솔로 랭크 <span class="muted small">' + board.length + "명 · 패치마다 초기화</span></h2>" +
+      '<table class="mini ladder-board"><tr><th class="r">#</th><th>선수</th><th>팀</th><th class="r">점수</th></tr>' + rows + "</table>" +
+      '<div class="buttons"><button class="small-btn" data-ladderall>' + (ladderShowAll ? "접기" : "전체 보기") + "</button></div>" +
     "</div>"
   );
 }
@@ -260,8 +339,8 @@ function resetLadder() {
   return before;
 }
 
-// ----- 다음 진행 주: 경기와 메타 챔피언 -----
-function upcomingHTML() {
+// ----- 왼쪽: 이번 주 (훈련 · 경기 · 조합 전략 · 퀘스트) -----
+function thisWeekHTML() {
   const mine = myTeam();
   const week = state.week;
   const matches = state.league.season.matches.filter(function (m) {
@@ -271,37 +350,24 @@ function upcomingHTML() {
   if (matches.length) {
     matchHTML = matches.map(function (m) {
       const opp = m.a === mine.id ? m.b : m.a;
-      return '<div class="rep-row"><span class="rep-tag train">경기</span>' + escapeHTML(m.label) + " · vs <b>" + escapeHTML(teamName(opp)) + "</b>" +
-        ' <span class="muted small">(' + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승 · 상대 전력 " + strengthOf(opp).toFixed(1) + " / 우리 " + teamStrength(mine.id).toFixed(1) + ")</span>" +
+      return '<div class="rep-row"><span class="rep-tag win">경기</span>' + escapeHTML(m.label) + " · vs <b>" + escapeHTML(teamName(opp)) + "</b>" +
+        ' <span class="muted small">(' + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승 · 전력 우리 " + teamStrength(mine.id).toFixed(1) + " / 상대 " + strengthOf(opp).toFixed(1) + ")</span>" +
         (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : "") + "</div>";
     }).join("");
   } else {
     const later = nextUserMatch();
     const ko = ["cup_po", "playin", "playoffs", "promotion", "worlds"].some(function (id) { return scheduleOfWeek(week).id.indexOf(id) === 0; });
-    matchHTML = '<div class="rep-row muted">이번 주는 잡힌 경기가 없어요' +
+    matchHTML = '<div class="rep-row muted"><span class="rep-tag">경기</span>이번 주는 잡힌 경기가 없어요' +
       (ko ? " (토너먼트 대진은 경기 주에 정해져요)" : "") +
       (later ? ". 다음 경기: " + later.week + "주차 " + escapeHTML(later.label) + " vs " + escapeHTML(teamName(later.a === mine.id ? later.b : later.a)) : "") + ".</div>";
   }
-
-  // 메타 챔피언: 내 포지션은 숙련도와 함께, 다른 포지션은 이름만
-  const myPos = state.player.position;
-  const myMeta = state.meta.champs[myPos].slice().sort(function (a, b) { return (metaTier(b) === "S") - (metaTier(a) === "S"); }).map(function (name) {
-    const v = state.mastery[name] || 1;
-    const t = metaTier(name);
-    return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + t + "</span> " + name + " <b>" + v + "</b>" + champComps(name).map(function (id) { return " " + findComp(id).icon; }).join("") + "</span>";
-  }).join("");
-  const others = POSITION_IDS.filter(function (p) { return p !== myPos; }).map(function (p) {
-    const sName = (state.meta.s && state.meta.s[p]) || state.meta.champs[p][0];
-    return '<div class="muted small">' + findPosition(p).name + ": " + state.meta.champs[p].map(function (n) { return n === sName ? n + "(S)" : n; }).join(", ") + "</div>";
-  }).join("");
+  const plan = state.plan ? findTraining(state.plan).name : '<span class="down">아직 안 정함</span>';
+  const trainHTML = '<div class="rep-row"><span class="rep-tag train">훈련</span><b>' + plan + '</b> <button class="small-btn" data-go="training">훈련 바꾸기</button></div>';
 
   return (
-    '<div class="card upcoming"><h2>▶ 다음 진행 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + "</span></h2>" +
+    '<div class="card upcoming"><h2>▶ 이번 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + "</span></h2>" +
+      trainHTML +
       matchHTML +
-      '<h2 class="sub">메타 챔피언 <span class="muted small">' + escapeHTML(state.meta.label) + " · 숫자 = 내 숙련도</span></h2>" +
-      '<div class="chips">' + myMeta + "</div>" +
-      '<div class="other-meta">' + others + "</div>" +
-      '<p class="muted small">S급: 픽 우선 +' + MATCH.metaPickBonus.S + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.S * 100) + "% · A급: 픽 우선 +" + MATCH.metaPickBonus.A + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.A * 100) + "%</p>" +
       compPlanHTML() + // 조합 전략 (js/comps.js)
       questsHTML(true) +
     "</div>"
