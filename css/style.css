@@ -609,3 +609,5 @@ details.log-card[open] summary { margin-bottom: 12px; }
 .rep-row.advice button { margin-left: auto; flex: none; }
 ul.howto { margin: 0; padding-left: 18px; }
 ul.howto li { margin: 4px 0; font-size: 14px; }
+.salary-breakdown { white-space: pre-line; margin-top: 4px; }
+.msg-text { white-space: pre-line; }

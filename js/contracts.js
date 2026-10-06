@@ -11,8 +11,69 @@ function salaryFor(score, tier, popularity) {
 }
 
 function userSalaryFor(tier) {
-  const base = salaryFor(playerScore(USER_ID), tier, state.popularity);
-  return Math.round(base * (1 + traitEffectSum("salaryBonus")) / 1000000) * 1000000; // 협상가
+  return salaryBreakdown(tier).total;
+}
+
+// ----- 내 연봉 계산 내역 (제안 글에 보여 줌) -----
+// 돌려주는 값: { base, skill, pop, score, popularity, reputation, repPct, premium: { pct, parts: [{label, pct}] }, traitPct, total }
+function salaryBreakdown(tier) {
+  const score = playerScore(USER_ID);
+  const base = CONTRACT.baseSalary[tier];
+  const skill = (score - CONTRACT.scorePivot) * CONTRACT.perScorePoint;
+  const pop = state.popularity * CONTRACT.perPopularity;
+  const repPct = state.reputation / 100 * CONTRACT.reputationPct;
+  const premium = seasonPremium();
+  const traitPct = traitEffectSum("salaryBonus"); // 협상가
+  const raw = Math.max(CONTRACT.minSalary, base + skill + pop) * (1 + repPct + premium.pct + traitPct);
+  const total = Math.max(CONTRACT.minSalary, Math.round(raw / 1000000) * 1000000);
+  return { base: base, skill: skill, pop: pop, score: score, popularity: state.popularity, reputation: state.reputation,
+    repPct: repPct, premium: premium, traitPct: traitPct, total: total };
+}
+
+// 이번 시즌 성적에 따른 프리미엄(+) / 역프리미엄(−)
+function seasonPremium() {
+  const P = CONTRACT.premium;
+  const parts = [];
+  const r = currentSeasonRecord();
+  const titleKeys = { "월드 우승": "worlds", "리그 우승": "playoffs", "컵 대회 우승": "cup" };
+  r.titles.forEach(function (t) { const k = titleKeys[t]; if (k) parts.push({ label: t, pct: P.titles[k] }); });
+  if (!r.titles.length && r.rank > 0 && r.sets > 0) {
+    const row = (P.rank[r.tier] || []).find(function (x) { return r.rank <= x[0]; });
+    if (row && row[1]) parts.push({ label: "팀 " + r.rank + "위", pct: row[1] });
+  }
+  (state.career.awards || []).filter(function (a) { return a.year === state.year; }).forEach(function (a) {
+    if (P.awards[a.key]) parts.push({ label: a.title, pct: P.awards[a.key] });
+  });
+  if (r.sets >= P.minSets) {
+    const pct = Math.max(-P.ratingMax, Math.min(P.ratingMax, (r.rating - P.ratingPivot) * P.ratingPer));
+    if (Math.abs(pct) >= 0.005) parts.push({ label: "평균 평점 " + r.rating.toFixed(2), pct: pct });
+  } else if (state.week >= CONTRACT.windowStart) {
+    parts.push({ label: "출전 부족 (" + r.sets + "세트)", pct: P.fewGames });
+  }
+  if (state.benched) parts.push({ label: "2군(후보)", pct: P.benched });
+  const rawPct = parts.reduce(function (a, p) { return a + p.pct; }, 0);
+  const pct = Math.max(CONTRACT.premiumClamp[0], Math.min(CONTRACT.premiumClamp[1], rawPct));
+  return { pct: pct, rawPct: rawPct, parts: parts };
+}
+
+function pctText(p) {
+  return (p >= 0 ? "+" : "−") + Math.abs(Math.round(p * 100)) + "%";
+}
+
+// 계산 내역 글 (제안 글·이적 시장 화면)
+function salaryBreakdownText(b, clubPct) {
+  const lines = [];
+  lines.push("  └ 기본 " + moneyText(b.base) + " + 실력 " + (b.skill >= 0 ? "" : "−") + moneyText(Math.abs(b.skill)) + " (종합 능력 " + b.score.toFixed(1) + ")" +
+    " + 인기도 " + moneyText(b.pop) + " (인기도 " + b.popularity + ")");
+  const mods = ["평판 " + pctText(b.repPct) + " (평판 " + (b.reputation > 0 ? "+" : "") + b.reputation + ")"];
+  if (b.traitPct) mods.push("협상가 " + pctText(b.traitPct));
+  if (clubPct) mods.push("영입 프리미엄 " + pctText(clubPct));
+  lines.push("  └ " + mods.join(" · "));
+  const pr = b.premium;
+  const capped = pr.rawPct !== undefined && Math.abs(pr.rawPct - pr.pct) > 0.001;
+  lines.push("  └ 시즌 성적 " + pctText(pr.pct) + (capped ? " (최대치 · 합계 " + pctText(pr.rawPct) + ")" : "") +
+    (pr.parts.length ? ": " + pr.parts.map(function (p) { return p.label + " " + pctText(p.pct); }).join(", ") : ": 해당 없음"));
+  return lines.join("\n");
 }
 
 function moneyText(won) {
@@ -114,10 +175,15 @@ function checkBench() {
 // ----- 제안 만들기 -----
 function makeOffer(teamId, renewal) {
   const team = findTeam(teamId);
-  let salary = userSalaryFor(team.tier);
-  if (!renewal) salary = Math.round(salary * randFloat(CONTRACT.offerSalaryBonus[0], CONTRACT.offerSalaryBonus[1]) / 1000000) * 1000000;
+  const breakdown = salaryBreakdown(team.tier);
+  let salary = breakdown.total;
+  let clubPct = 0;
+  if (!renewal) {
+    clubPct = Math.round((randFloat(CONTRACT.offerSalaryBonus[0], CONTRACT.offerSalaryBonus[1]) - 1) * 100) / 100;
+    salary = Math.round(salary * (1 + clubPct) / 1000000) * 1000000;
+  }
   return {
-    teamId: teamId, renewal: renewal, salary: salary,
+    teamId: teamId, renewal: renewal, salary: salary, breakdown: breakdown, clubPct: clubPct,
     years: randInt(CONTRACT.years[0], CONTRACT.years[1]),
     guarantee: Math.random() < CONTRACT.guaranteeChance ? CONTRACT.guaranteeGames[team.tier] : 0,
     negotiated: false, guaranteeAsked: false,
@@ -129,7 +195,8 @@ function offerText(o) {
   const rank = tierTeams(team.tier).slice().sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); })
     .map(function (t) { return t.id; }).indexOf(team.id) + 1;
   return (o.renewal ? "\"계속 함께하고 싶습니다.\" " : "\"주전 " + findPosition(state.player.position).name + " 자리를 맡아 주셨으면 합니다.\" ") +
-    "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) +
+    "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) + (o.raised ? " (인상 반영)" : "") +
+    (o.breakdown ? "\n" + salaryBreakdownText(o.breakdown, o.clubPct) : "") +
     "\n· 출전 보장: " + (o.guarantee ? "시즌 " + o.guarantee + "경기" : "없음") +
     "\n· " + team.name + " (" + tierName(team.tier) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
 }
@@ -197,6 +264,7 @@ function answerOffer(msg, index) {
       o.negotiated = true;
       if (ok) {
         o.salary = Math.round(o.salary * (1 + randFloat(CONTRACT.raiseRate[0], CONTRACT.raiseRate[1])) / 1000000) * 1000000;
+        o.raised = true;
         msg.notes.push("연봉 인상 요청 성공! 새 조건: " + moneyText(o.salary));
       } else msg.notes.push("연봉 인상 요청은 거절됐다. 원래 조건은 그대로다.");
     } else {
