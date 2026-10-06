@@ -708,6 +708,8 @@ function nextWeek(restWeek) {
   const playedWeek = state.week;
   playLeagueWeek(state.week);
   finishWeekReport(playedWeek, state.league.season.matches);
+  // 우리 팀 시즌이 끝났으면 비시즌 시작 (비시즌 솔랭 퀘스트, js/quests.js)
+  if (state.career.seasonOverYear !== state.year && userSeasonOver(playedWeek)) startOffseason();
   paySalary();
   // 회복력: 매주 체력 자연 회복
   const regen = traitEffectSum("staminaRegen");
@@ -717,6 +719,7 @@ function nextWeek(restWeek) {
   state.week += 1;
   if (state.week > CREATION.weeksPerSeason) {
     // 새해 = 새 시즌. 나이 +1, 승강·선수 성장/은퇴
+    offseasonRecover(state.year); // 시즌 마무리 체력 회복 (비시즌 퀘스트를 받은 시즌)
     saveSeasonHistory();
     // 은퇴 (스스로 결정 / 최대 나이 / 받아 줄 팀 없음) → 엔딩
     const retireReason = seasonEndRetireReason();

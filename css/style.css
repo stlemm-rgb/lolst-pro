@@ -442,7 +442,7 @@ tr.sel { outline: 1px solid var(--accent); }
 .quest-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .quest-foot .quest-pick, .quest-foot .quest-picked { margin-left: auto; }
 .quest-picked { font-size: 12px; color: var(--good); font-weight: bold; }
-.quest .stat { grid-template-columns: 60px 1fr 44px; margin: 4px 0; }
+.quest .stat { grid-template-columns: minmax(60px, auto) 1fr 44px; margin: 4px 0; }
 
 /* ===== 역사관 · 은퇴 · 엔딩 (7단계) ===== */
 .timeline { max-height: 420px; overflow-y: auto; }
@@ -545,3 +545,27 @@ details.log-card[open] summary { margin-bottom: 12px; }
 .tier-emblem { flex: none; vertical-align: middle; }
 .sum-sub.king { color: var(--gold); font-weight: bold; }
 .chip.title { border-color: var(--gold); color: #1a1405; background: var(--gold); font-weight: bold; }
+
+/* ===== 토너먼트 대진표 ([대회 일정]) ===== */
+.bracket { display: flex; gap: 18px; overflow-x: auto; padding: 4px 2px 10px; }
+.bk-col { display: flex; flex-direction: column; min-width: 190px; flex: 1; }
+.bk-champ-col { min-width: 150px; flex: 0.8; }
+.bk-round { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 8px; }
+.bk-boxes { display: flex; flex-direction: column; justify-content: space-around; flex: 1; gap: 12px; }
+.bk-match { border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); overflow: hidden; }
+.bk-match.tbd { opacity: 0.55; border-style: dashed; }
+.bk-match.has-detail { cursor: pointer; }
+.bk-match.has-detail:hover { border-color: var(--accent); }
+.bk-team { display: flex; align-items: center; gap: 6px; padding: 5px 10px; font-size: 13px; }
+.bk-team + .bk-team { border-top: 1px solid var(--border); }
+.bk-team.won { font-weight: bold; color: var(--text); background: rgba(52, 211, 153, 0.10); }
+.bk-team.lost { color: var(--muted); }
+.bk-team.lost .bk-name { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.25); }
+.bk-team.mine { box-shadow: inset 3px 0 0 var(--accent); }
+.bk-team.tbd { color: var(--muted); font-style: italic; }
+.bk-seed { font-size: 11px; color: var(--muted); min-width: 14px; text-align: center; border: 1px solid var(--border); border-radius: 4px; }
+.bk-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bk-score { font-weight: bold; min-width: 12px; text-align: right; }
+.bk-info { font-size: 11px; color: var(--muted); padding: 2px 10px 4px; border-top: 1px solid var(--border); }
+.bk-champ { border: 1px solid var(--gold); border-radius: 8px; padding: 12px; text-align: center; color: var(--gold); font-weight: bold; background: rgba(251, 191, 36, 0.08); }
+.bk-champ.tbd { opacity: 0.5; border-style: dashed; }

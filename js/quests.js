@@ -9,6 +9,7 @@ function questText(q, text) {
   return String(text)
     .replace(/\{need\}/g, q.need)
     .replace(/\{champ\}/g, q.champ || "")
+    .replace(/\{start\}/g, q.startRank || "")
     .replace(/\{pos\}/g, findPosition(state.player.position).name);
 }
 
@@ -37,6 +38,13 @@ function progressQuests(training, changes) {
     if (tpl.kind === "training") hit = training.id === tpl.training;
     if (tpl.kind === "metaS") hit = practiced.indexOf(q.champ) !== -1;
     if (tpl.kind === "metaAny") hit = practiced.some(function (n) { return myMeta.indexOf(n) !== -1; });
+    if (tpl.kind === "ladderTop") {
+      // 솔랭 순위 퀘스트: 진행 = 지금 리그 순위, 목표 순위 안이면 완료
+      q.rank = myLadderRank();
+      if (q.rank <= q.need) done.push(q);
+      else if (state.weekReport) state.weekReport.questLines.push("📋 " + tpl.title + ": 리그 " + q.rank + "위 (목표 " + q.need + "위)");
+      return;
+    }
     if (!hit) return;
     q.progress++;
     if (q.progress >= q.need) done.push(q);
@@ -73,14 +81,16 @@ function updateQuests() {
   state.quests.slice().forEach(function (q) {
     if (now > q.deadline) {
       state.quests.splice(state.quests.indexOf(q), 1);
-      postMessage("news", "⌛ 퀘스트 기한 만료: " + findQuest(q.id).title, "기한 안에 끝내지 못했다. (" + q.progress + "/" + q.need + ")", {});
+      const prog = findQuest(q.id).kind === "ladderTop" ? "최종 리그 " + (q.rank || "-") + "위 / 목표 " + q.need + "위" : q.progress + "/" + q.need;
+      postMessage("news", "⌛ 퀘스트 기한 만료: " + findQuest(q.id).title, "기한 안에 끝내지 못했다. (" + prog + ")", {});
     }
   });
+  if (state.career.seasonOverYear === state.year) return; // 우리 팀 시즌이 끝나면 새 퀘스트는 비시즌 퀘스트만
   const first = !state.career.questsGiven; // 첫 퀘스트는 바로
   if (state.quests.length >= QUEST_RULES.maxActive) return;
   if (!first && Math.random() >= QUEST_RULES.newChance) return;
   const active = state.quests.map(function (q) { return q.id; });
-  const pool = QUESTS.filter(function (t) { return active.indexOf(t.id) === -1 && !questMastered(t); });
+  const pool = QUESTS.filter(function (t) { return !t.offseason && active.indexOf(t.id) === -1 && !questMastered(t); });
   if (!pool.length) return;
   const tpl = pick(pool);
   const range = tpl.need || QUEST_RULES.need;
@@ -99,6 +109,7 @@ function questPlan(q) {
   if (tpl.kind === "training") return { plan: tpl.training };
   if (tpl.kind === "metaS") return { plan: "champ_focus", focusChamp: q.champ };
   if (tpl.kind === "metaAny") return { plan: "champion", practiceChamp: "" };
+  if (tpl.kind === "ladderTop") return { plan: "solo_rank" };
   return null;
 }
 
@@ -107,6 +118,7 @@ function questPlanActive(q) {
   const tpl = findQuest(q.id);
   const myMeta = state.meta.champs[state.player.position];
   if (tpl.kind === "training") return state.plan === tpl.training;
+  if (tpl.kind === "ladderTop") return state.plan === "solo_rank";
   if (tpl.kind === "metaS") {
     return (state.plan === "champ_focus" && focusChamp() === q.champ) || (state.plan === "champion" && state.practiceChamp === q.champ);
   }
@@ -146,6 +158,42 @@ function bindQuestPlan(page) {
   });
 }
 
+// ----- 비시즌: 우리 팀 시즌이 끝난 주에 부름 (main.js nextWeek) -----
+// 비시즌 솔랭 퀘스트를 바로 줌 (기한 = 그 시즌 마지막 주). 이미 받았으면 그대로
+function startOffseason() {
+  if (state.career.seasonOverYear === state.year) return;
+  state.career.seasonOverYear = state.year;
+  if (!state.quests) state.quests = [];
+  const tpl = findQuest(OFFSEASON.quest);
+  if (!tpl || state.quests.some(function (q) { return q.id === tpl.id; })) return;
+  state.questSeq = (state.questSeq || 0) + 1;
+  const rank = myLadderRank();
+  const q = { uid: state.questSeq, id: tpl.id, need: offseasonTarget(rank), progress: 0, rank: rank, startRank: rank, champ: null, deadline: absWeek(state.year, CREATION.weeksPerSeason) };
+  state.quests.push(q);
+  state.career.offseasonQuestYear = state.year;
+  state.career.questsGiven = (state.career.questsGiven || 0) + 1;
+  postMessage("inbox", "📋 새 퀘스트: " + tpl.title, QUEST_GIVERS[tpl.giver] + ": \"" + questText(q, tpl.desc) + "\"\n보상: " + rewardText(q) + "\n기한: " + state.year + "년 " + CREATION.weeksPerSeason + "주차까지 (시즌이 끝나면 달성 여부와 상관없이 체력 +" + OFFSEASON.staminaRecover + ")", {});
+  addNews("시즌 종료", myTeam().name + "의 " + state.year + "년 경기 일정이 모두 끝났다. 이제 비시즌!");
+}
+
+// 비시즌 솔랭 목표 순위: 지금 순위보다 climb 계단 위, 단 상위권은 지금 순위의 절반까지만
+function offseasonTarget(rank) {
+  return Math.max(1, rank - OFFSEASON.climb, Math.floor(rank / 2));
+}
+
+// 시즌이 넘어갈 때 (52주차 다음): 비시즌 퀘스트를 받은 시즌이면 체력 회복
+function offseasonRecover(endedYear) {
+  if (state.career.offseasonQuestYear !== endedYear) return;
+  const before = state.stamina;
+  state.stamina = Math.min(state.staminaMax, state.stamina + OFFSEASON.staminaRecover);
+  addNews("시즌 마무리", "한 시즌을 마무리하며 푹 쉬었다. 체력 +" + (state.stamina - before) + " (" + state.stamina + "/" + state.staminaMax + ")");
+}
+
+// 리그 솔로 랭크 내 순위 (js/dashboard.js의 leagueLadder)
+function myLadderRank() {
+  return leagueLadder().findIndex(function (x) { return x.id === USER_ID; }) + 1;
+}
+
 // 퀘스트 카드 (훈련 화면·대시보드)
 function questsHTML(compact) {
   const list = state.quests || [];
@@ -153,13 +201,21 @@ function questsHTML(compact) {
   const now = absWeek();
   const rows = list.map(function (q) {
     const tpl = findQuest(q.id);
-    const pct = Math.round(q.progress / q.need * 100);
+    let pct = Math.round(q.progress / q.need * 100);
+    let progLabel = q.progress + " / " + q.need;
+    if (tpl.kind === "ladderTop") {
+      // 순위 퀘스트: 지금 순위 → 목표까지 얼마나 왔는지
+      const rank = myLadderRank();
+      const from = q.startRank || leagueLadder().length; // 받을 때 순위 → 목표 순위 사이에서 얼마나 왔나
+      pct = rank <= q.need ? 100 : Math.max(0, Math.round((from - rank) / Math.max(1, from - q.need) * 100));
+      progLabel = rank + "위 → " + q.need + "위";
+    }
     return (
       '<div class="quest">' +
         '<div class="quest-head"><span class="muted small">' + QUEST_GIVERS[tpl.giver] + "</span> <b>" + escapeHTML(tpl.title) + "</b>" +
           '<span class="muted small quest-left">' + (q.deadline - now) + "주 남음</span></div>" +
         (compact ? "" : '<div class="small">' + escapeHTML(questText(q, tpl.desc)) + "</div>") +
-        '<div class="stat"><div class="stat-label small">' + q.progress + " / " + q.need + '</div><div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div><div class="stat-value small">' + pct + "%</div></div>" +
+        '<div class="stat"><div class="stat-label small">' + progLabel + '</div><div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div><div class="stat-value small">' + pct + "%</div></div>" +
         '<div class="quest-foot"><span class="muted small">보상: ' + escapeHTML(rewardText(q)) + "</span>" + questPlanButtonHTML(q) + "</div>" +
       "</div>"
     );

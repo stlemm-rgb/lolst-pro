@@ -517,6 +517,42 @@ function playLeagueWeek(week) {
   playDue(week);
 }
 
+// 우리 팀의 이번 시즌 경기가 모두 끝났나? (week = 방금 끝난 주)
+// - 앞으로 잡힌 경기가 있으면 아직
+// - 2부: 후반기(33주) 뒤, 2부 1·2위는 승강전을 치른 뒤
+// - 1부: 후반기(34주) 뒤. 9·10위는 승강전 뒤, 플레이인·플레이오프 1라운드에서 지면 끝,
+//        4강 이상(월드 진출)은 월드 조별 리그 탈락(43주) / 월드 토너먼트에서 지거나 결승이 끝나면(46주) 끝
+function userSeasonOver(week) {
+  const mine = myTeam();
+  if (!mine) return false;
+  const s = seasonOf();
+  const id = mine.id;
+  const involves = function (m) { return m.a === id || m.b === id; };
+  if (s.matches.some(function (m) { return !m.winner && involves(m); })) return false;
+  const promoDone = (s.promo || []).some(function (p) { return p.tier1 === id || p.tier2 === id; });
+  if (mine.tier === 2) {
+    if (week < 33) return false;
+    const top2 = standings(["tier2", "tier2b"], tier2Ids()).slice(0, 2).map(function (r) { return r.id; });
+    return top2.indexOf(id) === -1 || promoDone;
+  }
+  if (week < 34) return false;
+  const order = s.finalOrder || tier1FinalOrder();
+  if (order.indexOf(id) >= 8) return promoDone;
+  const lostEarly = s.matches.some(function (m) {
+    return m.loser === id && (m.comp === "playin" || (m.comp === "playoffs" && m.label.indexOf("1라운드") !== -1));
+  });
+  if (lostEarly) return true;
+  if (week < 38) return false;                               // 플레이오프 진행 중
+  if ((s.worldsTeams || []).indexOf(id) === -1) return true;  // (혹시 모를) 월드 미진출
+  if (week < 43) return false;                               // 월드 조별 리그 진행 중
+  if (s.matches.some(function (m) { return m.comp === "worlds_ko" && m.loser === id; })) return true;
+  if (week === 43) {
+    const g = s.worlds.groups.find(function (ids) { return ids.indexOf(id) !== -1; });
+    return standings("worlds_group", g).slice(0, 2).map(function (r) { return r.id; }).indexOf(id) === -1;
+  }
+  return week >= 46;
+}
+
 // 내 팀의 다음 경기 (아직 안 한 것 중 가장 빠른 것)
 function nextUserMatch() {
   const mine = myTeam();
