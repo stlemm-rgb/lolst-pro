@@ -49,20 +49,34 @@ const SHOP_STAFF = [
   { id: "nutrition", icon: "🥗", name: "영양사",       weekly: 150000, desc: "노화로 줄어드는 양 −20%",           effects: { agingCut: 0.2 } },
 ];
 
-// ----- 회복·힐링: 바로 효과. 한 주에 하나만 -----
+// ----- 회복·힐링: 바로 효과. 횟수 제한 없음 (돈만 있으면 언제든) -----
 // offseason: true → 우리 팀 시즌이 끝난 뒤(비시즌)에만
 const SHOP_CARE = [
   { id: "massage", icon: "💆", name: "마사지·한의원", price: 500000,  desc: "체력 +15",                 effects: { stamina: 15 } },
   { id: "dinner",  icon: "🍖", name: "맛집 회식",     price: 300000,  desc: "컨디션 +10",               effects: { condition: 10 } },
   { id: "trip",    icon: "🚗", name: "주말 여행",     price: 1500000, desc: "체력 +10, 컨디션 +15",     effects: { stamina: 10, condition: 15 } },
-  { id: "abroad",  icon: "✈️", name: "해외여행",      price: 5000000, desc: "체력 최대까지, 컨디션 +30 (비시즌만)", effects: { stamina: 999, condition: 30 }, offseason: true },
+  { id: "abroad",  icon: "✈️", name: "해외여행",      price: 5000000, desc: "컨디션 +40, 멘탈 +1 (머리를 식히고 옴 · 비시즌만)", effects: { condition: 40, mental: 1 }, offseason: true },
 ];
 
 // ----- 팬·명성 -----
-// perSeason: 한 시즌에 몇 번까지 / perWeek: 한 주에 한 번 / once: 한 번만 사면 영구
+// perSeason: 한 시즌에 몇 번까지 / once: 한 번만 사면 영구 / 둘 다 없으면 제한 없음
 const SHOP_FAME = [
-  { id: "gift",    icon: "🎁", name: "팬 선물 이벤트", price: 1000000,  desc: "인기도 +2",                 effects: { popularity: 2 }, perWeek: true },
+  { id: "gift",    icon: "🎁", name: "팬 선물 이벤트", price: 1000000,  desc: "인기도 +2",                 effects: { popularity: 2 } },
   { id: "fanmeet", icon: "🤝", name: "팬미팅 개최",    price: 3000000,  desc: "인기도 +5",                 effects: { popularity: 5 }, perSeason: 2 },
   { id: "donate",  icon: "💝", name: "기부",           price: 5000000,  desc: "평판 +5",                   effects: { reputation: 5 }, perSeason: 2 },
   { id: "stream",  icon: "🎥", name: "개인 방송 장비", price: 20000000, desc: "인기도 상승 +20% (영구)",   effects: { popularityGain: 0.2 }, once: true },
 ];
+
+// ----- 투자: 돈을 넣으면 정해진 주가 지난 뒤 무작위로 불어나거나 줄어요 (완전 운) -----
+// - weeks: 결과가 나오기까지 걸리는 주
+// - range: [최저, 최고] 수익률. 이 사이에서 완전히 무작위 (−0.4 = 40% 잃음, 0.45 = 45% 벌음)
+// - outcomes: 대신 [{ chance, range }] 여러 개 → 먼저 어느 쪽인지 정하고 그 범위에서 무작위 (코인: 반반 대박/쪽박)
+// - 평균은 0에 가깝게 맞춰 두었어요 (계속 넣는다고 무조건 불어나지 않게). 평균 = 펀드 +2%, 주식 +2.5%, 코인 +2.5%
+const SHOP_INVEST = [
+  { id: "fund",  icon: "🏦", name: "안정형 펀드", weeks: 8, range: [-0.08, 0.12], desc: "8주 뒤 −8% ~ +12%" },
+  { id: "stock", icon: "📈", name: "주식",        weeks: 4, range: [-0.40, 0.45], desc: "4주 뒤 −40% ~ +45%" },
+  { id: "coin",  icon: "🪙", name: "코인",        weeks: 2,
+    outcomes: [{ chance: 0.5, range: [-0.90, -0.50] }, { chance: 0.5, range: [0.30, 1.20] }],
+    desc: "2주 뒤 반반: 쪽박(−50 ~ −90%) 아니면 대박(+30 ~ +120%)" },
+];
+const INVEST_AMOUNTS = [0.1, 0.25, 0.5, 1];

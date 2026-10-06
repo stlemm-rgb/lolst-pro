@@ -178,6 +178,9 @@ function weekReportHTML() {
   (r.questLines || []).forEach(function (q) {
     html += '<div class="rep-row"><span class="rep-tag rank">퀘스트</span>' + escapeHTML(q) + "</div>";
   });
+  (r.investLines || []).forEach(function (l) {
+    html += '<div class="rep-row"><span class="rep-tag ' + (l.up ? "win" : "lose") + '">투자</span>' + escapeHTML(l.text) + "</div>";
+  });
   if (r.activityIncome) {
     html += '<div class="rep-row"><span class="rep-tag win">수입</span>스폰서 계약 <span class="up">+' + moneyText(r.activityIncome) + "</span></div>";
   }

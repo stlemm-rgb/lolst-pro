@@ -2,7 +2,8 @@
 // state.shop = {
 //   gear: { keyboard: 2, ... }        장비 단계 (0 = 없음)
 //   staff: { analyst: true, ... }     고용 중인 사람
-//   careWeek: 절대 주                  회복·힐링을 마지막으로 쓴 주 (한 주에 하나)
+//   invest: [{ id, amount, at(결과 나오는 절대 주) }]  진행 중인 투자
+//   investProfit: 투자로 번(잃은) 돈 합계
 //   fame: { gift: 절대 주, fanmeet: { year, count }, stream: true }
 // }
 
@@ -10,6 +11,7 @@ function shopState() {
   if (!state.shop) state.shop = { gear: {}, staff: {}, careWeek: -1, fame: {} };
   const s = state.shop;
   s.gear = s.gear || {}; s.staff = s.staff || {}; s.fame = s.fame || {};
+  s.invest = s.invest || []; s.investProfit = s.investProfit || 0;
   return s;
 }
 
@@ -92,7 +94,6 @@ function isOffseasonNow() {
 
 function careAvailable(c) {
   const s = shopState();
-  if (s.careWeek === absWeek()) return "이번 주에 이미 썼어요";
   if (c.offseason && !isOffseasonNow()) return "비시즌에만 갈 수 있어요";
   if (state.money < c.price) return "자금이 부족해요";
   return "";
@@ -102,7 +103,6 @@ function buyCare(id) {
   const c = SHOP_CARE.find(function (x) { return x.id === id; });
   if (!c || careAvailable(c)) return;
   state.money -= c.price;
-  shopState().careWeek = absWeek();
   const r = applyEffects(c.effects, {});
   shopNotice(c.icon + " " + c.name + " (" + moneyText(c.price) + ") → " + (changesText(r.changes) || "변화 없음"));
 }
@@ -111,7 +111,6 @@ function fameAvailable(f) {
   const s = shopState();
   const v = s.fame[f.id];
   if (f.once && v) return "이미 샀어요";
-  if (f.perWeek && v === absWeek()) return "이번 주에 이미 했어요";
   if (f.perSeason && v && v.year === state.year && v.count >= f.perSeason) return "이번 시즌은 다 했어요 (" + f.perSeason + "번)";
   if (state.money < f.price) return "자금이 부족해요";
   return "";
@@ -123,7 +122,6 @@ function buyFame(id) {
   const s = shopState();
   state.money -= f.price;
   if (f.once) s.fame[f.id] = true;
-  else if (f.perWeek) s.fame[f.id] = absWeek();
   else if (f.perSeason) {
     const v = s.fame[f.id];
     s.fame[f.id] = { year: state.year, count: v && v.year === state.year ? v.count + 1 : 1 };
@@ -134,6 +132,52 @@ function buyFame(id) {
     msg += " → " + (changesText(r.changes) || "변화 없음");
   } else msg += " → " + f.desc;
   shopNotice(msg);
+}
+
+// ----- 투자 (data/shop.js SHOP_INVEST) -----
+function invest(id, pct) {
+  const inv = SHOP_INVEST.find(function (x) { return x.id === id; });
+  const amount = Math.floor(state.money * pct / 10000) * 10000; // 만 원 단위
+  if (!inv || amount < 10000) return;
+  state.money -= amount;
+  shopState().invest.push({ id: id, amount: amount, at: absWeek() + inv.weeks });
+  shopNotice(inv.icon + " " + inv.name + "에 " + moneyText(amount) + " 투자! " + inv.weeks + "주 뒤에 결과가 나와요.");
+}
+
+// 수익률 뽑기: range 하나 또는 outcomes 중 하나를 고른 뒤 그 범위에서 무작위
+function investReturn(inv) {
+  let range = inv.range;
+  if (inv.outcomes) {
+    let r = Math.random();
+    range = inv.outcomes[inv.outcomes.length - 1].range;
+    for (let i = 0; i < inv.outcomes.length; i++) {
+      if (r < inv.outcomes[i].chance) { range = inv.outcomes[i].range; break; }
+      r -= inv.outcomes[i].chance;
+    }
+  }
+  return randFloat(range[0], range[1]);
+}
+
+// 매주 (main.js nextWeek에서): 기한이 된 투자 결과
+function settleInvestments() {
+  const s = shopState();
+  const now = absWeek();
+  const lines = [];
+  s.invest = s.invest.filter(function (x) {
+    if (x.at > now) return true;
+    const inv = SHOP_INVEST.find(function (i) { return i.id === x.id; });
+    const r = inv ? investReturn(inv) : 0;
+    const back = Math.max(0, Math.round(x.amount * (1 + r) / 10000) * 10000);
+    const profit = back - x.amount;
+    state.money += back;
+    s.investProfit += profit;
+    const line = (inv ? inv.icon + " " + inv.name : "투자") + " " + moneyText(x.amount) + " → " + moneyText(back) +
+      " (" + (profit >= 0 ? "+" : "−") + moneyText(Math.abs(profit)) + ", " + (r >= 0 ? "+" : "−") + Math.abs(Math.round(r * 100)) + "%)";
+    lines.push({ text: line, up: profit >= 0 });
+    addNews(profit >= 0 ? "📈 투자 수익" : "📉 투자 손실", line);
+    return false;
+  });
+  if (lines.length && state.weekReport) state.weekReport.investLines = lines;
 }
 
 // ----- 화면 -----
@@ -186,7 +230,7 @@ pages.shop = function () {
   }).join("");
 
   const fameRows = SHOP_FAME.map(function (f) {
-    const limit = f.once ? "한 번 (영구)" : f.perWeek ? "주 1번" : "시즌 " + f.perSeason + "번";
+    const limit = f.once ? "한 번 (영구)" : f.perSeason ? "시즌 " + f.perSeason + "번" : "제한 없음";
     return "<tr><td>" + f.icon + " <b>" + f.name + "</b></td><td>" + f.desc + ' <span class="muted small">· ' + limit + '</span></td><td class="r">' + moneyText(f.price) + "</td><td>" +
       btn(' data-fame="' + f.id + '"', f.once ? "사기" : "하기", fameAvailable(f)) + "</td></tr>";
   }).join("");
@@ -200,12 +244,37 @@ pages.shop = function () {
       '<table class="roster shop-table"><tr><th>장비</th><th class="c">단계</th><th>지금 효과</th><th>다음 단계</th></tr>' + gearRows + "</table></div>" +
     '<div class="card"><h2>🧑‍🏫 개인 고용 <span class="muted small">매주 비용이 나가는 동안만 효과 · 자금이 모자라면 자동 해지</span></h2>' +
       '<table class="roster shop-table">' + staffRows + "</table></div>" +
-    '<div class="card"><h2>💆 회복·힐링 <span class="muted small">바로 효과 · 한 주에 하나만</span></h2>' +
+    '<div class="card"><h2>💆 회복·힐링 <span class="muted small">바로 효과 · 횟수 제한 없음</span></h2>' +
       '<table class="roster shop-table">' + careRows + "</table></div>" +
+    investCardHTML() +
     '<div class="card"><h2>🌟 팬·명성</h2>' +
       '<table class="roster shop-table">' + fameRows + "</table></div>"
   );
 };
+
+// 투자 칸
+function investCardHTML() {
+  const s = shopState();
+  const now = absWeek();
+  const rows = SHOP_INVEST.map(function (inv) {
+    const btns = INVEST_AMOUNTS.map(function (p) {
+      const amt = Math.floor(state.money * p / 10000) * 10000;
+      return '<button class="small-btn" data-invest="' + inv.id + ":" + p + '"' + (amt < 10000 ? " disabled" : "") + ' title="' + moneyText(amt) + '">' +
+        (p === 1 ? "전부" : Math.round(p * 100) + "%") + "</button>";
+    }).join("");
+    return "<tr><td>" + inv.icon + " <b>" + inv.name + "</b></td><td>" + inv.desc + "</td><td>" + btns + "</td></tr>";
+  }).join("");
+  const holding = s.invest.map(function (x) {
+    const inv = SHOP_INVEST.find(function (i) { return i.id === x.id; });
+    return "<li>" + (inv ? inv.icon + " " + inv.name : "투자") + " " + moneyText(x.amount) + ' <span class="muted small">· ' + Math.max(0, x.at - now) + "주 뒤 결과</span></li>";
+  }).join("");
+  const profit = s.investProfit;
+  return '<div class="card"><h2>💹 투자 <span class="muted small">넣은 돈이 정해진 주 뒤에 무작위로 불어나거나 줄어요 · 완전 운</span></h2>' +
+    '<table class="roster shop-table">' + rows + "</table>" +
+    '<p class="muted small">버튼 = 지금 자금의 몇 %를 넣을지 (마우스를 올리면 금액이 보여요). 평균은 본전 근처라서 오래 하면 운에 따라 갈려요.</p>' +
+    '<p class="small">진행 중: ' + (holding ? "</p><ul class=\"invest-list\">" + holding + "</ul>" : '<span class="muted">없음</span></p>') +
+    '<p class="small">지금까지 투자 손익: <b class="' + (profit >= 0 ? "up" : "down") + '">' + (profit >= 0 ? "+" : "−") + moneyText(Math.abs(profit)) + "</b></p></div>";
+}
 
 // 진행 중인 계약·활동 (SNS 받은 연락에서 시작한 것)
 function activitiesCardHTML() {
@@ -227,6 +296,9 @@ function bindShop(page) {
   page.querySelectorAll("[data-staff]").forEach(function (b) { b.onclick = function () { toggleStaff(b.getAttribute("data-staff")); }; });
   page.querySelectorAll("[data-care]").forEach(function (b) { b.onclick = function () { buyCare(b.getAttribute("data-care")); }; });
   page.querySelectorAll("[data-fame]").forEach(function (b) { b.onclick = function () { buyFame(b.getAttribute("data-fame")); }; });
+  page.querySelectorAll("[data-invest]").forEach(function (b) {
+    b.onclick = function () { const v = b.getAttribute("data-invest").split(":"); invest(v[0], Number(v[1])); };
+  });
   page.querySelectorAll("[data-stopact]").forEach(function (b) {
     b.onclick = function () { stopActivity(b.getAttribute("data-stopact")); shopNotice("그만뒀어요."); };
   });

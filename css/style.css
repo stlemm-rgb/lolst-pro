@@ -587,3 +587,4 @@ details.log-card[open] summary { margin-bottom: 12px; }
 .shop-money { font-size: 18px; }
 .shop-table td { vertical-align: middle; }
 .shop-table td:last-child { white-space: nowrap; }
+.invest-list { margin: 4px 0 8px; padding-left: 20px; font-size: 13px; }
