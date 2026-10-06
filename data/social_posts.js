@@ -35,7 +35,7 @@
 //
 // ■ 글쓴이: 반은 리그의 다른 선수(@선수이름, 글은 data/social_posts_pro.js), 반은 아래 SOCIAL_FAN_NAMES 중 하나 + 숫자 (이 파일의 글)
 //
-// ■ 확률·개수 조절은 맨 아래 SOCIAL_RULES
+// ■ 확률·개수 조절은 맨 아래 SOCIAL_RULES (인기도가 낮으면 내 이름 언급이 줄어드는 규칙 mention 포함)
 
 const SOCIAL_POSTS = {
   win: [
@@ -455,6 +455,11 @@ const SOCIAL_FAN_NAMES = [
 const SOCIAL_RULES = {
   maxPerWeek: 4,        // 한 주에 올라오는 글 최대 개수
   proAuthorRate: 0.5,   // 글쓴이가 다른 프로 선수일 확률 (나머지는 팬)
+  // 내 선수 언급({name})이 얼마나 나오는지: 인기도가 낮으면 언급 없는 글 위주 (2026-10-06)
+  //   언급 가능 비율 = minRate + (1 − minRate) × 인기도 ÷ fullAt  (fullAt 이상이면 100% = 글 목록 그대로)
+  //   2부 리그면 프로 선수 글은 여기에 × tier2ProFactor (2부 선수는 다른 프로들이 잘 모름)
+  //   always 분류는 크게 활약한 주라서 인기도와 상관없이 그대로
+  mention: { minRate: 0.1, fullAt: 70, tier2ProFactor: 0.4, always: ["pog", "soloKill", "champion"] },
   // 분류별로 글이 올라올 확률 (경기 결과 글은 경기가 있으면 항상 1개). training = train_ 분류 모두
   chance: {
     pog: 0.6, training: 0.4,

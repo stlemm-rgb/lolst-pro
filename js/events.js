@@ -257,6 +257,15 @@ function checkTraitGains() {
   sTraitsWeeklyUser(); // 내 선수만 얻는 S급 특성 (js/straits.js)
 }
 
+// 이번 글에 내 이름 언급을 허용할까? (data/social_posts.js SOCIAL_RULES.mention)
+function mentionAllowed(cat, who) {
+  const M = SOCIAL_RULES.mention;
+  if (!M || M.always.indexOf(cat) !== -1) return true;
+  let rate = M.minRate + (1 - M.minRate) * Math.min(1, state.popularity / M.fullAt);
+  if (who.proId && myTeam() && myTeam().tier === 2) rate *= M.tier2ProFactor;
+  return Math.random() < rate;
+}
+
 // 선수 SNS (분위기용 글)
 // - 글: 팬 = data/social_posts.js (SOCIAL_POSTS), 프로 선수 = data/social_posts_pro.js (SOCIAL_PRO_POSTS, 점잖은 말투)
 // - 이번 주 상황에 맞는 분류에서 글을 고름 (경기 결과·훈련·솔로킬·패치 등)
@@ -316,7 +325,9 @@ function postSocial() {
     const chance = R.chance[cat] !== undefined ? R.chance[cat] : cat.indexOf("train_") === 0 ? R.chance.training : 0.3;
     if (!always && Math.random() >= chance) return;
     const who = author(cat);
-    const list = listOf(who.posts, cat);
+    let list = listOf(who.posts, cat);
+    // 인기도가 낮으면(또는 2부에서 프로 선수 글이면) 내 이름이 들어간 글을 덜 고름
+    if (!mentionAllowed(cat, who)) list = list.filter(function (t) { return t.indexOf("{name}") === -1; });
     if (!list.length) return;
     const raw = pick(list);
     const mention = raw.indexOf("{name}") !== -1;
