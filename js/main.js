@@ -878,6 +878,8 @@ function nextWeek(restWeek) {
 
   // 2군행/승격 판정, 비시즌 시작이면 재계약·영입 제안
   checkBench();
+  if (state.week === SUMMER_MARKET.start) startSummerWindow(); // 여름 이적 기간 (js/summer_market.js)
+  if (state.week === SUMMER_MARKET.applyWeek) summerMarket().forEach(function (text) { addNews(text.indexOf("🤝") === 0 ? "임대" : "여름 이적 시장", text.replace(/^(🔁|🤝) /, "")); });
   if (state.week === CONTRACT.windowStart) {
     askRetirement(); // 29세부터 은퇴 권유 (js/retire.js)
     startTransferWindow();

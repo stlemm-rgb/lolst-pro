@@ -165,7 +165,8 @@ function clubRosterHTML(teamId) {
 pages.transfer = function () {
   const c = state.contract;
   const team = myTeam();
-  const open = isTransferWindow();
+  const open = isAnyTransferWindow();
+  const summer = isSummerWindow();
   const role = state.benched ? '<span class="down">후보 (2군)</span>' : '<span class="up">주전</span>';
   const guaranteeText = c.guarantee
     ? "시즌 " + c.guarantee + "경기 (" + Math.min(state.career.seasonGames, c.guarantee) + "/" + c.guarantee + (state.career.seasonGames >= c.guarantee ? " 달성" : "") + ")"
@@ -182,7 +183,8 @@ pages.transfer = function () {
         "<tr><td>지금 기준 예상 연봉</td><td>" + moneyText(userSalaryFor(team.tier)) + ' <span class="muted small">(재계약·제안 때 기준, 시즌 성적에 따라 바뀜)</span>' +
           '<div class="salary-breakdown muted small">' + escapeHTML(salaryBreakdownText(salaryBreakdown(team.tier), 0)) + "</div></td></tr>" +
       "</table>" +
-      (state.pendingMove ? '<div class="notice">이적 확정: 새 시즌부터 <b>' + escapeHTML(findTeam(state.pendingMove.teamId).name) + "</b> (연봉 " + moneyText(state.pendingMove.salary) + ", " + state.pendingMove.endYear + "년까지)</div>" : "") +
+      (state.pendingMove ? '<div class="notice">' + (state.pendingMove.loan ? "임대 확정" : "이적 확정") + ": " + (state.pendingMove.summer ? "후반기(" + SUMMER_MARKET.applyWeek + "주)부터" : "새 시즌부터") + " <b>" + escapeHTML(findTeam(state.pendingMove.teamId).name) + "</b> (연봉 " + moneyText(state.pendingMove.salary) + ", " + state.pendingMove.endYear + "년까지)</div>" : "") +
+      (state.loan ? '<div class="notice">🤝 임대 중: 이번 시즌이 끝나면 <b>' + escapeHTML(findTeam(state.loan.from) ? findTeam(state.loan.from).name : "원래 팀") + "</b>(으)로 돌아가요.</div>" : "") +
     "</div>";
 
   const offers = state.inbox.filter(function (m) { return m.kind === "offer" && m.answered === null; });
@@ -190,7 +192,7 @@ pages.transfer = function () {
     '<div class="card"><h2>받은 제안</h2>' +
       (offers.length
         ? offers.map(function (m) { return "<p>📩 " + escapeHTML(m.title) + "</p>"; }).join("") + '<button class="primary" data-go-sns="1">SNS에서 답하기</button>'
-        : '<p class="muted">' + (open ? "답하지 않은 제안이 없어요." : "제안은 비시즌(" + CONTRACT.windowStart + "주차)에 SNS로 와요.") + "</p>") +
+        : '<p class="muted">' + (open ? "답하지 않은 제안이 없어요." : "제안은 여름(" + SUMMER_MARKET.start + "주차, 0~1개)과 비시즌(" + CONTRACT.windowStart + "주차)에 SNS로 와요.") + "</p>") +
     "</div>";
 
   // 이적 요청 보낼 수 있는 구단
@@ -212,7 +214,7 @@ pages.transfer = function () {
     }).join("");
   const requestCard =
     '<div class="card"><h2>이적 요청 보내기 <span class="muted small">' +
-      (open ? "남은 횟수 " + state.transferRequestsLeft + "회" : "비시즌(" + CONTRACT.windowStart + "~" + CONTRACT.windowEnd + "주)에만 가능") + "</span></h2>" +
+      (open ? "남은 횟수 " + state.transferRequestsLeft + "회" + (summer ? " · 여름엔 원래 팀에 이적료 " + moneyText(transferFee(USER_ID)) : "") : "여름(" + SUMMER_MARKET.start + "~" + SUMMER_MARKET.end + "주)·비시즌(" + CONTRACT.windowStart + "~" + CONTRACT.windowEnd + "주)에만 가능") + "</span></h2>" +
       '<p class="muted small">그 팀 ' + findPosition(state.player.position).name + " 주전보다 내 스탯 점수(" + me.toFixed(1) + ")가 높고 예산이 되면 받아줘요. 초록색 = 내가 더 높음.</p>" +
       '<table class="roster"><tr><th>구단</th><th class="r">전력</th><th>같은 포지션 주전</th><th class="r">스탯 점수</th><th class="r">남은 예산</th><th></th></tr>' + rows + "</table>" +
     "</div>";
@@ -229,7 +231,9 @@ pages.transfer = function () {
 
   return (
     "<h1>이적 시장</h1>" +
-    '<div class="notice">' + (open ? "🔓 이적 시장이 열려 있어요 (" + CONTRACT.windowEnd + "주차까지). 정해진 이적은 새 시즌에 반영돼요." : "🔒 시즌 중에는 이적할 수 없어요. 이적 시장은 " + CONTRACT.windowStart + "주차에 열려요.") + "</div>" +
+    '<div class="notice">' + (summer ? "☀️ 여름 이적·임대 기간이에요 (" + SUMMER_MARKET.end + "주차까지). 정해진 이적은 후반기(" + SUMMER_MARKET.applyWeek + "주)에 반영돼요. 하위권 팀들이 1명씩 보강해요."
+      : open ? "🔓 이적 시장이 열려 있어요 (" + CONTRACT.windowEnd + "주차까지). 정해진 이적은 새 시즌에 반영돼요."
+      : "🔒 지금은 이적할 수 없어요. 여름 이적 기간은 " + SUMMER_MARKET.start + "~" + SUMMER_MARKET.end + "주, 비시즌 이적 시장은 " + CONTRACT.windowStart + "주차에 열려요.") + "</div>" +
     '<div class="grid">' + contractCard + offerCard + "</div>" + requestCard + faCard
   );
 };

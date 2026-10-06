@@ -202,7 +202,14 @@ function offerText(o) {
   const team = findTeam(o.teamId);
   const rank = tierTeams(team.tier).slice().sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); })
     .map(function (t) { return t.id; }).indexOf(team.id) + 1;
+  if (o.loan) {
+    return "\"남은 시즌 동안 우리 팀에서 주전으로 뛰어 주셨으면 합니다.\" " +
+      "\n· 임대: 후반기(" + SUMMER_MARKET.applyWeek + "주)부터 이번 시즌 끝까지, 끝나면 " + myTeam().name + " 복귀" +
+      "\n· 연봉·계약은 그대로 (" + moneyText(o.salary) + ")" +
+      "\n· " + team.name + " (" + tierName(team.tier) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
+  }
   return (o.renewal ? "\"계속 함께하고 싶습니다.\" " : "\"주전 " + findPosition(state.player.position).name + " 자리를 맡아 주셨으면 합니다.\" ") +
+    (o.summer ? "\n· 여름 이적: 후반기(" + SUMMER_MARKET.applyWeek + "주)부터 합류 · 원래 팀에 이적료 " + moneyText(o.fee || 0) : "") +
     "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) + (o.raised ? " (인상 반영)" : "") +
     "\n· 출전 보장: " + (o.guarantee ? "시즌 " + o.guarantee + "경기" : "없음") +
     "\n· " + team.name + " (" + tierName(team.tier) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
@@ -210,6 +217,7 @@ function offerText(o) {
 
 function offerChoices(o) {
   const list = [{ label: "수락한다", act: "accept" }];
+  if (o.loan) return list.concat([{ label: "거절한다", act: "decline" }]);
   if (!o.negotiated) list.push({ label: "연봉 인상을 요청한다", act: "raise", hint: "성공률 " + Math.round(negotiateChance() * 100) + "% (평판이 높을수록 올라감)" });
   if (!o.guarantee && !o.guaranteeAsked) list.push({ label: "출전 보장을 요청한다", act: "guarantee", hint: "성공률 " + Math.round(negotiateChance() * 100) + "%" });
   list.push({ label: o.renewal ? "거절한다 (시즌이 끝나면 FA)" : "거절한다", act: "decline" });
@@ -222,7 +230,7 @@ function negotiateChance() {
 
 function sendOffer(o) {
   const team = findTeam(o.teamId);
-  postMessage("inbox", (o.renewal ? "재계약 제안: " : "영입 제안: ") + team.name, offerText(o), {
+  postMessage("inbox", (o.renewal ? "재계약 제안: " : o.loan ? "임대 제안: " : o.summer ? "여름 영입 제안: " : "영입 제안: ") + team.name, offerText(o), {
     kind: "offer", offer: o, choices: offerChoices(o),
   });
 }
@@ -303,6 +311,10 @@ function answerOffer(msg, index) {
   if (o.renewal) {
     state.contract = { teamId: team.id, salary: o.salary, endYear: state.year + o.years, guarantee: o.guarantee };
     msg.notes.push("재계약 완료! " + (state.year + 1) + "~" + (state.year + o.years) + "년, 연봉 " + moneyText(o.salary));
+  } else if (o.summer) {
+    // 여름 이적·임대: 29주에 반영 (js/summer_market.js)
+    state.pendingMove = { teamId: team.id, salary: o.salary, endYear: o.loan ? state.contract.endYear : state.year + Math.max(1, o.years), guarantee: o.guarantee, summer: true, loan: !!o.loan, fee: o.fee };
+    msg.notes.push((o.loan ? "임대 합의! " : "이적 합의! ") + "후반기(" + SUMMER_MARKET.applyWeek + "주)부터 " + team.name + "에서 뛴다." + (o.loan ? " 시즌이 끝나면 원래 팀으로 돌아온다." : ""));
   } else {
     state.pendingMove = { teamId: team.id, salary: o.salary, endYear: state.year + o.years, guarantee: o.guarantee };
     msg.notes.push("이적 합의! 새 시즌부터 " + team.name + " 소속이 된다.");
@@ -312,7 +324,8 @@ function answerOffer(msg, index) {
 
 // ----- 내가 이적 요청 보내기 (이적 시장 화면) -----
 function canRequestTransfer(teamId) {
-  if (!isTransferWindow()) return "이적 시장은 비시즌(" + CONTRACT.windowStart + "~" + CONTRACT.windowEnd + "주)에만 열려요.";
+  if (!isAnyTransferWindow()) return "이적은 여름(" + SUMMER_MARKET.start + "~" + SUMMER_MARKET.end + "주)과 비시즌(" + CONTRACT.windowStart + "~" + CONTRACT.windowEnd + "주)에만 할 수 있어요.";
+  if (state.loan) return "임대 중에는 이적할 수 없어요.";
   if (state.retirePlanned) return "은퇴 예정이라 이적할 수 없어요.";
   if (state.pendingMove) return "이미 이적이 정해졌어요.";
   if (!state.transferRequestsLeft) return "이번 비시즌 이적 요청 횟수를 다 썼어요.";
@@ -327,16 +340,21 @@ function requestTransfer(teamId) {
   const starter = starterAt(teamId, state.player.position);
   const me = playerScore(USER_ID);
   const salary = userSalaryFor(team.tier);
+  const summer = isSummerWindow();
+  const fee = summer ? transferFee(USER_ID) : 0; // 여름엔 계약 기간이 남아 있어서 원래 팀에 이적료
   const okSkill = !starter || me >= playerScore(starter) + CONTRACT.requestMargin;
-  const okBudget = teamBudgetLeft(teamId) >= salary;
+  const okBudget = teamBudgetLeft(teamId) - fee >= salary && teamMoney(teamId) - fee >= debtFloor(teamId);
   if (okSkill && okBudget) {
     const years = randInt(CONTRACT.years[0], CONTRACT.years[1]);
-    state.pendingMove = { teamId: teamId, salary: salary, endYear: state.year + years, guarantee: 0 };
+    state.pendingMove = summer
+      ? { teamId: teamId, salary: salary, endYear: state.year + years, guarantee: 0, summer: true, fee: fee }
+      : { teamId: teamId, salary: salary, endYear: state.year + years, guarantee: 0 };
     state.inbox.forEach(function (m) {
       if (m.kind === "offer" && m.answered === null) { m.answered = "ignored"; m.read = true; m.notes.push("다른 계약을 맺어서 정리됐다."); }
     });
-    postMessage("inbox", "이적 요청 수락: " + team.name, team.name + "이(가) 이적 요청을 받아들였다. " + years + "년 계약, 연봉 " + moneyText(salary) + ". 새 시즌부터 합류한다.", { read: true });
-    addNews("이적 합의", state.player.name + ", 새 시즌부터 " + team.name + " 합류");
+    const when = summer ? "후반기(" + SUMMER_MARKET.applyWeek + "주)부터" : "새 시즌부터";
+    postMessage("inbox", "이적 요청 수락: " + team.name, team.name + "이(가) 이적 요청을 받아들였다. " + years + "년 계약, 연봉 " + moneyText(salary) + (fee ? ", 원래 팀에 이적료 " + moneyText(fee) : "") + ". " + when + " 합류한다.", { read: true });
+    addNews("이적 합의", state.player.name + ", " + when + " " + team.name + " 합류");
   } else {
     const why = !okSkill ? "그 팀 " + findPosition(state.player.position).name + " 주전(" + playerName(starter) + ", " + playerScore(starter).toFixed(1) + ")보다 실력이 부족" : "구단 예산 부족";
     postMessage("inbox", "이적 요청 거절: " + team.name, team.name + "이(가) 이적 요청을 거절했다. (" + why + ")", { read: true });
@@ -365,7 +383,7 @@ function signFA(id, teamId) {
 
 // 팀에서 가장 약한 선수 (내 선수 제외)
 function weakestPlayer(teamId) {
-  const list = findTeam(teamId).roster.filter(function (id) { return id !== USER_ID; })
+  const list = findTeam(teamId).roster.filter(function (id) { return id !== USER_ID && !findPlayer(id).loan; }) // 임대 온 선수는 빼고
     .sort(function (a, b) { return playerScore(a) - playerScore(b); });
   return list[0];
 }
@@ -392,10 +410,33 @@ function moveUserTo(teamId) {
   state.team = team.name;
 }
 
+// 빈 포지션 채우기 (FA 또는 신인), 선수단 인원 맞추기 (새해·여름 이적 뒤)
+function fillRosters() {
+  const order = state.league.teams.slice().sort(function (a, b) { return (a.tier - b.tier) || (teamStrength(b.id) - teamStrength(a.id)); });
+  order.forEach(function (t) {
+    POSITION_IDS.forEach(function (pos) {
+      const has = t.roster.some(function (id) { return playerPos(id) === pos; });
+      if (!has) fillPosition(t.id, pos);
+    });
+    while (t.roster.length < LEAGUE.rosterSize && state.league.freeAgents.length) {
+      const best = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
+      signFA(best, t.id);
+    }
+    while (t.roster.length > LEAGUE.rosterSize) {
+      const w = weakestPlayer(t.id);
+      if (!w) break;
+      releaseToFA(w);
+    }
+  });
+}
+
 // ----- 새 시즌: 계약 만료·이적 반영 -----
 function contractsNewSeason() {
   const news = [];
   const lastYear = state.year - 1;
+
+  // 0) 여름에 임대 갔던 선수들 원래 팀으로 (js/summer_market.js)
+  returnLoans(news);
 
   // 1) 내 선수
   if (state.pendingMove) {
@@ -455,18 +496,7 @@ function contractsNewSeason() {
   const moves = [];
   offseasonRebuild(moves);
   // 4) 빈 포지션 채우기, 선수단 인원 맞추기
-  const order = state.league.teams.slice().sort(function (a, b) { return (a.tier - b.tier) || (teamStrength(b.id) - teamStrength(a.id)); });
-  order.forEach(function (t) {
-    POSITION_IDS.forEach(function (pos) {
-      const has = t.roster.some(function (id) { return playerPos(id) === pos; });
-      if (!has) fillPosition(t.id, pos);
-    });
-    while (t.roster.length < LEAGUE.rosterSize && state.league.freeAgents.length) {
-      const best = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
-      signFA(best, t.id);
-    }
-    while (t.roster.length > LEAGUE.rosterSize) releaseToFA(weakestPlayer(t.id));
-  });
+  fillRosters();
 
   // 5) FA가 너무 많으면 실력 낮은 순으로 은퇴 처리 (최대 40명 유지)
   const fa = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); });

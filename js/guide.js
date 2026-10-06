@@ -125,7 +125,7 @@ function weekAdvice() {
   const gearCount = Object.keys(s.gear || {}).filter(function (k) { return s.gear[k] > 0; }).length;
   if (state.money >= 10000000 && gearCount === 0) list.push({ text: "자금이 " + moneyText(state.money) + " 쌓였어요. 장비를 사면 훈련 효과가 영구로 올라요.", label: "상점 가기", act: { go: "shop" } });
   // 8) 이적 시장 기간 + 제안
-  if (isTransferWindow() && state.inbox.some(function (m) { return m.kind === "offer" && m.answered === null; })) {
+  if (isAnyTransferWindow() && state.inbox.some(function (m) { return m.kind === "offer" && m.answered === null; })) {
     list.push({ text: "이적 시장 기간이에요. 계약 제안을 확인해 보세요.", label: "SNS 열기", act: { sns: true } });
   }
   return list.slice(0, 3);

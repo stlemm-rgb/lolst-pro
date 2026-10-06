@@ -91,6 +91,7 @@ function sellable(id, buyer) {
   const p = findPlayer(id);
   if (!p.teamId) return true;                 // FA
   if (p.teamId === buyer.id) return false;
+  if (p.loan) return false;                    // 임대 중인 선수는 못 데려감
   const seller = findTeam(p.teamId);
   if (seller.tier > buyer.tier) return true;  // 2부 → 1부: 선수가 원해서 팀이 내줌
   return starterAt(seller.id, p.pos) !== id;   // 같은 리그(또는 아래로)는 후보만
@@ -154,36 +155,44 @@ function offseasonRebuild(news) {
   for (let pass = 0; pass < CLUB_MARKET.passes; pass++) {
     order.forEach(function (t) {
       const rule = rebuildRule(needOf(t));
-      // 주전이 약한 포지션부터
-      const s = starters(t.id);
-      const posList = POSITION_IDS.filter(function (pos) { return s[pos] !== USER_ID; })
-        .sort(function (a, b) { return (s[a] ? playerScore(s[a]) : 0) - (s[b] ? playerScore(s[b]) : 0); });
-      posList.forEach(function (pos) {
+      weakPositions(t).forEach(function (pos) {
         if (buysLeft[t.id] <= 0) return;
-        const starter = starterAt(t.id, pos);
-        const base = starter ? playerScore(starter) : 0;
-        const best = Object.keys(state.league.players).filter(function (id) {
-          const p = state.league.players[id];
-          return p.pos === pos && !moved[id] && playerScore(id) >= base + rule.margin && sellable(id, t);
-        }).map(function (id) {
-          const fee = transferFee(id);
-          const salary = npcContractSalary(id, t.tier);
-          return { id: id, fee: fee, salary: salary, score: playerScore(id) };
-        }).filter(function (c) {
-          // 돈: 구단 자금 − 이적료가 빚 한도 안 + 시즌 연봉 여유
-          return teamMoney(t.id) - c.fee >= debtFloor(t.id) && clubRoom(t.id) - c.fee >= payrollDelta(t, c.id, c.salary);
-        }).sort(function (a, b) { return (b.score - a.score) || (a.fee + a.salary - b.fee - b.salary); })[0];
-        if (!best) return;
-        const p = findPlayer(best.id);
-        const from = p.teamId ? findTeam(p.teamId) : null;
-        npcTransfer(best.id, t, best.fee, best.salary);
-        moved[best.id] = true;
-        buysLeft[t.id]--;
-        news.push("🔁 " + t.name + ", " + (from ? from.name + "의 " : "FA ") + p.name + "(" + findPosition(pos).name + ") 영입" +
-          (best.fee ? " · 이적료 " + moneyText(best.fee) : ""));
+        const text = tryBuy(t, pos, rule.margin, moved);
+        if (text) { buysLeft[t.id]--; news.push(text); }
       });
     });
   }
+}
+
+// 주전이 약한 포지션부터 (내 포지션은 빼고)
+function weakPositions(t) {
+  const s = starters(t.id);
+  return POSITION_IDS.filter(function (pos) { return s[pos] !== USER_ID; })
+    .sort(function (a, b) { return (s[a] ? playerScore(s[a]) : 0) - (s[b] ? playerScore(s[b]) : 0); });
+}
+
+// 그 포지션에 지금 주전보다 margin 이상 나은 선수를 이적료·연봉을 감당할 수 있으면 영입 → 소식 글 (못 사면 null)
+function tryBuy(t, pos, margin, moved) {
+  const starter = starterAt(t.id, pos);
+  const base = starter ? playerScore(starter) : 0;
+  const best = Object.keys(state.league.players).filter(function (id) {
+    const p = state.league.players[id];
+    return p.pos === pos && !moved[id] && playerScore(id) >= base + margin && sellable(id, t);
+  }).map(function (id) {
+    const fee = transferFee(id);
+    const salary = npcContractSalary(id, t.tier);
+    return { id: id, fee: fee, salary: salary, score: playerScore(id) };
+  }).filter(function (c) {
+    // 돈: 구단 자금 − 이적료가 빚 한도 안 + 시즌 연봉 여유
+    return teamMoney(t.id) - c.fee >= debtFloor(t.id) && clubRoom(t.id) - c.fee >= payrollDelta(t, c.id, c.salary);
+  }).sort(function (a, b) { return (b.score - a.score) || (a.fee + a.salary - b.fee - b.salary); })[0];
+  if (!best) return null;
+  const p = findPlayer(best.id);
+  const from = p.teamId ? findTeam(p.teamId) : null;
+  npcTransfer(best.id, t, best.fee, best.salary);
+  moved[best.id] = true;
+  return "🔁 " + t.name + ", " + (from ? from.name + "의 " : "FA ") + p.name + "(" + findPosition(pos).name + ") 영입" +
+    (best.fee ? " · 이적료 " + moneyText(best.fee) : "");
 }
 
 // [구단 탐색]용: 자금 한 줄

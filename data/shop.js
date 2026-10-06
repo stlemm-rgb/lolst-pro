@@ -87,8 +87,8 @@ const HOUSING = {
 };
 const SHOP_HOUSING = [
   { id: "oneroom",   icon: "🏠", name: "원룸 (월세)",     rent: 150000,                conditionCap: 80,  desc: "합숙 탈출. 내 방이 생겼다.",               effects: {} },
-  { id: "tworoom",   icon: "🏡", name: "투룸 (월세)",     rent: 400000,                conditionCap: 85,  desc: "쉬는 공간이 따로 있다.",                   effects: { staminaRegen: 1 } },
-  { id: "apt",       icon: "🏢", name: "아파트",          price: 200000000,            conditionCap: 90,  desc: "내 집 마련.",                              effects: { staminaRegen: 2, conditionRegen: 1 } },
-  { id: "luxury",    icon: "🏙️", name: "고급 아파트",     price: 500000000,            conditionCap: 95,  desc: "헬스장·사우나가 딸린 단지.",               effects: { staminaRegen: 3, conditionRegen: 2, popularityGain: 0.05 } },
+  { id: "tworoom",   icon: "🏡", name: "투룸 (월세)",     rent: 400000,                conditionCap: 90,  desc: "쉬는 공간이 따로 있다.",                   effects: { staminaRegen: 1 } },
+  { id: "apt",       icon: "🏢", name: "아파트",          price: 200000000,            conditionCap: 95,  desc: "내 집 마련.",                              effects: { staminaRegen: 2, conditionRegen: 1 } },
+  { id: "luxury",    icon: "🏙️", name: "고급 아파트",     price: 500000000,            conditionCap: 100,  desc: "헬스장·사우나가 딸린 단지.",               effects: { staminaRegen: 3, conditionRegen: 2, popularityGain: 0.05 } },
   { id: "penthouse", icon: "🌆", name: "초고급 아파트",   price: 1200000000,           conditionCap: 100, desc: "한강이 보이는 펜트하우스. 방송에도 나온다.", effects: { staminaRegen: 4, conditionRegen: 3, popularityGain: 0.10 } },
 ];

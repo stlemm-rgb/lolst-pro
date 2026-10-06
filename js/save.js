@@ -7,7 +7,7 @@ const SAVE_GAME_ID = "progamer-career";
 const SAVE_VERSION = 10; // 10: NPC 특성·S급 특성·스탯 상한선 / 9: 노화·은퇴·역사관 / 8: 메타 S급·퀘스트 / 7: 솔로 랭크·지난주 결과 / 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
-const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp", "retirePlanned", "retired", "compPlan", "shop", "activities", "pendingEvents", "tutorial", "housing"];
+const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp", "retirePlanned", "retired", "compPlan", "shop", "activities", "pendingEvents", "tutorial", "housing", "loan"];
 
 // 현재 게임 상태를 세이브 모양으로 만들기
 function makeSaveData() {
@@ -108,6 +108,7 @@ function stateFromSave(save) {
   fresh.retirePlanned = s.retirePlanned === true;
   if (COMP_PLANS.some(function (p) { return p.id === s.compPlan; })) fresh.compPlan = s.compPlan;
   if (s.shop && typeof s.shop === "object") fresh.shop = s.shop;
+  if (s.loan && typeof s.loan === "object") fresh.loan = s.loan; // 여름 임대 중
   if (s.housing && typeof s.housing === "object" && SHOP_HOUSING.some(function (h) { return h.id === s.housing.id; })) fresh.housing = s.housing; // 거주지 (없으면 합숙)
   fresh.tutorial = s.tutorial && typeof s.tutorial === "object" ? s.tutorial : { on: false, done: {}, visited: {} }; // 예전 세이브는 안내 꺼짐
   if (Array.isArray(s.activities)) fresh.activities = s.activities.filter(function (a) { return a && ACTIVITIES[a.id]; });
