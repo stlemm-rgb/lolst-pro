@@ -70,24 +70,12 @@ function npcPickValue(p, name, target) {
     (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
-// 밴 당하기: 내 선수와 같은 규칙 (0~3명, 상대가 경계하는 상위 5명 중에서)
+// 밴 당하기: 내 선수와 같은 규칙 (견제 밴 + 0~3명, 상대가 경계하는 상위 5명 중에서)
 function npcBans(p, exclude) {
   const ranked = Object.keys(p.mastery).filter(function (n) { return exclude.indexOf(n) === -1; })
     .sort(function (a, b) { return npcBanValue(p, b) - npcBanValue(p, a); });
-  let r = Math.random(), count = 0;
-  for (let i = 0; i < MATCH.banCount.length; i++) {
-    r -= MATCH.banCount[i][1];
-    if (r < 0) { count = MATCH.banCount[i][0]; break; }
-  }
-  const pool = ranked.slice(0, MATCH.banWeights.length);
-  const weights = MATCH.banWeights.slice(0, pool.length);
-  const banned = [];
-  while (banned.length < count && pool.length) {
-    const i = weightedIndex(weights);
-    banned.push(pool.splice(i, 1)[0]);
-    weights.splice(i, 1);
-  }
-  return banned;
+  const topMeta = ranked.filter(function (n) { return isMeta(n, p.pos); }).sort(function (a, b) { return p.mastery[b] - p.mastery[a]; })[0];
+  return rollBanList(ranked, topMeta, topMeta ? p.mastery[topMeta] : 0); // 견제 밴 포함 (js/champions.js)
 }
 
 // 이 라인업 자리(lane pos)에서 숙련도를 쓰는 선수인가? (자기 포지션에 섰을 때만)

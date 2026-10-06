@@ -241,14 +241,31 @@ function rollBans(exclude) {
   exclude = exclude || [];
   const ranked = myPositionChampions().filter(function (n) { return exclude.indexOf(n) === -1; })
     .sort(function (a, b) { return banValue(b) - banValue(a); });
+  const topMeta = ranked.filter(function (n) { return isMeta(n); }).sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
+  return rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0);
+}
+
+// 견제 밴 확률: 숙련도가 가장 높은 메타 챔피언 (data/match.js focusBan)
+function focusBanChance(mastery) {
+  const F = MATCH.focusBan;
+  return mastery >= F.from ? F.base + (mastery - F.from) * F.per : 0;
+}
+
+// 밴 목록 정하기 (나와 다른 선수 공통)
+// ranked: 상대가 경계하는 순서, topMeta: 숙련도 가장 높은 메타 챔피언 → 견제 밴 먼저
+function rollBanList(ranked, topMeta, topMastery) {
   let r = Math.random(), count = 0;
   for (let i = 0; i < MATCH.banCount.length; i++) {
     r -= MATCH.banCount[i][1];
     if (r < 0) { count = MATCH.banCount[i][0]; break; }
   }
-  const pool = ranked.slice(0, MATCH.banWeights.length);
-  const weights = MATCH.banWeights.slice(0, pool.length);
   const banned = [];
+  if (topMeta && Math.random() < focusBanChance(topMastery)) {
+    banned.push(topMeta);
+    count = Math.max(count, 1);
+  }
+  const pool = ranked.filter(function (n) { return banned.indexOf(n) === -1; }).slice(0, MATCH.banWeights.length);
+  const weights = MATCH.banWeights.slice(0, pool.length);
   while (banned.length < count && pool.length) {
     const i = weightedIndex(weights);
     banned.push(pool.splice(i, 1)[0]);
