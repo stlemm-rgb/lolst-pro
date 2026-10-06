@@ -43,7 +43,7 @@ const TRAITS = [
   { id: "diligent",     type: "good", group: "훈련", name: "모범생",        desc: "퀘스트 보상 +50%",                                     effects: { questBonus: 0.5 } },
 
   // ===== 좋은 특성: 챔피언 =====
-  { id: "champ_lab",    type: "good", group: "챔피언", name: "챔피언 연구가", desc: "챔피언 폭 훈련 +30%, 모든 챔피언 숙련도 성장 +50%",        effects: { trainingStat: { pool: 0.3 }, masteryGrowth: 0.5 } },
+  { id: "champ_lab",    type: "good", group: "챔피언", name: "챔피언 연구가", desc: "챔피언 폭 훈련 +30%, 모든 챔피언 숙련도 성장 +20%",        effects: { trainingStat: { pool: 0.3 }, masteryGrowth: 0.2 } },
   { id: "meta_reader",  type: "good", group: "챔피언", name: "메타 리더",     desc: "메타 챔피언 숙련도 성장 +40%",                           effects: { metaMastery: 0.4 } },
   { id: "one_trick",    type: "good", group: "챔피언", name: "장인",         desc: "숙련도 1위 챔피언을 고르면 경기력 +5%",                   effects: { signature: 0.05 } },
   { id: "carry_instinct", type: "good", group: "챔피언", name: "캐리 본능",   desc: "캐리형 챔피언 숙련도 성장 +30%",                         effects: { typeMastery: { carry: 0.3 } } },
