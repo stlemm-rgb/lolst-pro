@@ -919,7 +919,7 @@ function addNews(title, message) {
     changes: {},
   });
   if (state.inbox) postMessage("news", "[" + title + "] " + message, message); // SNS 소식 탭에도
-  if (state.weekReport) state.weekReport.news.push(message); // 대시보드 지난주 결과에도
+  if (state.weekReport) state.weekReport.news.push({ title: title, text: message }); // 대시보드 지난주 결과에도 (제목과 함께)
 }
 
 function renderAll() {

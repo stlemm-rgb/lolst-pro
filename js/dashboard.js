@@ -199,11 +199,45 @@ function weekReportHTML() {
     html += '<div class="rep-row"><span class="rep-tag msg">연락</span>새 연락 ' + msgs.length + "건: " +
       msgs.map(function (m) { return escapeHTML(m.title); }).join(", ") + ' <button class="small-btn" data-go-sns="1">SNS 열기</button></div>';
   }
-  if (r.news.length) {
-    html += '<div class="rep-row"><span class="rep-tag news">소식</span>' + r.news.map(escapeHTML).join(" · ") + "</div>";
-  }
+  if (r.news.length) html += reportNewsHTML(r.news);
 
   return '<div class="card report"><h2>📅 지난주 결과 <span class="muted small">' + escapeHTML(r.when) + "</span></h2>" + html + "</div>";
+}
+
+// 지난주 결과의 소식: 한 줄에 하나씩, 나·우리 팀 소식만 바로 보이고 나머지는 접어 둠
+//   - 이적·임대 소식은 '이적 시장 N건'으로 묶음 (우리 팀 관련은 위에 따로)
+//   - 그 밖의 리그 소식은 '다른 소식 N건'으로 접음 (나·우리 팀 소식이 적으면 앞의 몇 개는 보여 줌)
+const REPORT_NEWS = {
+  showMax: 4,                                          // 바로 보이는 소식 최대 개수
+  fillTo: 2,                                           // 나·우리 팀 소식이 이보다 적으면 다른 소식으로 채움
+  transferTitles: ["이적 시장", "여름 이적 시장", "임대"], // 이 제목은 '이적 시장'으로 묶음
+};
+
+function reportNewsHTML(list) {
+  const items = list.map(function (n) { return typeof n === "string" ? { title: "", text: n } : n; }); // 예전 세이브: 글만 있음
+  const team = myTeam();
+  const aboutMe = function (n) {
+    const t = n.text || "";
+    return t.indexOf(state.player.name) !== -1 || (team && t.indexOf(team.name) !== -1);
+  };
+  const isTransfer = function (n) { return REPORT_NEWS.transferTitles.indexOf(n.title) !== -1; };
+  const shown = [], transfers = [], others = [];
+  items.forEach(function (n) {
+    if (aboutMe(n) && shown.length < REPORT_NEWS.showMax) shown.push(n);
+    else if (isTransfer(n)) transfers.push(n);
+    else others.push(n);
+  });
+  while (shown.length < REPORT_NEWS.fillTo && others.length) shown.push(others.shift());
+  const li = function (n, noCat) {
+    return "<li>" + (n.title && noCat !== true ? '<span class="news-cat">' + escapeHTML(n.title.replace(/^\[|\]$/g, "")) + "</span>" : "") + escapeHTML(n.text) + "</li>";
+  };
+  const fold = function (label, arr, noCat) {
+    return arr.length ? '<details class="rep-fold"><summary>' + label + " " + arr.length + "건</summary><ul class=\"rep-news\">" +
+      arr.map(function (n) { return li(n, noCat); }).join("") + "</ul></details>" : "";
+  };
+  return '<div class="rep-row rep-news-row"><span class="rep-tag news">소식</span><div class="rep-news-body">' +
+    (shown.length ? '<ul class="rep-news">' + shown.map(li).join("") + "</ul>" : "") +
+    fold("🔁 이적 시장", transfers, true) + fold("📰 다른 소식", others, false) + "</div></div>";
 }
 
 // ===== 대시보드 조각들 (main.js의 pages.dashboard에서 조립) =====
