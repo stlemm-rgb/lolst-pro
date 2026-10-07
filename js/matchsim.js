@@ -89,6 +89,7 @@ function userMatchContext(match, target, used) {
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
   mult *= 1 + activityMatchBoost(match); // 라이벌 선언한 팀과 경기 (js/events.js)
+  mult *= 1 + chemistryBonus(); // 주전 동료와의 관계 (js/stories.js)
   // 특성(큰 무대·클러치·역전 등)은 다른 선수와 똑같이 traitPowerMult에서 계산
   return { power: m.power * mult, pick: m.pick, banned: m.banned, joker: m.joker };
 }

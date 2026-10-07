@@ -83,7 +83,10 @@ function fillText(text, ctx) {
     .replace(/\{oldteam\}/g, c.oldteam || "전 소속팀")
     .replace(/\{award\}/g, c.award || "개인상")
     .replace(/\{streak\}/g, c.streak || "")
-    .replace(/\{opp\}/g, c.opp || "상대 팀");
+    .replace(/\{opp\}/g, c.opp || "상대 팀")
+    .replace(/\{year\}/g, String(state.year))
+    .replace(/\{window\}/g, String(CONTRACT.windowStart))
+    .replace(/\{(\w+)\}/g, function (all, k) { return c[k] !== undefined && c[k] !== null && typeof c[k] !== "object" ? String(c[k]) : all; }); // 그 밖의 빈칸은 ctx 값
 }
 
 // ----- 메시지 넣기 -----
@@ -144,6 +147,24 @@ function applyEffects(eff, ctx) {
         notes.push("✒️ '" + ctx.champ + "'이(가) 나의 시그니처 픽이 됐다");
         addMoment("✒️", "시그니처 픽 '" + ctx.champ + "'");
         addNews("시그니처 픽", state.player.name + "의 시그니처 픽은 '" + ctx.champ + "'! 이제 이 챔피언을 고르면 언제나 한 번은 빛나는 장면을 만든다.");
+      }
+    } else if (key === "flag") {
+      // 이야기 기억 (need.flag / need.noFlag)
+      if (!state.flags) state.flags = {};
+      Object.keys(v).forEach(function (k) { state.flags[k] = v[k]; });
+    } else if (key === "unflag") {
+      (Array.isArray(v) ? v : [v]).forEach(function (k) { if (state.flags) delete state.flags[k]; });
+    } else if (key === "relation") {
+      if (ctx && ctx.pid) changeRelation(ctx.pid, v, notes); // js/stories.js
+    } else if (key === "teamRelation") {
+      const t = myTeam();
+      if (t) t.roster.forEach(function (id) { if (id !== USER_ID) changeRelation(id, v, null); });
+      notes.push("팀 동료들과의 관계 " + (v > 0 ? "+" : "") + v);
+    } else if (key === "salaryRaise") {
+      if (state.contract) {
+        const old = state.contract.salary;
+        state.contract.salary = Math.round(old * (1 + v) / 1000000) * 1000000;
+        notes.push("💰 연봉 " + moneyText(old) + " → " + moneyText(state.contract.salary));
       }
     } else if (key === "money") {
       const m = eventMoney(v);
@@ -235,6 +256,12 @@ function choiceHint(choice, ctx) {
   if (e.cureOther) parts.push("💚 " + Math.round(e.cureOther * 100) + "% 확률로 동료의 나쁜 특성 극복");
   if (choice.risk) parts.push("⚠️ 낮은 확률(" + Math.round(Math.min(EVENT_RULES.maxRisk, choice.risk.chance) * 100) + "%)로 나쁜 특성 '" + findTrait(choice.risk.trait).name + "'");
   if (choice.cure) parts.push("💚 " + Math.round(choice.cure.chance * 100) + "% 확률로 '" + findTrait(choice.cure.trait).name + "' 극복");
+  const fr = choice.check && choice.fail && choice.fail.risk;
+  if (fr) parts.push("실패하면 ⚠️ 낮은 확률(" + Math.round(Math.min(EVENT_RULES.maxRisk, fr.chance) * 100) + "%)로 나쁜 특성 '" + findTrait(fr.trait).name + "'");
+  const sg = choice.check && choice.success && choice.success.gain;
+  if (sg) parts.push("성공하면 ✨ 낮은 확률로 좋은 특성 '" + findTrait(sg.trait).name + "'");
+  if (choice.gain) parts.push("✨ 낮은 확률로 좋은 특성 '" + findTrait(choice.gain.trait).name + "'");
+  if (choice.check) parts.unshift("🎲 성공 확률 " + Math.round(checkChance(choice.check) * 100) + "% (" + checkStatName(choice.check.stat) + " " + Math.round(checkValue(choice.check.stat)) + ")"); // js/stories.js
   return parts.join(" · ");
 }
 
@@ -252,11 +279,19 @@ function eventReady(ev) {
   if (need.minWeek && state.week < need.minWeek) return false;
   if (need.trait && !hasTrait(need.trait)) return false;
   if (need.noTrait && hasTrait(need.noTrait)) return false;
+  if (!storyNeedOk(need)) return false; // 리뉴얼 조건 (js/stories.js)
+  // 한 시즌에 같은 연락은 seasonMax번까지, 받은 연락은 inboxPerSeason개까지 (always·후속 연락은 예외)
+  if (ev.tab === "inbox" && !ev.always && ev.trigger !== "followUp" && ev.trigger !== "signature") {
+    const L = eventLog();
+    if ((L.ys[ev.id] || 0) >= (ev.seasonMax || EVENT_RULES.seasonMax)) return false;
+    if (L.n >= EVENT_RULES.inboxPerSeason) return false;
+  }
   return true;
 }
 
 function fireEvent(ev, ctx) {
   state.eventCooldown[ev.id] = absWeek();
+  logEventFired(ev); // js/stories.js
   const title = fillText(ev.title, ctx);
   const text = fillText(ev.text, ctx);
   if (ev.tab === "news") {
@@ -290,7 +325,7 @@ function triggerContext(trigger) {
     case "highCondition": return state.condition >= 90 ? {} : null;
     case "lowStamina": return state.stamina <= 20 ? {} : null;
     case "benchLong": return state.benched && state.benchWeeks >= CONTRACT.benchTalkWeeks ? {} : null;
-    default: return null;
+    default: return storyTriggerContext(trigger); // 시즌 흐름 트리거 (js/stories.js)
   }
 }
 
@@ -303,20 +338,30 @@ function traitWeight(ev) {
 
 // 매주 한 번: 조건 이벤트 → 무작위 이벤트 → 특성 얻기 → 선수 SNS → 답 안 한 연락 정리
 function runWeeklyEvents() {
-  EVENTS.forEach(function (ev) {
-    if (ev.trigger === "random" || !eventReady(ev)) return;
+  // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/stories.js) → 조건 연락 → 무작위
+  let inboxFired = runQueuedTriggers();
+  shuffled(EVENTS).forEach(function (ev) {
+    if (ev.trigger === "random" || ev.trigger === "followUp" || ev.trigger === "signature" || QUEUE_TRIGGERS.indexOf(ev.trigger) !== -1 || !eventReady(ev)) return;
+    if (ev.tab === "inbox" && !ev.always && inboxFired) return;
     const ctx = triggerContext(ev.trigger);
     if (!ctx) return;
+    const full = ev.who ? whoContext(ev.who) : null;
+    if (ev.who && !full) return;
     const chance = Math.min(1, (ev.chance === undefined ? 1 : ev.chance) * traitWeight(ev));
-    if (Math.random() < chance) fireEvent(ev, ctx);
+    if (Math.random() < chance) {
+      fireEvent(ev, Object.assign({}, ctx, full || {}));
+      if (ev.tab === "inbox" && !ev.always) inboxFired = true;
+    }
   });
 
-  if (Math.random() < EVENT_RULES.randomChance) {
+  if (!inboxFired && Math.random() < EVENT_RULES.randomChance) {
     const pool = [];
+    const L = eventLog();
     EVENTS.forEach(function (ev) {
       if (ev.trigger !== "random" || !eventReady(ev)) return;
       if (ev.who && !whoContext(ev.who)) return; // 나올 선수가 없으면 빼기
-      for (let i = 0; i < traitWeight(ev); i++) pool.push(ev);
+      const w = traitWeight(ev) * (L.seen[ev.id] ? 1 : EVENT_RULES.freshWeight); // 처음 보는 연락 우선
+      for (let i = 0; i < w; i++) pool.push(ev);
     });
     if (pool.length) {
       const ev = pick(pool);
@@ -511,6 +556,21 @@ function answerMessage(msgId, index) {
   const r = applyEffects(choice.effects, msg.ctx);
   rollTraitEffects(choice, r.notes);
   scheduleFollowUps(choice.followUp, msg.ctx); // 몇 주 뒤 후속 연락
+  // 능력치 판정 🎲 → 성공/실패 결과 (js/stories.js)
+  let result = choice.result;
+  if (choice.check) {
+    const ok = Math.random() < checkChance(choice.check);
+    const br = (ok ? choice.success : choice.fail) || {};
+    r.notes.unshift(ok ? "🎲 성공!" : "🎲 실패…");
+    const r2 = applyEffects(br.effects, msg.ctx);
+    Object.keys(r2.changes).forEach(function (k) { r.changes[k] = (r.changes[k] || 0) + r2.changes[k]; });
+    r2.notes.forEach(function (n) { r.notes.push(n); });
+    rollTraitEffects(br, r.notes);
+    scheduleFollowUps(br.followUp, msg.ctx);
+    if (br.result) result = br.result;
+    msg.checkOk = ok;
+  }
+  if (result) msg.result = fillText(Array.isArray(result) ? pick(result) : result, msg.ctx);
   msg.answered = index;
   msg.read = true;
   msg.changes = r.changes;
@@ -553,6 +613,15 @@ function whoContext(who) {
     return same.length ? make(same[0]) : null;
   }
   if (who === "otherPro") return others.length ? make(pick(others)) : null;
+  // 관계 (js/stories.js): 절친 동료 · 앙숙
+  if (who === "friend") {
+    const f = mates.filter(function (id) { return relationOf(id) >= 40; });
+    return f.length ? make(pick(f)) : null;
+  }
+  if (who === "foe") {
+    const f = Object.keys(state.relations || {}).filter(function (id) { return P[id] && P[id].teamId && relationOf(id) <= -30; });
+    return f.length ? make(pick(f)) : null;
+  }
   if (who === "teammate") return mates.length ? make(pick(mates)) : null;
   if (who === "teammateBad") {
     const bad = [];

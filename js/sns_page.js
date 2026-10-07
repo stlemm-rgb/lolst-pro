@@ -45,7 +45,7 @@ pages.sns = function () {
     "<h1>SNS</h1>" +
     '<div class="card"><div class="buttons sns-tabs">' + tabHTML + readAll + "</div>" +
       '<p class="muted small">' +
-        (snsTab === "inbox" ? "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. ⚠️는 낮은 확률로 나쁜 특성, 💚는 나쁜 특성 극복이에요."
+        (snsTab === "inbox" ? "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. ⚠️는 낮은 확률로 나쁜 특성, 💚는 나쁜 특성 극복, 🎲는 능력치로 성공·실패가 갈리는 선택이에요."
           : snsTab === "news" ? "기사와 커뮤니티 소식이에요. 읽기만 하면 돼요."
           : "선수와 팬들의 글이에요. 🎮 선수 = 리그 프로 선수의 글, 📣 = 내 선수를 언급한 글 (보면 읽음 처리).") +
       "</p>" +
@@ -86,6 +86,7 @@ function messageHTML(m) {
       }).join("") + "</div>";
     } else if (m.choices && m.answered !== "ignored") {
       inner += '<div class="msg-answer">선택: <b>' + escapeHTML(m.choices[m.answered].label) + "</b></div>";
+      if (m.result) inner += '<div class="msg-result">' + escapeHTML(m.result) + "</div>"; // 결과 이야기 (js/events.js answerMessage)
     }
     const changes = changesText(m.changes);
     if (changes) inner += '<div class="log-changes">' + changes + "</div>";

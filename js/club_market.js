@@ -210,6 +210,7 @@ function payrollDelta(buyer, id, salary) {
 function npcTransfer(id, buyer, fee, salary, kind) {
   const p = findPlayer(id);
   const seller = p.teamId ? findTeam(p.teamId) : null;
+  noteFriendLeaving(id, seller, buyer); // 친한 동료가 떠나면 작별 연락 (js/stories.js)
   logTransfer({ kind: kind || "buy", team: buyer.id, from: seller ? seller.id : null, id: id, name: p.name, pos: p.pos, score: Math.round(playerScore(id) * 10) / 10, age: p.age, fee: fee });
   if (seller) {
     seller.roster.splice(seller.roster.indexOf(id), 1);
@@ -364,9 +365,7 @@ function depthSignings(order, moved, news) {
       news.push("🧩 " + t.name + ", " + (from ? from.name + "의 " : "FA ") + p.name + "(" + findPosition(g.pos).name + ", " + best.score.toFixed(1) + ") 영입 — 주전 경쟁 체제" +
         (best.fee ? " · 이적료 " + moneyText(best.fee) : ""));
       if (user) {
-        postMessage("inbox", "⚔️ 같은 포지션 경쟁자 합류", "구단이 " + findPosition(g.pos).name + " " + p.name + "(" + p.age + "세, 스탯 점수 " + best.score.toFixed(1) + ")을(를) 영입했다.\n" +
-          "내 스탯 점수는 " + playerScore(USER_ID).toFixed(1) + ". 이제 주전 자리를 지키려면 계속 성장해야 한다.",
-          { notes: ["경쟁 선수 점수가 나보다 " + (CONTRACT.benchGap + managerTrust()) + " 이상 높아지면 2군으로 밀려요 (4주마다 판정)."] });
+        queueTrigger("rivalSigned", { pid: best.id, player: p.name, pteam: from ? from.name : "FA", score: best.score.toFixed(1), gap: CONTRACT.benchGap + managerTrust() }); // 반응 연락 (data/events_story.js rival_signed)
       }
     });
   });

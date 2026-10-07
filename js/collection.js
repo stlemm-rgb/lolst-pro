@@ -26,6 +26,7 @@ function recordWorldsSkins(f) {
   if (me) {
     state.popularity = clamp(state.popularity + WORLDS_SKIN.popularity);
     addMoment("🎨", state.year + " 월드 우승 스킨 '" + skinName(entry, me.champ) + "'");
+    queueTrigger("skinMade", { champ: me.champ }); // 스킨 디자인 연락 (js/stories.js)
     postMessage("news", "🎨 월드 우승 스킨 제작 확정", state.year + " 월드 챔피언십 우승을 기념해 " + entry.team + " 선수들의 우승 스킨이 만들어진다.\n" +
       state.player.name + "의 스킨은 결승 마지막 세트에서 쓴 " + me.champ + ".", {
       notes: ["🎨 " + me.champ + "을(를) 고르면 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "% (스킨 효과)", "인기도 +" + WORLDS_SKIN.popularity, "[수집] → 컬렉션에서 볼 수 있어요."],

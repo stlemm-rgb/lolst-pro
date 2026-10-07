@@ -72,7 +72,7 @@ pages.team = function () {
     '<div class="card"><h2>선수단</h2>' +
       '<p class="muted small">주전은 포지션마다 스탯 점수가 가장 높은 선수예요. 내 선수는 항상 주전.</p>' +
       '<table class="roster"><tr><th>포지션</th><th>이름</th><th>나이</th><th class="r">스탯 점수</th><th></th></tr>' + rows + "</table>" +
-    "</div>"
+    "</div>" + relationsCardHTML() // 선수 관계 (js/stories.js)
   );
 };
 
