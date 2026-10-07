@@ -2,7 +2,7 @@
 // 1) 🏆 월드 우승 스킨: 월드 결승 우승 세트에서 우승 팀이 쓴 챔피언 → state.league.worldsSkins (모든 해 기록)
 //    내 선수가 뛰었으면 내 스킨 → 그 챔피언 경기력 +2% (js/champions.js champPower)
 // 2) ✒️ 시그니처 픽 성장: 시그니처로 뛴 세트마다 경험치 → ★1~★5 (state.sigGrowth = { xp, sets, wins })
-// 3) 🏅 업적 도감: 매주 확인해서 이룬 업적 기록·보상 (state.achievements = { id: { y, w } })
+// 3) 🏅 업적 도감: 매주 확인해서 이룬 업적 기록 (보상 없음, state.achievements = { id: { y, w } })
 // 화면: [수집] 업적 도감 (pages.achievements) · 컬렉션 (pages.collection)
 
 // ----- 1) 월드 우승 스킨 -----
@@ -127,25 +127,17 @@ function achValue(a, x) {
   return f ? f(x) || 0 : 0;
 }
 
-// 매주 (main.js nextWeek) + 화면 열 때 확인. 새로 이룬 업적 → 보상 + 연락 1개로 묶음
+// 매주 (main.js nextWeek) + 화면 열 때 확인. 새로 이룬 업적 → 소식 1개로 묶음 (보상 없음)
 function checkAchievements() {
   if (!state.player || state.retired || !state.league || !state.league.season) return;
   if (!state.achievements) state.achievements = {};
   const x = achContext();
   const fresh = ACHIEVEMENTS.filter(function (a) { return !state.achievements[a.id] && achValue(a, x) >= a.goal; });
   if (!fresh.length) return;
-  const sum = { popularity: 0, reputation: 0, money: 0 };
-  fresh.forEach(function (a) {
-    state.achievements[a.id] = { y: state.year, w: state.week };
-    const r = ACH_REWARD[a.grade];
-    sum.popularity += r.popularity; sum.reputation += r.reputation; sum.money += eventMoney(r.money);
-  });
-  state.popularity = clamp(state.popularity + sum.popularity);
-  state.reputation = Math.min(100, state.reputation + sum.reputation);
-  state.money += sum.money;
+  fresh.forEach(function (a) { state.achievements[a.id] = { y: state.year, w: state.week }; });
   const title = fresh.length === 1 ? "🏅 업적 달성: " + fresh[0].name : "🏅 업적 " + fresh.length + "개 달성";
   postMessage("news", title, fresh.map(function (a) { return a.icon + " " + a.name + " — " + a.desc; }).join("\n"), {
-    notes: ["보상: 인기도 +" + sum.popularity + (sum.reputation ? " · 평판 +" + sum.reputation : "") + " · " + moneyText(sum.money), "[수집] → 업적 도감 (" + achDoneCount() + "/" + ACHIEVEMENTS.length + ")"],
+    notes: ["[수집] → 업적 도감 (" + achDoneCount() + "/" + ACHIEVEMENTS.length + ")"],
   });
   fresh.filter(function (a) { return a.grade === "g"; }).forEach(function (a) { addMoment("🏅", "업적 '" + a.name + "' 달성"); });
 }
@@ -165,12 +157,10 @@ pages.achievements = function () {
     const items = list.map(function (a) {
       const d = state.achievements[a.id];
       const v = Math.min(a.goal, achValue(a, x));
-      const r = ACH_REWARD[a.grade];
-      const tip = "보상: 인기도 +" + r.popularity + (r.reputation ? " · 평판 +" + r.reputation : "") + " · " + moneyText(eventMoney(r.money));
       const prog = d ? '<span class="up small">✅ ' + d.y + "년 " + d.w + "주</span>"
         : '<div class="bar ach-bar"><div class="bar-fill" style="width:' + Math.round(v / a.goal * 100) + '%"></div></div><span class="muted small">' + achNum(a, v) + " / " + achNum(a, a.goal) + "</span>";
       return '<div class="ach' + (d ? " done" : "") + '"><div class="ach-icon">' + a.icon + "</div>" +
-        '<div class="ach-body"><div><b>' + escapeHTML(a.name) + '</b> <span class="ach-grade g-' + a.grade + ' tip" tabindex="0" data-tip="' + escapeHTML(tip) + '">' + ACH_GRADE_NAME[a.grade] + "</span></div>" +
+        '<div class="ach-body"><div><b>' + escapeHTML(a.name) + '</b> <span class="ach-grade g-' + a.grade + '" title="난이도">' + ACH_GRADE_NAME[a.grade] + "</span></div>" +
         '<div class="muted small">' + escapeHTML(a.desc) + "</div>" + prog + "</div></div>";
     }).join("");
     return '<div class="card"><h2>' + cat.name + ' <span class="muted small">' + got + "/" + list.length + "</span></h2>" + '<div class="ach-list">' + items + "</div></div>";
@@ -178,7 +168,7 @@ pages.achievements = function () {
   return "<h1>업적 도감</h1>" +
     '<div class="card"><h2>달성 ' + done + " / " + total + ' <span class="muted small">(' + pct + "%)</span></h2>" +
       '<div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div>' +
-      '<p class="muted small">업적을 이루면 인기도·평판·돈 보상이 와요 (동 · 은 · 금). 매주 자동으로 확인해요. 등급 글자에 마우스를 올리면 보상을 볼 수 있어요.</p></div>' +
+      '<p class="muted small">매주 자동으로 확인해요. 동 · 은 · 금은 난이도예요 (보상은 없어요).</p></div>' +
     '<div class="grid">' + cards + "</div>";
 };
 // 큰 숫자는 돈으로

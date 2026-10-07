@@ -19,7 +19,7 @@ const SIGNATURE_GROWTH = {
 };
 
 // ----- 3) 업적 도감 -----
-// key: 무엇을 셀지 (js/collection.js ACH_VALUES), goal: 목표, grade: 보상 등급 (ACH_REWARD)
+// key: 무엇을 셀지 (js/collection.js ACH_VALUES), goal: 목표, grade: 난이도 등급 b 동 · s 은 · g 금 (표시만, 보상 없음 — 2026-10-08 보상 삭제)
 // cat: 분류 (ACH_CATS 순서로 화면에 묶어 보여 줌). 이미 이룬 업적은 불러오기·다음 주에 한꺼번에 달성 처리
 const ACH_CATS = [
   { id: "career", name: "커리어" },
@@ -29,13 +29,6 @@ const ACH_CATS = [
   { id: "growth", name: "성장·수집" },
   { id: "life",   name: "선수 생활" },
 ];
-
-// 보상: b 동, s 은, g 금 (돈은 연봉 3,000만 기준 금액, 시대에 따라 커짐 — eventMoney)
-const ACH_REWARD = {
-  b: { popularity: 1, reputation: 0, money: 1000000 },
-  s: { popularity: 2, reputation: 1, money: 3000000 },
-  g: { popularity: 4, reputation: 2, money: 8000000 },
-};
 
 const ACHIEVEMENTS = [
   // 커리어
