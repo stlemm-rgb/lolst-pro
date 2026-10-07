@@ -861,3 +861,6 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .radar-legend { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; justify-content: center; }
 .radar-legend .lg-me { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--accent); }
 .radar-legend .lg-avg { display: inline-block; width: 18px; height: 0; border-top: 2px dashed var(--muted); margin-left: 10px; }
+
+/* 이적 목록 (js/market_pages.js) — 좁은 화면에서는 줄바꿈 대신 가로 스크롤 */
+.tlog td, .tlog th { white-space: nowrap; }

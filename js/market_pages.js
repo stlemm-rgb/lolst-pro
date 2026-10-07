@@ -183,6 +183,40 @@ function clubRosterHTML(teamId) {
 }
 
 // ----- 이적 시장 -----
+// ----- 이적 목록 (js/club_market.js logTransfer) -----
+let tlogYear = 0;      // 0 = 올해, 1 = 작년
+let tlogFilter = "all"; // all · t1 · mine
+const TLOG_KIND = { buy: "🔁 보강", star: "💥 주전 이적", depth: "🧩 경쟁 후보", loan: "🤝 임대" };
+function transferLogCardHTML() {
+  const log = state.league.transferLog || [];
+  const year = state.year - tlogYear;
+  const mine = myTeam();
+  const teamName = function (id) { const t = id && findTeam(id); return t ? t.name : id ? "(해체된 팀)" : "FA"; };
+  const list = log.filter(function (e) {
+    if (e.y !== year) return false;
+    if (tlogFilter === "t1") { const a = findTeam(e.team), b = e.from && findTeam(e.from); return (a && a.tier === 1) || (b && b.tier === 1); }
+    if (tlogFilter === "mine") return e.team === mine.id || e.from === mine.id;
+    return true;
+  }).sort(function (a, b) { return (a.w - b.w) || (b.fee - a.fee); });
+  const when = function (e) { return e.w >= SUMMER_MARKET.start && e.w < CONTRACT.windowStart ? "여름" : "비시즌"; };
+  const rows = list.map(function (e) {
+    const mineRow = e.team === mine.id || e.from === mine.id;
+    return "<tr" + (mineRow ? ' class="me"' : "") + "><td>" + when(e) + "</td><td>" + TLOG_KIND[e.kind] + "</td><td><b>" + escapeHTML(e.name) + '</b> <span class="muted small">' + findPosition(e.pos).name + " · " + e.age + "세</span></td>" +
+      '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(teamName(e.from)) + " → <b>" + escapeHTML(teamName(e.team)) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
+  }).join("");
+  const count = {};
+  list.forEach(function (e) { count[e.kind] = (count[e.kind] || 0) + 1; });
+  const summary = Object.keys(TLOG_KIND).filter(function (k) { return count[k]; }).map(function (k) { return TLOG_KIND[k] + " " + count[k]; }).join(" · ");
+  const btn = function (attr, val, cur, text) { return '<button class="small-btn' + (cur === val ? " primary" : "") + '" data-' + attr + '="' + val + '">' + text + "</button>"; };
+  return '<div class="card"><h2>📋 이적 목록 <span class="muted small">' + year + "년 · " + list.length + "건" + (summary ? " (" + summary + ")" : "") + "</span></h2>" +
+    '<div class="radar-ctrl">' + btn("tlog-year", 0, tlogYear, "올해") + " " + btn("tlog-year", 1, tlogYear, "작년") + " &nbsp; " +
+      btn("tlog-filter", "all", tlogFilter, "전체") + " " + btn("tlog-filter", "t1", tlogFilter, "1부 관련") + " " + btn("tlog-filter", "mine", tlogFilter, "우리 팀") + "</div>" +
+    (rows ? '<div class="table-wrap"><table class="roster tlog"><tr><th>시기</th><th>종류</th><th>선수</th><th class="r">스탯 점수</th><th>이동</th><th class="r">이적료</th></tr>' + rows + "</table></div>"
+      : '<p class="muted">' + year + "년 이적 기록이 없어요. 이적은 비시즌(새 시즌 시작)과 여름(" + SUMMER_MARKET.applyWeek + "주)에 일어나요.</p>") +
+    '<p class="muted small">💥 주전 이적: 돈 많은 1부 팀이 다른 1부 팀 주전을 비싸게 데려감 · 🧩 경쟁 후보: 주전과 실력이 비슷한 후보를 데려와 주전 경쟁 · 스탯 점수는 이적할 때 기준</p>' +
+    "</div>";
+}
+
 pages.transfer = function () {
   const c = state.contract;
   const team = myTeam();
@@ -255,7 +289,7 @@ pages.transfer = function () {
     '<div class="notice">' + (summer ? "☀️ 여름 이적·임대 기간이에요 (" + SUMMER_MARKET.end + "주차까지). 정해진 이적은 후반기(" + SUMMER_MARKET.applyWeek + "주)에 반영돼요. 하위권 팀들이 1명씩 보강해요."
       : open ? "🔓 이적 시장이 열려 있어요 (" + CONTRACT.windowEnd + "주차까지). 정해진 이적은 새 시즌에 반영돼요."
       : "🔒 지금은 이적할 수 없어요. 여름 이적 기간은 " + SUMMER_MARKET.start + "~" + SUMMER_MARKET.end + "주, 비시즌 이적 시장은 " + CONTRACT.windowStart + "주차에 열려요.") + "</div>" +
-    '<div class="grid">' + contractCard + offerCard + "</div>" + requestCard + faCard
+    '<div class="grid">' + contractCard + offerCard + "</div>" + requestCard + transferLogCardHTML() + faCard
   );
 };
 

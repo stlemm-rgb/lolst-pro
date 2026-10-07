@@ -102,6 +102,7 @@ function tryLoan(t, pos, margin, moved) {
   if (!best) return null;
   const p = findPlayer(best);
   const from = findTeam(p.teamId);
+  logTransfer({ kind: "loan", team: t.id, from: from.id, id: best, name: p.name, pos: pos, score: Math.round(playerScore(best) * 10) / 10, age: p.age, fee: 0 });
   from.roster.splice(from.roster.indexOf(best), 1);
   p.loan = { from: from.id, year: state.year };
   p.teamId = t.id;

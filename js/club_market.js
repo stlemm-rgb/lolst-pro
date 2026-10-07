@@ -205,10 +205,13 @@ function payrollDelta(buyer, id, salary) {
 }
 
 // 실제 이동: 이적료 주고받기, 새 계약
-function npcTransfer(id, buyer, fee, salary) {
+//   kind: "buy" 보강 · "star" 1부 주전 이적 · "depth" 경쟁 후보 (이적 목록에 기록)
+//   선수단이 넘치면 가장 약한 선수를 내보냄 (depth면 주전은 빼고 후보 중에서)
+function npcTransfer(id, buyer, fee, salary, kind) {
   const p = findPlayer(id);
-  if (p.teamId) {
-    const seller = findTeam(p.teamId);
+  const seller = p.teamId ? findTeam(p.teamId) : null;
+  logTransfer({ kind: kind || "buy", team: buyer.id, from: seller ? seller.id : null, id: id, name: p.name, pos: p.pos, score: Math.round(playerScore(id) * 10) / 10, age: p.age, fee: fee });
+  if (seller) {
     seller.roster.splice(seller.roster.indexOf(id), 1);
     seller.money = teamMoney(seller.id) + fee;
   } else {
@@ -221,11 +224,24 @@ function npcTransfer(id, buyer, fee, salary) {
   p.contractEnd = state.year - 1 + randInt(CONTRACT.years[0], CONTRACT.years[1]);
   buyer.roster.push(id);
   while (buyer.roster.length > LEAGUE.rosterSize) {
-    const w = buyer.roster.filter(function (x) { return x !== USER_ID && x !== id; })
+    const s = kind === "depth" ? starters(buyer.id) : {};
+    const keep = POSITION_IDS.map(function (pos) { return s[pos]; });
+    const w = buyer.roster.filter(function (x) { return x !== USER_ID && x !== id && !findPlayer(x).loan && keep.indexOf(x) === -1; })
       .sort(function (a, b) { return playerScore(a) - playerScore(b); })[0];
     if (!w) break;
     releaseToFA(w);
   }
+}
+
+// ----- 이적 목록 (state.league.transferLog, [이적 시장] '이적 목록') -----
+// { y, w, kind, team, from, id, name, pos, score, age, fee }  kind: buy·star·depth·loan
+function logTransfer(e) {
+  const L = state.league;
+  if (!L.transferLog) L.transferLog = [];
+  e.y = state.year; e.w = state.week;
+  L.transferLog.push(e);
+  const from = state.year - CLUB_MARKET.logYears + 1;
+  L.transferLog = L.transferLog.filter(function (x) { return x.y >= from; });
 }
 
 // 빚 한도를 넘은 팀: 연봉 비싼 후보부터 내보냄
@@ -249,6 +265,9 @@ function offseasonRebuild(news) {
   const buysLeft = {};
   order.forEach(function (t) { buysLeft[t.id] = rebuildRule(needOf(t)).buys; fireSale(t); });
 
+  // 1부 팀끼리 주전 이적 (판 팀은 아래 영입 라운드에서 받은 이적료로 다시 보강)
+  starTransfers(moved, news);
+
   for (let pass = 0; pass < CLUB_MARKET.passes; pass++) {
     order.forEach(function (t) {
       const rule = rebuildRule(needOf(t));
@@ -259,6 +278,98 @@ function offseasonRebuild(news) {
       });
     });
   }
+  // 경쟁 후보 영입
+  depthSignings(order, moved, news);
+}
+
+// 영입할 돈이 되나? (구단 자금 − 이적료가 빚 한도 안 + 시즌 연봉 여유)
+function canAfford(t, c) {
+  return teamMoney(t.id) - c.fee >= debtFloor(t.id) && clubRoom(t.id) - c.fee >= payrollDelta(t, c.id, c.salary);
+}
+
+// 1부 팀끼리 주전 이적: 돈 많은 팀부터, 약한 포지션에 다른 1부 팀 주전(margin 이상 나은)을 이적료 × feeMult로
+function starTransfers(moved, news) {
+  const S = CLUB_MARKET.star;
+  const sold = {};
+  let count = 0;
+  const buyers = tierTeams(1).slice().sort(function (a, b) { return teamMoney(b.id) - teamMoney(a.id); });
+  buyers.forEach(function (t) {
+    if (count >= S.maxMoves || sold[t.id] || Math.random() >= S.chance) return;
+    let done = false;
+    weakPositions(t).forEach(function (pos) {
+      if (done) return;
+      const starter = starterAt(t.id, pos);
+      const base = starter ? playerScore(starter) : 0;
+      const best = tierTeams(1).filter(function (o) { return o.id !== t.id && !sold[o.id]; }).map(function (o) {
+        const id = starterAt(o.id, pos);
+        if (!id || id === USER_ID || moved[id] || findPlayer(id).loan || playerScore(id) < base + S.margin) return null;
+        return { id: id, fee: Math.round(transferFee(id) * S.feeMult / 1000000) * 1000000, salary: npcContractSalary(id, 1), score: playerScore(id) };
+      }).filter(function (c) {
+        return c && teamMoney(t.id) - c.fee >= S.keepMoney && clubRoom(t.id) - c.fee >= payrollDelta(t, c.id, c.salary);
+      }).sort(function (a, b) { return b.score - a.score; })[0];
+      if (!best) return;
+      const p = findPlayer(best.id);
+      const from = findTeam(p.teamId);
+      npcTransfer(best.id, t, best.fee, best.salary, "star");
+      moved[best.id] = true;
+      sold[from.id] = true;
+      count++;
+      done = true;
+      news.push("💥 " + t.name + ", " + from.name + " 주전 " + p.name + "(" + findPosition(pos).name + ") 영입" +
+        (best.fee ? " · 이적료 " + moneyText(best.fee) : "") + " — " + transferSummary(pos, starter, best.id));
+    });
+  });
+}
+
+// 경쟁 후보 영입: 주전과 후보 차이가 큰 포지션에 '주전보다 조금 약한' 선수 (내 포지션이면 나와 비슷한 선수)
+function depthSignings(order, moved, news) {
+  const D = CLUB_MARKET.depth;
+  order.forEach(function (t) {
+    if (Math.random() >= D.chance) return;
+    const s = starters(t.id);
+    const starterIds = POSITION_IDS.map(function (pos) { return s[pos]; });
+    // 포지션별 차이 (주전 − 같은 포지션 가장 좋은 후보)
+    const gaps = POSITION_IDS.filter(function (pos) { return s[pos]; }).map(function (pos) {
+      const base = playerScore(s[pos]);
+      const bench = t.roster.filter(function (id) { return id !== USER_ID && starterIds.indexOf(id) === -1 && playerPos(id) === pos; })
+        .map(playerScore).sort(function (a, b) { return b - a; })[0];
+      return { pos: pos, base: base, gap: bench === undefined ? 99 : base - bench };
+    }).filter(function (g) { return g.gap >= D.gapFrom; }).sort(function (a, b) { return b.gap - a.gap; });
+    let done = false;
+    gaps.forEach(function (g) {
+      if (done) return;
+      const user = s[g.pos] === USER_ID;
+      const win = user ? D.userWindow : D.window;
+      // 내 포지션이면 같은 리그 다른 팀 주전도 후보 (이적료 × star.feeMult) — 내가 잘해도 경쟁자가 올 수 있게
+      const rivalStarter = function (id, p) {
+        return user && p.teamId && p.teamId !== t.id && !p.loan && findTeam(p.teamId).tier === t.tier && starterAt(p.teamId, p.pos) === id;
+      };
+      const best = Object.keys(state.league.players).filter(function (id) {
+        const p = state.league.players[id];
+        if (p.pos !== g.pos || moved[id] || !(sellable(id, t) || rivalStarter(id, p))) return false;
+        const sc = playerScore(id);
+        return sc >= g.base + win[0] && sc <= g.base + win[1];
+      }).map(function (id) {
+        const fee = rivalStarter(id, findPlayer(id)) ? Math.round(transferFee(id) * CLUB_MARKET.star.feeMult / 1000000) * 1000000 : transferFee(id);
+        return { id: id, fee: fee, salary: npcContractSalary(id, t.tier), score: playerScore(id),
+          pickScore: playerScore(id) + Math.max(0, 25 - playerAge(id)) * D.youngBonus };
+      }).filter(function (c) { return canAfford(t, c); })
+        .sort(function (a, b) { return (b.pickScore - a.pickScore) || (a.fee + a.salary - b.fee - b.salary); })[0];
+      if (!best) return;
+      const p = findPlayer(best.id);
+      const from = p.teamId ? findTeam(p.teamId) : null;
+      npcTransfer(best.id, t, best.fee, best.salary, "depth");
+      moved[best.id] = true;
+      done = true;
+      news.push("🧩 " + t.name + ", " + (from ? from.name + "의 " : "FA ") + p.name + "(" + findPosition(g.pos).name + ", " + best.score.toFixed(1) + ") 영입 — 주전 경쟁 체제" +
+        (best.fee ? " · 이적료 " + moneyText(best.fee) : ""));
+      if (user) {
+        postMessage("inbox", "⚔️ 같은 포지션 경쟁자 합류", "구단이 " + findPosition(g.pos).name + " " + p.name + "(" + p.age + "세, 스탯 점수 " + best.score.toFixed(1) + ")을(를) 영입했다.\n" +
+          "내 스탯 점수는 " + playerScore(USER_ID).toFixed(1) + ". 이제 주전 자리를 지키려면 계속 성장해야 한다.",
+          { notes: ["경쟁 선수 점수가 나보다 " + (CONTRACT.benchGap + managerTrust()) + " 이상 높아지면 2군으로 밀려요 (4주마다 판정)."] });
+      }
+    });
+  });
 }
 
 // 주전이 약한 포지션부터 (내 포지션은 빼고)
@@ -279,10 +390,7 @@ function tryBuy(t, pos, margin, moved) {
     const fee = transferFee(id);
     const salary = npcContractSalary(id, t.tier);
     return { id: id, fee: fee, salary: salary, score: playerScore(id) };
-  }).filter(function (c) {
-    // 돈: 구단 자금 − 이적료가 빚 한도 안 + 시즌 연봉 여유
-    return teamMoney(t.id) - c.fee >= debtFloor(t.id) && clubRoom(t.id) - c.fee >= payrollDelta(t, c.id, c.salary);
-  }).sort(function (a, b) { return (b.score - a.score) || (a.fee + a.salary - b.fee - b.salary); })[0];
+  }).filter(function (c) { return canAfford(t, c); }).sort(function (a, b) { return (b.score - a.score) || (a.fee + a.salary - b.fee - b.salary); })[0];
   if (!best) return null;
   const p = findPlayer(best.id);
   const from = p.teamId ? findTeam(p.teamId) : null;
