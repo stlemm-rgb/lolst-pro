@@ -458,7 +458,7 @@ function npcYearGrowth(ageAdd, forYear) {
     const rule = LEAGUE.npcGrowth.find(function (g) { return bodyAge <= g.maxAge; }) || LEAGUE.npcGrowth[LEAGUE.npcGrowth.length - 1];
     STATS.forEach(function (s) {
       let d = randInt(rule.change[0], rule.change[1]);
-      const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +50%
+      const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +25%
       const picky = traitSumOf(tr, "pickyGrowth"); // 편식 성장: 강점 +n, 약점은 성장 없음
       const bias = styleGrowthBias(p, s.id);
       const pickyAdd = picky ? (bias > 0 ? picky : bias < 0 ? -9 : 0) : 0;

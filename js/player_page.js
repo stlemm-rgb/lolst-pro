@@ -323,7 +323,7 @@ function playerGrowthHTML() {
   SHOP_STAFF.forEach(function (st) { if (s.staff[st.id]) owned.push(st.icon + " " + st.name + " (주 " + moneyText(st.weekly) + ")"); });
   SHOP_FAME.forEach(function (f) { if (f.once && s.fame[f.id]) owned.push(f.icon + " " + f.name); });
   const home = currentHome();
-  owned.push(home ? home.icon + " " + home.name : "🛏️ 팀 합숙 (훈련 +" + Math.round(HOUSING.dormTraining * 100) + "%)");
+  owned.push(home ? home.icon + " " + home.name : "🛏️ 팀 합숙 (훈련 +" + Math.round(dormRate() * 100) + "%)");
   const ownCard = '<div class="card"><h2>가진 것 <span class="muted small">[상점]에서 사고 고용해요</span></h2><div class="chips">' +
     owned.map(function (x) { return '<span class="chip">' + escapeHTML(x) + "</span>"; }).join("") + "</div></div>";
   return trainCard + otherCard + ownCard;

@@ -11,9 +11,19 @@ function inDorm() {
   return !currentHome();
 }
 
+// 합숙한 햇수 (state.dormWeeks: 합숙한 주 수, 집에 살다 돌아와도 그대로)
+function dormYears() {
+  return Math.floor((state.dormWeeks || 0) / CREATION.weeksPerSeason);
+}
+
+// 지금 합숙 훈련 보너스 비율 (합숙 피로: 1년마다 줄어듦)
+function dormRate() {
+  return Math.max(HOUSING.dormTrainingMin, HOUSING.dormTraining - HOUSING.dormFatiguePerYear * dormYears());
+}
+
 // 합숙 훈련 보너스 (모든 훈련: 스탯·챔피언 숙련도)
 function dormTrainingBonus() {
-  return inDorm() ? HOUSING.dormTraining : 0;
+  return inDorm() ? dormRate() : 0;
 }
 
 // 지금 컨디션 상한
@@ -44,6 +54,12 @@ function payHousing() {
 
 // 매주: 집 효과로 컨디션 회복 + 컨디션 상한 적용 (main.js nextWeek 끝)
 function applyHousingWeek() {
+  if (inDorm()) {
+    state.dormWeeks = (state.dormWeeks || 0) + 1;
+    if (state.dormWeeks % CREATION.weeksPerSeason === 0 && dormRate() < HOUSING.dormTraining) {
+      addNews("🛏️ 합숙 피로", "팀 합숙 " + dormYears() + "년째. 익숙해진 만큼 합숙 훈련 효과가 +" + Math.round(dormRate() * 100) + "%로 줄었다." + (dormRate() <= HOUSING.dormTrainingMin ? " (최소)" : " 슬슬 독립을 생각해 볼 때다."));
+    }
+  }
   const regen = traitEffectSum("conditionRegen");
   if (regen) state.condition = clamp(state.condition + regen);
   enforceConditionCap();
@@ -76,7 +92,7 @@ function moveHome(id) {
     addMoment("🏠", next.name + " 입주");
     shopNotice(next.icon + " " + next.name + "(으)로 이사했어요." + soldText + " 이제 합숙이 아니라 훈련 보너스는 없고, 컨디션 상한은 " + next.conditionCap + "이에요.");
   } else {
-    shopNotice("팀 합숙소로 들어갔어요." + soldText + " 훈련 효과 +" + Math.round(HOUSING.dormTraining * 100) + "%, 컨디션 상한 " + HOUSING.dormConditionCap + ".");
+    shopNotice("팀 합숙소로 들어갔어요." + soldText + " 훈련 효과 +" + Math.round(dormRate() * 100) + "%, 컨디션 상한 " + HOUSING.dormConditionCap + ".");
   }
 }
 
@@ -91,8 +107,8 @@ function housingCardHTML() {
     if (e.popularityGain) parts.push("인기도 상승 +" + Math.round(e.popularityGain * 100) + "%");
     return parts.join(" · ");
   };
-  const dormRow = "<tr" + (!home ? ' class="me"' : "") + "><td>🛏️ <b>팀 합숙소</b></td><td>모든 훈련 효과 +" + Math.round(HOUSING.dormTraining * 100) + "% · 컨디션 상한 " + HOUSING.dormConditionCap +
-    ' <span class="muted small">(경기력 보너스 없음)</span></td><td class="r">무료</td><td>' +
+  const dormRow = "<tr" + (!home ? ' class="me"' : "") + "><td>🛏️ <b>팀 합숙소</b></td><td>모든 훈련 효과 +" + Math.round(dormRate() * 100) + "% · 컨디션 상한 " + HOUSING.dormConditionCap +
+    ' <span class="muted small">(경기력 −' + Math.round((1 - TEAM_MATCH.conditionBase - HOUSING.dormConditionCap / TEAM_MATCH.conditionDiv) * 100) + '% · 합숙 ' + dormYears() + '년째, 1년마다 훈련 보너스 −' + Math.round(HOUSING.dormFatiguePerYear * 100) + '%p, 최소 +' + Math.round(HOUSING.dormTrainingMin * 100) + '%)</span></td><td class="r">무료</td><td>' +
     (!home ? '<span class="up small">지금 여기</span>' : '<button class="small-btn" data-home="">합숙으로 돌아가기</button>' + (refund ? ' <span class="muted small">매각 +' + moneyText(refund) + "</span>" : "")) + "</td></tr>";
   const rows = SHOP_HOUSING.map(function (h) {
     const here = home && home.id === h.id;
@@ -105,5 +121,5 @@ function housingCardHTML() {
   }).join("");
   return '<div class="card"><h2>🏠 거주지 <span class="muted small">집이 없으면 팀 합숙 · 훈련은 잘 되지만 컨디션이 ' + HOUSING.dormConditionCap + "을 못 넘어요</span></h2>" +
     '<table class="roster shop-table">' + dormRow + rows + "</table>" +
-    '<p class="muted small">컨디션 100이면 경기력 +10%, 50이면 ±0. 월세는 매주 나가고 모자라면 합숙으로 돌아가요. 아파트는 옮기거나 합숙으로 돌아가면 산 값의 ' + Math.round(HOUSING.resale * 100) + "%를 돌려받아요. 2부 선수들은 모두 합숙이라 빨리 크지만 경기력은 조금 떨어져요.</p></div>";
+    '<p class="muted small">컨디션 100이면 경기력 +10%, 50이면 ±0, 40이면 −2%. 월세는 매주 나가고 모자라면 합숙으로 돌아가요. 아파트는 옮기거나 합숙으로 돌아가면 산 값의 ' + Math.round(HOUSING.resale * 100) + "%를 돌려받아요. 2부 선수들은 모두 합숙이라 조금 더 빨리 크지만 경기력은 조금 떨어져요.</p></div>";
 }
