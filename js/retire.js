@@ -176,6 +176,10 @@ function careerSummary(includeCurrent) {
   let points = titles.worlds * P.worlds + titles.msi * P.msi + titles.playoffs * P.playoffs + titles.firststand * P.firststand + titles.cup * P.cup;
   (c.awards || []).forEach(function (a) { points += P[awardKeyOf(a.title)] || 0; });
   points += Math.max(0, Math.round(peak - P.peakFrom)) + sum.tier1Seasons * P.tier1Season;
+  // 인성 점수 (커리어 평균 평판, js/fame.js) · 올스타 선정
+  const repPoints = typeof reputationPoints === "function" ? reputationPoints() : 0;
+  const allstars = c.allstars || 0;
+  points += repPoints + allstars * (P.allstar || 0);
   const grade = CAREER.grades.find(function (g) { return points >= g.min; });
 
   return {
@@ -188,6 +192,8 @@ function careerSummary(includeCurrent) {
     sets: sum.sets, setWins: sum.setWins, rating: sum.sets ? sum.ratingSum / sum.sets : 0,
     pog: sum.pog, solo: sum.solo, tier1Seasons: sum.tier1Seasons,
     earned: c.earned || 0, soloPeak: state.soloRank ? state.soloRank.peak : 0,
+    repPoints: repPoints, avgRep: Math.round(typeof careerAvgReputation === "function" ? careerAvgReputation() : state.reputation), allstars: allstars,
+    peakFame: state.fame ? FAME.tiers[state.fame.best || 0].name : "",
     points: points, grade: grade.name, stars: grade.stars, gradeText: grade.text,
   };
 }
@@ -234,7 +240,7 @@ function addToHallOfFame(s) {
     id: id, name: s.name, position: s.position, archetype: s.archetype,
     debutYear: s.debutYear, retireYear: s.retireYear, age: s.age,
     grade: s.grade, stars: s.stars, points: s.points, peak: s.peak,
-    titles: s.titles, awards: s.awards.length, teams: s.teams, savedAt: new Date().toISOString(),
+    titles: s.titles, awards: s.awards.length, teams: s.teams, avgRep: s.avgRep, allstars: s.allstars, savedAt: new Date().toISOString(),
   });
   list.sort(function (a, b) { return b.points - a.points; });
   try {
@@ -279,7 +285,7 @@ function renderEnding() {
     '<p class="muted">' + pos.name + " · " + arch.name + " · " + s.debutYear + "~" + s.retireYear + "년 (" + s.years + "시즌) · " + s.age + "세 · " + RETIRE_REASONS[s.reason] + "</p>" +
     '<div class="card ending-grade"><div class="grade-stars">' + starsText(s.stars) + "</div>" +
       '<div class="grade-name">' + escapeHTML(s.grade) + '</div><div class="muted">' + escapeHTML(s.gradeText) + "</div>" +
-      '<div class="small muted">커리어 점수 ' + s.points + "점 · 명예의 전당에 기록됐어요</div></div>" +
+      '<div class="small muted">커리어 점수 ' + s.points + "점" + (s.repPoints !== undefined ? " (인성 점수 " + (s.repPoints > 0 ? "+" : "") + s.repPoints + " · 평균 평판 " + s.avgRep + (s.allstars ? " · 올스타 " + s.allstars + "회" : "") + (s.peakFame ? " · 최고 스타 등급 " + escapeHTML(s.peakFame) : "") + ")" : "") + " · 명예의 전당에 기록됐어요</div></div>" +
     '<div class="summary-row">' +
       '<div class="card"><div class="sum-label">우승</div><div class="sum-main">' + (t.worlds + (t.msi || 0) + t.playoffs + (t.firststand || 0) + t.cup) + "회</div>" +
         '<div class="sum-sub muted">월드 ' + t.worlds + " · MSI " + (t.msi || 0) + " · 리그 " + t.playoffs + " · First Stand " + (t.firststand || 0) + " · 컵 " + t.cup + "</div></div>" +

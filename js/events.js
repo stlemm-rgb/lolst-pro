@@ -237,6 +237,9 @@ function eventReady(ev) {
   if (cd !== undefined && absWeek() - cd < wait) return false;
   const need = ev.need || {};
   if (need.minPopularity && state.popularity < need.minPopularity) return false;
+  if (need.maxPopularity !== undefined && state.popularity > need.maxPopularity) return false;
+  if (need.minReputation !== undefined && state.reputation < need.minReputation) return false;
+  if (need.maxReputation !== undefined && state.reputation > need.maxReputation) return false;
   if (need.minAge && state.player.age < need.minAge) return false;
   if (need.minWeek && state.week < need.minWeek) return false;
   if (need.trait && !hasTrait(need.trait)) return false;

@@ -18,7 +18,7 @@
 //     "lowStamina"   체력 20 이하
 //     "benchLong"    후보로 8주 이상
 // - chance: 조건이 맞을 때 실제로 올 확률 (0.3 = 30%). 없으면 100%
-// - need: 추가 조건 { minPopularity, minAge, minWeek(이 주차 이후), trait(이 특성이 있어야), noTrait(이 특성이 없어야) }
+// - need: 추가 조건 { minPopularity, maxPopularity, minReputation, maxReputation, minAge, minWeek(이 주차 이후), trait(이 특성이 있어야), noTrait(이 특성이 없어야) }
 // - cooldown: 같은 이벤트가 다시 오기까지 쉬는 주 (없으면 EVENT_RULES.cooldown)
 // - effects: (소식) 읽으면 바로 적용되는 효과
 // - choices: (받은 연락) 선택지 [{ label, effects, risk, cure, note, followUp }]
@@ -69,6 +69,8 @@ const ACTIVITIES = {
     weekly: { moneySalaryPct: 0.004 }, untilSeasonEnd: true, failIf: { popularityBelow: 50 }, failEffects: { reputation: -5 } },
   stream: { icon: "🎥", name: "개인 방송", desc: "매주 인기도 +1, 체력 −2 · 언제든 그만둘 수 있음",
     weekly: { popularity: 1, stamina: -2 }, stoppable: true },
+  endorse: { icon: "💼", name: "대형 브랜드 개인 스폰서", desc: "시즌 끝까지 매주 연봉의 1% 수입 · 인기도 60 아래로 떨어지면 해지(평판 −5)",
+    weekly: { moneySalaryPct: 0.01 }, untilSeasonEnd: true, failIf: { popularityBelow: 60 }, failEffects: { reputation: -5 } },
   rival: { icon: "🔥", name: "라이벌 선언", desc: "시즌 끝까지 {player}({pteam})의 팀과 경기할 때 경기력 +5%",
     matchBoostVs: 0.05, untilSeasonEnd: true },
 };
@@ -451,6 +453,113 @@ const EVENTS = [
     title: "⚖️ 루머 소송 합의",
     text: "악성 루머 소송이 마무리됐다. 유포자 측이 잘못을 인정하고 합의금을 냈다.",
     effects: { money: 3000000, reputation: 2 },
+  },
+
+  // ===== I. 스타 등급·평판 등급 (2026-10-07, data/fame.js) =====
+  // 광고·스폰서: 스타 등급이 오를수록 큰 제의 (인기 선수 40~ · 스타 60~ · 슈퍼스타 80~)
+  {
+    id: "ad_local", tab: "inbox", trigger: "random", need: { minPopularity: 40, maxPopularity: 59 }, cooldown: 16,
+    title: "광고 촬영 제의",
+    text: "PC방 체인에서 {name}을(를) 모델로 지역 광고를 찍고 싶다고 연락이 왔다. 촬영은 하루면 끝난다고 한다.",
+    choices: [
+      { label: "촬영한다", effects: { money: 3000000, stamina: -6, popularity: 1 } },
+      { label: "연습이 먼저다", effects: {} },
+    ],
+  },
+  {
+    id: "ad_gear", tab: "inbox", trigger: "random", need: { minPopularity: 60, maxPopularity: 79 }, cooldown: 16,
+    title: "광고 모델 제의",
+    text: "게이밍 기어 브랜드에서 {name}을(를) 신제품 광고 모델로 쓰고 싶어 한다. \"요즘 가장 뜨는 {pos}잖아요.\"",
+    choices: [
+      { label: "모델이 된다", effects: { money: 10000000, stamina: -8, popularity: 2 } },
+      { label: "정중히 거절한다", effects: { reputation: 1 } },
+    ],
+  },
+  {
+    id: "ad_cf", tab: "inbox", trigger: "random", need: { minPopularity: 80 }, cooldown: 16,
+    title: "대기업 CF 모델 제의",
+    text: "대기업 광고 에이전시에서 연락이 왔다. TV 광고 모델 제의다. e스포츠 선수로는 이례적인 일이라며 기사도 날 거라고 한다.",
+    choices: [
+      { label: "CF를 찍는다", effects: { money: 30000000, stamina: -10, popularity: 3, condition: 3 } },
+      { label: "시즌에 집중한다", effects: { reputation: 2 } },
+    ],
+  },
+  {
+    id: "endorse_offer", tab: "inbox", trigger: "random", need: { minPopularity: 70 }, cooldown: 40,
+    title: "대형 브랜드 개인 스폰서 제안",
+    text: "글로벌 브랜드에서 {name}에게 개인 스폰서 계약을 제안했다. 조건은 단 하나, \"지금 인기를 유지해 주세요.\"",
+    choices: [
+      { label: "계약한다", effects: { activity: "endorse", popularity: 2 } },
+      { label: "거절한다", effects: {} },
+    ],
+  },
+  {
+    id: "variety_show", tab: "inbox", trigger: "random", need: { minPopularity: 45 }, cooldown: 20,
+    title: "예능 출연 제의",
+    text: "인기 예능 프로그램에서 프로게이머 특집에 {name}을(를) 섭외하고 싶다고 한다.",
+    choices: [
+      { label: "출연한다", effects: { popularity: 4, condition: 4, stamina: -6 }, risk: { trait: "scandal", chance: 0.02 } },
+      { label: "거절한다", effects: {} },
+    ],
+  },
+  // 좋은 평판 (모범 선수 20~ · 리그의 얼굴 60~)
+  {
+    id: "ambassador", tab: "inbox", trigger: "random", need: { minReputation: 40 }, cooldown: 30,
+    title: "리그 홍보대사 제안",
+    text: "리그 사무국에서 {name}에게 올 시즌 리그 홍보대사를 맡아 달라고 했다. \"선수들의 모범이 되어 주셨으면 합니다.\"",
+    choices: [
+      { label: "맡는다", effects: { reputation: 5, popularity: 3, stamina: -5 } },
+      { label: "경기에 집중하고 싶다", effects: {} },
+    ],
+  },
+  {
+    id: "charity", tab: "inbox", trigger: "random", need: { minReputation: 20 }, cooldown: 20,
+    title: "자선 행사 초대",
+    text: "소아 병동 아이들과 게임을 하는 자선 행사에 {name}을(를) 초대하고 싶다는 연락이 왔다.",
+    choices: [
+      { label: "참석하고 기부도 한다", effects: { reputation: 4, condition: 3, money: -500000 } },
+      { label: "일정이 맞지 않는다", effects: {} },
+    ],
+  },
+  {
+    id: "mentor", tab: "inbox", trigger: "random", need: { minReputation: 30 }, cooldown: 20,
+    title: "유망주 멘토링 요청",
+    text: "2부의 한 유망주가 {name}에게 조언을 구하고 싶다며 연락해 왔다. \"한 번만 시간 내 주실 수 있을까요?\"",
+    choices: [
+      { label: "시간을 내서 돕는다", effects: { reputation: 3, shotcall: 1, stamina: -4 } },
+      { label: "바빠서 거절한다", effects: { reputation: -1 } },
+    ],
+  },
+  // 나쁜 평판 (논란의 선수 −20 아래 · 악동 −60 아래)
+  {
+    id: "discipline", tab: "inbox", trigger: "random", need: { maxReputation: -20 }, cooldown: 16,
+    title: "리그 징계 위원회 소환",
+    text: "최근 언행이 문제가 되어 리그 징계 위원회가 {name}을(를) 불렀다. 해명할 기회를 준다고 한다.",
+    choices: [
+      { label: "공식 사과한다", effects: { reputation: 6, popularity: -2 } },
+      { label: "해명 없이 버틴다 (벌금)", effects: { reputation: -4, money: -2000000, condition: -5 } },
+    ],
+  },
+  {
+    id: "hate_flood", tab: "news", trigger: "random", need: { maxReputation: -30 }, cooldown: 12,
+    title: "📰 {name} SNS에 악플 폭주",
+    text: "{name}의 SNS에 비난 댓글이 쏟아지고 있다. 커뮤니티에서도 연일 논란이 이어지는 중이다.",
+    effects: { condition: -6 },
+  },
+  {
+    id: "team_warning", tab: "inbox", trigger: "random", need: { maxReputation: -40 }, cooldown: 16,
+    title: "구단 경고",
+    text: "단장: \"{name}, 요즘 구단으로 항의 전화가 너무 많이 온다. 계속 이러면 감독님도 너를 쓰기 어렵다.\"",
+    choices: [
+      { label: "반성하고 조심하겠다고 한다", effects: { reputation: 4, condition: -2 } },
+      { label: "내 실력으로 보여주겠다고 받아친다", effects: { reputation: -3, popularity: 2 } },
+    ],
+  },
+  {
+    id: "villain_fans", tab: "news", trigger: "random", need: { maxReputation: -60, minPopularity: 40 }, cooldown: 26,
+    title: "📰 '악동' {name}에 열광하는 팬들",
+    text: "논란이 끊이지 않지만, 거침없는 {name}의 캐릭터를 좋아하는 팬들도 늘고 있다. \"악역이 있어야 리그가 재밌다\"는 반응.",
+    effects: { popularity: 2 },
   },
 
   // ===== H. 다른 선수가 나오는 연락 (2026-10-06) =====

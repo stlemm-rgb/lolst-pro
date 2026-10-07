@@ -86,6 +86,7 @@ function playerHeaderHTML() {
         '<div class="mini-bar"><span class="mini-label">평판</span><span class="bar rep-bar"><span class="rep-mid"></span><span class="bar-fill ' + (state.reputation < 0 ? "neg" : "pos") +
           '" style="margin-left:' + (state.reputation < 0 ? 50 + state.reputation / 2 : 50) + "%;width:" + Math.abs(state.reputation) / 2 + '%"></span></span><span class="mini-value">' +
           (state.reputation > 0 ? "+" : "") + state.reputation + "</span></div>" +
+        fameLineHTML() +
       "</div>" +
     "</div>"
   );

@@ -29,6 +29,8 @@ const CAREER = {
     cupfmvp: 4, rookie: 4, tier2mvp: 2, msifmvp: 6, fsfmvp: 3,
     peakFrom: 60,        // 최고 종합 능력이 이 값을 넘은 만큼 1점씩
     tier1Season: 2,      // 1부에서 보낸 시즌 1개당
+    allstar: 3,          // 올스타 선정 1번당 (js/fame.js)
+    // + 인성 점수: 커리어 평균 평판 ÷ 4 (−25 ~ +25, data/fame.js REPUTATION)
   },
   grades: [
     { min: 500, name: "전설",   stars: 5, text: "e스포츠 역사에 이름을 새긴 선수. 모두가 그의 시대를 기억한다." },

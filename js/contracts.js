@@ -165,7 +165,8 @@ function checkBench() {
   const me = playerScore(USER_ID);
   if (!state.benched) {
     const protectedByContract = state.career.seasonGames < (state.contract.guarantee || 0);
-    if (rival && playerScore(rival) >= me + CONTRACT.benchGap && !protectedByContract) {
+    // 감독 신뢰 (평판 등급, js/fame.js): 평판이 좋으면 경쟁 선수가 더 잘해야 밀려남
+    if (rival && playerScore(rival) >= me + CONTRACT.benchGap + managerTrust() && !protectedByContract) {
       state.benched = true;
       state.career.benchedYear = state.year; // 잡초 (S급 특성) 조건
       state.benchWeeks = 0;
@@ -176,7 +177,7 @@ function checkBench() {
   } else {
     state.benchWeeks += CONTRACT.benchCheckEvery;
     state.popularity = clamp(state.popularity - CONTRACT.benchPopularityLoss);
-    if (!rival || me > playerScore(rival)) {
+    if (!rival || me + managerTrust() > playerScore(rival)) {
       state.benched = false;
       state.benchWeeks = 0;
       postMessage("inbox", CONTRACT_TEXTS.promoteTitle, contractText(CONTRACT_TEXTS.promote), {});

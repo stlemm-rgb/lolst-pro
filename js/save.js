@@ -7,7 +7,7 @@ const SAVE_GAME_ID = "progamer-career";
 const SAVE_VERSION = 10; // 10: NPC 특성·S급 특성·스탯 상한선 / 9: 노화·은퇴·역사관 / 8: 메타 S급·퀘스트 / 7: 솔로 랭크·지난주 결과 / 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
-const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp", "retirePlanned", "retired", "compPlan", "shop", "activities", "pendingEvents", "tutorial", "housing", "loan", "trainHistory", "shakeup", "newChampBuff", "dormWeeks", "world"];
+const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp", "retirePlanned", "retired", "compPlan", "shop", "activities", "pendingEvents", "tutorial", "housing", "loan", "trainHistory", "shakeup", "newChampBuff", "dormWeeks", "world", "fame"];
 
 // 현재 게임 상태를 세이브 모양으로 만들기
 function makeSaveData() {
@@ -79,7 +79,7 @@ function stateFromSave(save) {
   if (s.career && typeof s.career === "object") {
     fresh.career.finalsWon = Number(s.career.finalsWon) || 0;
     fresh.career.gainTried = s.career.gainTried || {};
-    ["seasonGames", "games", "wins", "seasonWins", "questsDone", "questsGiven", "earned"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
+    ["seasonGames", "games", "wins", "seasonWins", "questsDone", "questsGiven", "earned", "repSum", "repWeeks", "allstars", "allStarYear"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
     if (Array.isArray(s.career.seasons)) fresh.career.seasons = s.career.seasons;
     if (Array.isArray(s.career.awards)) fresh.career.awards = s.career.awards;
     if (s.career.debut) fresh.career.debut = s.career.debut;
@@ -127,7 +127,8 @@ function stateFromSave(save) {
   if (s.settings && typeof s.settings.autoSave === "boolean") fresh.settings.autoSave = s.settings.autoSave;
 
   if (s.world && typeof s.world === "object" && Array.isArray(s.world.teams)) fresh.world = s.world; // 해외 리그 (js/era.js)
-  if (Number.isFinite(s.dormWeeks)) fresh.dormWeeks = s.dormWeeks; // 합숙한 주 수 (합숙 피로)
+  if (Number.isFinite(s.dormWeeks)) fresh.dormWeeks = s.dormWeeks;
+  if (s.fame && typeof s.fame === "object") fresh.fame = s.fame; // 스타·평판 등급 (js/fame.js) // 합숙한 주 수 (합숙 피로)
   if (s.newChampBuff && typeof s.newChampBuff === "object") fresh.newChampBuff = s.newChampBuff; // 새 챔피언 출시 버프
   if (s.shakeup && typeof s.shakeup === "object") fresh.shakeup = s.shakeup; // 대격변 패치 (js/shakeup.js)
   applyExtraPositions(fresh.shakeup); // 대격변으로 생긴 챔피언 포지션
