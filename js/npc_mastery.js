@@ -40,13 +40,15 @@ function npcPractice() {
     if (!p.mastery) npcMasteryInit(p);
     const names = Object.keys(p.mastery);
     if (!names.length) return;
-    const focus = R.metaFocusBase + (p.stats.adapt - 50) * R.metaFocusPerAdapt;
+    const focus = (R.metaFocusBase + (p.stats.adapt - 50) * R.metaFocusPerAdapt) * Math.max(0, 1 + traitSumOf(p.traits, "metaFocus")); // 메타 부적응: 절반
+    const offSig = traitSumOf(p.traits, "offSigGrowth"); // 원챔 의존: 숙련도 상위 3명 말고는 성장 ↓
+    const top3 = offSig ? names.slice().sort(function (a, b) { return p.mastery[b] - p.mastery[a]; }).slice(0, 3) : null;
     const meta = (state.meta.champs[p.pos] || []).filter(function (n) { return p.mastery[n] !== undefined; })
       .sort(function (a, b) { return p.mastery[a] - p.mastery[b]; });
     for (let k = 0; k < R.practiceCount; k++) {
       const name = meta.length && Math.random() < focus ? meta[Math.min(k, meta.length - 1)] : pick(names);
       const now = p.mastery[name];
-      const gain = randInt(R.practiceGain[0], R.practiceGain[1]) * Math.max(0.3, 1 - now / 125);
+      const gain = randInt(R.practiceGain[0], R.practiceGain[1]) * Math.max(0.3, 1 - now / 125) * (top3 && top3.indexOf(name) === -1 ? Math.max(0, 1 + offSig) : 1);
       p.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
     }
   });

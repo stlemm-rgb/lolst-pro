@@ -164,7 +164,14 @@ function randomNpcTraits() {
   const goods = shuffled(TRAITS.filter(function (t) { return t.npc && t.type === "good"; })).slice(0, count);
   const list = goods.map(function (t) { return t.id; });
   if (Math.random() < NPC_TRAITS.badChance) list.push(pick(TRAITS.filter(function (t) { return t.npc && t.type === "bad"; })).id);
+  const locked = randomLockedTrait();
+  if (locked) list.push(locked);
   return list;
+}
+
+// 🔒 다른 선수 전용 나쁜 특성 (NPC_TRAITS.lockedChance 확률로 1개, 없으면 null)
+function randomLockedTrait() {
+  return Math.random() < NPC_TRAITS.lockedChance ? pick(TRAITS.filter(function (t) { return t.npcLocked; })).id : null;
 }
 
 // 예전 세이브: 특성이 없는 선수에게 특성 붙이기
@@ -173,7 +180,10 @@ function ensureNpcTraits() {
     const p = state.league.players[id];
     if (!Array.isArray(p.traits)) p.traits = randomNpcTraits();
     else p.traits = p.traits.filter(function (t) { return !!findTrait(t); });
+    // 예전 세이브: 🔒 특성을 한 번 나눠 줌
+    if (!state.league.lockedDone && !p.traits.some(function (t) { return findTrait(t).npcLocked; })) { const lk = randomLockedTrait(); if (lk) p.traits.push(lk); }
   });
+  state.league.lockedDone = true;
 }
 
 // ----- 구단 이름 정하기 -----
@@ -210,7 +220,7 @@ function shiftLevel(level, shift) {
 // ----- 리그 만들기 (새 게임) -----
 // defs: 구단 이름 목록 (없으면 새로 만듦), chosenIndex: 내가 고른 구단 번호 (-1이면 무작위)
 function makeLeague(defs, chosenIndex) {
-  state.league = { teams: [], players: {}, freeAgents: [], usedNames: [], season: null };
+  state.league = { teams: [], players: {}, freeAgents: [], usedNames: [], season: null, lockedDone: true }; // lockedDone: 🔒 특성은 선수를 만들 때 이미 붙음
   const names = defs || makeTeamDefs();
   names.forEach(function (n, i) {
     const tier = n.tier;
@@ -449,7 +459,10 @@ function npcYearGrowth(ageAdd, forYear) {
     STATS.forEach(function (s) {
       let d = randInt(rule.change[0], rule.change[1]);
       const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +50%
-      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id], tr, s.id) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + styleGrowthBias(p, s.id)));
+      const picky = traitSumOf(tr, "pickyGrowth"); // 편식 성장: 강점 +n, 약점은 성장 없음
+      const bias = styleGrowthBias(p, s.id);
+      const pickyAdd = picky ? (bias > 0 ? picky : bias < 0 ? -9 : 0) : 0;
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id], tr, s.id) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + bias + pickyAdd));
       else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
       const before = p.stats[s.id];
       p.stats[s.id] = Math.max(1, capRise(before, Math.min(100, before + d), statCapOf(tr, s.id)));

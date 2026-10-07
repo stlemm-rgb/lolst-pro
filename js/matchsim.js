@@ -222,7 +222,8 @@ function playSet(a, b, userCtx, setCtx) {
     const dodge = loserSt ? (loserSt.reaction - STAT_ROLES.pivot) * STAT_ROLES.reactionPer : 0; // 반응속도: 솔로킬 피하기
     const winnerTraits = pa.id || pb.id ? traitsOf(diff >= 0 ? pa.id : pb.id) : [];
     const winComp = diff >= 0 ? comps.a : comps.b; // 이긴 쪽 팀 조합 (돌진·누커 시너지)
-    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy") - winComp.soloEasy + dodge; // 라인 지배자·돌진·반응속도
+    const loserWeak = loser.id ? traitSumOf(traitsOf(loser.id), "soloWeak") : 0; // 초반 약골: 솔로킬을 더 잘 당함
+    const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy") - winComp.soloEasy + dodge - loserWeak; // 라인 지배자·돌진·반응속도
     const margin = Math.min(PHASES.lane.marginMax, Math.abs(diff) * PHASES.lane.marginPer); // 크게 이길수록 더 (data/match.js PHASES)
     const add = TEAM_MATCH.laneWinBonus + margin + traitSumOf(winnerTraits, "laneBonus") + winComp.laneExtra + (solo ? TEAM_MATCH.soloKillBonus : 0);
     if (diff >= 0) bonusA += add; else bonusB += add;

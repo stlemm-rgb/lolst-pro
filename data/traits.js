@@ -101,6 +101,25 @@ const TRAITS = [
   { id: "greedy",       type: "bad", npc: true, name: "과욕",         desc: "무리하다 생기는 실수(바론 버프 들고 무리, 추격하다 역전, 다이브 실패 등) ×8, 실수 크기 +50%", effects: { evBad: { greedy: 7.0 }, evPower: { bad: 0.5 } } },
   { id: "tilt",         type: "bad", name: "랭크 틸트",     desc: "솔로 랭크에서 진 판이 더 많은 주에 컨디션 −3",          effects: { tilt: 3 } },
   { id: "spender",      type: "bad", name: "낭비벽",       desc: "주급의 20%를 써 버림",                               effects: { spend: 0.2 } },
+  // ===== 다른 선수 전용 🔒 나쁜 특성 (지울 수 없음, 선수를 만들 때 NPC_TRAITS.lockedChance 확률로 1개) =====
+  //   npcLocked: true → 다른 선수 전용, 동료 돕기 이벤트(cureOther)로도 안 없어짐. 화면에 🔒 표시
+  //   새 효과: soloWeak(솔로킬을 당하는 기준이 n만큼 쉬워짐) · pickyGrowth(강점 스탯 성장 +n, 약점 스탯 성장 없음)
+  //           metaFocus(메타 챔피언 연습 확률 배율, −0.5 = 절반) · offSigGrowth(숙련도 상위 3명 말고는 숙련도 성장 배율)
+  { id: "dullard",      type: "bad", npcLocked: true, name: "둔재",        desc: "능력 성장 −50%",                                         effects: { trainingAll: -0.5 } },
+  { id: "early_decline", type: "bad", npcLocked: true, name: "조기 노쇠",   desc: "노화가 2년 일찍 시작, 은퇴도 빨라짐",                       effects: { agingDelay: -2 } },
+  { id: "glass_body",   type: "bad", npcLocked: true, name: "유리몸",      desc: "노화로 줄어드는 능력 1.5배",                                effects: { agingCut: -0.5 } },
+  { id: "hard_ceiling", type: "bad", npcLocked: true, name: "뚜렷한 한계", desc: "85 이상 스탯은 거의 안 오름 (성장 ×0.3)",                    effects: { topGrowth: { all: -0.7 } } },
+  { id: "picky_growth", type: "bad", npcLocked: true, name: "편식 성장",   desc: "강점 스탯 성장 +30%, 약점 스탯은 성장 없음",                  effects: { pickyGrowth: 0.3 } },
+  { id: "reckless",     type: "bad", npcLocked: true, name: "급발진",      desc: "무리하다 생기는 실수 ×5, 대신 초반 좋은 장면 +30%",            effects: { evBad: { greedy: 4.0 }, evGood: { early: 0.3 } } },
+  { id: "chicken_heart", type: "bad", npcLocked: true, name: "새가슴",     desc: "승부처(풀세트·경기 후반) 좋은 장면 −50%, 큰 경기 경기력 −3%",  effects: { evClutch: -0.5, bigMatch: -0.03 } },
+  { id: "quitter",      type: "bad", npcLocked: true, name: "쉽게 포기",   desc: "세트 스코어에서 지고 있을 때 경기력 −5%",                    effects: { comeback: -0.05 } },
+  { id: "low_stamina",  type: "bad", npcLocked: true, name: "저질 체력",   desc: "풀세트(마지막 세트) 경기력 −8%",                             effects: { clutch: -0.08 } },
+  { id: "fight_fear",   type: "bad", npcLocked: true, name: "한타 공포",   desc: "한타 실수 ×2, 한타 좋은 장면 −50%",                          effects: { evBad: { fight: 1.0 }, evGood: { fight: -0.5 } } },
+  { id: "weak_laner",   type: "bad", npcLocked: true, name: "초반 약골",   desc: "초반 실수 ×2, 라인전에서 솔로킬을 더 잘 당함",                 effects: { evBad: { early: 1.0 }, soloWeak: 4 } },
+  { id: "vision_blind", type: "bad", npcLocked: true, name: "시야 맹",     desc: "오브젝트 싸움 실수 ×2",                                     effects: { evBad: { object: 1.0 } } },
+  { id: "call_ignore",  type: "bad", npcLocked: true, name: "콜 무시",     desc: "팀 오더를 안 따름: 우리 팀 전체 실수 확률 +15%",               effects: { teamBad: 0.15 } },
+  { id: "meta_slow",    type: "bad", npcLocked: true, name: "메타 부적응", desc: "패치 후 4주 메타 페널티 +8, 메타 챔피언 연습 확률 절반",        effects: { metaPenalty: 8, metaFocus: -0.5 } },
+  { id: "one_champ",    type: "bad", npcLocked: true, name: "원챔 의존",   desc: "숙련도 상위 3명 말고는 챔피언 숙련도 성장 −50%",               effects: { offSigGrowth: -0.5 } },
   { id: "night_owl",    type: "bad", name: "올빼미",       desc: "휴식 체력 회복 −30%",                                effects: { restBonus: -0.3 } },
 
   // ===== 시작 유형 전용 특성 (data/archetypes.js의 startTrait, 정해진 시즌 동안만) =====
@@ -143,6 +162,7 @@ const S_TRAIT_RULES = [
 const NPC_TRAITS = {
   goodCount: [[0, 0.45], [1, 0.4], [2, 0.15]], // [개수, 확률]: 45% 없음, 40% 1개, 15% 2개
   badChance: 0.12,                              // 나쁜 특성 1개가 붙을 확률
+  lockedChance: 0.10,                           // 🔒 지울 수 없는 다른 선수 전용 나쁜 특성 1개가 붙을 확률 (위와 따로)
 };
 
 // 캐릭터 생성 화면: 포지션마다 추천하는 특성 (⭐ 추천 표시, 순서대로)

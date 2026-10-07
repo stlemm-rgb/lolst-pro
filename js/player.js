@@ -112,6 +112,7 @@ function percentText(ratio) {
 function traitChipHTML(id) {
   const t = findTrait(id);
   if (!t) return "";
+  if (t.npcLocked) return '<span class="chip tip bad" tabindex="0" data-tip="' + escapeHTML("🔒 지울 수 없는 특성 (다른 선수 전용) · " + t.desc) + '">🔒 ' + t.name + "</span>";
   return '<span class="chip tip ' + t.type + '" tabindex="0" data-tip="' + escapeHTML(t.desc) + '">' + t.name + "</span>";
 }
 

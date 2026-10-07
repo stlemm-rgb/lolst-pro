@@ -146,7 +146,7 @@ function applyEffects(eff, ctx) {
     } else if (key === "cureOther") {
       // 나온 선수의 나쁜 특성 없애 주기
       const p = ctx && ctx.pid && state.league.players[ctx.pid];
-      if (p && p.traits && p.traits.indexOf(ctx.trait) !== -1) {
+      if (p && p.traits && p.traits.indexOf(ctx.trait) !== -1 && !(findTrait(ctx.trait) && findTrait(ctx.trait).npcLocked)) { // 🔒 특성은 못 없앰
         if (Math.random() < v) {
           p.traits.splice(p.traits.indexOf(ctx.trait), 1);
           notes.push("💚 " + p.name + " 선수가 '" + findTrait(ctx.trait).name + "'을(를) 이겨냈다!");
