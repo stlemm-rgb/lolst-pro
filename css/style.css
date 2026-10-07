@@ -841,3 +841,23 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .grade-big { color: var(--gold); font-size: 22px; letter-spacing: 2px; }
 @media (max-width: 1200px) { .phead { grid-template-columns: 1fr 1fr; } .phead-bars { grid-column: 1 / -1; } }
 @media (max-width: 800px) { .phead { grid-template-columns: 1fr; } }
+
+/* 스탯 12각형 ([선수 정보] 능력 탭, js/player_page.js statRadarHTML) */
+.radar-ctrl { margin: 4px 0 8px; }
+.radar-wrap { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.radar-fig { flex: 1 1 340px; max-width: 460px; }
+.radar-table { flex: 1 1 260px; }
+.stat-radar { width: 100%; height: auto; display: block; }
+.stat-radar .rd-grid { fill: none; stroke: var(--border); stroke-width: 1; }
+.stat-radar .rd-axis { stroke: var(--border); stroke-width: 1; }
+.stat-radar .rd-tick { fill: var(--muted); font-size: 9px; }
+.stat-radar .rd-label { fill: var(--text); font-size: 11px; }
+.stat-radar .rd-label.bonus { fill: var(--gold); }
+.stat-radar .rd-val { fill: var(--muted); font-weight: bold; }
+.stat-radar .rd-avg { fill: rgba(139, 147, 167, 0.12); stroke: var(--muted); stroke-width: 2; stroke-dasharray: 5 4; }
+.stat-radar .rd-me { fill: rgba(59, 130, 246, 0.22); stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; }
+.stat-radar .rd-dot { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
+.stat-radar .rd-hit { fill: transparent; cursor: help; }
+.radar-legend { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; justify-content: center; }
+.radar-legend .lg-me { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--accent); }
+.radar-legend .lg-avg { display: inline-block; width: 18px; height: 0; border-top: 2px dashed var(--muted); margin-left: 10px; }

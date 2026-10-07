@@ -104,6 +104,74 @@ function deltaCell(d) {
   return '<td class="r ' + (v > 0 ? "up" : v < 0 ? "down" : "muted") + '">' + (v > 0 ? "+" : "") + (Number.isInteger(v) ? v : v.toFixed(1)) + "</td>";
 }
 
+// ----- 스탯 12각형: 내 스탯 vs 내가 뛰는 리그(1부/2부) 평균 -----
+// radarCmp: "league" = 리그 전체 선수 평균, "pos" = 리그의 같은 포지션 선수 평균
+let radarCmp = "league";
+function leagueStatAverage(pos) {
+  const team = myTeam();
+  const sums = {}, list = [];
+  if (team) tierTeams(team.tier).forEach(function (t) {
+    t.roster.forEach(function (id) {
+      if (id === USER_ID) return;
+      const p = findPlayer(id);
+      if (p && (!pos || p.pos === pos)) list.push(p);
+    });
+  });
+  STATS.forEach(function (s) { sums[s.id] = list.length ? average(list.map(function (p) { return p.stats[s.id]; })) : 0; });
+  return { avg: sums, n: list.length };
+}
+
+function statRadarHTML() {
+  const team = myTeam();
+  const posName = findPosition(state.player.position).name;
+  const cmp = leagueStatAverage(radarCmp === "pos" ? state.player.position : null);
+  const label = (team ? tierName(team.tier) : "리그") + (radarCmp === "pos" ? " " + posName : "") + " 평균";
+  const N = STATS.length, cx = 190, cy = 175, R = 120;
+  const pt = function (i, v) {
+    const a = -Math.PI / 2 + i * 2 * Math.PI / N;
+    const r = R * Math.max(0, Math.min(100, v)) / 100;
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  };
+  const poly = function (vals) { return vals.map(function (v, i) { const q = pt(i, v); return q[0].toFixed(1) + "," + q[1].toFixed(1); }).join(" "); };
+  // 눈금: 20·40·60·80·100 (12각형)
+  let grid = "";
+  [20, 40, 60, 80, 100].forEach(function (g) {
+    grid += '<polygon class="rd-grid" points="' + poly(STATS.map(function () { return g; })) + '"/>';
+  });
+  STATS.forEach(function (s, i) { const q = pt(i, 100); grid += '<line class="rd-axis" x1="' + cx + '" y1="' + cy + '" x2="' + q[0].toFixed(1) + '" y2="' + q[1].toFixed(1) + '"/>'; });
+  [20, 40, 60, 80].forEach(function (g) { const q = pt(-0.5, g); grid += '<text class="rd-tick" x="' + q[0].toFixed(1) + '" y="' + (q[1] + 3).toFixed(1) + '" text-anchor="middle">' + g + "</text>"; }); // 눈금 숫자는 축 사이에
+  const mine = STATS.map(function (s) { return state.stats[s.id]; });
+  const avg = STATS.map(function (s) { return cmp.avg[s.id]; });
+  // 꼭짓점 이름 + 내 값 (마우스를 올리면 평균과 차이)
+  let labels = "", dots = "";
+  STATS.forEach(function (s, i) {
+    const q = pt(i, 118);
+    const anchor = Math.abs(q[0] - cx) < 8 ? "middle" : q[0] > cx ? "start" : "end";
+    const d = mine[i] - avg[i];
+    const tip = s.name + " · 나 " + mine[i] + " / " + label + " " + avg[i].toFixed(1) + " (" + (d >= 0 ? "+" : "") + d.toFixed(1) + ")";
+    labels += '<text class="rd-label' + (isBonusStat(s.id) ? " bonus" : "") + '" x="' + q[0].toFixed(1) + '" y="' + (q[1] + 4).toFixed(1) + '" text-anchor="' + anchor + '">' +
+      (isBonusStat(s.id) ? "★" : "") + escapeHTML(s.name) + ' <tspan class="rd-val">' + mine[i] + "</tspan><title>" + escapeHTML(tip) + "</title></text>";
+    const m = pt(i, mine[i]);
+    dots += '<circle class="rd-dot" cx="' + m[0].toFixed(1) + '" cy="' + m[1].toFixed(1) + '" r="4"><title>' + escapeHTML(tip) + "</title></circle>" +
+      '<circle class="rd-hit" cx="' + m[0].toFixed(1) + '" cy="' + m[1].toFixed(1) + '" r="10"><title>' + escapeHTML(tip) + "</title></circle>";
+  });
+  const svg = '<svg class="stat-radar" viewBox="0 0 380 350" role="img" aria-label="스탯 12각형: 나와 ' + escapeHTML(label) + ' 비교">' + grid +
+    '<polygon class="rd-avg" points="' + poly(avg) + '"/>' +
+    '<polygon class="rd-me" points="' + poly(mine) + '"/>' + dots + labels + "</svg>";
+  // 차이 표 (큰 차이 순)
+  const rows = STATS.map(function (s, i) { return { s: s, me: mine[i], av: avg[i], d: mine[i] - avg[i] }; })
+    .sort(function (a, b) { return b.d - a.d; }).map(function (r) {
+      return "<tr><td" + (isBonusStat(r.s.id) ? ' class="bonus"' : "") + ">" + (isBonusStat(r.s.id) ? "★ " : "") + r.s.name + '</td><td class="r"><b>' + r.me + '</b></td><td class="r muted">' + r.av.toFixed(1) + "</td>" + deltaCell(r.d) + "</tr>";
+    }).join("");
+  const btn = function (id, text) { return '<button class="small-btn' + (radarCmp === id ? " primary" : "") + '" data-radar="' + id + '">' + text + "</button>"; };
+  return '<div class="card"><h2>스탯 12각형 <span class="muted small">나 vs ' + escapeHTML(label) + " (" + cmp.n + "명, 나 제외)</span></h2>" +
+    '<div class="radar-ctrl">' + btn("league", "리그 전체 평균") + " " + btn("pos", "같은 포지션(" + posName + ") 평균") + "</div>" +
+    '<div class="radar-wrap"><div class="radar-fig">' + svg +
+      '<div class="radar-legend"><span class="lg-me"></span> 나 <span class="lg-avg"></span> ' + escapeHTML(label) + "</div></div>" +
+      '<div class="radar-table"><table class="mini change-table"><tr><th>스탯</th><th class="r">나</th><th class="r">평균</th><th class="r">차이</th></tr>' + rows + "</table></div></div>" +
+    '<p class="muted small">꼭짓점이 바깥일수록 높아요 (가운데 0 → 바깥 100). 점·이름에 마우스를 올리면 평균과 차이가 보여요. 평균은 지금 내 소속 리그 선수(후보 포함) 기준이에요.</p></div>';
+}
+
 function playerAbilityHTML() {
   const c = state.career;
   const info = playerInfo(USER_ID);
@@ -137,6 +205,7 @@ function playerAbilityHTML() {
       '<h2 class="sub">유형 스탯 <span class="muted small">높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)</span></h2>' +
       '<div class="stat-columns type-stats">' + typeScoresHTML() + "</div>" +
     "</div>" +
+    statRadarHTML() + // 스탯 12각형 (리그 평균 비교)
     '<div class="grid">' + changeCard + scoreCard + "</div>" +
     matchPreviewHTML()
   );

@@ -608,6 +608,9 @@ function renderPage() {
   page.querySelectorAll("[data-stab]").forEach(function (btn) {
     btn.onclick = function () { standingsTab = btn.getAttribute("data-stab"); renderPage(); };
   });
+  page.querySelectorAll("[data-radar]").forEach(function (btn) {
+    btn.onclick = function () { radarCmp = btn.getAttribute("data-radar"); renderPage(); }; // 스탯 12각형 비교 대상 (js/player_page.js)
+  });
   page.querySelectorAll("[data-ptab]").forEach(function (btn) {
     btn.onclick = function () { playerTab = btn.getAttribute("data-ptab"); renderPage(); };
   });
