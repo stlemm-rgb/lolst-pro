@@ -883,6 +883,7 @@ function renderAll() {
   document.getElementById("creation").innerHTML = "";
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
+  ensureNpcStyles(); // 예전 세이브: 다른 선수 플레이 스타일 (js/league.js)
   ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)
   enforceConditionCap(); // 거주지 컨디션 상한 (집이 없으면 합숙, js/housing.js)
   if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦

@@ -10,7 +10,7 @@ const LEAGUE = {
     tier1Sub:     { avg: 52, spread: 8 },
     tier2Starter: { avg: 46, spread: 8 },
     tier2Sub:     { avg: 40, spread: 6 },
-    statSpread: 8,        // 같은 선수 안에서 스탯마다 ±8
+    statSpread: 5,        // 같은 선수 안에서 스탯마다 ±5 (+ 플레이 스타일 NPC_STYLES로 강점·약점)
     ageRange: [17, 27],   // 처음 생성할 때 나이
   },
 
@@ -40,3 +40,26 @@ const LEAGUE = {
   afterWin:  { condition: [3, 6],  popularity: [1, 2] },
   afterLoss: { condition: [-6, -3], popularity: [0, 0] },
 };
+
+// ===== 다른 선수 플레이 스타일 (js/league.js) =====
+// 선수를 만들 때 하나를 골라 스탯에 mod를 더해요 (더하고 빼는 합이 0이라 스탯 점수 평균은 그대로)
+// → 같은 점수라도 라인전이 강한 선수, 운영이 강한 선수처럼 개성이 생겨요
+// - weight: 포지션별로 뽑힐 비율 (없으면 1)
+// - growth: 해마다 성장할 때 강점(+) 스탯은 +30%, 약점(−) 스탯은 −30% 더 (스타일이 유지되게)
+const NPC_STYLES = [
+  { id: "laner",     icon: "🗡️", name: "라인전형",   desc: "라인전·반응속도가 강하지만 운영·오더·시야가 약해요",
+    mod: { laning: 10, reaction: 7, accuracy: 5, macro: -8, shotcall: -8, vision: -6 }, weight: { top: 3, mid: 2, adc: 2, jungle: 0.5, support: 0.5 } },
+  { id: "macro",     icon: "🧠", name: "운영형",     desc: "운영·오더·시야가 강하지만 피지컬과 라인전이 약해요",
+    mod: { macro: 10, shotcall: 8, vision: 6, reaction: -8, accuracy: -8, laning: -8 }, weight: { jungle: 3, support: 3, mid: 1, top: 1, adc: 0.5 } },
+  { id: "fighter",   icon: "⚔️", name: "한타형",     desc: "한타·거리 조절이 강하지만 라인전·챔피언 폭·시야가 약해요",
+    mod: { teamfight: 10, spacing: 8, focus: 4, laning: -6, pool: -8, vision: -8 }, weight: { adc: 2, jungle: 2, support: 2, top: 2, mid: 1 } },
+  { id: "mechanic",  icon: "⚡", name: "피지컬형",   desc: "반응속도·입력 정확도가 뛰어나지만 오더·운영·멘탈이 약해요",
+    mod: { reaction: 10, accuracy: 10, laning: 4, shotcall: -8, macro: -8, mental: -8 }, weight: { adc: 3, mid: 2, top: 1, jungle: 1, support: 0.5 } },
+  { id: "mental",    icon: "🧊", name: "강철 멘탈형", desc: "멘탈·집중력·적응력이 강하지만 피지컬과 거리 조절이 약해요",
+    mod: { mental: 10, focus: 8, adapt: 6, reaction: -8, accuracy: -8, spacing: -8 }, weight: { support: 2, jungle: 1, top: 1, mid: 1, adc: 1 } },
+  { id: "chameleon", icon: "🦎", name: "카멜레온형", desc: "챔피언 폭·적응력이 넓지만 한타·라인전·집중력이 약해요 (패치에 강함)",
+    mod: { pool: 10, adapt: 10, macro: 4, teamfight: -8, laning: -8, focus: -8 }, weight: { mid: 2, top: 1, jungle: 1, support: 1, adc: 0.5 } },
+  { id: "allround",  icon: "⚖️", name: "올라운더",   desc: "약점도 강점도 크지 않은 고른 스탯",
+    mod: {}, weight: { top: 1, jungle: 1, mid: 1, adc: 1, support: 1 } },
+];
+const NPC_STYLE_RULES = { growthBias: 0.3 };

@@ -96,10 +96,62 @@ function makeNpc(pos, level, ageRange) {
     stats: stats,
     teamId: null,
     traits: randomNpcTraits(),
+    style: pickStyle(pos), // 플레이 스타일: 강점·약점 스탯 (data/league.js NPC_STYLES)
   };
+  applyStyle(p);
   if (state.year) npcMasteryInit(p); // 챔피언 숙련도 (js/npc_mastery.js)
   state.league.players[p.id] = p;
   return p;
+}
+
+// ----- 플레이 스타일 (data/league.js NPC_STYLES) -----
+function findStyle(id) { return NPC_STYLES.find(function (s) { return s.id === id; }) || null; }
+
+// 포지션에 맞는 스타일 뽑기 (weight 비율)
+function pickStyle(pos) {
+  const w = NPC_STYLES.map(function (s) { return (s.weight && s.weight[pos] !== undefined) ? s.weight[pos] : 1; });
+  return NPC_STYLES[weightedIndex(w)].id;
+}
+
+// 스탯에 스타일 강점·약점 더하기 (1~99, 상한선 안)
+function applyStyle(p) {
+  const st = findStyle(p.style);
+  if (!st) return;
+  Object.keys(st.mod).forEach(function (id) {
+    const v = p.stats[id] + st.mod[id];
+    p.stats[id] = Math.max(1, Math.min(statCapOf(p.traits || [], id), v));
+  });
+}
+
+// 예전 세이브: 스타일이 없는 선수에게 붙이고 강점·약점 반영
+function ensureNpcStyles() {
+  Object.keys(state.league.players).forEach(function (id) {
+    const p = state.league.players[id];
+    if (p.style && findStyle(p.style)) return;
+    p.style = pickStyle(p.pos);
+    applyStyle(p);
+  });
+}
+
+// 스타일 성장 배율: 강점 스탯 +30%, 약점 스탯 −30% (해마다 성장할 때)
+function styleGrowthBias(p, statId) {
+  const st = findStyle(p.style);
+  const m = st && st.mod[statId];
+  return m > 0 ? NPC_STYLE_RULES.growthBias : m < 0 ? -NPC_STYLE_RULES.growthBias : 0;
+}
+
+// 선수단 표용: 스타일 아이콘만 (마우스를 올리면 이름·설명)
+function styleIconHTML(id) {
+  const p = findPlayer(id);
+  const st = p && findStyle(p.style);
+  return st ? '<span class="tip style-icon" tabindex="0" data-tip="' + escapeHTML(st.name + ": " + st.desc) + '">' + st.icon + "</span>" : "";
+}
+
+// 선수 정보 화면용: 스타일 칩
+function styleChipHTML(id) {
+  const p = id === USER_ID ? null : findPlayer(id);
+  const st = p && findStyle(p.style);
+  return st ? '<span class="style-chip tip" tabindex="0" data-tip="' + escapeHTML(st.desc) + '">' + st.icon + " " + st.name + "</span>" : "";
 }
 
 // 다른 선수(NPC) 특성 무작위로 (data/traits.js의 NPC_TRAITS)
@@ -211,6 +263,8 @@ function placeNamedPlayers() {
     // 스탯: 고르게 만든 뒤 목표 종합 능력에 맞게 한꺼번에 올리거나 내림
     const bonus = findPosition(n.pos).bonus;
     STATS.forEach(function (st) { p.stats[st.id] = target + randInt(-5, 5) + (bonus.indexOf(st.id) !== -1 ? 4 : 0); });
+    p.style = n.style || pickStyle(n.pos); // 네임드 선수도 플레이 스타일
+    applyStyle(p);
     const shift = Math.round(target - statScoreFor(p.stats, n.pos));
     STATS.forEach(function (st) { p.stats[st.id] = Math.max(1, Math.min(90, p.stats[st.id] + shift)); });
     // 좋은 특성 (다른 선수가 가질 수 있는 것 중 무작위)
@@ -362,7 +416,7 @@ function newSeasonLeague() {
     STATS.forEach(function (s) {
       let d = randInt(rule.change[0], rule.change[1]);
       const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +50%
-      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id]) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm));
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id]) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + styleGrowthBias(p, s.id)));
       else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
       const before = p.stats[s.id];
       p.stats[s.id] = Math.max(1, capRise(before, Math.min(99, before + d), statCapOf(tr, s.id)));

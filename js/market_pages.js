@@ -101,12 +101,20 @@ function playerDetailHTML(id) {
       "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.pos).name + " · " + p.age + "세 · " +
         (team ? escapeHTML(team.name) : "FA") + '</span> <span class="detail-score">스탯 점수 <b>' + playerScore(id).toFixed(1) + "</b></span></h2>" +
       posScoresHTML(id, p) +
-      '<div class="chips">' + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
+      '<div class="chips">' + styleChipHTML(id) + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
+      strengthLineHTML(p) +
       champLineHTML(id) +
       '<div class="stat-columns">' + bars + "</div>" +
       '<p class="muted small">숫자 옆 /값은 스탯 상한선이에요.</p>' +
     "</div>"
   );
+}
+
+// 강점·약점: 가장 높은 스탯 3개 / 가장 낮은 스탯 2개
+function strengthLineHTML(p) {
+  const list = STATS.map(function (s) { return { name: s.name, v: p.stats[s.id] }; }).sort(function (a, b) { return b.v - a.v; });
+  const fmtS = function (x) { return x.name + " " + x.v; };
+  return '<p class="small strength-line">💪 강점: <span class="up">' + list.slice(0, 3).map(fmtS).join(" · ") + '</span> &nbsp; 🩹 약점: <span class="down">' + list.slice(-2).reverse().map(fmtS).join(" · ") + "</span></p>";
 }
 
 // 포지션별 점수: 그 포지션 가산점 스탯(★)을 1.5배로 쳤을 때의 스탯 점수 (지금 포지션은 굵게)
@@ -166,7 +174,7 @@ function clubRosterHTML(teamId) {
   }).map(function (id) {
     const p = playerInfo(id);
     const mainText = topChampList(id, 2).map(function (c) { return escapeHTML(c.name); }).join(" · ");
-    return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + traitChipsMini(id) +
+    return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + (id === USER_ID ? "" : " " + styleIconHTML(id)) + traitChipsMini(id) +
       (mainText ? ' <span class="muted small">⚔️ ' + mainText + "</span>" : "") + "</td><td>" + p.age + '세</td><td class="r"><b>' +
       playerScore(id).toFixed(1) + '</b></td><td class="r">' + moneyText(p.salary || 0) + "</td><td>" + (starterIds.indexOf(id) !== -1 ? "주전" : '<span class="muted">후보</span>') + "</td></tr>";
   }).join("");
