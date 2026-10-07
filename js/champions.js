@@ -43,23 +43,42 @@ function startMastery(stats, position, year, week) {
 }
 
 // 새 패치: 포지션마다 메타 챔피언을 무작위로 뽑음
-function makePatch(year, week) {
+// prefer: { 포지션: [챔피언...] } 메타에 꼭 넣을 챔피언 (대격변 리워크·포지션 변경, js/shakeup.js)
+// 대격변이 있는 해는 메타 판 확대: 포지션마다 SHAKEUP.metaWide.perPosition 명, S급 sCount 명 (data/shakeup.js)
+function makePatch(year, week, prefer) {
   const pool = releasedChampions(year, week);
+  const wide = typeof isShakeupYear === "function" && isShakeupYear(year);
+  const perPos = wide ? SHAKEUP.metaWide.perPosition : MASTERY.metaPerPosition;
   const champs = {};
   const theme = pick(COMPS).id; // 이번 패치 테마 성향 (js/comps.js) → 메타 챔피언을 그 성향 위주로
   POSITION_IDS.forEach(function (pos) {
     const list = pool.filter(function (c) { return c.positions.indexOf(pos) !== -1; });
-    champs[pos] = pickThemedMeta(list, theme, MASTERY.metaPerPosition).map(function (c) { return c.name; });
+    let names = pickThemedMeta(list, theme, perPos).map(function (c) { return c.name; });
+    // 꼭 넣을 챔피언: 뒤쪽(A급) 자리를 바꿔 넣음
+    ((prefer && prefer[pos]) || []).forEach(function (n) {
+      if (names.indexOf(n) !== -1) return;
+      const others = names.filter(function (x) { return !prefer[pos] || prefer[pos].indexOf(x) === -1; });
+      if (!others.length) return;
+      names[names.lastIndexOf(others[others.length - 1])] = n;
+    });
+    if (prefer && prefer[pos] && prefer[pos].length && Math.random() < 0.5) {
+      // 리워크·새 포지션 챔피언이 S급이 되기도 함
+      const i = names.indexOf(prefer[pos][0]);
+      if (i > 0) { const t = names[0]; names[0] = names[i]; names[i] = t; }
+    }
+    champs[pos] = names;
   });
   // 메타 조합 = 메타 챔피언들 성향 중 가장 많은 것
   const all = [];
   POSITION_IDS.forEach(function (pos) { champs[pos].forEach(function (n) { all.push(n); }); });
   const comp = countComps(all, theme).main || theme;
-  // 포지션마다 메타 중 1명은 S급 (맨 앞)
-  const s = {};
-  POSITION_IDS.forEach(function (pos) { s[pos] = champs[pos][0]; });
+  // 포지션마다 메타 중 1명은 S급 (맨 앞). 메타 판 확대면 2번째도 S급 (s2)
+  const s = {}, s2 = {};
+  POSITION_IDS.forEach(function (pos) { s[pos] = champs[pos][0]; if (wide && SHAKEUP.metaWide.sCount > 1 && champs[pos][1]) s2[pos] = champs[pos][1]; });
   const number = MASTERY.patchWeeks.indexOf(week) + 1;
-  return { label: year + "년 " + (number > 0 ? number + "차" : "") + " 패치", champs: champs, s: s, comp: comp };
+  const meta = { label: year + "년 " + (number > 0 ? number + "차" : "") + (wide ? " 대격변" : "") + " 패치", champs: champs, s: s, comp: comp };
+  if (wide) meta.s2 = s2;
+  return meta;
 }
 
 // 메타 챔피언인가? pos를 안 주면 "내 포지션" 기준
@@ -81,8 +100,9 @@ function metaTier(name, pos) {
   if (!isMeta(name, pos)) return null;
   const p = metaPos(pos);
   const s = state.meta.s || {};
-  if (!p) return POSITION_IDS.some(function (x) { return (s[x] || state.meta.champs[x][0]) === name; }) ? "S" : "A";
-  return (s[p] || state.meta.champs[p][0]) === name ? "S" : "A";
+  const s2 = state.meta.s2 || {};
+  if (!p) return POSITION_IDS.some(function (x) { return (s[x] || state.meta.champs[x][0]) === name || s2[x] === name; }) ? "S" : "A";
+  return (s[p] || state.meta.champs[p][0]) === name || s2[p] === name ? "S" : "A";
 }
 
 // 내 포지션 S급 메타 챔피언

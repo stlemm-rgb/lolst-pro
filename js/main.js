@@ -771,12 +771,14 @@ function nextWeek(restWeek) {
 
   // 패치 주차면 메타가 바뀜
   if (MASTERY.patchWeeks.indexOf(state.week) !== -1) {
-    state.meta = makePatch(state.year, state.week);
+    const prefer = runShakeupIfDue(); // 2~3년마다 대격변 패치 (js/shakeup.js)
+    state.meta = makePatch(state.year, state.week, prefer);
     const mine = state.meta.champs[state.player.position].join(", ");
     addNews("패치", state.meta.label + " 적용! 메타 조합: " + findComp(metaComp()).icon + " " + findComp(metaComp()).name + " · " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
     state.weekCtx.patch = true;
     const outlook = npcPatchNews(); // 새 메타에 강한/고전할 선수 (js/npc_mastery.js)
     if (outlook) addNews("패치 전망", outlook);
+    shakeupNews(); // 대격변이면 소식·신문 기사
     // 패치마다 솔로 랭크 초기화
     const oldPoints = resetLadder();
     if (oldPoints !== undefined) addNews("랭크 초기화", "패치로 솔로 랭크가 초기화됐다. (" + ladderTier(oldPoints) + " " + oldPoints.toLocaleString() + "점 → " + ladderTier(LADDER.resetPoints) + " " + LADDER.resetPoints.toLocaleString() + "점)");

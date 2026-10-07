@@ -445,6 +445,8 @@ function startCareer() {
   fresh.year = draft.startYear;
   fresh.week = 1;
   fresh.mastery = startMastery(fresh.stats, fresh.player.position, fresh.year, fresh.week);
+  fresh.shakeup = newShakeupState(fresh.year); // 대격변 패치 (js/shakeup.js)
+  applyExtraPositions(null); // 예전 게임의 포지션 변경 되돌리기
   fresh.meta = makePatch(fresh.year, fresh.week);
 
   const teams = draft.teams, teamChoice = draft.teamChoice;

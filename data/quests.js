@@ -35,5 +35,5 @@ const QUESTS = [
   { id: "q_meta_s", giver: "manager", kind: "metaS",                            title: "S급 메타 장악",           desc: "이번 패치 S급 '{champ}'을(를) {need}회 연습해라.", reward: { masteryChamp: 5, adapt: 2 } },
   { id: "q_meta_any", giver: "coach", kind: "metaAny",                          title: "메타 챔피언 준비",        desc: "{pos} 메타 챔피언을 {need}회 연습해라.",     reward: { masteryMetaAll: 2, pool: 2 } },
   { id: "q_offseason_ladder", giver: "coach", kind: "ladderTop", offseason: true, title: "비시즌 솔랭 순위 올리기", desc: "시즌은 끝났지만 손은 놀리지 마라. 시즌 마지막 주까지 리그 솔로 랭크 {need}위 안에 들어라. (지금 {start}위)", reward: { reaction: 1, accuracy: 1, laning: 1 } },
-  { id: "q_rest",  giver: "manager", kind: "training", training: "rest", need: [2, 3], title: "컨디션 관리", desc: "무리하지 말고 {need}회 쉬어라.",           reward: { mental: 2, condition: 8 } },
+  { id: "q_rest",  giver: "manager", kind: "training", training: "rest", need: [2, 2], title: "컨디션 관리", desc: "무리하지 말고 {need}회 쉬어라.",           reward: { mental: 2, condition: 8 } },
 ];

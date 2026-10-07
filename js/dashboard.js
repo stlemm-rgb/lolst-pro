@@ -348,8 +348,7 @@ function championCardHTML() {
     return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + t + "</span> " + name + " <b>" + v + "</b>" + champComps(name).map(function (id) { return " " + findComp(id).icon; }).join("") + "</span>";
   }).join("");
   const others = POSITION_IDS.filter(function (p) { return p !== myPos; }).map(function (p) {
-    const sName = (state.meta.s && state.meta.s[p]) || state.meta.champs[p][0];
-    return "<div>" + findPosition(p).name + ": " + state.meta.champs[p].map(function (n) { return n === sName ? n + "(S)" : n; }).join(", ") + "</div>";
+    return "<div>" + findPosition(p).name + ": " + state.meta.champs[p].map(function (n) { return metaTier(n, p) === "S" ? n + "(S)" : n; }).join(", ") + "</div>";
   }).join("");
   const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
   return (

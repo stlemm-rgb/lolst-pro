@@ -173,7 +173,7 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
     for (let tries = 0; tries < 4 && !ev; tries++) {
       const kind = weightedPick(kinds, function (k) { return R.kindWeight[k]; });
       const pool = MATCH_EVENTS.filter(function (e) { return e.kind === kind && t >= e.t[0] && t <= e.t[1]; });
-      ev = weightedPick(pool, function (e) { return e.w; });
+      ev = weightedPick(pool, function (e) { return e.w * shakeupEvMult(e.cat); }); // 대격변 오브젝트·아이템 개편 (js/shakeup.js)
     }
     if (!ev) return;
     // 주인공: 양 팀 10명 중에서
