@@ -735,6 +735,7 @@ function nextWeek(restWeek) {
   applyHousingWeek(); // 집 효과: 컨디션 회복 + 컨디션 상한 (합숙 40)
 
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
+  const finalLadderBoard = isPrePatchWeek(state.week) ? leagueLadder() : null;
   state.week += 1;
   if (state.week > CREATION.weeksPerSeason) {
     // 새해 = 새 시즌. 나이 +1, 승강·선수 성장/은퇴
@@ -798,7 +799,7 @@ function nextWeek(restWeek) {
     if (outlook) addNews("패치 전망", outlook);
     shakeupNews(); // 대격변이면 소식·신문 기사
     // 패치마다 솔로 랭크 초기화
-    const oldPoints = resetLadder();
+    const oldPoints = resetLadder(finalLadderBoard);
     if (oldPoints !== undefined) addNews("랭크 초기화", "패치로 솔로 랭크가 초기화됐다. (" + ladderTier(oldPoints) + " " + oldPoints.toLocaleString() + "점 → " + ladderTier(LADDER.resetPoints) + " " + LADDER.resetPoints.toLocaleString() + "점)");
     // 숙련도 1위 챔피언이 메타에서 빠졌으면 "너프" 소식 후보
     const top = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];

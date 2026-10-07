@@ -290,6 +290,7 @@ function dashStripHTML() {
           '<div><div class="sum-main" style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + '</div><div class="sum-points">' + sr.points.toLocaleString() + "점</div></div></div>" +
         (hasTrait(LADDER.kingTrait) ? '<div class="sum-sub king">👑 지난 랭크 시즌 1위 · 경기력 +3%</div>' : "") +
         '<div class="sum-sub">리그 ' + board.length + "명 중 <b>" + myLadderRank + "위</b> · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
+        '<div class="sum-sub muted">전 시즌 최종 순위: ' + (sr.lastSeason ? '<b>' + sr.lastSeason.rank + '위</b> / ' + sr.lastSeason.total + '명' : '기록 없음') + '</div>' +
         '<div class="sum-sub muted">이번 패치 최고 ' + (sr.patchPeak || sr.points).toLocaleString() + " · 역대 최고 " + sr.peak.toLocaleString() + "</div>" +
         (isPrePatchWeek(state.week) ? '<div class="sum-sub warn-text">⚠️ 이번 주 끝에 초기화</div>' : "") +
       "</div>" +
@@ -460,9 +461,12 @@ function crownLadderKing() {
 }
 
 // 패치 때 솔로 랭크 초기화 (main.js의 패치 처리에서 부름)
-function resetLadder() {
+function resetLadder(finalBoard) {
   const r = state.soloRank;
   if (!r) return;
+  // 연말 선수 이동·은퇴 전에 확정한 순위표를 우선 사용해 지난 랭크 시즌 기록 보관.
+  const board = finalBoard || leagueLadder();
+  r.lastSeason = { rank: board.findIndex(function (x) { return x.id === USER_ID; }) + 1, total: board.length };
   crownLadderKing(); // 초기화 직전 1위에게 '솔랭 1위' 칭호
   const before = r.points;
   r.points = LADDER.resetPoints;
