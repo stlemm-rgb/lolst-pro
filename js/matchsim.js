@@ -542,6 +542,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const f = schedule(week, comp, label, semis[0].winner, semis[1].winner, bo);
   playMatch(f);
   seasonOf().champions[champKey] = f.winner;
+  payPrize(champKey, f, semis); // 구단 상금 (js/club_market.js)
   finalsMvp(champKey, f); // 결승 MVP (js/records.js)
   sTraitsOnTitle(f.winner, champKey); // 황제·잡초 (js/straits.js)
   const mine = myTeam();

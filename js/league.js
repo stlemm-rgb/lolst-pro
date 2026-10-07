@@ -411,6 +411,8 @@ function newSeasonLeague() {
     if (p.winner === p.tier2) {
       findTeam(p.tier2).tier = 1;
       findTeam(p.tier1).tier = 2;
+      addClubIncome(findTeam(p.tier2), "promo", CLUB_INCOME.promotion);  // 승격 지원금 (js/club_market.js)
+      addClubIncome(findTeam(p.tier1), "promo", CLUB_INCOME.relegation); // 강등 낙하산 지원금
       if (p.tier2 === myTeam().id) addMoment("⬆️", myTeam().name + " 1부 승격");
       if (p.tier1 === myTeam().id) addMoment("⬇️", myTeam().name + " 2부 강등");
       news.push(findTeam(p.tier2).name + " 1부 승격, " + findTeam(p.tier1).name + " 2부 강등");

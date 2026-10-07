@@ -2,6 +2,68 @@
 // team.money: 구단 자금 (이적료로 늘고 줄어요, 빚이면 −)
 // state.league.marketSnap: 새해 직전에 저장한 지난 시즌 정보 { year, need: {팀: 0~1}, ratings: {선수: [평점, 세트]}, awards: {선수: [상 key]} }
 
+// ----- 구단 수입 (data/contracts.js CLUB_INCOME) -----
+// t.incomeLog = { 연도: { prize, sponsor, save, promo } } (최근 2년만)
+function addClubIncome(t, kind, amount) {
+  if (!t || !amount) return;
+  if (!Number.isFinite(t.money)) t.money = 0;
+  t.money = Math.round(t.money + amount);
+  const log = t.incomeLog = t.incomeLog || {};
+  const y = log[state.year] = log[state.year] || { prize: 0, sponsor: 0, save: 0, promo: 0 };
+  y[kind] = (y[kind] || 0) + Math.round(amount);
+  Object.keys(log).forEach(function (k) { if (Number(k) < state.year - 1) delete log[k]; });
+}
+
+// 결승이 끝나면 상금 (js/matchsim.js koFinal에서 부름)
+function payPrize(champKey, final, semis) {
+  const P = CLUB_INCOME.prize[champKey];
+  if (!P) return;
+  const list = [[final.winner, P[0]], [final.loser, P[1]]].concat(semis.map(function (m) { return [m.loser, P[2]]; }));
+  list.forEach(function (x) {
+    const t = findTeam(x[0]);
+    if (!t) return; // 해외 팀
+    addClubIncome(t, "prize", x[1]);
+    if (myTeam() && t.id === myTeam().id) addNews("💰 구단 상금", t.name + " 구단이 상금 " + moneyText(x[1]) + "을(를) 받았다.");
+  });
+}
+
+// 시즌 끝 스폰서 수입 (snapshotSeasonForMarket에서, 순위가 정해진 뒤)
+function paySponsors() {
+  const S = CLUB_INCOME.sponsor;
+  const scores = [];
+  tierTeams(1).forEach(function (t) {
+    const st = starters(t.id);
+    Object.keys(st).forEach(function (pos) { if (st[pos] && st[pos] !== USER_ID) scores.push(playerScore(st[pos])); });
+  });
+  const avg = scores.length ? scores.reduce(function (a, b) { return a + b; }, 0) / scores.length : 60;
+  [[1, tier1FinalOrder()], [2, standings(["tier2", "tier2b"], tier2Ids()).map(function (x) { return x.id; })]].forEach(function (pair) {
+    const order = pair[1];
+    order.forEach(function (id, i) {
+      const t = findTeam(id);
+      if (!t) return;
+      const mult = S.rankMult[0] + (S.rankMult[1] - S.rankMult[0]) * (order.length > 1 ? i / (order.length - 1) : 0);
+      const stars = t.roster.filter(function (pid) { return playerScore(pid) >= avg + S.starMargin; }).length;
+      const mine = myTeam() && t.id === myTeam().id;
+      const amount = S.base[pair[0]] * mult + stars * S.starBonus + (mine ? state.popularity * S.userPopularity : 0);
+      addClubIncome(t, "sponsor", amount);
+      if (mine) addNews("💰 구단 스폰서", t.name + " 구단 스폰서 수입 " + moneyText(Math.round(amount)) + " (리그 " + (i + 1) + "위 · 스타 선수 " + stars + "명 · 내 인기도 " + state.popularity + ")");
+    });
+  });
+}
+
+// [구단 탐색]용: 올해(없으면 지난해) 수입 글
+function clubIncomeText(teamId) {
+  const t = findTeam(teamId);
+  const log = t && t.incomeLog;
+  if (!log) return "";
+  const y = log[state.year] ? state.year : log[state.year - 1] ? state.year - 1 : null;
+  if (!y) return "";
+  const r = log[y];
+  const parts = [["상금", r.prize], ["스폰서", r.sponsor], ["저축", r.save], ["승강 지원금", r.promo]].filter(function (x) { return x[1] > 0; })
+    .map(function (x) { return x[0] + " " + moneyText(x[1]); });
+  return parts.length ? y + "년 수입: " + parts.join(" · ") : "";
+}
+
 function teamMoney(teamId) {
   const t = findTeam(teamId);
   return t && Number.isFinite(t.money) ? t.money : 0;
@@ -70,12 +132,15 @@ function snapshotSeasonForMarket() {
   });
   state.league.marketSnap = { year: state.year, need: need, ratings: ratings, awards: awards };
 
-  // 구단 자금 정산: 예산보다 연봉을 많이 썼으면 빚, 빚이 있으면 남는 예산으로 조금씩 갚음
+  // 스폰서 수입 (순위·스타 선수·내 인기도)
+  paySponsors();
+  // 구단 자금 정산: 예산보다 연봉을 많이 썼으면 빚, 빚이 있으면 남는 예산으로 조금씩 갚음, 빚이 없으면 남은 돈 일부 저축
   state.league.teams.forEach(function (t) {
     if (!Number.isFinite(t.money)) t.money = 0;
     const left = CONTRACT.teamBudget[t.tier] - teamPayroll(t.id);
     if (left < 0) t.money += left;
     else if (t.money < 0) t.money = Math.min(0, t.money + left * CLUB_MARKET.repayRate);
+    else addClubIncome(t, "save", left * CLUB_INCOME.saveRate);
     t.money = Math.round(t.money);
   });
 }

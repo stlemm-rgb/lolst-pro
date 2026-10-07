@@ -452,9 +452,43 @@ function startCareer() {
   window.scrollTo(0, 0); // 생성 화면에서 내려간 스크롤을 맨 위로
   state = fresh;
   makeLeague(teams, teamChoice); // 리그·구단·선수 만들고 내 소속팀 정하기
-  enforceConditionCap(); // 처음엔 집이 없어서 합숙 (js/housing.js)
-  replaceState(fresh, "dashboard", escapeHTML(fresh.player.name) + " 선수의 커리어가 시작됐어요! 훈련을 고르고 [다음 주로 진행]을 눌러 보세요.");
+  const extra = applyFirstContract(); // 첫 계약: 능력 보너스·계약금·원룸 (data/contracts.js FIRST_CONTRACT)
+  enforceConditionCap(); // 2부는 합숙으로 시작 (js/housing.js)
+  replaceState(fresh, "dashboard", escapeHTML(fresh.player.name) + " 선수의 커리어가 시작됐어요! " + extra + "훈련을 고르고 [다음 주로 진행]을 눌러 보세요.");
   saveGame();
+}
+
+// 첫 계약 (data/contracts.js FIRST_CONTRACT): 돌려주는 값 = 시작 안내에 붙일 글
+function applyFirstContract() {
+  const F = FIRST_CONTRACT;
+  const team = myTeam();
+  if (!team || !state.contract) return "";
+  // 1) 능력 보너스: 1부 주전 평균보다 높은 만큼
+  const scores = [];
+  tierTeams(1).forEach(function (t) {
+    const st = starters(t.id);
+    Object.keys(st).forEach(function (pos) { if (st[pos] && st[pos] !== USER_ID) scores.push(playerScore(st[pos])); });
+  });
+  const avg = scores.reduce(function (a, b) { return a + b; }, 0) / Math.max(1, scores.length);
+  const boost = Math.min(F.maxBoost, Math.max(0, (playerScore(USER_ID) - avg) * F.perPointAbove));
+  if (boost > 0) state.contract.salary = Math.round(state.contract.salary * (1 + boost) / 1000000) * 1000000;
+  state.contract.firstBoost = Math.round(boost * 100); // [이적 시장] 내 계약 칸 표시용
+  let text = "연봉 " + moneyText(state.contract.salary) + (boost > 0 ? "(능력 보너스 +" + Math.round(boost * 100) + "%)" : "") + ". ";
+  // 2) 1부 시작: 계약금 + 원룸
+  if (team.tier === 1) {
+    const bonus = Math.round(state.contract.salary * F.signingBonus / 10000) * 10000;
+    state.money += bonus;
+    text += "계약금 " + moneyText(bonus) + "을(를) 받았고, ";
+    // 원룸: 주급이 월세보다 적으면 몇 주 만에 돈이 떨어지니 합숙으로 시작
+    const home = SHOP_HOUSING.find(function (h) { return h.id === F.tier1Home; });
+    if (home && state.contract.salary / CREATION.weeksPerSeason >= (home.rent || 0)) {
+      state.housing = { id: F.tier1Home, since: absWeek() };
+      text += home.name + "에서 시작해요. ";
+    } else {
+      text += "주급이 월세보다 적어서 팀 합숙소에서 시작해요. ";
+    }
+  }
+  return text;
 }
 
 // 새 시즌 (js/main.js): 전용 특성 기간이 끝났으면 빼기 — 유망주는 4년차 시즌이 시작될 때
