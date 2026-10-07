@@ -111,7 +111,7 @@ function bindSns(page) {
     renderMenu();
   }
   page.querySelectorAll("[data-snstab]").forEach(function (btn) {
-    btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; renderPage(); };
+    btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; selectMenu("sns"); };
   });
   page.querySelectorAll("[data-msg]").forEach(function (el) {
     el.onclick = function () {

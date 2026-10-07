@@ -474,6 +474,7 @@ function selectMenu(id) {
   tutorialVisit(id); // 처음 안내: 들어가 본 메뉴 (js/guide.js)
   renderMenu();
   renderPage();
+  if (id === "sns") window.scrollTo(0, 0); // SNS에 들어갈 때는 항상 맨 위부터 보기
 }
 
 // 합친 메뉴의 화면 위 탭 버튼 + 제목
