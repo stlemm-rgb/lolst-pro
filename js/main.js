@@ -767,6 +767,10 @@ function nextWeek(restWeek) {
     });
   }
 
+  // 이번 주·다음 주 리그 일정(대진) 미리 만들기 → 대시보드 '이번 주'·'다음 경기'에 바로 보임 (js/matchsim.js)
+  prepareWeek(state.week);
+  prepareWeek(state.week + 1);
+
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
   newlyReleased(state.year, state.week).forEach(function (c) {
     if (state.mastery[c.name] !== undefined) return;
@@ -889,6 +893,7 @@ function renderAll() {
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
   ensureWorld(); // 해외 리그 (새 게임·예전 세이브, js/era.js)
+  if (state.league && state.league.season) { prepareWeek(state.week); prepareWeek(state.week + 1); } // 새 게임 1주차: 2주차 LCK 컵 대진도 미리
   ensureNpcStyles(); // 예전 세이브: 다른 선수 플레이 스타일 (js/league.js)
   ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)
   enforceConditionCap(); // 거주지 컨디션 상한 (집이 없으면 합숙, js/housing.js)

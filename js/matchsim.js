@@ -451,18 +451,6 @@ function tier1Ids() { return tierTeams(1).map(function (t) { return t.id; }); }
 function tier2Ids() { return tierTeams(2).map(function (t) { return t.id; }); }
 
 const WEEK_EVENTS = {
-  // LCK 컵 조 편성: 1부를 두 조로 (10팀이면 5라운드, 8팀이면 4라운드, 2~6주)
-  2: [function () {
-    const ids = shuffled(tier1Ids());
-    const h = Math.floor(ids.length / 2);
-    const A = ids.slice(0, h), B = ids.slice(h, h * 2);
-    seasonOf().cupGroups = { A: A, B: B };
-    for (let r = 0; r < h; r++) {
-      for (let i = 0; i < h; i++) {
-        schedule(2 + r, "cup", "LCK 컵 그룹 배틀 " + (r + 1) + "라운드", A[i], B[(i + r) % h], LEAGUE.bestOf.cup);
-      }
-    }
-  }],
   // LCK 컵 플레이오프 1라운드: 3위 vs 6위, 4위 vs 5위
   8: [function () {
     const seeds = standings("cup", tier1Ids()).slice(0, 6).map(function (r) { return r.id; });
@@ -473,21 +461,6 @@ const WEEK_EVENTS = {
   // 컵 4강 → 결승
   9: [function () { koSemis("cup_po", "LCK 컵 플레이오프 4강", seasonOf().cupSeeds, 8, 9, LEAGUE.bestOf.cup_po); },
       function () { koFinal("cup_po", "LCK 컵 결승", 9, LEAGUE.bestOf.cup_final, "cup", "LCK 컵"); }],
-  // 정규 시즌 전반기: 1부 더블 라운드 로빈 18라운드(13~21주), 2부 14라운드(13~19주)
-  13: [function () {
-    scheduleRounds(shuffledRounds(doubleRoundRobin(shuffled(tier1Ids()))), 13, 2, "split1", "전반기");
-    scheduleRounds(shuffledRounds(doubleRoundRobin(shuffled(tier2Ids()))), 13, 2, "tier2", "2부 전반기");
-  }],
-  // 후반기: 상위 절반 / 하위 절반 그룹 (10팀이면 5·5, 8팀이면 4·4, 30~34주), 2부는 한 번씩 (30~33주)
-  30: [function () {
-    const order = standings("split1", tier1Ids()).map(function (r) { return r.id; });
-    const h = Math.ceil(order.length / 2);
-    const g = { legend: order.slice(0, h), rise: order.slice(h) };
-    seasonOf().groups = g;
-    scheduleRounds(doubleRoundRobin(g.legend), 30, 2, "split2", "후반기 상위 그룹");
-    scheduleRounds(doubleRoundRobin(g.rise), 30, 2, "split2", "후반기 하위 그룹");
-    scheduleRounds(roundRobin(shuffled(tier2Ids())), 30, 2, "tier2b", "2부 후반기");
-  }],
   // 플레이인 (1부 10팀일 때만): 5위 vs 8위, 6위 vs 7위 → 승자가 플레이오프 5·6번 시드
   //   1부 8팀이면 플레이인 없이 상위 6팀이 바로 플레이오프 (data/era.js ERA.teams)
   35: [function () {
@@ -527,6 +500,52 @@ const WEEK_EVENTS = {
   }],
   46: [function () { koFinal("worlds_ko", "월드 결승", 46, LEAGUE.bestOf.worlds_ko, "worlds", "월드 챔피언십"); }],
 };
+
+// 리그 일정 만들기(대진표 짜기)는 그 주가 '시작될 때' 미리 해요 (main.js nextWeek → prepareWeek)
+//   → 대시보드 '이번 주'에 경기가 바로 보임 (예전엔 그 주를 진행할 때 만들어져서 '경기 없음'으로 보였음)
+//   토너먼트 대진(앞 라운드 결과가 필요한 것)은 그대로 WEEK_EVENTS + koPreview
+const PRE_WEEK_EVENTS = {
+  // LCK 컵 조 편성: 1부를 두 조로 (10팀이면 5라운드, 8팀이면 4라운드, 2~6주)
+  2: [function () {
+    const ids = shuffled(tier1Ids());
+    const h = Math.floor(ids.length / 2);
+    const A = ids.slice(0, h), B = ids.slice(h, h * 2);
+    seasonOf().cupGroups = { A: A, B: B };
+    for (let r = 0; r < h; r++) {
+      for (let i = 0; i < h; i++) {
+        schedule(2 + r, "cup", "LCK 컵 그룹 배틀 " + (r + 1) + "라운드", A[i], B[(i + r) % h], LEAGUE.bestOf.cup);
+      }
+    }
+  }],
+  // 정규 시즌 전반기: 1부 더블 라운드 로빈 18라운드(13~21주), 2부 14라운드(13~19주)
+  13: [function () {
+    scheduleRounds(shuffledRounds(doubleRoundRobin(shuffled(tier1Ids()))), 13, 2, "split1", "전반기");
+    scheduleRounds(shuffledRounds(doubleRoundRobin(shuffled(tier2Ids()))), 13, 2, "tier2", "2부 전반기");
+  }],
+  // 후반기: 상위 절반 / 하위 절반 그룹 (10팀이면 5·5, 8팀이면 4·4, 30~34주), 2부는 한 번씩 (30~33주)
+  30: [function () {
+    const order = standings("split1", tier1Ids()).map(function (r) { return r.id; });
+    const h = Math.ceil(order.length / 2);
+    const g = { legend: order.slice(0, h), rise: order.slice(h) };
+    seasonOf().groups = g;
+    scheduleRounds(doubleRoundRobin(g.legend), 30, 2, "split2", "후반기 상위 그룹");
+    scheduleRounds(doubleRoundRobin(g.rise), 30, 2, "split2", "후반기 하위 그룹");
+    scheduleRounds(roundRobin(shuffled(tier2Ids())), 30, 2, "tier2b", "2부 후반기");
+  }],
+};
+
+// 그 주 일정 미리 만들기 (한 시즌에 주마다 한 번만, season.prepared)
+function prepareWeek(week) {
+  const s = seasonOf();
+  if (!s) return;
+  s.prepared = s.prepared || {};
+  if (s.prepared[week]) return;
+  s.prepared[week] = true;
+  // 예전 세이브: 이미 일정이 만들어진 주면 표시만
+  const done = { 2: !!s.cupGroups, 13: s.matches.some(function (m) { return m.comp === "split1" || m.comp === "tier2"; }), 30: !!s.groups };
+  if (done[week]) return;
+  (PRE_WEEK_EVENTS[week] || []).forEach(function (fn) { fn(); });
+}
 
 // 라운드 순서를 섞어서 (같은 상대를 연달아 만나지 않게 앞뒤 절반은 유지)
 function shuffledRounds(rounds) {
@@ -625,6 +644,7 @@ function setupWorlds() {
 
 // 한 주 진행: 그 주의 행사(조 편성·토너먼트) → 잡힌 경기 진행
 function playLeagueWeek(week) {
+  prepareWeek(week); // 아직 안 만든 일정이 있으면 (예전 세이브)
   const events = WEEK_EVENTS[week] || [];
   events.forEach(function (fn) {
     fn();
