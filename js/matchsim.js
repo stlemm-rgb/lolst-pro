@@ -230,23 +230,30 @@ function playSet(a, b, userCtx, setCtx) {
     if (pa.id === USER_ID) userLane = { won: diff >= 0, solo: solo, opp: pb.id };
     if (pb.id === USER_ID) userLane = { won: diff < 0, solo: solo, opp: pa.id };
   });
-  const luckA = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom), luckB = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
+  // 경기 흐름: 스틸·슈퍼플레이·실수·심리 사건이 점수를 흔듦 (js/match_events.js) + 남은 작은 운
+  const series = setCtx.series || newSeriesMood();
+  const ev = rollSetEvents(la, lb, a, b, laneResults, series);
+  const R = MATCH_EVENT_RULES.residual;
+  const luckA = randFloat(-R, R), luckB = randFloat(-R, R);
   const avgA = average(la.map(function (p) { return p.power; })), avgB = average(lb.map(function (p) { return p.power; }));
   // 운영·한타 = 기본(운영 스탯 평균) + 운영 단계 + 한타 단계 (스타일 차이)
   const macroA = phaseTeamScore(la, "macro"), macroB = phaseTeamScore(lb, "macro");
   const fightA = phaseTeamScore(la, "fight"), fightB = phaseTeamScore(lb, "fight");
   const playA = teamplayScore(la) + macroA + fightA, playB = teamplayScore(lb) + macroB + fightB;
   const compA = comps.a.bonus, compB = comps.b.bonus;
-  const powerA = avgA + bonusA + playA + compA + luckA;
-  const powerB = avgB + bonusB + playB + compB + luckB;
+  const powerA = avgA + bonusA + playA + compA + ev.a + luckA;
+  const powerB = avgB + bonusB + playB + compB + ev.b + luckB;
   // 타고난 리더·원클럽맨: 그 선수가 있는 팀 한타 전력 보너스
   const mood = function (list) { return list.reduce(function (sum, p) { return sum + (p.id ? traitSumOf(traitsOf(p.id), "teamMood") : 0); }, 0); };
   const moodA = mood(la), moodB = mood(lb);
+  const aWins = powerA + moodA >= powerB + moodB;
+  const flipped = aWins !== (powerA + moodA - ev.a >= powerB + moodB - ev.b); // 사건이 승패를 뒤집음
+  afterSetEvents(ev, la, lb, a, b, aWins ? 0 : 1, flipped, series);
   return {
-    winner: powerA + moodA >= powerB + moodB ? a : b, userLane: userLane, la: la, lb: lb,
-    lanes: laneResults, comps: comps,
-    teamA: { avg: avgA, lane: bonusA, play: playA, macro: macroA, fight: fightA, comp: compA, luck: luckA, mood: moodA },
-    teamB: { avg: avgB, lane: bonusB, play: playB, macro: macroB, fight: fightB, comp: compB, luck: luckB, mood: moodB },
+    winner: aWins ? a : b, userLane: userLane, la: la, lb: lb,
+    lanes: laneResults, comps: comps, events: ev.list, evRate: ev.rate, flipped: flipped,
+    teamA: { avg: avgA, lane: bonusA, play: playA, macro: macroA, fight: fightA, comp: compA, ev: ev.a, luck: luckA, mood: moodA },
+    teamB: { avg: avgB, lane: bonusB, play: playB, macro: macroB, fight: fightB, comp: compB, ev: ev.b, luck: luckB, mood: moodB },
   };
 }
 
@@ -264,6 +271,8 @@ function playMatch(m) {
   const lanes = [];
   const perf = {}; // 이 경기 선수별 기록 (js/records.js)
   const downTwo = []; // 0:2로 몰렸던 팀 (역전의 명수)
+  const series = newSeriesMood(); // 심리 상태: 세트를 넘어 이어짐 (js/match_events.js)
+  const userEvents = [];          // 내 선수 하이라이트
   // 경기 상세: 우리 팀 경기와 결승전만 저장 (js/match_detail.js)
   const keepDetail = (mine && (m.a === mine.id || m.b === mine.id)) || m.label.indexOf("결승") !== -1;
   const detail = keepDetail ? { sets: [] } : null;
@@ -278,6 +287,7 @@ function playMatch(m) {
       setNo: m.score[0] + m.score[1] + 1,
       plans: plans,
       used: seriesUsed,
+      series: series,
     };
     if (userIn) {
       userCtx = userMatchContext(m, myTarget, seriesUsed);
@@ -287,6 +297,7 @@ function playMatch(m) {
     set.comps.a.picks.concat(set.comps.b.picks).forEach(function (n) { if (seriesUsed.indexOf(n) === -1) seriesUsed.push(n); });
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
+    if (userIn) userEventHighlights(set.events).forEach(function (h) { userEvents.push(h); });
     recordSet(set, m, perf);
     if (detail) {
       const sd = setDetail(set, setCtx, m, userCtx ? userCtx.pick : null);
@@ -294,12 +305,17 @@ function playMatch(m) {
       detail.sets.push(sd);
     }
   }
-  if (detail) m.detail = detail;
+  if (detail) {
+    // 마지막 세트 뒤 심리 변화는 다음 세트가 없으니 빼기
+    const last = detail.sets[detail.sets.length - 1];
+    if (last && last.ev) last.ev = last.ev.filter(function (e) { return !e.a; });
+    m.detail = detail;
+  }
   m.winner = m.score[0] > m.score[1] ? m.a : m.b;
   m.loser = m.winner === m.a ? m.b : m.a;
   finishSeriesRecord(m, perf);
   sTraitsOnMatch(m, perf, downTwo); // 0:2 역전승 기록 (역전의 명수, js/straits.js)
-  if (userIn) afterUserMatch(m, { pick: userPicks.map(function (u) { return (u.joker ? "🃏" : "") + u.pick; }).join(" / "), joker: false }, lanes, perf[USER_ID]);
+  if (userIn) afterUserMatch(m, { pick: userPicks.map(function (u) { return (u.joker ? "🃏" : "") + u.pick; }).join(" / "), joker: false, events: userEvents }, lanes, perf[USER_ID]);
   return m;
 }
 
@@ -370,6 +386,12 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
   if (solos) laneText += ", 솔로킬 " + solos + "회!";
   if (soloLosses) laneText += ", 솔로킬 " + soloLosses + "회 허용";
   if (lanes.length && lanes[0].opp) laneText += " (상대 " + playerName(lanes[0].opp) + ")";
+  // 경기 흐름 하이라이트 (js/match_events.js): 같은 사건은 ×2로 묶음, 최대 4개
+  if (ctx.events && ctx.events.length) {
+    const cnt = {};
+    ctx.events.forEach(function (h) { cnt[h] = (cnt[h] || 0) + 1; });
+    laneText += " · " + Object.keys(cnt).slice(0, 4).map(function (h) { return h + (cnt[h] > 1 ? " ×" + cnt[h] : ""); }).join(", ");
+  }
 
   // 팀은 졌지만 나는 빛났다: 솔로킬 또는 라인전 절반 넘게 우세 → 뉴스 기사 (data/events.js LOSS_HERO)
   if (!won && lanes.length && (solos > 0 || laneWins * 2 > lanes.length)) {

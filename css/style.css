@@ -505,6 +505,18 @@ table.lane-table th { color: var(--muted, #8b95a7); font-weight: normal; text-al
 .lane-win { background: rgba(34, 197, 94, 0.08); }
 .lane-mid { font-size: 12px; line-height: 1.2; white-space: nowrap; }
 .solo { color: var(--gold); }
+/* 경기 흐름 타임라인 (js/match_events.js) */
+table.ev-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 8px; }
+table.ev-table td { padding: 3px 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+table.ev-table td:first-child { width: 48px; white-space: nowrap; }
+table.ev-table td:nth-child(2) { width: 28px; }
+table.ev-table td:last-child { width: 72px; white-space: nowrap; }
+.ev-row.ev-a td:first-child { border-left: 3px solid var(--accent); }
+.ev-row.ev-b td:first-child { border-left: 3px solid #f59e0b; }
+.ev-row.ev-psych td { color: #c4b5fd; }
+.ev-row.me td { background: rgba(59, 130, 246, 0.10); }
+.ev-team { display: inline-block; min-width: 34px; font-size: 11px; color: var(--muted); }
+ul.ev-key { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
 .md-ratings { margin-top: 8px; }
 .md-ratings h3 { margin: 0 0 4px; }
 

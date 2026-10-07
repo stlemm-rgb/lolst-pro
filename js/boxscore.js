@@ -35,8 +35,8 @@ function npcPick(pos, used) {
 // set: playSet 결과, userPick: 내 선수가 고른 챔피언
 function makeBoxScore(set, m, userPick) {
   const aWon = set.winner === m.a;
-  const total = function (t) { return t.avg + t.lane + (t.play || 0) + (t.comp || 0) + t.luck + t.mood; };
-  const gap = Math.abs(total(set.teamA) - total(set.teamB));
+  const total = function (t) { return t.avg + t.lane + (t.play || 0) + (t.comp || 0) + (t.ev || 0) + t.luck + t.mood; };
+  const gap = Math.abs(total(set.teamA) - total(set.teamB)) * BOXSCORE.gapScale; // 경기 흐름 사건이 커서 줄여서 씀
   const minutes = Math.max(BOXSCORE.minutesMin, randFloat(BOXSCORE.minutes[0], BOXSCORE.minutes[1]) - gap * BOXSCORE.minutesPerGap);
   const winK = randInt(BOXSCORE.winnerKills[0], BOXSCORE.winnerKills[1]) + Math.round(gap * BOXSCORE.killsPerGap);
   const loseK = Math.max(1, randInt(BOXSCORE.loserKills[0], BOXSCORE.loserKills[1]) - Math.round(gap * BOXSCORE.killsPerGap));

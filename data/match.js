@@ -51,7 +51,7 @@ const MATCH = {
 // 1) 라인전: 같은 포지션끼리 경기력 비교 → 이긴 쪽 팀에 laneWinBonus
 //    차이가 soloKillGap 이상이면 "솔로킬"로 soloKillBonus 추가
 // 2) 운영·한타: 5명의 운영·오더·시야·한타·거리 조절 평균이 teamplayBase보다 높은 만큼 × teamplayWeight
-// 3) 팀 전력 = 5명 경기력 평균 + 라인전 보너스 합 + 운영·한타 + 무작위(±teamRandom)
+// 3) 팀 전력 = 5명 경기력 평균 + 라인전 보너스 합 + 운영·한타 + 경기 흐름 사건(data/match_events.js) + 작은 운
 //    → 전력이 높은 팀이 그 세트 승리
 // 4) 3판 2선승 / 5판 3선승은 세트마다 따로 판정
 // (2026-10-06) 라인전이 너무 중요해서 라인전 보너스를 3 → 1.5, 솔로킬 2 → 1로 줄이고 운영·한타 점수를 추가
@@ -84,7 +84,7 @@ const TEAM_MATCH = {
   teamplayStats: ["macro", "shotcall", "vision", "teamfight", "spacing"],
   teamplayBase: 60,
   teamplayWeight: 0.35,
-  teamRandom: 8,
+  teamRandom: 8,          // (2026-10-07부터 안 씀) 운 대신 경기 흐름 사건 — data/match_events.js
   conditionBase: 0.9,
   conditionDiv: 500,
   lowStaminaLimit: 30,

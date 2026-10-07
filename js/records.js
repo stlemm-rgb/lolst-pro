@@ -21,6 +21,12 @@ function setRating(myPower, oppPower, won) {
   return Math.max(1, Math.min(10, v));
 }
 
+// 세트 평점 + 경기 흐름 사건 (슈퍼플레이 +, 실수 −, js/match_events.js)
+function setRatingOf(set, p, opp, won) {
+  const v = setRating(p.power, opp.power, won) + (set.evRate && p.id ? set.evRate[p.id] || 0 : 0);
+  return Math.max(1, Math.min(10, v));
+}
+
 // 한 세트 기록 (playMatch에서 세트마다 부름)
 function recordSet(set, m, perf) {
   const regular = REGULAR_COMPS.indexOf(m.comp) !== -1;
@@ -30,7 +36,7 @@ function recordSet(set, m, perf) {
     mine.forEach(function (p, i) {
       if (!p.id) return; // 해외 가상 팀 선수는 기록 안 함
       const opp = theirs[i];
-      const rating = setRating(p.power, opp.power, wonSet);
+      const rating = setRatingOf(set, p, opp, wonSet);
       const solo = p.power - opp.power >= TEAM_MATCH.soloKillGap;
       const soloLost = opp.power - p.power >= TEAM_MATCH.soloKillGap;
       const st = seasonPlayerStats(p.id);

@@ -42,10 +42,20 @@ function activeTraits(id, teamId, setCtx, laneWon) {
 
 // 한 세트 기록 만들기 (playMatch에서 부름)
 function setDetail(set, setCtx, m, userPick) {
-  const team = function (t) { return { avg: round1(t.avg), lane: round1(t.lane), play: round1(t.play), macro: round1(t.macro || 0), fight: round1(t.fight || 0), comp: round1(t.comp || 0), luck: round1(t.luck), mood: round1(t.mood) }; };
+  const team = function (t) { return { avg: round1(t.avg), lane: round1(t.lane), play: round1(t.play), macro: round1(t.macro || 0), fight: round1(t.fight || 0), comp: round1(t.comp || 0), ev: round1(t.ev || 0), luck: round1(t.luck), mood: round1(t.mood) }; };
   const comp = function (c) { return c ? { main: c.main, n: c.n, plan: c.plan, target: c.target, match: c.match, syn: c.syn, bonus: round1(c.bonus) } : null; };
+  const box = makeBoxScore(set, m, userPick);
+  const end = Math.floor(box.min);
+  // 경기 흐름 사건: 경기 시간 안으로 (마무리·세트 뒤 심리 변화는 마지막 분)
+  //   사건 시간(최대 MATCH_EVENT_RULES.timeRange[1]분)을 실제 경기 시간 비율로 줄임
+  const maxT = MATCH_EVENT_RULES.timeRange[1];
+  const ev = (set.events || []).map(function (e) {
+    const t = e.t >= 99 ? end : end - 1 < maxT ? Math.max(1, Math.round(e.t * (end - 1) / maxT)) : e.t;
+    return Object.assign({}, e, { t: t });
+  }).sort(function (x, y) { return x.t - y.t; });
   return {
     w: set.winner === m.a ? 0 : 1,
+    ev: ev, flip: !!set.flipped,
     deciding: !!setCtx.deciding,
     ta: team(set.teamA), tb: team(set.teamB),
     ca: comp(set.comps && set.comps.a), cb: comp(set.comps && set.comps.b), // 조합 (js/comps.js)
@@ -53,12 +63,12 @@ function setDetail(set, setCtx, m, userPick) {
       const pb = set.lb[i], ln = set.lanes[i];
       return {
         a: pa.id, b: pb.id, pa: round1(lanePower(pa)), pb: round1(lanePower(pb)), aWon: ln.aWon, solo: ln.solo,
-        ra: round1(setRating(pa.power, pb.power, set.winner === m.a)),
-        rb: round1(setRating(pb.power, pa.power, set.winner === m.b)),
+        ra: round1(setRatingOf(set, pa, pb, set.winner === m.a)),
+        rb: round1(setRatingOf(set, pb, pa, set.winner === m.b)),
         xa: activeTraits(pa.id, m.a, setCtx, ln.aWon), xb: activeTraits(pb.id, m.b, setCtx, !ln.aWon),
       };
     }),
-    box: makeBoxScore(set, m, userPick),
+    box: box,
   };
 }
 
@@ -79,13 +89,38 @@ function miniChips(ids) {
 function teamScoreText(t) {
   const play = t.play || 0; // 예전 기록에는 없음
   const comp = t.comp || 0;
-  const total = t.avg + t.lane + play + comp + t.luck + t.mood;
+  const ev = t.ev || 0; // 경기 흐름 사건 (예전 기록에는 없음)
+  const total = t.avg + t.lane + play + comp + ev + t.luck + t.mood;
   return "<b>" + total.toFixed(1) + "</b> " +
     '<span class="muted small">= 선수 평균 ' + t.avg.toFixed(1) + " + 라인전 " + t.lane.toFixed(1) +
     (t.play !== undefined ? " " + (play >= 0 ? "+ " : "− ") + "운영·한타 " + Math.abs(play).toFixed(1) +
       (t.macro !== undefined && (t.macro || t.fight) ? " (스타일: 운영 " + (t.macro >= 0 ? "+" : "") + t.macro.toFixed(1) + " · 한타 " + (t.fight >= 0 ? "+" : "") + t.fight.toFixed(1) + ")" : "") : "") +
     (comp ? " " + (comp >= 0 ? "+ " : "− ") + "조합 " + Math.abs(comp).toFixed(1) : "") +
-    (t.mood ? " + 한타 특성 " + t.mood.toFixed(1) : "") + " " + (t.luck >= 0 ? "+ " : "− ") + "운 " + Math.abs(t.luck).toFixed(1) + "</span>";
+    (t.mood ? " + 한타 특성 " + t.mood.toFixed(1) : "") +
+    (t.ev !== undefined ? " " + (ev >= 0 ? "+ " : "− ") + "<b>경기 흐름 " + Math.abs(ev).toFixed(1) + "</b>" : "") +
+    " " + (t.luck >= 0 ? "+ " : "− ") + "운 " + Math.abs(t.luck).toFixed(1) + "</span>";
+}
+
+// 경기 흐름 타임라인 (js/match_events.js)
+function timelineHTML(m, s) {
+  if (!s.ev || !s.ev.length) return "";
+  const teams = [m.a, m.b];
+  const nameOf = function (id, side, pos) { return detailName(id, teams[side], pos); };
+  const rows = s.ev.map(function (e) {
+    const info = matchEventInfo(e);
+    if (!info) return "";
+    const side = e.s === 0 ? "a" : "b";
+    const num = e.x ? '<b class="' + (e.x > 0 ? "up" : "down") + '">' + (e.x > 0 ? "+" : "−") + Math.abs(e.x).toFixed(0) + "</b>" :
+      e.e === "solo" ? '<span class="muted small">라인전</span>' : e.k === "psych" ? '<span class="muted small">' + (e.a ? "다음 세트" : "심리") + "</span>" : "";
+    return '<tr class="ev-row ev-' + side + " ev-" + (info.cat || "") + (e.p === USER_ID ? " me" : "") + '">' +
+      '<td class="r muted small">' + (e.t < 10 ? "0" : "") + e.t + "분</td>" +
+      '<td class="c">' + info.icon + "</td>" +
+      '<td><span class="ev-team">' + escapeHTML(teamShort(teams[e.s])) + "</span> " + matchEventText(e, nameOf) + "</td>" +
+      '<td class="r">' + num + "</td></tr>";
+  }).join("");
+  return '<h2 class="sub">경기 흐름 <span class="muted small">숫자 = 그 팀 점수 ±(실수는 −) · 심리 = 이후 실수·슈퍼플레이 확률이 바뀜' +
+    (s.flip ? ' · <b>이 세트는 경기 흐름이 승패를 뒤집었어요</b>' : "") + "</span></h2>" +
+    '<table class="ev-table">' + rows + "</table>";
 }
 
 function kdaText(k, d, a) {
@@ -211,7 +246,25 @@ function seriesSummaryHTML(m) {
     }).join("");
   };
   const head = "<tr><th>포지션</th><th>선수</th><th>챔피언</th><th class=\"r\">K / D / A</th><th class=\"r\">KDA</th><th class=\"r\">CS/분</th><th class=\"r\">피해량 (비중)</th><th class=\"r\">시야</th><th class=\"r\">라인</th><th class=\"r\">운영</th><th class=\"r\">한타</th><th class=\"r\">평점</th></tr>";
+  // 주요 장면: 큰 사건·승패를 뒤집은 세트·내 선수 사건
+  const key = [];
+  d.sets.forEach(function (s, i) {
+    (s.ev || []).forEach(function (e) {
+      const info = matchEventInfo(e);
+      if (!info || e.a) return;
+      const big = Math.abs(e.x || 0) >= MATCH_EVENT_RULES.size.l[0] * MATCH_EVENT_RULES.scale;
+      if (big || (e.p === USER_ID && e.k !== "psych")) key.push({ set: i, e: e, info: info });
+    });
+  });
+  const keyHTML = key.length ? '<div class="card"><h2>주요 장면 <span class="muted small">큰 사건과 내 선수 장면 · 세트 탭에서 경기 흐름 전체</span></h2><ul class="ev-key">' +
+    key.slice(0, 10).map(function (k) {
+      const teams = [m.a, m.b];
+      const nameOf = function (id, side, pos) { return detailName(id, teams[side], pos); };
+      return "<li>" + '<span class="muted small">' + (k.set + 1) + "세트 " + k.e.t + "분</span> " + k.info.icon + " " + matchEventText(k.e, nameOf) +
+        (k.e.x ? ' <b class="' + (k.e.x > 0 ? "up" : "down") + '">' + (k.e.x > 0 ? "+" : "−") + Math.abs(k.e.x).toFixed(0) + "</b>" : "") + "</li>";
+    }).join("") + "</ul></div>" : "";
   return (
+    keyHTML +
     '<div class="card"><h2>' + teamLabel(m.a) + ' <span class="muted small">시리즈 합계 (CS/분·비중·점수·평점은 평균)</span></h2><div class="table-wrap"><table class="roster box">' + head + rows("a", m.a) + "</table></div></div>" +
     '<div class="card"><h2>' + teamLabel(m.b) + '</h2><div class="table-wrap"><table class="roster box">' + head + rows("b", m.b) + "</table></div></div>" +
     '<p class="muted small">라인·운영·한타 점수는 0~100 (70 이상 초록, 40 미만 빨강). 평점은 세트 평점 평균(1~10). 경기 기록은 판정 결과에 맞춰 만들어진 값이에요.</p>'
@@ -269,6 +322,7 @@ function setAnalysisHTML(m, idx) {
       '<table class="lane-table">' + lanes + "</table>" +
       (s.ca ? '<h2 class="sub">밴픽 조합 <span class="muted small">주력 성향 = 가장 많은 성향</span></h2>' +
         '<div class="small">' + compSummaryHTML(s.ca, m.a) + "</div>" + '<div class="small">' + compSummaryHTML(s.cb, m.b) + "</div>" : "") +
+      timelineHTML(m, s) +
       '<h2 class="sub">팀 점수 <span class="muted small">높은 쪽이 승리</span></h2>' +
       '<div class="small">' + teamLabel(m.a) + " " + teamScoreText(s.ta) + "</div>" +
       '<div class="small">' + teamLabel(m.b) + " " + teamScoreText(s.tb) + "</div>" +
