@@ -189,6 +189,13 @@ button.primary:hover:not(:disabled) { background: linear-gradient(180deg, #63a0f
 .notice-go b { color: var(--accent); white-space: nowrap; }
 .notice:has(.notice-go):hover { border-color: var(--accent); }
 
+/* 대시보드 제목 옆 우승 트로피 (js/trophies.js) */
+.dash-title { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.trophy-shelf { display: inline-flex; align-items: flex-end; gap: 10px; font-size: 13px; font-weight: normal; }
+.trophy { position: relative; display: inline-flex; align-items: flex-end; cursor: default; filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); }
+.trophy:hover { transform: translateY(-2px); }
+.trophy-n { margin-left: 2px; color: var(--gold); font-weight: bold; font-size: 13px; line-height: 1; }
+
 /* 주간 기록 */
 .log-entry { padding: 10px 0; border-bottom: 1px solid var(--border); }
 .log-entry:last-child { border-bottom: none; }

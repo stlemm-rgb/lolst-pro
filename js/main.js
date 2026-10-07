@@ -130,7 +130,7 @@ pages.dashboard = function () {
   // 맨 위 요약 4칸 → 왼쪽(이번 주 할 일: 지난주 결과·이번 주·최근 경기) / 오른쪽(내 선수: 프로필·챔피언·솔로 랭크) → 맨 아래 내 스탯
   // 조각들은 js/dashboard.js
   return (
-    "<h1>대시보드</h1>" +
+    '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/trophies.js)
     tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 프로필 카드, 💡 추천은 '이번 주' 카드 안
     dashStripHTML() +
     '<div class="dash">' +

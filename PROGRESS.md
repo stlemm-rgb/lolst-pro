@@ -116,6 +116,7 @@
 90. (커밋 필요) 대시보드의 '📣 선수 SNS에서 ○○ 선수를 언급한 글이 n개' 알림을 누르면 [SNS] → 💬 선수 SNS 탭으로 바로 이동 (data-gosns, js/main.js renderPage)
 91. (커밋 필요) 선수 SNS 새 분류 13개: winStreak(3연승+)·streakBreak(3연패+ 탈출)·superPlay·blunder(경기 흐름 사건의 내 슈퍼플레이/큰 실수, js/match_events.js countSocialPlays)·promoted·relegated·benchReturn·transfer·renewal·award·ladderTop(솔랭 1위/칭호)·streaming·sponsor(활동 중 가끔). 이적·재계약·승강·2군 복귀·시상·솔랭 1위는 지난번 글 올릴 때 상태(state.career.socialSnap)와 비교해서 알아챔. 새 빈칸 {streak}·{oldteam}·{award}. 중요한 분류는 경기 결과 글 바로 뒤 순서, 확률은 SOCIAL_RULES.chance. 지금은 예시 글 1개씩만 → 다른 AI로 보충 예정 (요청 양식 제공)
 92. (커밋 필요) 선수 SNS 새 분류 13개 글 보충 (다른 AI 작성): 팬 글 분류마다 15개, 프로 선수 글 12개(streaming·sponsor 6개). 형식 검사 통과(빈칸·큰따옴표), 빈칸 뒤 '와' 조사 3곳 고침
+93. (커밋 필요) 대시보드 제목 옆 우승 트로피 진열장 (js/trophies.js): 대회마다 모양이 다른 SVG 트로피 1개 + 2번 이상이면 ×횟수 (최대 5개라 많이 우승해도 안 넘침). 크기 월드 46px > MSI 38 > First Stand 34 > 리그 31 > 컵 26. 월드 = 큰 금색 컵·3단 받침, MSI = 파란 구슬, First Stand = 은색 별, 리그 = 뚜껑 달린 손잡이 컵, 컵 대회 = 작은 동색 컵. 마우스를 올리면 '월드 챔피언십 우승 3회 · 2014, 2016, 2019'. 기록은 careerSummary(true)
 
 ## 파일 구성
 
@@ -133,6 +134,7 @@
 - `data/traits.js` — 특성 51개 (좋은 29, 나쁜 11, S급 11), S급 특성 조건, NPC 특성 확률
 - `data/comps.js`, `js/comps.js` — 조합 성향·상성·시너지·메타 조합·조합 전략
 - `js/match_detail.js` — [경기 결과] 화면, 경기 상세 기록
+- `js/trophies.js` — 대시보드 우승 트로피 진열장 (대회별 SVG 트로피·횟수)
 - `js/player_page.js` — [선수 정보] 화면 (내 선수의 모든 것: 능력·특성·S급 진행도·챔피언·성장 보너스·기록·나이)
 - `data/match_events.js`, `js/match_events.js` — 경기 흐름 사건(스틸·슈퍼플레이·실수·심리) 목록과 코드
 - `data/boxscore.js`, `js/boxscore.js` — 경기 기록(KDA·CS·피해량·시야·점수) 만들기 규칙과 코드
