@@ -644,6 +644,7 @@ function renderPage() {
   }
   page.innerHTML = html;
   linkifyNames(page); // 선수·구단 이름을 누르면 선수 검색·구단 탐색으로 (js/links.js)
+  maybeShowNews(); // 대회 결과 뉴스 팝업 (js/news_popup.js)
   page.querySelectorAll("[data-subtab]").forEach(function (btn) {
     btn.onclick = function () { selectMenu(btn.getAttribute("data-subtab")); };
   });

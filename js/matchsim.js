@@ -485,6 +485,11 @@ function koFinal(comp, label, week, bo, champKey, title) {
   }
   addNews(title + " 우승", teamName(f.winner) + "이(가) " + teamName(f.loser) + "을(를) " +
     Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]) + "로 꺾고 " + title + " 우승!");
+  queueFinalNews(champKey, title, f); // 화면 뉴스 (js/news_popup.js)
+  if (champKey === "playoffs") {
+    const wt = seasonOf().worldsTeams;
+    queueHeadline("worlds_qualify", mine && wt.indexOf(mine.id) !== -1 ? "myTeam" : "other", { teams: wt.map(teamName).join(", "), count: wt.length });
+  }
 }
 
 function promoMatch(week, tier1Index, tier2Index) {
@@ -493,6 +498,10 @@ function promoMatch(week, tier1Index, tier2Index) {
   const m = schedule(week, "promotion", "승강전", t1, t2, LEAGUE.bestOf.promotion);
   playMatch(m);
   seasonOf().promo.push({ tier1: t1, tier2: t2, winner: m.winner });
+  const mine = myTeam();
+  const who = mine && mine.id === t2 ? (m.winner === t2 ? "myUp" : "myFail") : mine && mine.id === t1 ? (m.winner === t1 ? "myStay" : "myDown") : (m.winner === t2 ? "up" : "stay");
+  queueHeadline("promotion", who, { tier1: teamName(t1), tier2: teamName(t2), winner: teamName(m.winner),
+    score: Math.max(m.score[0], m.score[1]) + ":" + Math.min(m.score[0], m.score[1]) }); // 화면 뉴스
   addNews("승강전", m.winner === t2
     ? teamName(t2) + "이(가) " + teamName(t1) + "을(를) 꺾고 다음 시즌 1부 승격!"
     : teamName(t1) + "이(가) 1부 잔류에 성공했다.");

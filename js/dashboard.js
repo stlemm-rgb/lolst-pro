@@ -201,7 +201,8 @@ function weekReportHTML() {
   }
   if (r.news.length) html += reportNewsHTML(r.news);
 
-  return '<div class="card report"><h2>📅 지난주 결과 <span class="muted small">' + escapeHTML(r.when) + "</span></h2>" + html + "</div>";
+  const newsBtn = r.headlines && r.headlines.length ? '<button class="news-btn" data-news-open="1" title="이번 주 대회 결과 뉴스 다시 보기">📰 NEWS ' + r.headlines.length + "</button>" : "";
+  return '<div class="card report"><h2>📅 지난주 결과 <span class="muted small">' + escapeHTML(r.when) + "</span>" + newsBtn + "</h2>" + html + "</div>";
 }
 
 // 지난주 결과의 소식: 한 줄에 하나씩, 나·우리 팀 소식만 바로 보이고 나머지는 접어 둠

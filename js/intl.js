@@ -113,6 +113,8 @@ function roadToMsiWeek2() {
   const r5 = schedule(24, "rtmsi", RTMSI_LABELS.r5, r3.loser, r4.winner, bo);
   playMatch(r5);
   s.msiTeams = [r3.winner, r5.winner];
+  const mine = myTeam();
+  queueHeadline("rtmsi_result", mine && s.msiTeams.indexOf(mine.id) !== -1 ? "myTeam" : "other", { seed1: teamName(r3.winner), seed2: teamName(r5.winner) }); // 화면 뉴스
   addNews("Road to MSI", "MSI 대표 확정: 1번 시드 " + teamName(r3.winner) + ", 2번 시드 " + teamName(r5.winner) + ".");
   setupMsi();
 }

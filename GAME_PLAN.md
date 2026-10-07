@@ -407,3 +407,8 @@
 - 우승 기록·결승 MVP(First Stand·MSI)·연봉 프리미엄(MSI +12%, First Stand +6%)·커리어 점수(MSI 15, First Stand 8)·역대 우승표·SNS 우승 글(MSI) 반영
 - [대회 일정]: First Stand·MSI 대진표, Road to MSI 경기 목록, 보너스(직행·월드 +1) 표시
 
+### 대회 결과 뉴스 팝업 (`js/news_popup.js`, 기사: `data/news_articles.js`)
+- 결승(컵·First Stand·MSI·리그·월드), Road to MSI 결과, 월드 진출 팀, 승강전 결과가 나온 주에 신문 모양 팝업
+- 상황별 기사(우리 팀 우승/준우승/다른 국내 팀/해외 팀, 승격·잔류·강등 등), 우리 팀 기사가 맨 위(★)
+- 아무 곳이나 누르거나 Esc → 닫힘, 대시보드 '지난주 결과' 오른쪽 위 [📰 NEWS] → 다시 보기
+
