@@ -121,6 +121,16 @@ function stateFromSave(save) {
   if (L && Array.isArray(L.teams) && L.players && L.season && Array.isArray(L.season.matches) &&
       L.teams.some(function (t) { return Array.isArray(t.roster) && t.roster.indexOf("USER") !== -1; })) {
     fresh.league = L;
+    TEAM_ORG_RENAMES.forEach(function (rename) {
+      const team = L.teams.find(function (t) { return t.id === rename.id && rename.from.indexOf(t.short) !== -1; });
+      if (!team) return;
+      const oldName = team.name;
+      if (team.name === team.short || team.name.indexOf(team.short + " ") === 0) {
+        team.name = rename.to + team.name.slice(team.short.length);
+      }
+      team.short = rename.to;
+      if (fresh.team === oldName) fresh.team = team.name;
+    });
     if (!Array.isArray(L.freeAgents)) L.freeAgents = [];
     if (!Array.isArray(L.usedNames)) L.usedNames = [];
   }

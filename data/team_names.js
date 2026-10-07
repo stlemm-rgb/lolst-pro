@@ -1,7 +1,13 @@
 // 구단 이름 = 기업명 + 서브 브랜드 (예: T1 VANGUARD)
 // - 1부 기업명 10개는 고정이에요. 서브 브랜드는 새 게임마다 무작위로 붙어요.
 // - 2부 구단은 영문 2글자 기업명(무작위) + 서브 브랜드
-const TIER1_ORGS = ["GEN.G", "HL", "T1", "DK", "KT", "BNK", "BRION", "NS", "KW", "DN"];
+const TIER1_ORGS = ["GEN.G", "Hanwha", "T1", "Dplus", "KT", "BNK", "BRION", "NS", "KW", "DN"];
+
+// 기존 세이브의 고정 구단만 개명 (무작위 2부 구단의 같은 약칭은 유지).
+const TEAM_ORG_RENAMES = [
+  { id: "T2", from: ["HL"], to: "Hanwha" },
+  { id: "T4", from: ["DK", "DP"], to: "Dplus" },
+];
 
 // 서브 브랜드 50개 (이름, 뜻)
 const TEAM_BRANDS = [
