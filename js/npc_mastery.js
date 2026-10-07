@@ -54,6 +54,21 @@ function npcPractice() {
   });
 }
 
+// 다른 선수 조커픽 후보: 비메타 챔피언 중 숙련도 상위 MATCH.jokerSlots명 (주마다·패치마다 다시 계산, 저장 안 함)
+const npcJokerCache = {};
+function npcJokers(p) {
+  const key = absWeek() + "|" + (state.meta ? state.meta.label : "");
+  const c = npcJokerCache[p.id];
+  if (c && c.key === key) return c.list;
+  const list = Object.keys(p.mastery).filter(function (n) { return !isMeta(n, p.pos) && p.mastery[n] >= MATCH.jokerFrom; })
+    .sort(function (a, b) { return p.mastery[b] - p.mastery[a]; }).slice(0, MATCH.jokerSlots);
+  npcJokerCache[p.id] = { key: key, list: list };
+  return list;
+}
+function npcJokerFactor(p, name, meta) {
+  return npcJokers(p).indexOf(name) !== -1 ? jokerFactor(p.mastery[name], meta) : 0;
+}
+
 // ----- 밴픽 -----
 // 상대가 경계하는 가치 = 숙련도 + 메타 보너스 (메타가 아니면 덜 경계)
 function npcBanValue(p, name) {
@@ -64,7 +79,7 @@ function npcBanValue(p, name) {
 // 고를 때 가치 = 숙련도 + 메타 보너스 + 조커픽 보너스 + 팀이 노리는 조합 성향 보너스
 function npcPickValue(p, name, target) {
   const t = metaTier(name, p.pos);
-  return p.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0) + newChampPick(name, t) + MATCH.jokerPickBonus * jokerFactor(p.mastery[name], !!t) +
+  return p.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0) + newChampPick(name, t) + MATCH.jokerPickBonus * npcJokerFactor(p, name, !!t) +
     (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
@@ -100,7 +115,7 @@ function npcPickChamp(p, target, used) {
 function npcChampMult(p, name) {
   const t = metaTier(name, p.pos);
   const m = p.mastery[name] || MASTERY.min;
-  return masteryMult(m) * (1 + (t ? MATCH.metaPowerBonus[t] : 0) + newChampPower(name, t)) * (1 + MATCH.jokerPowerBonus * jokerFactor(m, !!t));
+  return masteryMult(m) * (1 + (t ? MATCH.metaPowerBonus[t] : 0) + newChampPower(name, t)) * (1 + MATCH.jokerPowerBonus * npcJokerFactor(p, name, !!t));
 }
 
 // 메타 챔피언 평균 숙련도 (S급은 2배로 셈)

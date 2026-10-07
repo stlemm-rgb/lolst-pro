@@ -562,6 +562,17 @@ const EVENTS = [
     effects: { popularity: 2 },
   },
 
+  // ===== J. 시그니처 픽 (2026-10-08, js/signature.js) — 숙련도 100이 된 주에만 (무작위로는 안 옴) =====
+  {
+    id: "signature_found", tab: "inbox", trigger: "signature", cooldown: 0,
+    title: "✒️ 혼잣말: '{champ}'",
+    text: "(연습이 끝난 밤, 모니터를 끄지 못한 채 중얼거린다)\n\"...이상하네. '{champ}'만 잡으면 손이 먼저 움직여. 상대가 뭘 할지 보이고, 스킬이 내가 생각한 자리에 정확히 떨어져.\"\n\"이렇게까지 손에 맞는 챔피언은 처음이야. 혹시... 이게 내 시그니처 픽일까?\"",
+    choices: [
+      { label: "맞다. 이게 내 시그니처 픽이다", effects: { setSignature: true } },
+      { label: "아니다. 아직 더 맞는 챔피언이 있을 거야", effects: {} },
+    ],
+  },
+
   // ===== H. 다른 선수가 나오는 연락 (2026-10-06) =====
   {
     id: "rival_taunt", tab: "inbox", trigger: "random", who: "rival", need: { minWeek: 13 }, cooldown: 26,

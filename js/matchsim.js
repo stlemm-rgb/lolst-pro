@@ -239,6 +239,7 @@ function playSet(a, b, userCtx, setCtx) {
   }
   const ev = rollSetEvents(la, lb, a, b, laneResults, series, {
     big: !!(setCtx.match && isBigMatch(setCtx.match)), deciding: !!setCtx.deciding, behind: setCtx.behind || null,
+    sigUser: !!(userCtx && state.signature && userCtx.pick === state.signature), // 시그니처 픽 (js/signature.js)
   });
   const R = MATCH_EVENT_RULES.residual;
   const luckA = randFloat(-R, R), luckB = randFloat(-R, R);

@@ -59,7 +59,7 @@ function runShakeupIfDue() {
   // 1) 리워크: 포지션마다 2~3명 (겹치지 않게)
   const reworks = [];
   POSITION_IDS.forEach(function (pos) {
-    const list = shuffled(pool.filter(function (c) { return c.basePositions[0] === pos && reworks.indexOf(c.name) === -1; }));
+    const list = shuffled(pool.filter(function (c) { return c.basePositions[0] === pos && reworks.indexOf(c.name) === -1 && c.name !== state.signature; })); // 시그니처 픽은 리워크 안 됨
     list.slice(0, randInt(S.rework.perPosition[0], S.rework.perPosition[1])).forEach(function (c) {
       reworks.push(c.name);
       sh.reworked[c.name] = state.year;
@@ -68,18 +68,20 @@ function runShakeupIfDue() {
   });
 
   // 2) 숙련도: 리워크 × keep, 나머지는 from 이상이면 × masteryCut.keep (나와 다른 선수 모두)
-  const cut = function (m) {
+  const cut = function (m, isMe) {
     Object.keys(m).forEach(function (name) {
+      if (isMe && state.signature === name) return; // 시그니처 픽은 숙련도가 줄지 않음 (js/signature.js)
       if (reworks.indexOf(name) !== -1) m[name] = Math.max(MASTERY.min, Math.round(m[name] * S.rework.keep));
       else if (m[name] >= S.masteryCut.from) m[name] = Math.max(MASTERY.min, Math.round(m[name] * S.masteryCut.keep));
     });
   };
-  cut(state.mastery);
+  cut(state.mastery, true);
   Object.keys(state.league.players).forEach(function (id) { const p = state.league.players[id]; if (p.mastery) cut(p.mastery); });
 
   // 3) 포지션 변경: 포지션이 1~2개인 챔피언 중 3~5명에게 새 포지션 하나
   const moves = [];
-  shuffled(pool.filter(function (c) { return c.positions.length <= 2; })).slice(0, randInt(S.posChange.count[0], S.posChange.count[1])).forEach(function (c) {
+  // 시그니처 픽은 포지션 변경 없음 (js/signature.js)
+  shuffled(pool.filter(function (c) { return c.positions.length <= 2 && c.name !== state.signature; })).slice(0, randInt(S.posChange.count[0], S.posChange.count[1])).forEach(function (c) {
     const to = pick(POSITION_IDS.filter(function (p) { return c.positions.indexOf(p) === -1; }));
     sh.extraPos[c.name] = (sh.extraPos[c.name] || []).concat([to]);
     c.positions.push(to);

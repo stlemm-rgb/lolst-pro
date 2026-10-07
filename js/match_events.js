@@ -206,6 +206,7 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
     if (who.tr) rec.tr = who.tr; // 이 사건에 작용한 특성
     out.list.push(rec);
   });
+  if (ctx.sigUser) sigGuaranteedPlay(out, sides, R); // 시그니처 픽: 좋은 장면 1번 보장 (js/signature.js)
   out.list.sort(function (x, y) { return x.t - y.t; });
   return out;
 }

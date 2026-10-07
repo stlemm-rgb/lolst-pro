@@ -137,6 +137,14 @@ function applyEffects(eff, ctx) {
       before = state.reputation;
       state.reputation = Math.max(-100, Math.min(100, state.reputation + v));
       add(key, state.reputation - before);
+    } else if (key === "setSignature") {
+      // 시그니처 픽 정하기 (js/signature.js)
+      if (ctx && ctx.champ && !state.signature) {
+        state.signature = ctx.champ;
+        notes.push("✒️ '" + ctx.champ + "'이(가) 나의 시그니처 픽이 됐다");
+        addMoment("✒️", "시그니처 픽 '" + ctx.champ + "'");
+        addNews("시그니처 픽", state.player.name + "의 시그니처 픽은 '" + ctx.champ + "'! 이제 이 챔피언을 고르면 언제나 한 번은 빛나는 장면을 만든다.");
+      }
     } else if (key === "money") {
       const m = eventMoney(v);
       state.money += m;

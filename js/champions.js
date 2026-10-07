@@ -237,14 +237,29 @@ function jokerFactor(m, meta) {
 // 조커픽(🃏 표시): 메타가 아닌데 숙련도가 높은 챔피언 (data/match.js)
 function isJoker(name) {
   const c = findChampion(name);
-  return !!c && c.positions.indexOf(state.player.position) !== -1 && !isMeta(name) && state.mastery[name] >= MATCH.jokerMinMastery;
+  return !!c && c.positions.indexOf(state.player.position) !== -1 && !isMeta(name) && state.mastery[name] >= MATCH.jokerMinMastery && myJokers().indexOf(name) !== -1;
 }
+
+// 내 조커픽 후보: 내 포지션 비메타 챔피언 중 숙련도가 가장 높은 MATCH.jokerSlots명 (시그니처 픽 제외)
+function myJokers() {
+  const sig = state.signature;
+  return myPositionChampions().filter(function (n) { return !isMeta(n) && n !== sig && state.mastery[n] >= MATCH.jokerFrom; })
+    .sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, MATCH.jokerSlots);
+}
+// 내 챔피언 조커 배율 (조커 칸 안에 들어간 챔피언만)
+function myJokerFactor(name) {
+  return myJokers().indexOf(name) !== -1 ? jokerFactor(state.mastery[name], isMeta(name)) : 0;
+}
+
+// 시그니처 픽 보너스 (js/signature.js) — 메타와 상관없이
+function sigPickBonus(name) { return state.signature && name === state.signature ? MATCH.signaturePick.pickBonus : 0; }
+function sigPowerBonus(name) { return state.signature && name === state.signature ? MATCH.signaturePick.powerBonus : 0; }
 
 // 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스 (+ 우리 팀이 노리는 조합 성향이면 보너스)
 function myPickValue(name, target) {
   const c = findChampion(name);
   const mine = !!c && c.positions.indexOf(state.player.position) !== -1;
-  return pickValue(name) + (mine ? MATCH.jokerPickBonus * jokerFactor(state.mastery[name], isMeta(name)) : 0) +
+  return pickValue(name) + (mine ? MATCH.jokerPickBonus * myJokerFactor(name) + sigPickBonus(name) : 0) +
     (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
@@ -287,7 +302,14 @@ function rollBans(exclude) {
   const ranked = myPositionChampions().filter(function (n) { return exclude.indexOf(n) === -1; })
     .sort(function (a, b) { return banValue(b) - banValue(a); });
   const topMeta = ranked.filter(function (n) { return isMeta(n); }).sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
-  return rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0);
+  const banned = rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0);
+  // 시그니처 픽: 메타와 상관없이 일정 확률로 먼저 밴 (밴 수는 최대 3)
+  const sig = state.signature;
+  if (sig && ranked.indexOf(sig) !== -1 && banned.indexOf(sig) === -1 && Math.random() < MATCH.signaturePick.banChance) {
+    banned.unshift(sig);
+    if (banned.length > 3) banned.pop();
+  }
+  return banned;
 }
 
 // 견제 밴 확률: 숙련도가 가장 높은 메타 챔피언 (data/match.js focusBan)
@@ -333,7 +355,7 @@ function matchPower(bans, target, exclude) {
   const score = statScore();
   const tier = metaTier(pick);
   const mult = masteryMult(state.mastery[pick]) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0) + newChampPower(pick, tier));
-  const jokerBonus = MATCH.jokerPowerBonus * jokerFactor(state.mastery[pick], !!tier);
+  const jokerBonus = MATCH.jokerPowerBonus * myJokerFactor(pick) + sigPowerBonus(pick); // 조커 칸 + 시그니처 픽
   const meta = metaPenaltyInfo();
   return {
     score: score,
