@@ -18,8 +18,8 @@ function checkSignature100() {
 // 시그니처 픽 표시 칩
 function sigTagHTML(name) {
   return state.signature && name === state.signature
-    ? ' <span class="joker-tag sig-tag" title="시그니처 픽: 메타와 상관없이 고를 때 가치 +' + MATCH.signaturePick.pickBonus + ' · 경기력 +' + Math.round(MATCH.signaturePick.powerBonus * 100) +
-      '%, 고른 세트에서 좋은 장면 1번 보장, 상대가 ' + Math.round(MATCH.signaturePick.banChance * 100) + '% 확률로 먼저 밴, 대격변 패치에도 숙련도·포지션 그대로">✒️ 시그니처</span>'
+    ? ' <span class="joker-tag sig-tag" title="시그니처 픽 ' + starText(sigStar()) + ': 메타와 상관없이 고를 때 가치 +' + sigValue("pickBonus") + ' · 경기력 +' + Math.round(sigValue("powerBonus") * 100) +
+      '%, 고른 세트에서 좋은 장면 1번 보장, 상대가 ' + Math.round(sigValue("banChance") * 100) + '% 확률로 먼저 밴, 대격변 패치에도 숙련도·포지션 그대로">✒️ 시그니처 ' + "★".repeat(sigStar()) + '</span>'
     : "";
 }
 

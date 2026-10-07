@@ -20,6 +20,10 @@ const MENU_GROUPS = [
     { id: "standings", name: "리그 순위" },
     { id: "world",     name: "해외 리그" },
   ] },
+  { title: "수집", items: [
+    { id: "achievements", name: "업적 도감" },
+    { id: "collection",   name: "컬렉션" },
+  ] },
   { title: "이적", items: [
     { id: "market", name: "이적 시장", tabs: [
       { id: "transfer", name: "이적 시장" },

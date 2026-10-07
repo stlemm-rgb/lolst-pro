@@ -864,3 +864,24 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 
 /* 이적 목록 (js/market_pages.js) — 좁은 화면에서는 줄바꿈 대신 가로 스크롤 */
 .tlog td, .tlog th { white-space: nowrap; }
+
+/* ===== 수집 (js/collection.js) ===== */
+/* 업적 도감 */
+.ach-list { display: flex; flex-direction: column; gap: 8px; }
+.ach { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--panel-2); opacity: 0.75; }
+.ach.done { opacity: 1; border-color: var(--good); }
+.ach-icon { font-size: 22px; line-height: 1; width: 28px; text-align: center; filter: grayscale(1); }
+.ach.done .ach-icon { filter: none; }
+.ach-body { flex: 1; min-width: 0; }
+.ach-bar { height: 6px; margin: 4px 0 2px; }
+.ach-grade { font-size: 11px; padding: 0 6px; border-radius: 999px; border: 1px solid var(--border); margin-left: 4px; }
+.ach-grade.g-b { color: #d19a66; border-color: #d19a66; }
+.ach-grade.g-s { color: #c0c8d6; border-color: #c0c8d6; }
+.ach-grade.g-g { color: var(--gold); border-color: var(--gold); }
+/* 시그니처 별 · 우승 스킨 */
+.sig-stars { font-size: 26px; color: var(--gold); letter-spacing: 2px; margin: 4px 0 8px; }
+.sig-tag, .skin-tag { border-color: var(--gold); color: var(--gold); }
+.skin-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.skin-card { min-width: 120px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--gold); background: linear-gradient(160deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.03)); text-align: center; }
+.skin-year { font-size: 12px; color: var(--gold); font-weight: bold; }
+.skin-champ { font-size: 18px; font-weight: bold; margin: 2px 0; }

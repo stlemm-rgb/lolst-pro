@@ -252,8 +252,9 @@ function myJokerFactor(name) {
 }
 
 // 시그니처 픽 보너스 (js/signature.js) — 메타와 상관없이
-function sigPickBonus(name) { return state.signature && name === state.signature ? MATCH.signaturePick.pickBonus : 0; }
-function sigPowerBonus(name) { return state.signature && name === state.signature ? MATCH.signaturePick.powerBonus : 0; }
+//   값은 시그니처 별(★1~★5)에 따라 커짐 (js/collection.js sigValue)
+function sigPickBonus(name) { return state.signature && name === state.signature ? sigValue("pickBonus") : 0; }
+function sigPowerBonus(name) { return state.signature && name === state.signature ? sigValue("powerBonus") : 0; }
 
 // 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스 (+ 우리 팀이 노리는 조합 성향이면 보너스)
 function myPickValue(name, target) {
@@ -305,7 +306,7 @@ function rollBans(exclude) {
   const banned = rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0);
   // 시그니처 픽: 메타와 상관없이 일정 확률로 먼저 밴 (밴 수는 최대 3)
   const sig = state.signature;
-  if (sig && ranked.indexOf(sig) !== -1 && banned.indexOf(sig) === -1 && Math.random() < MATCH.signaturePick.banChance) {
+  if (sig && ranked.indexOf(sig) !== -1 && banned.indexOf(sig) === -1 && Math.random() < sigValue("banChance")) {
     banned.unshift(sig);
     if (banned.length > 3) banned.pop();
   }
@@ -355,7 +356,7 @@ function matchPower(bans, target, exclude) {
   const score = statScore();
   const tier = metaTier(pick);
   const mult = masteryMult(state.mastery[pick]) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0) + newChampPower(pick, tier));
-  const jokerBonus = MATCH.jokerPowerBonus * myJokerFactor(pick) + sigPowerBonus(pick); // 조커 칸 + 시그니처 픽
+  const jokerBonus = MATCH.jokerPowerBonus * myJokerFactor(pick) + sigPowerBonus(pick) + skinPowerBonus(pick); // 조커 칸 + 시그니처 픽 + 월드 우승 스킨 (js/collection.js)
   const meta = metaPenaltyInfo();
   return {
     score: score,

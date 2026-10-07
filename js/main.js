@@ -201,7 +201,7 @@ function masteryRowHTML(name, pos) {
   return (
     '<div class="stat mastery-row">' +
       '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
-        metaTagHTML(name, pos) + champCompsHTML(name) + sigTagHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도가 높음: 고르면 경기력 +' + (MATCH.jokerPowerBonus * 100 * jokerFactor(v, false)).toFixed(1) + '% (숙련도 ' + MATCH.jokerFull + '이면 최대 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%)">🃏 조커</span>' : "") +
+        metaTagHTML(name, pos) + champCompsHTML(name) + sigTagHTML(name) + skinTagHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도가 높음: 고르면 경기력 +' + (MATCH.jokerPowerBonus * 100 * jokerFactor(v, false)).toFixed(1) + '% (숙련도 ' + MATCH.jokerFull + '이면 최대 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%)">🃏 조커</span>' : "") +
         (isNewChampBuff(name) && !isMeta(name, pos) ? ' <span class="joker-tag" title="새 챔피언 출시 버프 (다음 패치 전까지): 픽 가치 +' + MATCH.newChamp.pick + ' · 경기력 +' + Math.round(MATCH.newChamp.power * 100) + '%. 다음 패치 때 메타에 들어갈 확률 ' + Math.round(MATCH.newChamp.nextMetaChance * 100) + '%">🆕 출시</span>' : "") + "</div>" +
       '<div class="bar"><div class="bar-fill' + (isMeta(name, pos) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
@@ -738,6 +738,7 @@ function nextWeek(restWeek) {
   payHousing(); // 월세 (js/housing.js)
   runActivities(); // 스폰서·개인 방송 등 매주 효과 (js/events.js)
   weeklyFame(); // 인기도 자연 감소·평판 제자리 찾기·등급 소식 (js/fame.js)
+  checkAchievements(); // 업적 도감 (js/collection.js)
   settleInvestments(); // 상점 투자 결과 (js/shop.js)
   // 회복력: 매주 체력 자연 회복
   const regen = traitEffectSum("staminaRegen");

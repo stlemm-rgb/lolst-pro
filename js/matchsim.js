@@ -305,6 +305,10 @@ function playMatch(m) {
     set.comps.a.picks.concat(set.comps.b.picks).forEach(function (n) { if (seriesUsed.indexOf(n) === -1) seriesUsed.push(n); });
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
+    // 월드 결승: 마지막(우승) 세트 픽을 남김 → 우승 스킨 (js/collection.js recordWorldsSkins)
+    if (m.label === "월드 결승") m.finalPicks = { a: set.comps.a.picks.slice(), b: set.comps.b.picks.slice(), la: set.la.map(function (p) { return p.id; }), lb: set.lb.map(function (p) { return p.id; }) };
+    // 시그니처 픽 성장 (js/collection.js)
+    if (userIn && state.signature && userCtx.pick === state.signature) sigGrowthOnSet(set.winner === mine.id);
     if (userIn) {
       userEventHighlights(set.events).forEach(function (h) { userEvents.push(h); });
       tallyUserEvents(set.events); // [선수 정보] 내 경기 장면 통계 (js/player_page.js)
@@ -571,6 +575,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   seasonOf().champions[champKey] = f.winner;
   payPrize(champKey, f, semis); // 구단 상금 (js/club_market.js)
   finalsMvp(champKey, f); // 결승 MVP (js/records.js)
+  if (champKey === "worlds") recordWorldsSkins(f); // 월드 우승 스킨 (js/collection.js)
   sTraitsOnTitle(f.winner, champKey); // 황제·잡초 (js/straits.js)
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
