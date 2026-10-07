@@ -115,10 +115,46 @@ function statPowerMult(st, teamId, setCtx) {
   return mult;
 }
 
-// 라인 맞대결 경기력 = 경기력 + 라인전 스탯 보정
+// 단계 스탯 가중 평균 (data/match.js PHASES)
+function phaseComp(st, phase) {
+  const w = PHASES[phase].stats;
+  let sum = 0;
+  Object.keys(w).forEach(function (id) { sum += st[id] * w[id]; });
+  return sum;
+}
+
+// 단계 스탯 9개(라인전·운영·한타 스탯)의 평균 — 단계마다 이것보다 얼마나 강한가를 봄
+// (챔피언 폭·멘탈·적응력은 단계 스탯이 아니라서, 올려도 단계 점수가 깎이지 않음)
+function phaseBase(st) {
+  let sum = 0, n = 0;
+  Object.keys(PHASES).forEach(function (ph) { Object.keys(PHASES[ph].stats).forEach(function (id) { sum += st[id]; n++; }); });
+  return n ? sum / n : 0;
+}
+
+// 단계에서 그 선수가 단계 스탯 평균보다 얼마나 강한가 (스타일 차이)
+function phaseDev(id, phase) {
+  const st = id ? statsOfId(id) : null;
+  return st ? phaseComp(st, phase) - phaseBase(st) : 0;
+}
+
+// 라인 맞대결 경기력 = 경기력 + 라인전 단계(라인전·반응속도·입력 정확도가 평균보다 강한 만큼) + 라인전 스탯 보정
 function lanePower(p) {
   const st = p.id ? statsOfId(p.id) : null;
-  return p.power + (st ? (st.laning - STAT_ROLES.pivot) * STAT_ROLES.lanePer : 0);
+  if (!st) return p.power;
+  return p.power + phaseDev(p.id, "lane") * PHASES.lane.devWeight + (st.laning - STAT_ROLES.pivot) * STAT_ROLES.lanePer;
+}
+
+// 운영·한타 단계 팀 점수: 5명이 그 단계 스탯에서 평균보다 강한 만큼 (포지션 비중)
+function phaseTeamScore(list, phase) {
+  const P = PHASES[phase];
+  let sum = 0, weight = 0;
+  list.forEach(function (p) {
+    if (!p.id) return; // 해외 팀은 경기력만
+    const w = (P.posWeight && P.posWeight[p.pos]) || 1;
+    sum += phaseDev(p.id, phase) * w;
+    weight += w;
+  });
+  return weight ? sum / weight * P.devWeight : 0;
 }
 
 // 한 팀의 이번 세트 라인업과 경기력
@@ -187,7 +223,8 @@ function playSet(a, b, userCtx, setCtx) {
     const winnerTraits = pa.id || pb.id ? traitsOf(diff >= 0 ? pa.id : pb.id) : [];
     const winComp = diff >= 0 ? comps.a : comps.b; // 이긴 쪽 팀 조합 (돌진·누커 시너지)
     const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy") - winComp.soloEasy + dodge; // 라인 지배자·돌진·반응속도
-    const add = TEAM_MATCH.laneWinBonus + traitSumOf(winnerTraits, "laneBonus") + winComp.laneExtra + (solo ? TEAM_MATCH.soloKillBonus : 0);
+    const margin = Math.min(PHASES.lane.marginMax, Math.abs(diff) * PHASES.lane.marginPer); // 크게 이길수록 더 (data/match.js PHASES)
+    const add = TEAM_MATCH.laneWinBonus + margin + traitSumOf(winnerTraits, "laneBonus") + winComp.laneExtra + (solo ? TEAM_MATCH.soloKillBonus : 0);
     if (diff >= 0) bonusA += add; else bonusB += add;
     laneResults.push({ aWon: diff >= 0, solo: solo });
     if (pa.id === USER_ID) userLane = { won: diff >= 0, solo: solo, opp: pb.id };
@@ -195,7 +232,10 @@ function playSet(a, b, userCtx, setCtx) {
   });
   const luckA = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom), luckB = randFloat(-TEAM_MATCH.teamRandom, TEAM_MATCH.teamRandom);
   const avgA = average(la.map(function (p) { return p.power; })), avgB = average(lb.map(function (p) { return p.power; }));
-  const playA = teamplayScore(la), playB = teamplayScore(lb);
+  // 운영·한타 = 기본(운영 스탯 평균) + 운영 단계 + 한타 단계 (스타일 차이)
+  const macroA = phaseTeamScore(la, "macro"), macroB = phaseTeamScore(lb, "macro");
+  const fightA = phaseTeamScore(la, "fight"), fightB = phaseTeamScore(lb, "fight");
+  const playA = teamplayScore(la) + macroA + fightA, playB = teamplayScore(lb) + macroB + fightB;
   const compA = comps.a.bonus, compB = comps.b.bonus;
   const powerA = avgA + bonusA + playA + compA + luckA;
   const powerB = avgB + bonusB + playB + compB + luckB;
@@ -205,7 +245,8 @@ function playSet(a, b, userCtx, setCtx) {
   return {
     winner: powerA + moodA >= powerB + moodB ? a : b, userLane: userLane, la: la, lb: lb,
     lanes: laneResults, comps: comps,
-    teamA: { avg: avgA, lane: bonusA, play: playA, comp: compA, luck: luckA, mood: moodA }, teamB: { avg: avgB, lane: bonusB, play: playB, comp: compB, luck: luckB, mood: moodB },
+    teamA: { avg: avgA, lane: bonusA, play: playA, macro: macroA, fight: fightA, comp: compA, luck: luckA, mood: moodA },
+    teamB: { avg: avgB, lane: bonusB, play: playB, macro: macroB, fight: fightB, comp: compB, luck: luckB, mood: moodB },
   };
 }
 

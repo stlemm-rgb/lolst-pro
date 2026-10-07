@@ -71,9 +71,9 @@ const STAT_ROLES = {
   lanePer: 0.15,
   reactionPer: 0.1,
   accuracyMax: 0.5,
-  mentalPer: 0.002,
+  mentalPer: 0.004,      // 2026-10-07 0.002 → 0.004 (스탯 역할 강화)
   mentalLossMin: 0.4,
-  focusPer: 0.002,
+  focusPer: 0.004,       // 2026-10-07 0.002 → 0.004
   focusFromSet: 3,
 };
 
@@ -91,4 +91,19 @@ const TEAM_MATCH = {
   lowStaminaCut: 0.1,
   staminaCostBo3: 8,
   staminaCostBo5: 12,
+};
+
+// ===== 경기 단계별 스탯 역할 (js/matchsim.js) — 2026-10-07 스탯 역할 강화 =====
+// 경기력(스탯 평균)은 그대로 쓰고, 그 위에 "어떤 스탯이 강한가"를 단계마다 따로 봐요.
+// 단계 점수 = (그 단계 스탯 가중 평균 − 단계 스탯 9개 평균) × devWeight
+//   → 스탯 평균이 같아도 라인전형은 라인전에서, 운영형은 운영에서, 한타형은 한타에서 앞서요
+//   (전체 스탯이 다 같이 오르면 단계 점수는 그대로 → 실력 차이는 경기력이, 스타일 차이는 단계 점수가 맡음)
+// - stats: 그 단계 스탯과 비중 (합 1)
+// - devWeight: 라인전은 그 라인 경기력에, 운영·한타는 팀 점수에 더하는 배율
+// - posWeight: 운영·한타에서 포지션별 비중 (없으면 1)
+const PHASES = {
+  // lane: marginPer·marginMax = 라인전을 크게 이길수록 팀 보너스 추가 (차이 × marginPer, 최대 marginMax)
+  lane:  { name: "라인전", stats: { laning: 0.4, reaction: 0.3, accuracy: 0.3 }, devWeight: 1.1, marginPer: 0.05, marginMax: 1.5 },
+  macro: { name: "운영",   stats: { macro: 0.35, vision: 0.35, shotcall: 0.3 },   devWeight: 0.55, posWeight: { jungle: 1.5, support: 1.5 } },
+  fight: { name: "한타",   stats: { teamfight: 0.4, spacing: 0.3, focus: 0.3 },   devWeight: 0.55, posWeight: { adc: 1.3, mid: 1.3 } },
 };
