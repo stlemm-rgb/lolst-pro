@@ -757,7 +757,11 @@ function nextWeek(restWeek) {
     const leagueNews = newSeasonLeague().concat(contractsNewSeason()).concat(addBigRookies()); // 대형 신인 (js/league.js)
     initContracts(); // 새로 들어온 신인들 계약
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
-    leagueNews.forEach(function (text) { addNews(text.indexOf("🔁") === 0 ? "이적 시장" : text.indexOf("🌟") === 0 ? "대형 신인" : "승강", text.replace(/^(🔁|🌟) /, "")); });
+    const NEWS_TAGS = { "🔁": "이적 시장", "🌟": "대형 신인", "📈": "리그 확장", "🆕": "신생 구단", "🌏": "해외 리그" };
+    leagueNews.forEach(function (text) {
+      const tag = Object.keys(NEWS_TAGS).find(function (k) { return text.indexOf(k) === 0; });
+      addNews(tag ? NEWS_TAGS[tag] : "승강", tag ? text.slice(tag.length).trim() : text);
+    });
   }
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
@@ -879,6 +883,7 @@ function renderAll() {
   document.getElementById("creation").innerHTML = "";
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
+  ensureWorld(); // 해외 리그 (새 게임·예전 세이브, js/era.js)
   ensureNpcStyles(); // 예전 세이브: 다른 선수 플레이 스타일 (js/league.js)
   ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)
   enforceConditionCap(); // 거주지 컨디션 상한 (집이 없으면 합숙, js/housing.js)

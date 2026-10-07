@@ -119,9 +119,12 @@ pages.standings = function () {
     if (season.groups) {
       const top = standings(["split1", "split2"], season.groups.legend);
       const low = standings(["split1", "split2"], season.groups.rise);
-      body = '<p class="muted small">전반기 + 후반기 합산. 후반기 상위 그룹 1~4위는 플레이오프 직행, 5위와 하위 그룹 1~3위는 플레이인. 하위 그룹 4·5위는 승강전.</p>' +
-        "<h2 class=\"sub\">상위 그룹</h2>" + standingsTableHTML(top, ["플레이오프", "플레이오프", "플레이오프", "플레이오프", "플레이인"]) +
-        "<h2 class=\"sub\">하위 그룹</h2>" + standingsTableHTML(low, ["플레이인", "플레이인", "플레이인", "승강전", "승강전"]);
+      const n1 = top.length + low.length;
+      const tags = []; // 최종 순위별 표시 (1부 10팀: 1~4 직행·5~8 플레이인 / 8팀: 1~6 직행)
+      for (let i = 0; i < n1; i++) tags.push(i >= n1 - 2 ? "승강전" : playinOn() ? (i < 4 ? "플레이오프" : "플레이인") : "플레이오프");
+      body = '<p class="muted small">전반기 + 후반기 합산. ' + (playinOn() ? "최종 1~4위는 플레이오프 직행, 5~8위는 플레이인." : "1부 " + n1 + "팀이라 플레이인 없이 최종 1~6위가 플레이오프.") + " 최종 " + (n1 - 1) + "·" + n1 + "위는 승강전.</p>" +
+        "<h2 class=\"sub\">상위 그룹</h2>" + standingsTableHTML(top, tags.slice(0, top.length)) +
+        "<h2 class=\"sub\">하위 그룹</h2>" + standingsTableHTML(low, tags.slice(top.length));
     } else {
       body = '<p class="muted small">전반기 순위. 30주차에 상위 5팀 / 하위 5팀으로 나뉘어 후반기를 치러요.</p>' +
         standingsTableHTML(standings("split1", tier1Ids()), ["상위 그룹", "상위 그룹", "상위 그룹", "상위 그룹", "상위 그룹", "하위 그룹", "하위 그룹", "하위 그룹", "하위 그룹", "하위 그룹"]);
@@ -154,7 +157,7 @@ pages.tournament = function () {
 
   // 토너먼트 대회는 대진표, 승강전은 경기 목록
   const promo = season.matches.filter(function (m) { return m.comp === "promotion"; });
-  const promoHTML = '<div class="card"><h2>승강전 <span class="muted small">1부 9·10위 vs 2부 1·2위 · 5판 3선승</span></h2>' +
+  const promoHTML = '<div class="card"><h2>승강전 <span class="muted small">1부 꼴찌·끝에서 2번째 vs 2부 1·2위 · 5판 3선승</span></h2>' +
     (promo.length ? '<table class="matches">' + promo.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
       : '<p class="muted small">아직 대진이 정해지지 않았어요. (39·40주차)</p>') + "</div>";
 
@@ -220,7 +223,7 @@ const TOURNAMENT_BRACKETS = [
     ],
   },
   {
-    title: "플레이인 · 플레이오프", sub: "1부 최종 순위 · 1~4위 직행, 5~8위 플레이인 · 5판 3선승", champKey: "playoffs", when: "35주차",
+    title: "플레이인 · 플레이오프", sub: "1부 최종 순위 · 1~4위 직행, 5~8위 플레이인 (1부 8팀이면 1~6위 직행) · 5판 3선승", champKey: "playoffs", when: "35주차",
     seeds: function (s) { return s.seeds || s.finalOrder; },
     rounds: [
       { name: "플레이인", pick: function (s) { return koMatches(s, "playin", "").slice().reverse(); }, size: 2,
@@ -271,7 +274,9 @@ function bracketHTML(def) {
     return '<div class="card"><h2>' + def.title + ' <span class="muted small">' + def.sub + "</span></h2>" +
       '<p class="muted small">아직 대진이 정해지지 않았어요. (' + def.when + "에 정해져요)</p></div>";
   }
-  const cols = def.rounds.map(function (r) {
+  // 1부 8팀(플레이인 없음)인 해: 플레이인 칸은 빼고 그림
+  const rounds = def.rounds.filter(function (r) { return r.name !== "플레이인" || playinOn() || r.pick(season).length; });
+  const cols = rounds.map(function (r) {
     const list = r.pick(season);
     const pre = r.slots ? r.slots(season, seeds) : null;
     const boxes = [];

@@ -5,9 +5,11 @@
 // NPC 계약: 선수마다 salary, contractEnd
 
 // ----- 연봉 -----
+// 시대 배율(data/era.js ERA.money)을 곱함: 2012년 40% → 2017년 100%. 비시즌 계약은 다음 시즌 기준
 function salaryFor(score, tier, popularity) {
-  const s = CONTRACT.baseSalary[tier] + (score - CONTRACT.scorePivot) * CONTRACT.perScorePoint + (popularity || 0) * CONTRACT.perPopularity;
-  return Math.max(CONTRACT.minSalary, Math.round(s / 1000000) * 1000000); // 100만 원 단위
+  const y = contractYear();
+  const s = (CONTRACT.baseSalary[tier] + (score - CONTRACT.scorePivot) * CONTRACT.perScorePoint + (popularity || 0) * CONTRACT.perPopularity) * eraMoney(y);
+  return Math.max(minSalaryNow(y), Math.round(s / 1000000) * 1000000); // 100만 원 단위
 }
 
 function userSalaryFor(tier) {
@@ -18,14 +20,16 @@ function userSalaryFor(tier) {
 // 돌려주는 값: { base, skill, pop, score, popularity, reputation, repPct, premium: { pct, parts: [{label, pct}] }, traitPct, total }
 function salaryBreakdown(tier) {
   const score = playerScore(USER_ID);
-  const base = CONTRACT.baseSalary[tier];
-  const skill = (score - CONTRACT.scorePivot) * CONTRACT.perScorePoint;
-  const pop = state.popularity * CONTRACT.perPopularity;
+  const y = contractYear();
+  const era = eraMoney(y); // 시대 배율 (data/era.js)
+  const base = CONTRACT.baseSalary[tier] * era;
+  const skill = (score - CONTRACT.scorePivot) * CONTRACT.perScorePoint * era;
+  const pop = state.popularity * CONTRACT.perPopularity * era;
   const repPct = state.reputation / 100 * CONTRACT.reputationPct;
   const premium = seasonPremium();
   const traitPct = traitEffectSum("salaryBonus"); // 협상가
-  const raw = Math.max(CONTRACT.minSalary, base + skill + pop) * (1 + repPct + premium.pct + traitPct);
-  const total = Math.max(CONTRACT.minSalary, Math.round(raw / 1000000) * 1000000);
+  const raw = Math.max(minSalaryNow(y), base + skill + pop) * (1 + repPct + premium.pct + traitPct);
+  const total = Math.max(minSalaryNow(y), Math.round(raw / 1000000) * 1000000);
   return { base: base, skill: skill, pop: pop, score: score, popularity: state.popularity, reputation: state.reputation,
     repPct: repPct, premium: premium, traitPct: traitPct, total: total };
 }

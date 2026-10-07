@@ -9,20 +9,20 @@
 // - empty: 국제대회를 나중에 추가할 수 있게 비워 둔 기간
 const SCHEDULE = [
   { from: 1,  to: 1,  id: "preseason",  name: "프리시즌",            desc: "새 시즌 준비. 패치 적용." },
-  { from: 2,  to: 7,  id: "cup",        name: "컵 대회 조별 리그",     desc: "1부 10팀이 두 조로 나뉘어 상대 조 팀과 한 번씩 경기.", league: true },
+  { from: 2,  to: 7,  id: "cup",        name: "컵 대회 조별 리그",     desc: "1부 팀들이 두 조로 나뉘어 상대 조 팀과 한 번씩 경기.", league: true },
   { from: 8,  to: 9,  id: "cup_po",     name: "컵 대회 플레이오프",    desc: "상위 6팀 토너먼트.", league: true },
-  { from: 10, to: 11, id: "first_stand", name: "First Stand",        desc: "국제대회. 컵 대회 우승팀 + 해외 4개 지역 우승팀. 우리 리그가 우승하면 MSI에서 2팀 모두 본선 직행.", international: true },
+  { from: 10, to: 11, id: "first_stand", name: "First Stand",        desc: "국제대회 (2025년부터). 컵 대회 우승팀 + 해외 4개 지역 우승팀. 우리 리그가 우승하면 MSI에서 2팀 모두 본선 직행.", international: true },
   { from: 12, to: 12, id: "break1",     name: "휴식기",              desc: "정규 시즌 준비." },
-  { from: 13, to: 22, id: "split1",     name: "정규 시즌 1·2라운드",   desc: "1부 10팀, 2부 8팀이 서로 두 번씩 경기 (3판 2선승).", league: true },
-  { from: 23, to: 24, id: "road_to_msi", name: "Road to MSI",        desc: "1·2라운드 상위 6팀이 계단식 토너먼트로 MSI 대표 2팀을 가려요 (5판 3선승).", league: true },
-  { from: 25, to: 28, id: "msi",        name: "MSI",                 desc: "국제대회. 국내 2팀 + 해외 8팀 (플레이인 → 8강 → 4강 → 결승). 우리 리그가 우승하면 월드 진출 +1팀.", international: true },
+  { from: 13, to: 22, id: "split1",     name: "정규 시즌 1·2라운드",   desc: "1부·2부 팀들이 서로 두 번씩 경기 (3판 2선승).", league: true },
+  { from: 23, to: 24, id: "road_to_msi", name: "Road to MSI",        desc: "(2015년부터) 1·2라운드 상위 6팀이 계단식 토너먼트로 MSI 대표 2팀을 가려요 (5판 3선승).", league: true },
+  { from: 25, to: 28, id: "msi",        name: "MSI",                 desc: "국제대회 (2015년부터). 국내 2팀 + 해외 8팀 (플레이인 → 8강 → 4강 → 결승). 우리 리그가 우승하면 월드 진출 +1팀.", international: true },
   { from: 29, to: 29, id: "summer_prep", name: "후반기 준비",         desc: "패치 적용. 후반기 준비." },
-  { from: 30, to: 34, id: "split2",     name: "정규 시즌 3·4라운드",   desc: "1부는 상위 5팀 / 하위 5팀으로 나뉘어 두 번씩 경기.", league: true },
-  { from: 35, to: 35, id: "playin",     name: "플레이인",             desc: "플레이오프 5·6번 자리를 두고 4팀이 경기.", league: true },
+  { from: 30, to: 34, id: "split2",     name: "정규 시즌 3·4라운드",   desc: "1부는 상위 절반 / 하위 절반으로 나뉘어 두 번씩 경기.", league: true },
+  { from: 35, to: 35, id: "playin",     name: "플레이인",             desc: "플레이오프 5·6번 자리를 두고 4팀이 경기 (1부 10팀일 때만).", league: true },
   { from: 36, to: 38, id: "playoffs",   name: "플레이오프",           desc: "6팀 토너먼트, 전부 5판 3선승. 상위 4팀 월드 진출.", league: true },
   { from: 39, to: 40, id: "promotion",  name: "승강전",              desc: "1부 하위 팀과 2부 상위 팀이 다음 시즌 1부 자리를 두고 경기.", league: true },
   { from: 41, to: 41, id: "worlds_prep", name: "월드 준비",           desc: "월드 챔피언십 출전 팀 부트캠프." },
-  { from: 42, to: 46, id: "worlds",     name: "월드 챔피언십",        desc: "국내 상위 4팀 + 해외 가상 팀 12팀.", international: true },
+  { from: 42, to: 46, id: "worlds",     name: "월드 챔피언십",        desc: "국내 상위 3팀(MSI 우승 시 4팀) + 해외 지역 팀 = 16팀.", international: true },
   { from: 47, to: 52, id: "offseason",  name: "비시즌 (이적 시장)",    desc: "계약 만료, 이적, 재계약." },
 ];
 

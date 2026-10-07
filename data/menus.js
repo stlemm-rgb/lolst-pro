@@ -31,6 +31,7 @@ const MENU_GROUPS = [
       { id: "awards",    name: "개인 시상" },
       { id: "history",   name: "역사관" },
       { id: "ecosystem", name: "리그 생태계" },
+      { id: "world",     name: "해외 리그" },
     ] },
   ] },
 ];

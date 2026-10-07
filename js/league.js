@@ -187,17 +187,19 @@ function ensureNpcTraits() {
 }
 
 // ----- 구단 이름 정하기 -----
-// 1부: 고정 기업명 10개 + 무작위 서브 브랜드 / 2부: 무작위 영문 2글자 + 서브 브랜드
+// 1부: 고정 기업명 + 무작위 서브 브랜드 / 2부: 무작위 영문 2글자 + 서브 브랜드
+// 구단 수는 시작 연도에 따라 (data/era.js ERA.teams: 2012년 1부 8·2부 6 → 2016년 10·8)
 // 결과: [{ name: "T1 VANGUARD", short: "T1", tier: 1 }, ...]
-function makeTeamDefs() {
+function makeTeamDefs(year) {
   const brands = shuffled(TEAM_BRANDS.map(function (b) { return b[0]; }));
   const defs = [];
-  TIER1_ORGS.slice(0, LEAGUE.tier1Teams).forEach(function (org) {
+  const count = eraTeams(year);
+  TIER1_ORGS.slice(0, count[1]).forEach(function (org) {
     defs.push({ name: org + " " + brands.pop(), short: org, tier: 1, shift: teamShiftRoll(1) });
   });
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const taken = TIER1_ORGS.slice();
-  for (let i = 0; i < LEAGUE.tier2Teams; i++) {
+  for (let i = 0; i < count[2]; i++) {
     let tag;
     do { tag = letters[randInt(0, 25)] + letters[randInt(0, 25)]; } while (taken.indexOf(tag) !== -1);
     taken.push(tag);
@@ -428,6 +430,12 @@ function newSeasonLeague() {
     }
   });
 
+  // 구단 수 늘리기: 확장 승격·신생 구단 창단 (data/era.js ERA.teams, js/era.js)
+  expandLeague(season).forEach(function (t) { news.push(t); });
+  // 해외 리그: 새 지역 참가, 해외 선수 나이·은퇴
+  worldNewSeason();
+  ensureWorld().forEach(function (t) { news.push(t); });
+
   // NPC 1년 성장·노화는 보통 비시즌 시작(47주, npcYearGrowth)에 이미 들어갔음. 예전 세이브처럼 안 들어갔으면 여기서
   const grown = state.league.grownYear === state.year - 1;
   if (!grown) npcYearGrowth(1, state.year - 1); // 지난 시즌 몫으로 기록
@@ -451,8 +459,7 @@ function newSeasonLeague() {
 // ageAdd: 나이 기준 보정 (47주에는 아직 나이가 안 올라서 '다음 시즌 나이' = 나이 + 1로 규칙을 고름. 새해에 부르면 +1 전이라 역시 1)
 function npcYearGrowth(ageAdd, forYear) {
   state.league.grownYear = forYear || state.year; // 몇 년 시즌 몫의 성장인지 (두 번 안 들어가게)
-  Object.keys(state.league.players).forEach(function (id) {
-    const p = state.league.players[id];
+  Object.keys(state.league.players).map(function (id) { return state.league.players[id]; }).concat(worldPlayersList()).forEach(function (p) { // 해외 선수도 같은 규칙 (js/era.js)
     const tr = p.traits || [];
     const bodyAge = p.age + ageAdd - traitSumOf(tr, "agingDelay");
     const rule = LEAGUE.npcGrowth.find(function (g) { return bodyAge <= g.maxAge; }) || LEAGUE.npcGrowth[LEAGUE.npcGrowth.length - 1];

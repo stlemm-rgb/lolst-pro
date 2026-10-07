@@ -102,7 +102,7 @@ function postMessage(tab, title, text, extra) {
 // ----- 이벤트 돈: 데이터 값은 "연봉 3,000만 원 기준" → 내 연봉에 맞게 키움 (10만 원 단위) -----
 function eventMoneyScale() {
   const salary = state.contract ? state.contract.salary : 0;
-  return Math.max(1, salary / EVENT_RULES.moneyBaseSalary);
+  return Math.max(eraMoney(), salary / EVENT_RULES.moneyBaseSalary); // 초창기엔 이벤트 돈도 작게 (data/era.js)
 }
 function eventMoney(v) {
   return Math.round(v * eventMoneyScale() / 100000) * 100000;

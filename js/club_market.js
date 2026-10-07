@@ -22,8 +22,8 @@ function settleSeasonClubs() {
   snapshotSeasonForMarket();
   state.league.season.promo.forEach(function (p) {
     if (p.winner !== p.tier2) return;
-    addClubIncome(findTeam(p.tier2), "promo", CLUB_INCOME.promotion);  // 승격 지원금
-    addClubIncome(findTeam(p.tier1), "promo", CLUB_INCOME.relegation); // 강등 낙하산 지원금
+    addClubIncome(findTeam(p.tier2), "promo", CLUB_INCOME.promotion * eraMoney());  // 승격 지원금 (시대 배율)
+    addClubIncome(findTeam(p.tier1), "promo", CLUB_INCOME.relegation * eraMoney()); // 강등 낙하산 지원금
   });
 }
 
@@ -47,7 +47,8 @@ function nextTierName(teamId) {
 function payPrize(champKey, final, semis) {
   const P = CLUB_INCOME.prize[champKey];
   if (!P) return;
-  const list = [[final.winner, P[0]], [final.loser, P[1]]].concat(semis.map(function (m) { return [m.loser, P[2]]; }));
+  const era = eraMoney(); // 시대 배율 (data/era.js)
+  const list = [[final.winner, P[0] * era], [final.loser, P[1] * era]].concat(semis.map(function (m) { return [m.loser, P[2] * era]; }));
   list.forEach(function (x) {
     const t = findTeam(x[0]);
     if (!t) return; // 해외 팀
@@ -73,7 +74,7 @@ function paySponsors() {
       const mult = S.rankMult[0] + (S.rankMult[1] - S.rankMult[0]) * (order.length > 1 ? i / (order.length - 1) : 0);
       const stars = t.roster.filter(function (pid) { return playerScore(pid) >= avg + S.starMargin; }).length;
       const mine = myTeam() && t.id === myTeam().id;
-      const amount = S.base[pair[0]] * mult + stars * S.starBonus + (mine ? state.popularity * S.userPopularity : 0);
+      const amount = (S.base[pair[0]] * mult + stars * S.starBonus + (mine ? state.popularity * S.userPopularity : 0)) * eraMoney(); // 시대 배율
       addClubIncome(t, "sponsor", amount);
       if (mine) addNews("💰 구단 스폰서", t.name + " 구단 스폰서 수입 " + moneyText(Math.round(amount)) + " (리그 " + (i + 1) + "위 · 스타 선수 " + stars + "명 · 내 인기도 " + state.popularity + ")");
     });
@@ -101,12 +102,12 @@ function teamMoney(teamId) {
 // 구단 여유 = 예산 × (1 + 빚 한도) + 구단 자금 − 연봉 총액
 function clubRoom(teamId) {
   const t = findTeam(teamId);
-  return CONTRACT.teamBudget[nextTier(teamId)] * (1 + CLUB_MARKET.debtLimit) + teamMoney(teamId) - teamPayroll(teamId); // 비시즌엔 다음 시즌 리그 예산
+  return teamBudgetOf(nextTier(teamId), contractYear()) * (1 + CLUB_MARKET.debtLimit) + teamMoney(teamId) - teamPayroll(teamId); // 비시즌엔 다음 시즌 리그 예산
 }
 
 // 빚 한도 (구단 자금이 이 아래로 내려가면 안 됨)
 function debtFloor(teamId) {
-  return -CONTRACT.teamBudget[findTeam(teamId).tier] * CLUB_MARKET.debtLimit;
+  return -teamBudgetOf(findTeam(teamId).tier) * CLUB_MARKET.debtLimit;
 }
 
 // 이적료: 1부 기준 연봉 × 비율 × 나이 배율 × 남은 계약 (계약 없으면 0)
@@ -137,7 +138,7 @@ function npcPremium(id) {
 function npcContractSalary(id, tier) {
   const p = findPlayer(id);
   const s = salaryFor(statScoreFor(p.stats, p.pos), tier, 0) * (1 + npcPremium(id));
-  return Math.max(CONTRACT.minSalary, Math.round(s / 1000000) * 1000000);
+  return Math.max(minSalaryNow(contractYear()), Math.round(s / 1000000) * 1000000);
 }
 
 // ----- 새해 직전: 지난 시즌 정보 저장 + 구단 자금 정산 (main.js에서 newSeasonLeague 전에 부름) -----
@@ -166,7 +167,7 @@ function snapshotSeasonForMarket() {
   // 구단 자금 정산: 예산보다 연봉을 많이 썼으면 빚, 빚이 있으면 남는 예산으로 조금씩 갚음, 빚이 없으면 남은 돈 일부 저축
   state.league.teams.forEach(function (t) {
     if (!Number.isFinite(t.money)) t.money = 0;
-    const left = CONTRACT.teamBudget[t.tier] - teamPayroll(t.id);
+    const left = teamBudgetOf(t.tier) - teamPayroll(t.id);
     if (left < 0) t.money += left;
     else if (t.money < 0) t.money = Math.min(0, t.money + left * CLUB_MARKET.repayRate);
     else addClubIncome(t, "save", left * CLUB_INCOME.saveRate);
@@ -228,7 +229,7 @@ function npcTransfer(id, buyer, fee, salary) {
 // 빚 한도를 넘은 팀: 연봉 비싼 후보부터 내보냄
 function fireSale(t) {
   let guard = 10;
-  while (teamMoney(t.id) + CONTRACT.teamBudget[t.tier] - teamPayroll(t.id) < debtFloor(t.id) && guard-- > 0) {
+  while (teamMoney(t.id) + teamBudgetOf(t.tier) - teamPayroll(t.id) < debtFloor(t.id) && guard-- > 0) {
     const s = starters(t.id);
     const bench = t.roster.filter(function (id) { return id !== USER_ID && POSITION_IDS.every(function (pos) { return s[pos] !== id; }); })
       .sort(function (a, b) { return (findPlayer(b).salary || 0) - (findPlayer(a).salary || 0); });

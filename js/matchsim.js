@@ -444,18 +444,21 @@ function matchLine(m) {
 
 // ----- 주차별 진행 -----
 function seasonOf() { return state.league.season; }
+// 플레이인이 있는가 (1부 10팀 이상)
+function playinOn() { return tierTeams(1).length >= 10; }
 function tier1Ids() { return tierTeams(1).map(function (t) { return t.id; }); }
 function tier2Ids() { return tierTeams(2).map(function (t) { return t.id; }); }
 
 const WEEK_EVENTS = {
-  // 컵 대회 조 편성 + 5라운드 (2~6주)
+  // 컵 대회 조 편성: 1부를 두 조로 (10팀이면 5라운드, 8팀이면 4라운드, 2~6주)
   2: [function () {
     const ids = shuffled(tier1Ids());
-    const A = ids.slice(0, 5), B = ids.slice(5, 10);
+    const h = Math.floor(ids.length / 2);
+    const A = ids.slice(0, h), B = ids.slice(h, h * 2);
     seasonOf().cupGroups = { A: A, B: B };
-    for (let r = 0; r < 5; r++) {
-      for (let i = 0; i < 5; i++) {
-        schedule(2 + r, "cup", "컵 대회 " + (r + 1) + "라운드", A[i], B[(i + r) % 5], LEAGUE.bestOf.cup);
+    for (let r = 0; r < h; r++) {
+      for (let i = 0; i < h; i++) {
+        schedule(2 + r, "cup", "컵 대회 " + (r + 1) + "라운드", A[i], B[(i + r) % h], LEAGUE.bestOf.cup);
       }
     }
   }],
@@ -474,19 +477,22 @@ const WEEK_EVENTS = {
     scheduleRounds(shuffledRounds(doubleRoundRobin(shuffled(tier1Ids()))), 13, 2, "split1", "전반기");
     scheduleRounds(shuffledRounds(doubleRoundRobin(shuffled(tier2Ids()))), 13, 2, "tier2", "2부 전반기");
   }],
-  // 후반기: 상위 5팀 / 하위 5팀 그룹 (30~34주), 2부는 한 번씩 (30~33주)
+  // 후반기: 상위 절반 / 하위 절반 그룹 (10팀이면 5·5, 8팀이면 4·4, 30~34주), 2부는 한 번씩 (30~33주)
   30: [function () {
     const order = standings("split1", tier1Ids()).map(function (r) { return r.id; });
-    const g = { legend: order.slice(0, 5), rise: order.slice(5, 10) };
+    const h = Math.ceil(order.length / 2);
+    const g = { legend: order.slice(0, h), rise: order.slice(h) };
     seasonOf().groups = g;
     scheduleRounds(doubleRoundRobin(g.legend), 30, 2, "split2", "후반기 상위 그룹");
     scheduleRounds(doubleRoundRobin(g.rise), 30, 2, "split2", "후반기 하위 그룹");
     scheduleRounds(roundRobin(shuffled(tier2Ids())), 30, 2, "tier2b", "2부 후반기");
   }],
-  // 플레이인: 상위 그룹 5위 vs 하위 그룹 3위, 하위 그룹 1위 vs 2위 → 승자가 플레이오프 5·6번 시드
+  // 플레이인 (1부 10팀일 때만): 5위 vs 8위, 6위 vs 7위 → 승자가 플레이오프 5·6번 시드
+  //   1부 8팀이면 플레이인 없이 상위 6팀이 바로 플레이오프 (data/era.js ERA.teams)
   35: [function () {
     const order = tier1FinalOrder();
     seasonOf().finalOrder = order;
+    if (!playinOn()) return;
     schedule(35, "playin", "플레이인", order[4], order[7], LEAGUE.bestOf.playin);
     schedule(35, "playin", "플레이인", order[5], order[6], LEAGUE.bestOf.playin);
   }],
@@ -494,16 +500,16 @@ const WEEK_EVENTS = {
   36: [function () {
     const order = seasonOf().finalOrder;
     const pi = seasonOf().matches.filter(function (m) { return m.comp === "playin"; });
-    const seeds = order.slice(0, 4).concat([pi[0].winner, pi[1].winner]);
+    const seeds = pi.length === 2 ? order.slice(0, 4).concat([pi[0].winner, pi[1].winner]) : order.slice(0, 6);
     seasonOf().seeds = seeds;
     schedule(36, "playoffs", "플레이오프 1라운드", seeds[2], seeds[5], LEAGUE.bestOf.playoffs);
     schedule(36, "playoffs", "플레이오프 1라운드", seeds[3], seeds[4], LEAGUE.bestOf.playoffs);
   }],
   37: [function () { koSemis("playoffs", "플레이오프 4강", seasonOf().seeds, 36, 37, LEAGUE.bestOf.playoffs); }],
   38: [function () { koFinal("playoffs", "결승전", 38, LEAGUE.bestOf.playoffs, "playoffs", "리그 우승"); }],
-  // 승강전: 1부 10위 vs 2부 1위, 1부 9위 vs 2부 2위
-  39: [function () { promoMatch(39, 9, 0); }],
-  40: [function () { promoMatch(40, 8, 1); }],
+  // 승강전: 1부 꼴찌 vs 2부 1위, 1부 끝에서 2번째 vs 2부 2위
+  39: [function () { promoMatch(39, tier1Ids().length - 1, 0); }],
+  40: [function () { promoMatch(40, tier1Ids().length - 2, 1); }],
   41: [setupWorlds],
   44: [function () {
     const g = seasonOf().worlds.groups;
@@ -585,12 +591,19 @@ function promoMatch(week, tier1Index, tier2Index) {
 // 월드 챔피언십 준비: 해외 가상 팀 만들고 4개 조 편성
 function setupWorlds() {
   const season = seasonOf();
-  const domestic = season.worldsTeams || [];
+  const domestic = (season.worldsTeams || []).slice();
   // 해외 팀: 시즌 해외 팀 중 강한 순으로 16팀을 채움 (First Stand·MSI에 나온 팀도 다시 나옴, js/intl.js)
   // 전력은 국내 선수들의 숙련도·메타 수준에 맞춰 갱신 (js/npc_mastery.js npcPowerFactor)
   ensureOverseasPool();
   refreshOverseasPower();
-  const overseas = overseasByPower().slice(0, 16 - domestic.length);
+  // 자리 나누기: 강한 지역 1위부터 자리 확보 (전력 순 자리 WORLD_RULES.openSlots개는 남겨 둠, 약한 지역은 탈락할 수 있음) → 남는 자리는 전력 순
+  const slots = 16 - domestic.length;
+  const overseas = regionChampions().slice(0, Math.max(0, slots - WORLD_RULES.openSlots));
+  overseasByPower(overseas.map(function (t) { return t.id; })).forEach(function (t) { if (overseas.length < slots) overseas.push(t); });
+  // 해외 팀이 모자라면 (초창기 지역이 적을 때) 우리 리그 팀을 더 보냄
+  const order = season.finalOrder || tier1FinalOrder();
+  order.forEach(function (id) { if (domestic.length + overseas.length < 16 && domestic.indexOf(id) === -1) domestic.push(id); });
+  season.worldsTeams = domestic;
   season.worlds = { overseas: overseas, groups: [] };
   // 조 편성: 국내 팀은 서로 다른 조에, 나머지는 해외 팀으로
   const pool = shuffled(overseas.map(function (t) { return t.id; }));
@@ -644,14 +657,14 @@ function koPreview(week) {
   }
   if (week === 9) return semisFrom("cup_po", "컵 플레이오프 4강", s.cupSeeds, done("cup_po", 8), B.cup_po);
   if (week === 35) {
-    if (s.matches.some(function (m) { return m.comp === "split2" && !m.winner; })) return [];
+    if (!playinOn() || s.matches.some(function (m) { return m.comp === "split2" && !m.winner; })) return [];
     const o = tier1FinalOrder();
     return [{ comp: "playin", label: "플레이인", a: o[4], b: o[7], bo: B.playin }, { comp: "playin", label: "플레이인", a: o[5], b: o[6], bo: B.playin }];
   }
   if (week === 36) {
     const pi = done("playin", 35), o = s.finalOrder;
-    if (!o || !allPlayed(pi)) return [];
-    const seeds = o.slice(0, 4).concat([pi[0].winner, pi[1].winner]);
+    if (!o || (playinOn() && !allPlayed(pi))) return [];
+    const seeds = pi.length === 2 ? o.slice(0, 4).concat([pi[0].winner, pi[1].winner]) : o.slice(0, 6);
     return [{ comp: "playoffs", label: "플레이오프 1라운드", a: seeds[2], b: seeds[5], bo: B.playoffs },
             { comp: "playoffs", label: "플레이오프 1라운드", a: seeds[3], b: seeds[4], bo: B.playoffs }];
   }
@@ -662,7 +675,8 @@ function koPreview(week) {
     if (!o) return [];
     const t2 = standings(["tier2", "tier2b"], tier2Ids());
     const i = week === 39 ? 0 : 1;
-    return [{ comp: "promotion", label: "승강전", a: o[week === 39 ? 9 : 8], b: t2[i].id, bo: B.promotion }];
+    const n1 = tier1Ids().length;
+    return [{ comp: "promotion", label: "승강전", a: o[week === 39 ? n1 - 1 : n1 - 2], b: t2[i].id, bo: B.promotion }];
   }
   if (week === 44) {
     if (!s.worlds || s.matches.some(function (m) { return m.comp === "worlds_group" && !m.winner; })) return [];
@@ -712,7 +726,7 @@ function userSeasonOver(week) {
   }
   if (week < 34) return false;
   const order = s.finalOrder || tier1FinalOrder();
-  if (order.indexOf(id) >= 8) return promoDone;
+  if (order.indexOf(id) >= order.length - 2) return promoDone;
   const lostEarly = s.matches.some(function (m) {
     return m.loser === id && (m.comp === "playin" || (m.comp === "playoffs" && m.label.indexOf("1라운드") !== -1));
   });

@@ -5,9 +5,25 @@
 // 해외 팀: season.overseas = [{ id, name, short, region, rank, ratio, power }] — 시즌 내내 같은 팀이 나와요
 
 // ----- 해외 팀 -----
+// 시즌 해외 팀 = 해외 리그(state.world, js/era.js)의 올해 참가 지역 팀들. 지역 순위는 전력 ± 흔들림으로 정함
+// (예전 세이브에서 해외 리그가 없으면 예전 방식: INTL.regions 가상 팀)
 function ensureOverseasPool() {
   const s = seasonOf();
   if (s.overseas && s.overseas.length) return s.overseas;
+  if (state.world && state.world.teams.length) {
+    const list = [];
+    activeRegions(s.year).forEach(function (r) {
+      state.world.teams.filter(function (t) { return t.region === r.id; })
+        .map(function (t) { return { t: t, v: worldTeamStrength(t) + randFloat(-WORLD_RULES.rankNoise, WORLD_RULES.rankNoise) }; })
+        .sort(function (a, b) { return b.v - a.v; })
+        .forEach(function (x, i) {
+          list.push({ id: x.t.id, name: x.t.name + " (" + r.name + ")", short: x.t.short, region: r.name, regionId: r.id, rank: i + 1, strength: r.strength, power: 0 });
+        });
+    });
+    s.overseas = list;
+    refreshOverseasPower();
+    return list;
+  }
   const names = shuffled(OVERSEAS_TEAM_NAMES);
   const list = [];
   INTL.regions.forEach(function (region) {
@@ -31,8 +47,12 @@ function ensureOverseasPool() {
 
 // 대회가 열릴 때마다 우리 리그 수준(1부 전력 × 숙련도 배율)에 맞춰 해외 팀 전력 갱신
 function refreshOverseasPower() {
-  const base = average(tier1Ids().map(teamStrength)) * npcPowerFactor();
-  (seasonOf().overseas || []).forEach(function (t) { t.power = base * t.ratio; });
+  const f = npcPowerFactor();
+  const base = average(tier1Ids().map(teamStrength)) * f;
+  (seasonOf().overseas || []).forEach(function (t) {
+    const wt = findWorldTeam(t.id);
+    t.power = wt ? worldTeamStrength(wt) * f : base * t.ratio; // 해외 리그 팀은 선수 전력으로
+  });
 }
 
 // 해외 팀 중 강한 순 (exclude: 뺄 팀 id)
@@ -42,11 +62,14 @@ function overseasByPower(exclude) {
     .slice().sort(function (a, b) { return b.power - a.power; });
 }
 
-// 지역별 1위 팀들
+// 지역별 1위 팀들 (강한 지역 순)
 function regionChampions() {
-  return INTL.regions.map(function (r) {
-    return ensureOverseasPool().filter(function (t) { return t.region === r.name; }).sort(function (a, b) { return a.rank - b.rank; })[0];
-  }).filter(Boolean);
+  const pool = ensureOverseasPool();
+  const regions = [];
+  pool.forEach(function (t) { if (regions.indexOf(t.region) === -1) regions.push(t.region); });
+  return regions.map(function (name) {
+    return pool.filter(function (t) { return t.region === name; }).sort(function (a, b) { return a.rank - b.rank; })[0];
+  }).filter(Boolean).sort(function (a, b) { return b.power - a.power; });
 }
 
 function isDomestic(id) { return !!findTeam(id); }
@@ -55,10 +78,10 @@ function isDomestic(id) { return !!findTeam(id); }
 // 9주(컵 결승 직후): 컵 우승팀 + 해외 지역 1위 4팀, 10주에 조별 리그(한 번씩) 일정
 function setupFirstStand() {
   const s = seasonOf();
-  if (s.fs || !s.champions.cup) return;
+  if (s.fs || !s.champions.cup || !firstStandOn(s.year)) return; // First Stand는 2025년부터 (data/era.js)
   ensureOverseasPool();
   refreshOverseasPower();
-  const teams = [s.champions.cup].concat(regionChampions().map(function (t) { return t.id; }));
+  const teams = [s.champions.cup].concat(regionChampions().slice(0, 4).map(function (t) { return t.id; }));
   s.fs = { teams: teams };
   roundRobin(shuffled(teams)).forEach(function (pairs) {
     pairs.forEach(function (p) { schedule(10, "fs_group", "First Stand 조별 리그", p[0], p[1], INTL.firstStand.groupBo); });
@@ -94,6 +117,7 @@ function rtmsiMatch(word) {
 const RTMSI_LABELS = { r1: "Road to MSI 1라운드", r2: "Road to MSI 2라운드", r3: "Road to MSI 1번 시드전", r4: "Road to MSI 3라운드", r5: "Road to MSI 최종전" };
 
 function roadToMsiWeek1() {
+  if (!msiOn(seasonOf().year)) return; // MSI는 2015년부터 (data/era.js)
   const sd = rtmsiSeeds();
   const bo = INTL.roadToMsi.bo;
   const r1 = schedule(23, "rtmsi", RTMSI_LABELS.r1, sd[4], sd[5], bo);
@@ -103,6 +127,7 @@ function roadToMsiWeek1() {
 
 function roadToMsiWeek2() {
   const s = seasonOf();
+  if (!msiOn(s.year) || !s.rtmsiSeeds) return;
   const sd = rtmsiSeeds();
   const bo = INTL.roadToMsi.bo;
   const r2 = rtmsiMatch("2라운드");
@@ -189,7 +214,7 @@ function intlPreview(week) {
     return [{ comp: "fs_ko", label: "First Stand 4강", a: t[0], b: t[3], bo: INTL.firstStand.koBo },
             { comp: "fs_ko", label: "First Stand 4강", a: t[1], b: t[2], bo: INTL.firstStand.koBo }];
   }
-  if (week === 23 && allPlayed(of("split1"))) {
+  if (week === 23 && msiOn(s.year) && allPlayed(of("split1"))) {
     const sd = standings("split1", tier1Ids()).slice(0, 6).map(function (r) { return r.id; });
     return [{ comp: "rtmsi", label: RTMSI_LABELS.r1, a: sd[4], b: sd[5], bo: INTL.roadToMsi.bo },
             { comp: "rtmsi", label: RTMSI_LABELS.r2 + " (1라운드 승자와)", a: sd[3], b: null, bo: INTL.roadToMsi.bo }];

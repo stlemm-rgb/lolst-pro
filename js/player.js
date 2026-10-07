@@ -91,8 +91,9 @@ function staminaCostMultiplier() {
 }
 
 // 인기도 상승 배율
+// 시대 배율(data/era.js ERA.popularity): 초창기엔 관심이 적어서 인기도가 천천히 오름
 function popularityMultiplier() {
-  return Math.max(0, 1 + traitEffectSum("popularityGain"));
+  return Math.max(0, 1 + traitEffectSum("popularityGain")) * eraPop();
 }
 
 // 소수점 값을 확률로 반올림 (2.4 → 60% 확률로 2, 40% 확률로 3)

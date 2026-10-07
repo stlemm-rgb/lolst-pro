@@ -28,7 +28,7 @@ function newDraft() {
     offsets: offsets,
     alloc: {},                          // 보너스 포인트를 어디에 몇 점 줬는지
     traits: [],                         // 직접 고른 좋은 특성 (유형별 개수까지)
-    teams: makeTeamDefs(),              // 이번 판 구단 이름 (1부 10 + 2부 8)
+    teams: makeTeamDefs(CREATION.startYears[0].year), // 이번 판 구단 이름 (구단 수는 시작 연도에 따라, data/era.js)
     teamChoice: -1,                     // 고른 구단 번호 (-1 = 무작위)
     error: "",
   };
@@ -336,6 +336,10 @@ function playerCardHTML(stats, myScore) {
 
 function renderCreation() {
   if (!draft) draft = newDraft();
+  // 시작 연도가 바뀌어 구단 수가 달라지면 구단 목록 다시 만들기 (2012년 1부 8·2부 6 / 2017년 10·8)
+  const need = eraTeams(draft.startYear);
+  const have = { 1: draft.teams.filter(function (d) { return d.tier === 1; }).length, 2: draft.teams.filter(function (d) { return d.tier === 2; }).length };
+  if (need[1] !== have[1] || need[2] !== have[2]) { draft.teams = makeTeamDefs(draft.startYear); draft.teamChoice = -1; }
   const box = document.getElementById("creation");
   const scrollY = window.scrollY;
   box.innerHTML = creationHTML();
