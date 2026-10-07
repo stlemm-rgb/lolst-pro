@@ -1,14 +1,16 @@
-# 다음 세션 이어가기 — 2026-10-08, PROGRESS 113까지
+# 다음 세션 이어가기 — 2026-10-08, PROGRESS 120까지
 
-새 세션에서는 이 파일 → PROGRESS.md → CLAUDE.md → 필요한 GAME_PLAN.md 순서로 읽고, 실제 git 상태를 확인한다.
+새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 114~120) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
 ## 1. 프로젝트와 사용자 작업 방식
 
-- 게임: 오프라인 텍스트 시뮬레이션 「프로게이머 커리어」.
-- 실제 저장소: `C:\Project\Game\Game`. `index.html`을 브라우저에서 직접 열어 실행한다.
-- 사용자는 코딩 초보. 짧고 쉬운 한국어로 설명한다. 명확한 수정 요청은 바로 진행하고, 큰 기능의 범위·순서는 사용자에게 고르게 한다.
-- 새 화면은 숨겨진 탭보다 왼쪽 메뉴에서 찾기 쉽게 한다.
-- 커밋은 사용자가 PC의 Claude Code 등에서 한다. CLAUDE.md의 자동 커밋 규칙보다 사용자의 현재 방식이 우선이다. 직접 커밋하지 말고 마지막에 아래 형식으로 제공한다.
+- 게임: 오프라인 텍스트 시뮬레이션 「프로게이머 커리어」. 저장소 `C:\Project\Game\Game`, `index.html`을 브라우저에서 직접 열어 실행.
+- 사용자(Shane)는 코딩 초보. **항상 짧고 쉬운 한국어 + 표**로 설명 (영어로 답하면 "한글로 다시"라고 함).
+- 명확한 수정 요청·버그 신고·"~를 삭제해 줘" 같은 요청은 바로 진행한다.
+- 큰 기능이나 "왜 이렇지?" 같은 원인 질문: 먼저 시뮬레이션으로 원인을 측정 → 표로 설명 → 고칠 범위를 여러 개 고를 수 있게 선택지로 묻는다. 사용자는 추천안을 대부분 전부 고르는 편이다.
+- 아이디어 질문("~할 만한 게 있을지?")이면 표로 후보를 제시하고 사용자가 고르게 한다.
+- 새 화면은 숨겨진 탭보다 **왼쪽 메뉴**에서 바로 보이게 한다 (기존 화면에 카드를 추가하는 건 괜찮음).
+- **커밋은 사용자가 직접** 한다. 직접 커밋하지 말고 답변 끝에 아래 형식으로 준다 (CLAUDE.md의 자동 커밋 규칙보다 이 방식이 우선).
 
 ```powershell
 cd C:\Project\Game\Game
@@ -16,135 +18,101 @@ git add -A
 git commit -m "이번 변경을 설명하는 한국어 메시지"
 ```
 
-- 사용자가 커밋했다는 말을 생략할 수 있으므로 `git status --short`, `git log`로 확인한다. PROGRESS.md의 `(커밋 필요)` 표시는 실제 커밋 뒤에도 남아 있어 사실 판단에 쓰면 안 된다.
-- 검토만 요청하면 먼저 검토 결과를 설명한다. 수정 요청과 구분한다.
-- 사용자가 다른 도구의 검토 결과를 붙이면 코드와 실제 검증 범위를 확인해서 답한다.
+- 커밋 여부는 `git status --short`, `git log`로 확인. PROGRESS.md의 `(커밋 필요)` 표시는 커밋 뒤에도 남아 있으므로 믿지 않는다.
+- "검토만" 요청이면 결과만 설명. 다른 AI·도구의 검토 결과를 붙이면 코드로 확인해서 답한다.
 
-## 2. 현재 git 상태
+## 2. git 상태 (작성 시점)
 
-2026-10-08 문서 작성 전 직접 확인한 최근 커밋:
+- 113 + 이전 HANDOFF.md까지는 커밋된 것으로 확인했다.
+- **114~120과 이 HANDOFF.md는 작성 시점에 커밋 여부 미확인** (사용자가 중간에 했을 수 있음). 새 세션에서 반드시 `git status`로 확인할 것.
 
-| 번호 | 커밋 | 내용 |
+## 3. 최근 변경 (114~120, Claude 클라우드 세션에서 작업)
+
+| 번호 | 내용 | 주요 파일 |
 |---|---|---|
-| 107 | `1fe6a9d` | 인기도·평판 시스템 |
-| 108 | `1d0c447` | 해외 리그 화면을 왼쪽 메뉴로 이동 |
-| 109 | `311d17a` | 대시보드 솔로랭크 요약에 전 시즌 최종 순위 추가 |
-| 110 | `7b18f4c` | 팀명을 Hanwha와 Dplus로 변경 |
-| 111 | `99d2442` | SNS 화면 진입 시 항상 최상단으로 이동 |
-| 112 | `0dd2d1a` | 컵 대회 명칭을 LCK 컵과 그룹 배틀로 통일 |
+| 114 | 조커픽 2명 제한 + ✒️ 시그니처 픽 (숙련도 100 독백 → 선택, 좋은 장면 1번 보장, 선밴, 대격변 보호) | data/match.js, js/signature.js, js/champions.js, js/npc_mastery.js |
+| 115 | 버그: 대회 시작 주 '이번 주 경기 없음' → 대진 미리 만들기 PRE_WEEK_EVENTS/prepareWeek | js/matchsim.js, js/main.js |
+| 116 | [선수 정보] 능력 탭 스탯 12각형 (리그 평균 / 같은 포지션 평균 비교) | js/player_page.js, css |
+| 117 | 이적 시장 활성화: 💥 1부 팀끼리 주전 이적, 🧩 경쟁 후보 영입(내 포지션 포함), 📋 이적 목록 | js/club_market.js, data/contracts.js(CLUB_MARKET.star·depth), js/market_pages.js |
+| 118 | 수집·강화: 🎨 월드 우승 스킨(경기력 +2%), ✒️ 시그니처 ★1~★5 성장, 🏅 업적 도감 47개. 왼쪽 메뉴 '수집' 묶음 | data/collection.js, js/collection.js |
+| 119 | **받은 연락 리뉴얼**: 반복·개수 조절, 결과 이야기, 🎲 능력치 판정, 연작, 시즌 흐름 연락, 시스템 연결 연락, 🤝 선수 관계·팀 케미, 선수 생활 연락 (연락 60 → 109개) | data/events.js, data/events_story.js, data/events_life.js, js/events.js, js/stories.js |
+| 120 | 업적 보상(인기도·평판·돈) 삭제 — 업적은 소식만, 동·은·금은 난이도 표시 | data/collection.js, js/collection.js |
 
-112까지 커밋됐으며 113 작업 전 작업 트리는 깨끗했다. **113과 이 HANDOFF.md는 작성 시점 미커밋**이다. 다음 세션에서는 다시 확인할 것.
-
-## 3. 이번 세션에서 완료한 변경
-
-### 109. 전 랭크 시즌 최종 순위
-
-- `js/dashboard.js`: 솔로랭크 요약에 `전 시즌 최종 순위: n위 / n명`, 없으면 `기록 없음`.
-- `js/main.js`: 28·52주가 끝날 때 `finalLadderBoard` 확보. 특히 연말 선수 이동·은퇴 전에 확보한다.
-- `resetLadder(finalBoard)`가 `state.soloRank.lastSeason = { rank, total }`로 보관한다.
-- 여기서 시즌은 연간 리그 시즌이 아니라 **패치 사이 랭크 시즌**이다.
-- soloRank가 통째로 저장·복원되므로 별도 최상위 저장 필드는 필요 없다. 예전 세이브는 다음 마감부터 기록이 생긴다.
-- Node로 실제 게임 코드 52주 진행, 두 번의 마감, 저장·불러오기, 기존 세이브를 검증했다.
-
-### 110. 구단 이름
-
-- `data/team_names.js`: 고정 구단 HL → Hanwha, DK → Dplus. 사용자 요청의 DP는 실제 고정 데이터에서 DK였음을 설명했다.
-- `TEAM_ORG_RENAMES`: T2의 HL, T4의 DK/DP만 개명. 같은 약칭의 무작위 구단은 보존한다.
-- `js/save.js`: 불러올 때 구단 name·short 및 해당 시 fresh.team을 변경한다. 서브 브랜드는 유지한다. 승강 여부와 관계없다.
-- 이미 저장된 과거 뉴스·소속 기록의 문자열은 그대로다.
-- 새 구단, 기존 세이브, 승강 후 구단, 무작위 동명 구단, 반복 불러오기 검증 통과.
-
-### 111. SNS 진입 위치
-
-- `selectMenu("sns")`에서 그리기 후 `window.scrollTo(0, 0)`.
-- `js/sns_page.js` 내부 탭 전환도 selectMenu를 사용한다.
-- 왼쪽 메뉴·SNS 바로가기·언급 알림·SNS 내부 탭에 적용한다.
-- 메시지 펼치기·답변처럼 renderPage/renderAll로 다시 그리는 동작에는 강제 스크롤을 넣지 않았다.
-- 문법 검사 통과. 실제 브라우저 스크롤 조작은 이 환경에서 미검증.
-
-### 112. LCK 컵 용어
-
-- 컵 대회 → **LCK 컵**, 컵 조별 리그 → **LCK 컵 그룹 배틀**, 컵 플레이오프 → **LCK 컵 플레이오프**, 결승 → **LCK 컵 결승**.
-- 일정·순위·대회 안내·뉴스·우승·트로피·결승 MVP에 반영.
-- **명칭만 변경**했다. 기존 경기 방식(두 조 간 경기, 전체 성적 상위 6팀, 1·2위 4강 직행)은 유지했다. 실제 LCK의 그룹별 진출·플레이인·더블 엘리미네이션으로 바꾼 것이 아니다. 연도별 실제 대회를 완전히 재현하는 게임도 아니다.
-- `js/save.js`: 기존 세이브의 이번 시즌 cup/cup_po 경기 label을 변환한다. 내부 대회 ID는 그대로다.
-- 기존 `컵 대회 우승`·`컵 대회 결승 MVP`도 연봉·엔딩 점수·트로피 연도 집계에 포함하도록 contracts.js, retire.js, trophies.js에 호환 처리했다.
-- 과거 뉴스 등 저장 문자열을 전체 일괄 치환하지 않았다.
-- 9주 실제 게임 진행, 그룹 배틀·결승 생성, 우승 연봉, 신·구 MVP/우승 집계, 트로피, 기존 일정 변환 및 변경 JS 문법 검사 통과.
-
-### 113. 첫 단기 계약과 최저 연봉 — 최신 요청, 구현·검증 완료
-
-사용자 요청: “게임 시작시 첫시즌 첫계약은 단기로, 여름 이적 시즌이 오면 바로 재계약 할 수 있도록. 전체선수들의 시작 연봉이 너무 낮음, 연봉 최저는 1200만으로.”
-
-- **새 게임 내 선수의 첫 계약만 첫해 28주까지**. `applyFirstContract()`에서 `endYear = state.year`, `endWeek = FIRST_CONTRACT.endWeek` 설정.
-- 여름 시장 시작인 **23주**, 현재 팀의 재계약 제안이 SNS로 온다. 다른 구단의 영입 후보 유무나 주전·후보 여부에 관계없이 제공한다(이미 이적 확정·임대·은퇴 예정이면 기존 시장 예외 적용).
-- 재계약 수락 즉시 새 연봉 적용. 1~3년 계약의 첫해는 현재 연도여서 1년이면 올해 말까지다. endWeek가 없는 일반 계약으로 교체된다.
-- 첫 단기 계약은 29주 합류 때 만료되므로 여름 이적료가 0이다. 이 계약의 후보 선수는 만료 계약을 끌고 임대하지 않고 일반 영입 대상으로 처리한다.
-- 재계약 거절·무응답이고 다른 이적도 없으면 29주에 **동일 연봉으로 현재 팀과 올해 말까지 자동 연장**하고 SNS로 안내한다. 팀 없는 상태를 만들지 않는 기존 게임 설계에 맞춘 처리다.
-- `contractEndText(c)`로 대시보드·선수 정보·선수 검색·이적 시장에 `YYYY년 28주까지 (단기)` 등을 표시한다.
-- `CONTRACT.minSalary = 12000000`, `minSalaryNow()`는 시대 배율을 적용하지 않고 이 하한을 돌려준다. 나와 국내 NPC의 시작·새 계약 모두 최소 1,200만 원. FA 자동 계약의 20% 할인에도 하한을 적용한다.
-- 기존 세이브는 불러올 때 내 계약·예정 이적 계약·국내 NPC·미응답 제안의 낮은 연봉을 보정한다. 과거 수입 기록은 바꾸지 않는다. **기존 계약 기간은 소급해서 단축하지 않는다.**
-- 해외 선수는 현재 연봉·계약 필드 자체가 없는 가벼운 시스템이다. 이번 변경으로 해외 계약 시스템을 새로 만들지는 않았다.
-- 수정 파일: `data/contracts.js`, `js/era.js`, `js/creation.js`, `js/contracts.js`, `js/summer_market.js`, `js/club_market.js`, `js/save.js`, `js/dashboard.js`, `js/player_page.js`, `js/market_pages.js`, `GAME_PLAN.md`, `PROGRESS.md`.
-- 검증: 2012/2017/2022 새 게임의 모든 국내 선수 하한, 첫 계약 기간, 실제 23주 진입·제안, 수락/거절/무응답, 29주 이적·자동 연장, 저장 복원·기존 계약 기간 보존·낮은 연봉 보정 통과. 52주 진행 회귀 검사와 변경 JS 문법·git diff 검사도 통과. 화면 배치는 실제 브라우저에서 미검증.
+자세한 수치·측정은 PROGRESS.md 114~120 참고.
 
 ## 4. 기술 규칙과 코드 위치
 
-- 순수 HTML/CSS/JavaScript. 외부 라이브러리·CDN·웹 폰트·빌드 도구를 게임에 추가하지 않는다.
-- `file://` 실행 유지: fetch로 JSON 불러오기, ES module/import 금지. 데이터는 data/*.js 상수, 로직은 js/*.js. script 로드 순서를 지키고 신규 코드는 start.js 이전에 배치한다.
-- 텍스트 이벤트·선택지는 데이터 파일에 둔다.
-- 저장은 localStorage. 최상위 필드 추가 시 save.js의 SAVED_FIELDS와 stateFromSave를 모두 수정한다. state.league, state.soloRank, state.contract는 통째로 저장·복원된다. career 숫자는 복사 목록 추가가 필요하다.
-- 초기 상태 createNewState는 js/main.js, 캐릭터 생성과 첫 계약은 js/creation.js.
-- 페이지는 pages.<id>, 메뉴는 data/menus.js의 MENU_GROUPS. 일반 화면 이동은 selectMenu 사용.
-- 특성 합산: traitSumOf / traitKeyOf / traitsOf. 내 선수 ID는 USER_ID.
-- 사건 조건은 js/events.js eventReady, 지속 활동은 data/events.js ACTIVITIES.
-- 구단 재정·NPC 계약·이적료는 js/club_market.js. 여름 시장은 23~28주, 적용은 29주. 비시즌 시작은 47주.
-- 47주 순서: NPC 성장 → 구단 정산 → 내 계약 제안. 제안에서 다음 시즌 리그를 보려면 nextTier/nextTierName, 계약 연도는 contractYear.
+### 공통
+- 순수 HTML/CSS/JS. 외부 라이브러리·CDN·웹 폰트·빌드 도구 금지. `file://` 실행 유지 → fetch·ES module 금지. 차트는 SVG 직접.
+- 데이터는 data/*.js 상수, 로직은 js/*.js. index.html script 순서를 지키고 새 js는 start.js 앞에. `pages`는 main.js에서 만들어지므로 `pages.x = ...`를 하는 파일은 main.js 뒤.
+- 저장은 localStorage. **새 최상위 필드는 js/save.js의 SAVED_FIELDS와 stateFromSave 둘 다** 수정. state.league·soloRank·contract는 통째로 저장 (league 안에 넣은 필드는 따로 등록 불필요). career 숫자 필드는 stateFromSave 숫자 키 목록에.
+  - 최근 추가된 최상위 필드: signature·sig100 (114), sigGrowth·achievements (118), eventLog·flags·relations·trigQueue (119).
+- 초기 상태 createNewState는 js/main.js, 캐릭터 생성·첫 계약은 js/creation.js. 화면 pages.<id>, 메뉴 data/menus.js MENU_GROUPS (내 선수 / 경기 / 수집 / 이적 / 기록), 이동은 selectMenu.
+- 화면 안 버튼 클릭은 js/main.js renderPage 안의 `querySelectorAll("[data-…]")` 묶음에 추가 (예: data-radar, data-tlog-year).
+- 특성: traitSumOf / traitKeyOf / traitsOf. 내 선수 ID는 USER_ID.
+- 주간 흐름은 js/main.js nextWeek: 훈련 → 경기 → 급여·활동·인기도·업적 → 주 넘김(새해면 새 시즌) → 대진 미리 만들기 → 새 챔피언·패치 → 2군 판정·올스타·여름/비시즌 시장 → 시그니처 체크 → 받은 연락(runWeeklyEvents) → 퀘스트.
 
-## 5. 실행 환경과 검증 시 주의
+### 경기 일정
+- 리그 대진 짜기(LCK 컵 2주·정규 시즌 13주·후반기 30주)는 js/matchsim.js PRE_WEEK_EVENTS + prepareWeek(week) — 그 주와 다음 주를 미리 만든다. 앞 라운드 결과가 필요한 토너먼트는 WEEK_EVENTS + koPreview/intlPreview. 새 대회를 추가할 때 이 규칙을 지켜야 '이번 주 경기 없음' 버그가 안 생긴다.
 
-- 이번 세션은 Windows Codex에서 PowerShell·Node로 실제 프로젝트 파일을 직접 수정했다. 과거 Claude 클라우드의 device_stage_files/device_commit_files나 `/home/claude/Game` 절차는 현재 환경에 적용하지 않는다.
-- Codex 채팅 작업 폴더는 `C:\Users\dhlth\Documents\Codex\2026-10-07\c-project-game-game-hand-off-2`이다. 실제 게임 저장소와 혼동하지 않는다.
-- 프로젝트 폴더 권한은 도구로 요청해 받았다. 새 세션의 실제 권한 범위를 확인하고, 쓰기가 막히면 그 폴더만 권한 요청한다.
-- Node는 PATH에서 사용 가능했다. 필요하면 Codex load_workspace_dependencies로 현재 경로를 확인한다.
-- Playwright + Edge headless가 이 환경에서 실행 중 종료되어 실제 브라우저 배치를 검증하지 못했다. 게임 오류가 확인된 것은 아니다. 사용자의 별도 브라우저에서는 게임이 정상 실행되고 콘솔 오류가 없었다는 보고가 있다.
-- Node vm 테스트는 index.html의 스크립트 순서대로 start.js를 제외해 로드하고 DOM 렌더링만 대체한다. 실제 게임의 생성·주차 진행·계약·저장 함수를 실행한다. 화면 검증과 혼동하지 않는다.
-- 임시 검증 스크립트 위치: 위 Codex 채팅 폴더의 `work`.
-  - `verify-ladder-vm.cjs`: 52주 진행·순위·저장 호환.
-  - `verify-team-names-run.cjs`: 팀명 생성·세이브 변환.
-  - `verify-cup-run.cjs`: 컵 용어·기록 호환.
-  - `verify-contracts-run.cjs`: 113의 계약·최저연봉 검증.
-- 테스트용 새 게임: draft = newDraft(); draft.name을 채운 후 startCareer(). 훈련 계획 없이 nextWeek가 진행되지 않는 경우에 주의. restWeek=true 또는 state.plan 지정. alert/confirm 등은 실제 테스트 환경에 맞춰 처리한다.
-- 변경 JS에는 node --check, 변경 내용에는 git diff --check. 무작위 시뮬레이션에서 나온 특정 순위·금액 자체를 고정 기대값으로 쓰지 않는다.
+### 이적 시장 (117)
+- js/club_market.js, 값 data/contracts.js CLUB_MARKET. 비시즌: offseasonRebuild = fireSale → starTransfers(1부 주전 이적) → 보강 라운드 tryBuy → depthSignings(경쟁 후보, 내 포지션 포함) → fillRosters.
+- 여름(23~28주, 29주 적용)은 js/summer_market.js. 모든 NPC 이동은 npcTransfer/tryLoan에서 logTransfer → state.league.transferLog → [이적 시장] 📋 이적 목록.
+- 47주 순서: NPC 성장 → 구단 정산 → 내 계약 제안 (다음 시즌 리그는 nextTier/nextTierName, 계약 연도는 contractYear).
 
-## 6. 기존 로드맵과 남은 과제
+### 수집·강화 (118, 120)
+- 월드 우승 스킨: state.league.worldsSkins (playMatch가 '월드 결승' 세트 픽을 m.finalPicks에 남김 → koFinal에서 recordWorldsSkins). mySkins / skinPowerBonus.
+- 시그니처 성장: state.sigGrowth {xp, sets, wins}. 보너스 값은 반드시 sigValue(key) 사용 (MATCH.signaturePick을 직접 쓰지 말 것).
+- 업적: state.achievements {id: {y, w}}, checkAchievements 매주. **보상 없음 (사용자 요청으로 120에서 삭제) — 다시 넣지 말 것.**
 
-사용자가 우선순위를 선택하기 전 임의로 큰 확장을 시작하지 않는다.
+### 받은 연락 (119)
+- 데이터: data/events.js(EVENT_RULES·ACTIVITIES·기본 연락) + data/events_story.js(시즌 흐름·시스템 연결·연작) + data/events_life.js(선수 생활·관계). 모두 EVENTS 배열에 들어간다. 맨 위 주석에 모든 키 설명이 있다.
+- 엔진: js/events.js(eventReady·fireEvent·runWeeklyEvents·answerMessage·applyEffects·choiceHint·whoContext·fillText) + js/stories.js(연락 기록·능력치 판정·조건·관계·시즌 트리거·시스템 트리거 큐).
+- 횟수: 같은 연락은 한 시즌 seasonMax(기본 1)번, 시즌 받은 연락 상한 inboxPerSeason 10 (always·followUp·signature 제외), 한 주 선택지 연락 1개. 결과적으로 1년 약 16~19개.
+- 선택지: `result`(결과 이야기), `check {stat, diff}` + `success/fail`(능력치 판정), `followUp {event, weeks, chance}`(ctx가 그대로 넘어가 연작에서 {player} 유지). 효과 키 추가: flag / unflag / relation / teamRelation / salaryRaise.
+- 새 트리거: 주차형은 stories.js storyTriggerContext, 시스템형은 다른 코드에서 `queueTrigger(name, ctx)` (경쟁자 합류·스타 등급·우승 스킨·2군 통보·친한 동료 이적). 새 시스템형은 QUEUE_TRIGGERS에 이름 추가.
+- 관계: state.relations {선수 id: −100~100}. 주전 동료 절친(50↑) +0.5%, 앙숙(−50↓) −0.5% 내 경기력 (최대 ±2%). [소속팀] 화면 맨 아래 🤝 선수 관계 카드.
+- 데이터 파일 작성 뒤 확인할 것: `node --check`, EVENTS id 중복 없음, followUp 대상 id가 존재, check.stat이 스탯 id 또는 reputation·popularity·condition·stamina·score.
 
-1. **받은 연락 선택지 이벤트** 수정·추가.
-2. **퀘스트 완료 횟수에 따른 팀 내부 평가**. 기존 managerTrust(평판 → 주전/후보 판정)와 함께 설계할 여지.
-3. **구단 능력치**: 감독·코치 점수, 시설, 구단 평가. 이전 HANDOFF의 추천은 이 항목과 팀 내부 평가를 묶고, 다음에 연락 이벤트를 진행하는 순서였으나 확정 선택은 아니다.
-4. **해외 리그 확장**은 사용자 요청 시. 확장 여지를 남겨 달라는 요청이 있다: 국제대회 해외 선수 이름·평점·POG → 실제 경기 기반 지역 순위 → 해외 영입·국내 스타 해외 이적 → 내 선수 해외 진출.
+## 5. 실행 환경과 검증
 
-이미 완료된 기반:
+- 이 PC에서는 PowerShell·Node로 저장소 파일을 직접 수정하면 된다 (클라우드 세션의 업로드/커밋 절차는 필요 없음).
+- 문법 검사: 바뀐 JS마다 `node --check`, 변경 내용은 `git diff --check`.
+- 이전 Codex 세션 메모: Playwright + Edge headless가 중간에 종료되어 화면 검증을 못 했고, 대신 Node vm으로 index.html 순서대로 스크립트(start.js 제외)를 불러 게임 함수를 실행했다 (DOM 렌더링만 대체).
+- 클라우드 세션에서는 Playwright(Chromium)로 화면까지 확인했다. 쓸 수 있으면 이 방법이 가장 확실하다:
+  - 새 게임: `draft.name='테스트'; draft.startYear=2012; renderCreation(); startCareer();` (**시작 연도는 2012·2017·2022만** 가능). 1부 팀: `draft.teamChoice = draft.teams.findIndex(d=>d.tier===1)` (startCareer 전).
+  - 강한 내 선수: startCareer 뒤 `Object.keys(state.stats).forEach(k=>state.stats[k]+=33)`.
+  - **state.plan이 있어야 nextWeek()가 진행된다** (`state.plan='scrim'`, 체력 30 미만이면 'rest').
+  - 연락 자동 답: `state.inbox.filter(m=>m.tab==='inbox'&&m.choices&&m.answered===null&&m.kind!=='offer'&&m.kind!=='retire').forEach(m=>answerMessage(m.id, 0))`.
+  - 새 시즌 소식 팝업(#news-popup)이 클릭을 가리면 제거. 저장 확인은 `saveGame(); loadGame();` 전후 비교.
+  - 1시즌 시뮬 ≈ 1~2분.
+- 은퇴·삭제된 선수 id가 relations 등에 남을 수 있다 → playerName 전에 `state.league.players[id]` 확인.
+- 무작위 시뮬레이션 결과(순위·금액)를 고정 기대값으로 쓰지 않는다.
 
-- 97 대격변 패치, 99 새 챔피언 이벤트, 106 시대별 돈·인기·구단 수·국제대회 시작 연도 및 가벼운 해외 리그.
-- 107 팬 수·스타 등급·광고/스폰서·평판 등급/이벤트·감독 신뢰·49주 올스타전·엔딩 인성 점수.
-- 해외 리그는 왼쪽 경기 메뉴에 있다. state.world, data/era.js, js/era.js. 국제대회 해외 경기는 여전히 팀 전력 중심이다.
-- 인기도·평판 주요 함수: fameTier, repTier, fansCount, weeklyFame, managerTrust, runAllStar, reputationPoints. data/fame.js, js/fame.js.
+## 6. 로드맵 (사용자가 고르기 전 큰 확장 시작 금지)
 
-## 7. 기존 측정과 밸런스 메모
+1. ~~받은 연락 선택지 이벤트~~ → 119에서 완료.
+2. **퀘스트 완료 횟수에 따른 팀 내부 평가** (managerTrust·relations와 함께 설계 여지).
+3. **구단 능력치**: 감독·코치 점수, 시설, 구단 평가. (이전 추천: 2와 묶어서)
+4. **해외 리그 확장**은 사용자 요청 시: 국제대회 해외 선수 이름·평점·POG → 지역 순위 → 해외 영입·이적 → 내 선수 해외 진출. (119의 '해외 구단 러브콜' 연작은 아직 실제 이적이 없음 — 확장 때 연결)
 
-아래 수치는 이전 HANDOFF에서 인계한 과거 측정이며 이번 세션에서 재측정한 값이 아니다.
+원하면 제안할 수 있는 작은 아이디어:
+- 연락: 관계를 다른 화면에도 표시, 라이벌 맞대결 전적, 연작 추가, 연락 도감.
+- 이적: 후보 생성 수준 올리기(LEAGUE.npc.tier1Sub 52, rookie 46 — 117 때 사용자가 선택 안 함).
+- 수집: 시즌 선수 카드, 칭호, 장비 Lv4~5 튜닝, 숙련도 배지 (118 때 선택 안 함).
+- 12각형: 다른 선수와 비교.
 
-- 14시즌 1부 평균 전력: 2013 약 64.8 → 2020 약 72.7 → 2026 약 74.4. 사용자는 상향 평준화를 수용했다.
-- 과거 2012 시작 초반 최저 연봉 약 200만 원 때문에 월세가 어려웠던 문제는 이번 113에서 연봉 하한 1,200만 원으로 정책이 변경됐다. 예전 연봉 측정치는 현재 버전 수치로 제시하지 않는다.
-- 107 당시 인기도 85인 1부 선수가 1년 뒤 95~100 근처가 되는 측정이 있었다. 사용자가 너무 쉽다고 느끼면 경기 승리 인기도·자연 감소를 검토한다.
-- 대격변·합숙·특성·새 챔피언·성장·엔딩 난이도는 실제 플레이 피드백에 따라 조정한다. 내 선수가 너무 강한지 아직 확정하지 않았다.
-- 팬 선물 이벤트 밸런스는 사용자가 추후 언급 예정이라 먼저 꺼내지 않는다.
+## 7. 밸런스 메모
+
+- 1부 평균 전력 2013 약 64.8 → 2020 약 72.7 → 2026 약 74.4 (사용자 수용).
+- 인기도가 너무 쉽게 오른다고 하면: 연락의 popularity 값, 경기 승리 인기도, 자연 감소를 검토 (업적 보상은 이미 삭제).
+- 117 이후 비시즌 직후 빚 있는 구단 2~5팀 (한도 안). 많으면 CLUB_MARKET.depth.chance 낮추기.
+- 연락이 많다고 하면 EVENT_RULES.inboxPerSeason, media_day chance 줄이기.
+- 대격변·합숙·특성·새 챔피언·성장·엔딩 난이도·내 선수가 너무 강한지는 실제 플레이 피드백으로 조정.
+- 팬 선물 이벤트 밸런스는 사용자가 추후 언급 예정이므로 먼저 꺼내지 않는다.
 
 ## 8. 다음 세션 시작 시
 
-1. 실제 git 상태를 확인하고 113 및 HANDOFF 커밋 여부를 파악한다.
-2. 새 사용자 요청이 있으면 그 요청을 우선한다. 현재 요청된 구현은 완료되어 있고, 장기 로드맵의 다음 기능은 미선택 상태다.
-3. 필요하면 실제 브라우저에서 단기 계약 표시·23주 SNS 재계약·대시보드 순위 줄·SNS 스크롤 배치를 확인한다. 이미 통과한 코드 검증과 미검증 화면을 구분한다.
+1. `git status --short`, `git log --oneline -10`으로 114~120·HANDOFF 커밋 여부 확인.
+2. 새 사용자 요청을 우선한다. 현재 요청된 작업은 모두 끝났고, 로드맵의 다음 기능은 미선택 상태다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 121), 이 HANDOFF.md도 갱신한다.
