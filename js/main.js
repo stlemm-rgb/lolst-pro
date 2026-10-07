@@ -322,75 +322,12 @@ function champOptionsHTML(selected) {
   }).join("");
 }
 
-function practiceSelectHTML() {
-  return (
-    '<p class="effects"><label>연습할 챔피언 ' +
-      '<select id="practice-champ"><option value="">자동 (메타·낮은 숙련도 3명에게 나눠서)</option>' + champOptionsHTML(state.practiceChamp) + "</select>" +
-    "</label></p>"
-  );
-}
-
 // 챔피언 집중 연습: 한 명 고르기 (안 골랐으면 S급 메타)
 function focusChamp() {
   return state.focusChamp && state.mastery[state.focusChamp] !== undefined ? state.focusChamp : mySMeta();
 }
 
-function focusSelectHTML() {
-  return (
-    '<p class="effects"><label>집중할 챔피언 ' +
-      '<select id="focus-champ">' + champOptionsHTML(focusChamp()) + "</select>" +
-    "</label></p>"
-  );
-}
-
-pages.training = function () {
-  let cards = "";
-  TRAININGS.forEach(function (t) {
-    const selected = state.plan === t.id;
-    const sign = function (n) { return (n > 0 ? "+" : "") + n; };
-    const effects = Object.keys(t.effects).map(function (id) {
-      const r = t.effects[id];
-      let text = (isBonusStat(id) ? '<span class="bonus">★</span>' : "") + statName(id) + " " + sign(r[0]) + " ~ " + sign(r[1]);
-      // 내 보너스 표시
-      let extra = 0;
-      if (state.stats[id] !== undefined && r[1] > 0) extra = trainingBonusFor(id);
-      if (id === "stamina" && r[1] < 0) extra = staminaCostMultiplier() - 1;
-      if (id === "stamina" && r[1] > 0) extra = traitEffectSum("restBonus");
-      if (id === "popularity" && r[1] > 0) extra = popularityMultiplier() - 1;
-      if (id === "mastery") extra = masteryGrowthMultiplier() - 1;
-      if (id === "masteryFocus") extra = masteryGrowthMultiplier(focusChamp()) - 1;
-      if (id === "masteryMeta") extra = masteryGrowthMultiplier(mySMeta()) - 1;
-      if (Math.abs(extra) > 0.001) text += ' <span class="' + (extra > 0 === (id !== "stamina") ? "up" : "down") + '">(' + percentText(extra) + ")</span>";
-      return text;
-    }).join("<br>");
-
-    cards +=
-      '<div class="card training' + (selected ? " selected" : "") + '">' +
-        "<h2>" + t.name + "</h2>" +
-        "<p>" + t.desc + "</p>" +
-        '<p class="effects">' + effects + "</p>" +
-        (t.effects.mastery ? practiceSelectHTML() : "") +
-        (t.effects.masteryFocus ? focusSelectHTML() : "") +
-        '<button data-plan="' + t.id + '"' + (selected ? ' class="primary"' : "") + ">" +
-          (selected ? "✔ 선택됨" : "이번 주 훈련으로 선택") +
-        "</button>" +
-      "</div>";
-  });
-
-  const tired = state.stamina < TIRED_LIMIT
-    ? '<div class="notice">체력이 ' + state.stamina + "밖에 남지 않았어요. 체력이 " + TIRED_LIMIT + " 미만이면 훈련 효과가 절반이 돼요. 휴식을 고려해 보세요.</div>"
-    : "";
-  return (
-    "<h1>훈련</h1>" + tired + questsHTML(false) +
-    '<p class="placeholder">이번 주에 할 훈련을 고른 뒤, 위의 [다음 주로 진행]을 누르세요. 괄호 안은 포지션 가산점·유형·특성으로 받는 내 보너스예요.</p>' +
-    '<p class="muted small">📉 성장 곡선: 스탯이 높을수록 덜 올라요. ' + GROWTH_CURVE.map(function (g, i) {
-      const from = i ? GROWTH_CURVE[i - 1].upTo : 0;
-      return from + "~" + Math.min(100, g.upTo - 1) + " " + Math.round(g.mult * 100) + "%";
-    }).join(" · ") + "</p>" +
-    '<div class="grid">' + cards + "</div>" +
-    '<div class="card">' + statGuideHTML(state.player.position) + "</div>"
-  );
-};
+// 훈련 화면은 js/training_page.js
 
 pages.settings = function () {
   const last = lastSavedText();
@@ -666,6 +603,7 @@ function renderPage() {
   bindCompPlan(page); // 조합 전략 (js/comps.js)
   bindShop(page); // 상점 (js/shop.js)
   bindGuide(page); // 이번 주 추천·처음 안내 (js/guide.js)
+  bindTraining(page); // 훈련 화면 (js/training_page.js)
   page.querySelectorAll("[data-retire]").forEach(function (btn) {
     btn.onclick = function () {
       if (btn.getAttribute("data-retire") === "now") return retireNowButton();
@@ -795,6 +733,8 @@ function nextWeek(restWeek) {
     message: message,
     changes: changes,
   });
+  // 훈련 화면 '최근 4주 성장'용 기록 (js/training_page.js)
+  state.trainHistory = (state.trainHistory || []).concat([{ name: training.name, changes: changes }]).slice(-8);
   // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
   startWeekReport(training, message, changes, playLadder(training));
   playNpcLadder(); // 다른 선수들도 솔로 랭크 (리그 솔로 랭크 순위)

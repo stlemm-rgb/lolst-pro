@@ -34,7 +34,8 @@ function queueFinalNews(champKey, eventName, f) {
   const EVENT_NAMES = { cup: "컵 대회", playoffs: "리그 플레이오프", worlds: "월드 챔피언십", firststand: "First Stand", msi: "MSI" };
   queueHeadline(champKey + "_final", who, {
     event: EVENT_NAMES[champKey] || eventName, winner: teamName(f.winner), loser: teamName(f.loser),
-    score: Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]), mvp: f.pogName || "-",
+    score: Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]),
+    mvp: f.pogName || teamName(f.winner) + "의 에이스", // 해외 팀은 선수 이름이 없어서
   });
 }
 
