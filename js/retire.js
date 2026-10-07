@@ -85,7 +85,7 @@ function askRetirement() {
   if (age < CAREER.retireAskAge) return;
   postMessage("inbox", RETIRE_TEXTS.askTitle, retireText(RETIRE_TEXTS.ask), {
     kind: "retire",
-    choices: [{ label: RETIRE_TEXTS.stay }, { label: RETIRE_TEXTS.retire, hint: "시즌(52주)이 끝나면 은퇴하고 엔딩을 봐요. [나의 커리어]에서 취소할 수 있어요." }],
+    choices: [{ label: RETIRE_TEXTS.stay }, { label: RETIRE_TEXTS.retire, hint: "시즌(52주)이 끝나면 은퇴하고 엔딩을 봐요. [선수 정보] → ⏳ 나이·은퇴에서 취소할 수 있어요." }],
   });
 }
 
@@ -209,7 +209,7 @@ function finishCareer(reason, includeCurrent) {
 
 const RETIRE_REASONS = { "선택": "스스로 은퇴를 결정", "나이": "최대 나이", "계약": "받아 주는 팀이 없음", "즉시": "시즌 중 은퇴" };
 
-// [나의 커리어]의 은퇴 버튼
+// [선수 정보] → ⏳ 나이·은퇴의 은퇴 버튼
 function retireNowButton() {
   if (!confirm("지금 바로 은퇴할까요?\n커리어가 끝나고 엔딩 화면으로 넘어가요. 되돌릴 수 없어요.")) return;
   finishCareer("즉시", true);

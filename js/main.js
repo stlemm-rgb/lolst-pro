@@ -149,7 +149,7 @@ pages.dashboard = function () {
   );
 };
 
-// 최근 기록 (훈련·경기·소식 30개) — [나의 커리어] 맨 아래
+// 최근 기록 (훈련·경기·소식 30개) — [선수 정보] ⏳ 나이·은퇴 탭
 function recentLogHTML() {
   if (!state.log.length) return "";
   const items = state.log.map(function (entry) {
@@ -238,57 +238,10 @@ pages.schedule = function () {
   );
 };
 
-// ===== 나의 커리어: 챔피언 숙련도 =====
-let championTab = ""; // 보고 있는 포지션 탭 (저장 안 함)
+// ===== 선수 정보 화면은 js/player_page.js (예전 '나의 커리어') =====
+let championTab = ""; // 챔피언 탭에서 보고 있는 포지션 (저장 안 함)
 
-pages.career = function () {
-  if (!championTab) championTab = state.player.position;
-  const tabs = POSITION_IDS.map(function (id) {
-    const pos = findPosition(id);
-    return '<button data-ctab="' + id + '"' + (championTab === id ? ' class="primary"' : "") + ">" + pos.name + "</button>";
-  }).join("");
-
-  const names = Object.keys(state.mastery)
-    .filter(function (name) { return findChampion(name).positions.indexOf(championTab) !== -1; })
-    .sort(function (a, b) { return state.mastery[b] - state.mastery[a] || a.localeCompare(b); });
-  const rows = names.map(function (n) { return masteryRowHTML(n, championTab); }).join("");
-
-  const upcoming = CHAMPIONS.filter(function (c) { return state.mastery[c.name] === undefined; });
-  const next = upcoming.length
-    ? "다음 출시 예정: <b>" + upcoming[0].name + "</b> (" + upcoming[0].released + ")"
-    : "모든 챔피언이 출시됐어요.";
-
-  // 경기력 미리보기 (밴 2명 기준)
-  const m = matchPower();
-  const mp = m.meta;
-  const preview =
-    '<div class="card"><h2>경기력 미리보기 <span class="muted small">상대가 가장 경계하는 내 챔피언 ' + MATCH.bansAgainstMe + "명을 밴했을 때 · 실제 경기에서는 밴 수(0~3명)와 대상이 경기마다 달라요</span></h2>" +
-      '<table class="calc">' +
-        "<tr><td>스탯 점수</td><td>12개 평균, ★가산점 " + POSITION_BONUS.matchMultiplier + "배</td><td><b>" + m.score.toFixed(1) + "</b></td></tr>" +
-        "<tr><td>밴 당한 챔피언</td><td colspan=\"2\">" + (m.banned.join(", ") || "없음") + "</td></tr>" +
-        "<tr><td>고른 챔피언</td><td>" + m.pick + " (숙련도 " + state.mastery[m.pick] + (metaTier(m.pick) ? ", 메타 " + metaTier(m.pick) + "급 +" + Math.round(MATCH.metaPowerBonus[metaTier(m.pick)] * 100) + "%" : "") + ")</td><td>× <b>" + m.multiplier.toFixed(2) + "</b></td></tr>" +
-        (m.jokerBonus > 0 ? "<tr><td>🃏 조커픽</td><td>메타가 아닌 챔피언 · 숙련도 " + MATCH.jokerFrom + "~" + MATCH.jokerFull + "에서 서서히 커짐 · 상대가 예상 못 함</td><td>× <b>" + (1 + m.jokerBonus).toFixed(3) + "</b></td></tr>" : "") +
-        "<tr><td>메타 페널티</td><td>메타 챔피언 평균 숙련도 " + mp.avg.toFixed(0) +
-          (mp.adapting ? " · 패치 적응 기간 (적응력 −" + Math.round(mp.adaptCut * 100) + "%" + (mp.stubborn ? ", 고집 +" + mp.stubborn : "") + ")" : "") +
-          "</td><td>− <b>" + mp.penalty.toFixed(1) + "</b></td></tr>" +
-        '<tr class="total"><td>경기력</td><td>스탯 점수 × 숙련도 배율(메타 등급 보너스 포함) × 조커픽 − 메타 페널티</td><td><b>' + m.power.toFixed(1) + "</b></td></tr>" +
-      "</table>" +
-    "</div>";
-
-  return (
-    "<h1>나의 커리어</h1>" + careerRecordHTML() + preview +
-    '<div class="card"><h2>챔피언 숙련도 <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
-      '<p class="muted small">1 = 한 번도 안 해 본 챔피언, 100 = 완벽하게 다룸. 금색 막대 = 이번 패치 메타 챔피언. ' +
-        "지금까지 출시된 챔피언 " + Object.keys(state.mastery).length + "명 · " + next + "</p>" +
-      '<div class="buttons">' + tabs + "</div>" +
-      '<div class="stat-columns mastery-list">' + rows + "</div>" +
-    "</div>" +
-    retireCardHTML() +
-    recentLogHTML()
-  );
-};
-
-// 나이와 은퇴 카드 (나의 커리어 맨 아래)
+// 나이와 은퇴 카드 ([선수 정보] ⏳ 나이·은퇴 탭)
 function retireCardHTML() {
   const age = state.player.age;
   const start = agingStartAge();
@@ -630,9 +583,12 @@ function renderPage() {
   const ladderAll = page.querySelector("[data-ladderall]");
   if (ladderAll) ladderAll.onclick = function () { ladderShowAll = !ladderShowAll; renderPage(); };
 
-  // 나의 커리어: 포지션 탭
+  // 선수 정보 챔피언 탭: 포지션 탭
   page.querySelectorAll("[data-stab]").forEach(function (btn) {
     btn.onclick = function () { standingsTab = btn.getAttribute("data-stab"); renderPage(); };
+  });
+  page.querySelectorAll("[data-ptab]").forEach(function (btn) {
+    btn.onclick = function () { playerTab = btn.getAttribute("data-ptab"); renderPage(); };
   });
   page.querySelectorAll("[data-ctab]").forEach(function (btn) {
     btn.onclick = function () { championTab = btn.getAttribute("data-ctab"); renderPage(); };
@@ -734,6 +690,7 @@ function nextWeek(restWeek) {
   });
   // 훈련 화면 '최근 4주 성장'용 기록 (js/training_page.js)
   state.trainHistory = (state.trainHistory || []).concat([{ name: training.name, changes: changes }]).slice(-8);
+  recordStatSnapshot(); // [선수 정보] 능력 변화: 4주 전·시즌 시작 비교 (js/player_page.js)
   // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
   startWeekReport(training, message, changes, playLadder(training));
   playNpcLadder(); // 다른 선수들도 솔로 랭크 (리그 솔로 랭크 순위)

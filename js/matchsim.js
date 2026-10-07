@@ -303,7 +303,10 @@ function playMatch(m) {
     set.comps.a.picks.concat(set.comps.b.picks).forEach(function (n) { if (seriesUsed.indexOf(n) === -1) seriesUsed.push(n); });
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
-    if (userIn) userEventHighlights(set.events).forEach(function (h) { userEvents.push(h); });
+    if (userIn) {
+      userEventHighlights(set.events).forEach(function (h) { userEvents.push(h); });
+      tallyUserEvents(set.events); // [선수 정보] 내 경기 장면 통계 (js/player_page.js)
+    }
     recordSet(set, m, perf);
     if (detail) {
       const sd = setDetail(set, setCtx, m, userCtx ? userCtx.pick : null);

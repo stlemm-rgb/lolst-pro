@@ -362,7 +362,7 @@ function championCardHTML() {
       '<p class="muted small">S급: 픽 우선 +' + MATCH.metaPickBonus.S + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.S * 100) + "% · A급: 픽 우선 +" + MATCH.metaPickBonus.A + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.A * 100) + "%</p>" +
       '<details class="other-meta"><summary class="muted small">다른 포지션 메타 보기</summary><div class="muted small">' + others + "</div></details>" +
       '<h2 class="sub">내 숙련도 상위 5</h2>' + top5.map(function (n) { return masteryRowHTML(n); }).join("") +
-      '<p class="muted small">전체 목록은 [나의 커리어]에서 볼 수 있어요.</p>' +
+      '<p class="muted small">전체 목록은 [선수 정보] → ⚔️ 챔피언에서 볼 수 있어요.</p>' +
     "</div>"
   );
 }

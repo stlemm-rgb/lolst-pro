@@ -812,3 +812,21 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .style-chip { display: inline-block; font-size: 12px; padding: 2px 9px; border-radius: 12px; background: rgba(168, 85, 247, 0.18); border: 1px solid rgba(168, 85, 247, 0.5); margin-right: 6px; }
 .style-icon { font-size: 13px; }
 .strength-line { margin: 4px 0; }
+
+/* ===== 선수 정보 (js/player_page.js) ===== */
+.phead { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.4fr) minmax(220px, 1fr); gap: 20px; align-items: center; }
+.phead-name { font-size: 24px; font-weight: bold; margin-bottom: 6px; }
+.phead-line { margin-top: 6px; }
+.phead-nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.phead-bars .mini-bar { margin: 3px 0; }
+.ptabs { justify-content: flex-start; flex-wrap: wrap; margin: 4px 0 12px; }
+.change-table td, .change-table th { padding: 3px 8px; }
+.change-table tr.total td { border-bottom: 1px solid var(--border); }
+.trait-table td { vertical-align: top; }
+.s-table .s-prog { min-width: 220px; grid-template-columns: 1fr 100px; }
+.s-table .s-prog .bar { height: 7px; position: relative; display: block; flex: 1; }
+.s-table .s-prog .bar-fill { display: block; height: 100%; }
+.growth-table td, .growth-table th { padding: 4px 8px; white-space: nowrap; }
+.grade-big { color: var(--gold); font-size: 22px; letter-spacing: 2px; }
+@media (max-width: 1200px) { .phead { grid-template-columns: 1fr 1fr; } .phead-bars { grid-column: 1 / -1; } }
+@media (max-width: 800px) { .phead { grid-template-columns: 1fr; } }

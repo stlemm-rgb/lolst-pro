@@ -1,7 +1,13 @@
-// ===== 기록 화면: 나의 커리어(위쪽), 개인 시상, 대회 일정(아래쪽) =====
+// ===== 기록 화면: 선수 정보 기록(위쪽), 개인 시상, 대회 일정(아래쪽) =====
 
-// ----- 나의 커리어: 요약·시즌별 기록·능력 변화 -----
+// ----- 선수 정보(예전 나의 커리어): 요약·시즌별 기록·능력 변화 -----
 function careerRecordHTML() {
+  const x = careerRecordParts();
+  return x.summary + x.season + x.growth;
+}
+
+// [선수 정보] 탭마다 나눠 쓰기: summary 커리어 요약 / season 시즌별 기록 / growth 능력 변화
+function careerRecordParts() {
   ensureCareerRecords();
   const c = state.career;
   const now = currentSeasonRecord();
@@ -75,7 +81,7 @@ function careerRecordHTML() {
       '<div class="card"><h2>스탯 변화 <span class="muted small">데뷔 → 지금</span></h2><table class="mini">' + statRows + "</table></div>" +
     "</div>";
 
-  return summary + seasonCard + growthCard;
+  return { summary: summary, season: seasonCard, growth: growthCard, scoreBars: bars };
 }
 
 // ----- 개인 시상 -----
