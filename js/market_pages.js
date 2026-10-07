@@ -201,8 +201,8 @@ pages.transfer = function () {
         "<tr><td>계약 만료</td><td>" + c.endYear + "년 시즌 종료" + (c.endYear <= state.year ? ' <span class="down">(이번 시즌)</span>' : "") + "</td></tr>" +
         "<tr><td>출전 보장</td><td>" + guaranteeText + "</td></tr>" +
         "<tr><td>이번 시즌 출전</td><td>" + state.career.seasonGames + "경기</td></tr>" +
-        "<tr><td>지금 기준 예상 연봉</td><td>" + moneyText(userSalaryFor(team.tier)) + ' <span class="muted small">(재계약·제안 때 기준, 시즌 성적에 따라 바뀜)</span>' +
-          '<div class="salary-breakdown muted small">' + escapeHTML(salaryBreakdownText(salaryBreakdown(team.tier), 0)) + "</div></td></tr>" +
+        "<tr><td>지금 기준 예상 연봉</td><td>" + moneyText(userSalaryFor(nextTier(team.id))) + ' <span class="muted small">(재계약·제안 때 기준, 시즌 성적에 따라 바뀜)</span>' +
+          '<div class="salary-breakdown muted small">' + escapeHTML(salaryBreakdownText(salaryBreakdown(nextTier(team.id)), 0)) + "</div></td></tr>" +
       "</table>" +
       (state.pendingMove ? '<div class="notice">' + (state.pendingMove.loan ? "임대 확정" : "이적 확정") + ": " + (state.pendingMove.summer ? "후반기(" + SUMMER_MARKET.applyWeek + "주)부터" : "새 시즌부터") + " <b>" + escapeHTML(findTeam(state.pendingMove.teamId).name) + "</b> (연봉 " + moneyText(state.pendingMove.salary) + ", " + state.pendingMove.endYear + "년까지)</div>" : "") +
       (state.loan ? '<div class="notice">🤝 임대 중: 이번 시즌이 끝나면 <b>' + escapeHTML(findTeam(state.loan.from) ? findTeam(state.loan.from).name : "원래 팀") + "</b>(으)로 돌아가요.</div>" : "") +

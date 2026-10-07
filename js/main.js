@@ -748,7 +748,7 @@ function nextWeek(restWeek) {
       renderAll();
       return;
     }
-    snapshotSeasonForMarket(); // 지난 시즌 순위·평점 저장 + 구단 자금 정산 (js/club_market.js)
+    if (state.league.settledYear !== state.year) settleSeasonClubs(); // 보통 47주에 이미 함 (예전 세이브만 여기서)
     state.year += 1;
     state.week = 1;
     state.player.age += 1;
@@ -815,7 +815,8 @@ function nextWeek(restWeek) {
   if (state.week === CONTRACT.windowStart) {
     if (state.league.grownYear !== state.year) {
       npcYearGrowth(1); // 다른 선수들 1년치 성장·노화를 이적 시장 전에 (js/league.js)
-      addNews("비시즌", "시즌이 끝나고 다른 선수들의 1년 성장·노화가 반영됐다. 이적 시장에서 바뀐 능력을 확인해 보자.");
+      settleSeasonClubs(); // 구단 스폰서 수입·저축/빚 정산·승강 지원금도 이적 시장 전에 (js/club_market.js)
+      addNews("비시즌", "시즌이 끝나고 다른 선수들의 1년 성장·노화와 구단 스폰서 수입·승강 지원금이 반영됐다. 이적 시장에서 바뀐 능력과 구단 자금을 확인해 보자.");
     }
     askRetirement(); // 29세부터 은퇴 권유 (js/retire.js)
     startTransferWindow();

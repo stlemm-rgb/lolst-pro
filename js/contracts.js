@@ -183,7 +183,8 @@ function checkBench() {
 // ----- 제안 만들기 -----
 function makeOffer(teamId, renewal) {
   const team = findTeam(teamId);
-  const breakdown = salaryBreakdown(team.tier);
+  const tier = nextTier(teamId); // 비시즌엔 다음 시즌 리그 (승격 팀 = 1부 기준, js/club_market.js)
+  const breakdown = salaryBreakdown(tier);
   let salary = breakdown.total;
   let clubPct = 0;
   if (!renewal) {
@@ -193,7 +194,7 @@ function makeOffer(teamId, renewal) {
   return {
     teamId: teamId, renewal: renewal, salary: salary, breakdown: breakdown, clubPct: clubPct,
     years: randInt(CONTRACT.years[0], CONTRACT.years[1]),
-    guarantee: Math.random() < CONTRACT.guaranteeChance ? CONTRACT.guaranteeGames[team.tier] : 0,
+    guarantee: Math.random() < CONTRACT.guaranteeChance ? CONTRACT.guaranteeGames[tier] : 0,
     negotiated: false, guaranteeAsked: false,
   };
 }
@@ -212,7 +213,7 @@ function offerText(o) {
     (o.summer ? "\n· 여름 이적: 후반기(" + SUMMER_MARKET.applyWeek + "주)부터 합류 · 원래 팀에 이적료 " + moneyText(o.fee || 0) : "") +
     "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) + (o.raised ? " (인상 반영)" : "") +
     "\n· 출전 보장: " + (o.guarantee ? "시즌 " + o.guarantee + "경기" : "없음") +
-    "\n· " + team.name + " (" + tierName(team.tier) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
+    "\n· " + team.name + " (" + nextTierName(team.id) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
 }
 
 function offerChoices(o) {
@@ -255,7 +256,7 @@ function startTransferWindow() {
     if (t.id === mine.id) return false;
     const starter = starterAt(t.id, state.player.position);
     const better = !starter || me > playerScore(starter);
-    return better && teamBudgetLeft(t.id) >= userSalaryFor(t.tier);
+    return better && teamBudgetLeft(t.id) >= userSalaryFor(nextTier(t.id));
   }).sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); });
   let count = 1 + Math.floor(state.popularity / 40) + (state.transferListed ? 1 : 0) + (state.benched ? 1 : 0);
   if (state.reputation < 0) count -= 1;
@@ -285,7 +286,7 @@ function answerOffer(msg, index) {
     } else {
       o.guaranteeAsked = true;
       if (ok) {
-        o.guarantee = CONTRACT.guaranteeGames[team.tier];
+        o.guarantee = CONTRACT.guaranteeGames[nextTier(team.id)];
         msg.notes.push("출전 보장 요청 성공! 시즌 " + o.guarantee + "경기 보장");
       } else msg.notes.push("출전 보장 요청은 거절됐다.");
     }
@@ -339,7 +340,7 @@ function requestTransfer(teamId) {
   const team = findTeam(teamId);
   const starter = starterAt(teamId, state.player.position);
   const me = playerScore(USER_ID);
-  const salary = userSalaryFor(team.tier);
+  const salary = userSalaryFor(nextTier(teamId));
   const summer = isSummerWindow();
   const fee = summer ? transferFee(USER_ID) : 0; // 여름엔 계약 기간이 남아 있어서 원래 팀에 이적료
   const okSkill = !starter || me >= playerScore(starter) + CONTRACT.requestMargin;

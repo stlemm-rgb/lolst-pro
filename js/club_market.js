@@ -1,6 +1,6 @@
 // ===== 구단 자금 · 이적료 · 비시즌 리빌딩 (규칙: data/contracts.js CLUB_MARKET) =====
 // team.money: 구단 자금 (이적료로 늘고 줄어요, 빚이면 −)
-// state.league.marketSnap: 새해 직전에 저장한 지난 시즌 정보 { year, need: {팀: 0~1}, ratings: {선수: [평점, 세트]}, awards: {선수: [상 key]} }
+// state.league.marketSnap: 비시즌 시작(47주)에 저장한 지난 시즌 정보 { year, need: {팀: 0~1}, ratings: {선수: [평점, 세트]}, awards: {선수: [상 key]} }
 
 // ----- 구단 수입 (data/contracts.js CLUB_INCOME) -----
 // t.incomeLog = { 연도: { prize, sponsor, save, promo } } (최근 2년만)
@@ -12,6 +12,35 @@ function addClubIncome(t, kind, amount) {
   const y = log[state.year] = log[state.year] || { prize: 0, sponsor: 0, save: 0, promo: 0 };
   y[kind] = (y[kind] || 0) + Math.round(amount);
   Object.keys(log).forEach(function (k) { if (Number(k) < state.year - 1) delete log[k]; });
+}
+
+// ----- 비시즌 정산 (47주, 이적 시장이 열릴 때 — js/main.js) -----
+// 지난 시즌 순위·평점 저장 + 스폰서 수입 + 저축·빚 정산 + 승격/강등 지원금. state.league.settledYear로 한 번만
+function settleSeasonClubs() {
+  if (state.league.settledYear === state.year) return;
+  state.league.settledYear = state.year;
+  snapshotSeasonForMarket();
+  state.league.season.promo.forEach(function (p) {
+    if (p.winner !== p.tier2) return;
+    addClubIncome(findTeam(p.tier2), "promo", CLUB_INCOME.promotion);  // 승격 지원금
+    addClubIncome(findTeam(p.tier1), "promo", CLUB_INCOME.relegation); // 강등 낙하산 지원금
+  });
+}
+
+// 다음 시즌 리그 (비시즌에는 승강전 결과 반영: 승격 팀 = 1부, 강등 팀 = 2부). 1부/2부 표시는 새해에 바뀜
+// 이적 시장 예산·제안 연봉·출전 보장은 이 값으로 계산
+function nextTier(teamId) {
+  const t = findTeam(teamId);
+  if (!t) return 2;
+  if (state.week < CONTRACT.windowStart || !state.league.season || !state.league.season.promo) return t.tier;
+  const p = state.league.season.promo.find(function (x) { return x.winner === x.tier2 && (x.tier1 === teamId || x.tier2 === teamId); });
+  return p ? (p.tier2 === teamId ? 1 : 2) : t.tier;
+}
+
+// 리그 이름 + (승격/강등 예정)
+function nextTierName(teamId) {
+  const t = findTeam(teamId), n = nextTier(teamId);
+  return tierName(n) + (n !== t.tier ? (n < t.tier ? " · 승격 예정" : " · 강등 예정") : "");
 }
 
 // 결승이 끝나면 상금 (js/matchsim.js koFinal에서 부름)
@@ -72,7 +101,7 @@ function teamMoney(teamId) {
 // 구단 여유 = 예산 × (1 + 빚 한도) + 구단 자금 − 연봉 총액
 function clubRoom(teamId) {
   const t = findTeam(teamId);
-  return CONTRACT.teamBudget[t.tier] * (1 + CLUB_MARKET.debtLimit) + teamMoney(teamId) - teamPayroll(teamId);
+  return CONTRACT.teamBudget[nextTier(teamId)] * (1 + CLUB_MARKET.debtLimit) + teamMoney(teamId) - teamPayroll(teamId); // 비시즌엔 다음 시즌 리그 예산
 }
 
 // 빚 한도 (구단 자금이 이 아래로 내려가면 안 됨)
