@@ -62,7 +62,7 @@ function npcBanValue(p, name) {
 // 고를 때 가치 = 숙련도 + 메타 보너스 + 조커픽 보너스 + 팀이 노리는 조합 성향 보너스
 function npcPickValue(p, name, target) {
   const t = metaTier(name, p.pos);
-  return p.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0) + MATCH.jokerPickBonus * jokerFactor(p.mastery[name], !!t) +
+  return p.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0) + newChampPick(name, t) + MATCH.jokerPickBonus * jokerFactor(p.mastery[name], !!t) +
     (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
@@ -98,7 +98,7 @@ function npcPickChamp(p, target, used) {
 function npcChampMult(p, name) {
   const t = metaTier(name, p.pos);
   const m = p.mastery[name] || MASTERY.min;
-  return masteryMult(m) * (1 + (t ? MATCH.metaPowerBonus[t] : 0)) * (1 + MATCH.jokerPowerBonus * jokerFactor(m, !!t));
+  return masteryMult(m) * (1 + (t ? MATCH.metaPowerBonus[t] : 0) + newChampPower(name, t)) * (1 + MATCH.jokerPowerBonus * jokerFactor(m, !!t));
 }
 
 // 메타 챔피언 평균 숙련도 (S급은 2배로 셈)

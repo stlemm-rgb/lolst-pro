@@ -201,7 +201,8 @@ function masteryRowHTML(name, pos) {
   return (
     '<div class="stat mastery-row">' +
       '<div class="stat-label">' + name + ' <span class="type-tag ' + findChampion(name).type + '">' + findChampionType(findChampion(name).type).name.slice(0, 2) + "</span>" +
-        metaTagHTML(name, pos) + champCompsHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도가 높음: 고르면 경기력 +' + (MATCH.jokerPowerBonus * 100 * jokerFactor(v, false)).toFixed(1) + '% (숙련도 ' + MATCH.jokerFull + '이면 최대 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%)">🃏 조커</span>' : "") + "</div>" +
+        metaTagHTML(name, pos) + champCompsHTML(name) + (isJoker(name) ? ' <span class="joker-tag" title="메타가 아니지만 숙련도가 높음: 고르면 경기력 +' + (MATCH.jokerPowerBonus * 100 * jokerFactor(v, false)).toFixed(1) + '% (숙련도 ' + MATCH.jokerFull + '이면 최대 +' + Math.round(MATCH.jokerPowerBonus * 100) + '%)">🃏 조커</span>' : "") +
+        (isNewChampBuff(name) && !isMeta(name, pos) ? ' <span class="joker-tag" title="새 챔피언 출시 버프 (다음 패치 전까지): 픽 가치 +' + MATCH.newChamp.pick + ' · 경기력 +' + Math.round(MATCH.newChamp.power * 100) + '%. 다음 패치 때 메타에 들어갈 확률 ' + Math.round(MATCH.newChamp.nextMetaChance * 100) + '%">🆕 출시</span>' : "") + "</div>" +
       '<div class="bar"><div class="bar-fill' + (isMeta(name, pos) ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
       '<div class="stat-value">' + v + "</div>" +
     "</div>"
@@ -764,6 +765,8 @@ function nextWeek(restWeek) {
     if (state.mastery[c.name] !== undefined) return;
     state.mastery[c.name] = MASTERY.min;
     state.weekCtx.newChamps.push(c);
+    state.newChampBuff = state.newChampBuff || {};
+    state.newChampBuff[c.name] = true; // 출시 버프: 다음 패치 전까지 (data/match.js MATCH.newChamp)
     const posNames = c.positions.map(function (id) { return findPosition(id).name; }).join("·");
     addNews("새 챔피언", "새 챔피언 '" + c.name + "'(" + posNames + ")이(가) 출시됐다!");
   });
@@ -771,7 +774,17 @@ function nextWeek(restWeek) {
 
   // 패치 주차면 메타가 바뀜
   if (MASTERY.patchWeeks.indexOf(state.week) !== -1) {
-    const prefer = runShakeupIfDue(); // 2~3년마다 대격변 패치 (js/shakeup.js)
+    const prefer = runShakeupIfDue() || {}; // 2~3년마다 대격변 패치 (js/shakeup.js)
+    // 지난 패치 뒤 나온 새 챔피언: nextMetaChance 확률로 그 포지션 메타에 (이번 주 출시는 제외)
+    Object.keys(state.newChampBuff || {}).forEach(function (name) {
+      const c = findChampion(name);
+      if (!c || newlyReleased(state.year, state.week).indexOf(c) !== -1 || Math.random() >= MATCH.newChamp.nextMetaChance) return;
+      const pos = c.positions[0];
+      prefer[pos] = (prefer[pos] || []).concat([name]);
+    });
+    const keep = {};
+    newlyReleased(state.year, state.week).forEach(function (c) { keep[c.name] = true; }); // 패치 주에 나온 챔피언은 버프 유지
+    state.newChampBuff = keep;
     state.meta = makePatch(state.year, state.week, prefer);
     const mine = state.meta.champs[state.player.position].join(", ");
     addNews("패치", state.meta.label + " 적용! 메타 조합: " + findComp(metaComp()).icon + " " + findComp(metaComp()).name + " · " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);

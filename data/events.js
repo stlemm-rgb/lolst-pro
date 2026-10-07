@@ -128,10 +128,11 @@ const EVENTS = [
   {
     id: "new_champ", tab: "inbox", trigger: "newChamp", cooldown: 1,
     title: "새 챔피언 '{champ}' 연구",
-    text: "새 챔피언 '{champ}'이(가) 나왔다. 팀에서 먼저 연구해 보자는 말이 나온다.",
+    text: "새 챔피언 '{champ}'이(가) 나왔다. 출시 직후라 다음 패치 전까지는 꽤 세다는 평가다 (메타가 아니어도 픽 가치 +15·경기력 +6%). 다음 패치 때 메타에 들어갈 가능성도 높다. 팀에서 먼저 연구해 보자는 말이 나온다.",
     choices: [
-      { label: "내가 먼저 파 본다", effects: { masteryChamp: 8, stamina: -8 } },
-      { label: "지금 하던 챔피언에 집중한다", effects: { masteryMetaAll: 3 } },
+      { label: "내가 먼저 파 본다", effects: { masteryChamp: 30, adapt: 1, stamina: -3 } },
+      { label: "팀과 같이 연구한다", effects: { masteryChamp: 15, reputation: 2 } },
+      { label: "지금 하던 챔피언에 집중한다", effects: { masteryMetaAll: 2 } },
     ],
   },
   {

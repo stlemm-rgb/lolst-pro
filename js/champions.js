@@ -200,10 +200,17 @@ function statScore() {
   return sum / weight;
 }
 
-// 밴픽에서 챔피언 가치 = 숙련도 + (메타면 보너스)
+// 새 챔피언 출시 버프 중인가 (출시 주 ~ 다음 패치 전, 메타가 아닐 때만 보너스) — data/match.js MATCH.newChamp
+function isNewChampBuff(name) {
+  return !!(state.newChampBuff && state.newChampBuff[name]);
+}
+function newChampPick(name, metaT) { return !metaT && isNewChampBuff(name) ? MATCH.newChamp.pick : 0; }
+function newChampPower(name, metaT) { return !metaT && isNewChampBuff(name) ? MATCH.newChamp.power : 0; }
+
+// 밴픽에서 챔피언 가치 = 숙련도 + (메타면 보너스) + (새 챔피언 버프)
 function pickValue(name) {
   const t = metaTier(name);
-  return state.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0);
+  return state.mastery[name] + (t ? MATCH.metaPickBonus[t] : 0) + newChampPick(name, t);
 }
 
 // 상대가 밴할 때 보는 가치: 메타가 아닌 챔피언은 덜 경계함 (조커픽이 살아남기 쉬움)
@@ -325,7 +332,7 @@ function matchPower(bans, target, exclude) {
   const joker = isJoker(pick);
   const score = statScore();
   const tier = metaTier(pick);
-  const mult = masteryMult(state.mastery[pick]) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0));
+  const mult = masteryMult(state.mastery[pick]) * (1 + (tier ? MATCH.metaPowerBonus[tier] : 0) + newChampPower(pick, tier));
   const jokerBonus = MATCH.jokerPowerBonus * jokerFactor(state.mastery[pick], !!tier);
   const meta = metaPenaltyInfo();
   return {

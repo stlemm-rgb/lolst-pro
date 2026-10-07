@@ -45,6 +45,10 @@ const MATCH = {
   adaptWeeks: 4,
   adaptFrom: 40,
   adaptRange: 40,
+  // 새 챔피언 출시 버프: 출시된 주부터 다음 패치 전까지 (나와 다른 선수 모두, 메타가 아닐 때만)
+  //   - 고를 때 가치 +pick, 경기력 +power (메타 페널티 계산에는 안 들어감)
+  //   - 다음 패치 때 그 포지션 메타에 들어갈 확률 nextMetaChance (먼저 연구해 두면 이득)
+  newChamp: { pick: 15, power: 0.06, nextMetaChance: 0.5 },
 };
 
 // 팀 경기 판정: 라인 맞대결 방식 (3단계에서 사용)
