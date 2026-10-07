@@ -115,6 +115,7 @@
 89. (커밋 필요) 챔피언 집중 연습 '자동': 챔피언을 안 골라도 됨 (S급 메타 챔피언 → 숙련도 100이면 숙련도가 가장 높은 다른 메타 챔피언, js/main.js autoFocusChamp). 훈련 카드에 '🔄 자동' 칩, 상단바 '챔피언 집중 연습 · 자동(이름)'. 퀘스트 '주력 챔피언 만들기' 선택 버튼은 자동으로 고름. 숙련도 100 조기 완료: '주력 챔피언 만들기'는 집중 연습한 챔피언이 100에 도달한 주, 'S급 메타 장악'은 그 챔피언이 100이 되면 남은 횟수와 상관없이 완료 (지난주 결과에 '(숙련도 100 달성)')
 90. (커밋 필요) 대시보드의 '📣 선수 SNS에서 ○○ 선수를 언급한 글이 n개' 알림을 누르면 [SNS] → 💬 선수 SNS 탭으로 바로 이동 (data-gosns, js/main.js renderPage)
 91. (커밋 필요) 선수 SNS 새 분류 13개: winStreak(3연승+)·streakBreak(3연패+ 탈출)·superPlay·blunder(경기 흐름 사건의 내 슈퍼플레이/큰 실수, js/match_events.js countSocialPlays)·promoted·relegated·benchReturn·transfer·renewal·award·ladderTop(솔랭 1위/칭호)·streaming·sponsor(활동 중 가끔). 이적·재계약·승강·2군 복귀·시상·솔랭 1위는 지난번 글 올릴 때 상태(state.career.socialSnap)와 비교해서 알아챔. 새 빈칸 {streak}·{oldteam}·{award}. 중요한 분류는 경기 결과 글 바로 뒤 순서, 확률은 SOCIAL_RULES.chance. 지금은 예시 글 1개씩만 → 다른 AI로 보충 예정 (요청 양식 제공)
+92. (커밋 필요) 선수 SNS 새 분류 13개 글 보충 (다른 AI 작성): 팬 글 분류마다 15개, 프로 선수 글 12개(streaming·sponsor 6개). 형식 검사 통과(빈칸·큰따옴표), 빈칸 뒤 '와' 조사 3곳 고침
 
 ## 파일 구성
 
