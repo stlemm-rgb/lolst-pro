@@ -131,8 +131,7 @@ pages.dashboard = function () {
   // 조각들은 js/dashboard.js
   return (
     "<h1>대시보드</h1>" +
-    tutorialCardHTML() + // 📘 처음이라면 (js/guide.js)
-    guideCardHTML() +    // 🎯 지금 목표 · 💡 이번 주 추천
+    tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 프로필 카드, 💡 추천은 '이번 주' 카드 안
     dashStripHTML() +
     '<div class="dash">' +
       '<div class="dash-main">' +

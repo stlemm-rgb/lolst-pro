@@ -665,8 +665,18 @@ details.log-card[open] summary { margin-bottom: 12px; }
 .goal-step { color: var(--muted); }
 .goal-step.passed { color: var(--good); }
 .goal-step.now { color: var(--accent); font-weight: bold; }
-.rep-row.advice { display: flex; align-items: center; gap: 8px; }
-.rep-row.advice button { margin-left: auto; flex: none; }
+.rep-row.advice { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rep-row.advice button { flex: none; }
+.rep-tag.tip-tag { background: rgba(251, 191, 36, 0.15); color: var(--gold); }
+/* 처음이라면: 한 줄 */
+.card.tutorial.compact { padding-top: 10px; padding-bottom: 10px; }
+.tut-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tut-now { font-weight: bold; }
+.tut-btns { margin-left: auto; display: flex; gap: 6px; }
+.card.tutorial.compact .tut-steps { margin-top: 8px; }
+/* 프로필 카드 안 목표 한 줄 */
+.goal-line { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border); }
+.goal-line .goal-ladder { margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 4px; }
 ul.howto { margin: 0; padding-left: 18px; }
 ul.howto li { margin: 4px 0; font-size: 14px; }
 .salary-breakdown { white-space: pre-line; margin-top: 4px; }

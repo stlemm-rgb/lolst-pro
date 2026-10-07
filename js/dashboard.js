@@ -337,6 +337,7 @@ function profileCardHTML() {
   return (
     '<div class="card"><h2>👤 ' + escapeHTML(p.name) + ' <span class="muted small">' + p.age + "세 · " + findPosition(p.position).name + " · " + findArchetype(p.archetype).name + "</span></h2>" +
       '<div class="chips">' + traits + "</div>" +
+      goalLineHTML() + // 🎯 지금 목표 (js/guide.js)
     "</div>"
   );
 }
@@ -505,6 +506,7 @@ function thisWeekHTML() {
 
   return (
     '<div class="card upcoming"><h2>▶ 이번 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + "</span></h2>" +
+      adviceRowsHTML() + // 💡 이번 주 추천 (js/guide.js)
       trainHTML +
       matchHTML +
       ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고

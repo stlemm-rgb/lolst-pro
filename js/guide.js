@@ -30,7 +30,7 @@ function updateTutorial() {
   if (TUTORIAL_STEPS.every(function (s) { return t.done[s.check]; })) {
     t.on = false;
     t.finished = true;
-    state.notice = "🎉 처음 안내를 모두 마쳤어요! 이제 대시보드의 🎯 지금 목표와 💡 이번 주 추천을 따라가 보세요. (게임 규칙은 왼쪽 아래 ❓ 게임 방법)";
+    state.notice = "🎉 처음 안내를 모두 마쳤어요! 이제 대시보드 오른쪽 🎯 목표와 '이번 주' 카드의 💡 추천을 따라가 보세요. (게임 규칙은 왼쪽 아래 ❓ 게임 방법)";
   }
 }
 
@@ -39,6 +39,8 @@ function tutorialVisit(id) {
   if (state && state.tutorial) state.tutorial.visited[id] = true;
 }
 
+// 📘 처음이라면: 평소엔 지금 단계 한 줄만, [전체 보기 ▾]를 누르면 6단계 모두 (2026-10-07 대시보드 정리)
+let tutorialExpanded = false;
 function tutorialCardHTML() {
   const t = tutorialState();
   if (!t.on) return "";
@@ -53,8 +55,15 @@ function tutorialCardHTML() {
       (!ok ? '<div class="tut-hint' + (now ? "" : " later") + '">' + s.hint + go + "</div>" : "") + "</li>";
   }).join("");
   const doneCount = TUTORIAL_STEPS.filter(function (s) { return t.done[s.check]; }).length;
-  return '<div class="card tutorial"><h2>📘 처음이라면 <span class="muted small">' + doneCount + " / " + TUTORIAL_STEPS.length + "</span>" +
-    '<button class="small-btn tut-off" data-tutorial="off">안내 끄기</button></h2><ol class="tut-steps">' + rows + "</ol></div>";
+  const step = TUTORIAL_STEPS[current];
+  const head = '<div class="tut-line"><b>📘 처음이라면</b> <span class="muted small">' + doneCount + " / " + TUTORIAL_STEPS.length + "</span>" +
+    (step && !tutorialExpanded
+      ? ' <span class="tut-now tip" tabindex="0" data-tip="' + escapeHTML(step.hint) + '">▶ ' + step.title + "</span>" +
+        (step.go ? ' <button class="small-btn" data-tutgo="' + step.go + '">' + step.goLabel + " ▶</button>" : "")
+      : "") +
+    '<span class="tut-btns"><button class="small-btn" data-tutexpand="1">' + (tutorialExpanded ? "접기 ▴" : "전체 보기 ▾") + "</button>" +
+    '<button class="small-btn" data-tutorial="off">안내 끄기</button></span></div>';
+  return '<div class="card tutorial compact">' + head + (tutorialExpanded ? '<ol class="tut-steps">' + rows + "</ol>" : "") + "</div>";
 }
 
 // ----- 🎯 지금 목표 -----
@@ -131,22 +140,24 @@ function weekAdvice() {
   return list.slice(0, 3);
 }
 
-function guideCardHTML() {
+// 🎯 지금 목표 한 줄 (오른쪽 프로필 카드 안, js/dashboard.js) — 긴 설명은 마우스를 올리면
+function goalLineHTML() {
   const goal = currentGoal();
-  const advice = weekAdvice();
+  if (!goal) return "";
+  const ladder = GOAL_LADDER.map(function (name, i) {
+    return '<span class="goal-step' + (i < goal.step ? " passed" : i === goal.step ? " now" : "") + '">' + (i < goal.step ? "✓" : "") + name + "</span>";
+  }).join('<span class="muted">→</span>');
+  return '<div class="goal-line"><span class="tip tip-down" tabindex="0" data-tip="' + escapeHTML(goal.text) + '">🎯 <b>' + goal.title + '</b> <span class="tip-mark">ⓘ</span></span>' +
+    '<div class="goal-ladder small">' + ladder + "</div></div>";
+}
+
+// 💡 이번 주 추천 줄들 ('이번 주' 카드 맨 위, js/dashboard.js). 훈련 미선택은 바로 아래 훈련 줄에 이미 보여서 뺌
+function adviceRowsHTML() {
+  const advice = weekAdvice().filter(function (a) { return !(a.act && a.act.go === "training"); });
   adviceActions = advice.map(function (a) { return a.act; });
-  const ladder = goal ? GOAL_LADDER.map(function (name, i) {
-    return '<span class="goal-step' + (i < goal.step ? " passed" : i === goal.step ? " now" : "") + '">' + (i < goal.step ? "✓ " : "") + name + "</span>";
-  }).join('<span class="muted"> → </span>') : "";
-  const rows = advice.length ? advice.map(function (a, i) {
-    return '<div class="rep-row advice"><span>' + escapeHTML(a.text) + '</span> <button class="small-btn" data-advice="' + i + '">' + escapeHTML(a.label) + "</button></div>";
-  }).join("") : '<div class="rep-row muted">지금은 특별히 할 일이 없어요. [다음 주로 진행 ▶]을 눌러도 좋아요.</div>';
-  return (
-    '<div class="card guide">' +
-      (goal ? '<div class="goal"><h2>🎯 지금 목표: ' + goal.title + '</h2><p class="small">' + escapeHTML(goal.text) + '</p><div class="goal-ladder small">' + ladder + "</div></div>" : "") +
-      '<h2 class="sub">💡 이번 주 추천</h2>' + rows +
-    "</div>"
-  );
+  return advice.map(function (a, i) {
+    return '<div class="rep-row advice"><span class="rep-tag tip-tag">💡</span><span>' + escapeHTML(a.text) + '</span><button class="small-btn" data-advice="' + i + '">' + escapeHTML(a.label) + "</button></div>";
+  }).join("");
 }
 
 function bindGuide(page) {
@@ -169,6 +180,9 @@ function bindGuide(page) {
         renderPage();
       }
     };
+  });
+  page.querySelectorAll("[data-tutexpand]").forEach(function (btn) {
+    btn.onclick = function () { tutorialExpanded = !tutorialExpanded; renderPage(); };
   });
   page.querySelectorAll("[data-tutgo]").forEach(function (btn) {
     btn.onclick = function () { selectMenu(btn.getAttribute("data-tutgo")); };
