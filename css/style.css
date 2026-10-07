@@ -117,26 +117,37 @@ body {
 
 .placeholder { color: var(--muted); }
 
+/* 버튼: 누를 수 있는 게 한눈에 보이게 (파란 테두리 + 밝은 바탕 + 그림자, 마우스를 올리면 살짝 떠오름) */
 button {
   font: inherit;
   padding: 8px 16px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--panel-2);
-  color: var(--text);
+  border: 1px solid rgba(96, 165, 250, 0.55);
+  border-radius: 7px;
+  background: linear-gradient(180deg, #2f3c58, #26314a);
+  color: #f1f5ff;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.08s, background 0.12s, border-color 0.12s, box-shadow 0.12s;
 }
-button:disabled { opacity: 0.4; cursor: default; }
+button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #3a4b70, #2f3d5c);
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(59, 130, 246, 0.18);
+}
+button:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35); }
+button:focus-visible { outline: 2px solid #93c5fd; outline-offset: 2px; }
+button:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
 
 button.primary {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: linear-gradient(180deg, #4f8ff7, #2f6fe0);
+  border-color: #60a5fa;
   color: #fff;
   font-weight: bold;
 }
-
-button:hover:not(:disabled) { filter: brightness(1.2); }
+button.primary:hover:not(:disabled) { background: linear-gradient(180deg, #63a0ff, #3b7cf0); }
 
 /* 카드 여러 개를 나란히 (화면이 좁으면 자동 줄바꿈) */
 .grid {
@@ -199,7 +210,8 @@ input[type="text"] {
   background: var(--bg);
   color: var(--text);
 }
-button.danger { color: var(--bad); border-color: var(--bad); }
+button.danger { color: #fecaca; border-color: rgba(248, 113, 113, 0.7); background: linear-gradient(180deg, #4a2a32, #3a2229); }
+button.danger:hover:not(:disabled) { border-color: var(--bad); background: linear-gradient(180deg, #5a2f39, #47262e); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(248, 113, 113, 0.18); }
 
 /* 공통 작은 글씨 */
 .muted { color: var(--muted); }
@@ -422,7 +434,7 @@ tr.sel { outline: 1px solid var(--accent); }
 .rep-tag.train { color: var(--accent); }
 .rep-tag.rank { color: var(--gold); }
 .rep-tag.msg { color: var(--gold); }
-.small-btn { padding: 2px 10px; font-size: 13px; margin-left: 6px; }
+.small-btn { padding: 3px 11px; font-size: 13px; margin-left: 6px; }
 
 /* 대시보드: 요약 3칸 */
 .summary-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
@@ -685,7 +697,7 @@ table.calc.mastery-table td:last-child { text-align: center; }
 .tstat.hl { background: rgba(59, 130, 246, 0.22); }
 .tforecast { line-height: 1.8; margin: 4px 0; }
 .tcards .tcard { display: flex; flex-direction: column; gap: 6px; }
-.tcards .tcard button[data-plan] { margin-top: auto; align-self: flex-start; }
+.tcards .tcard button[data-plan] { margin-top: auto; align-self: stretch; }
 .tc-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
 .tc-head h2 { margin: 0 6px 0 0; }
 .tc-desc { margin: 0; }
@@ -730,3 +742,11 @@ table.calc.mastery-table td:last-child { text-align: center; }
 .tstrip.warn { border-color: var(--bad); }
 .tcards.tfirst { margin-top: 10px; }
 .tbelow { margin-top: 16px; }
+/* 훈련 카드 선택 버튼: 카드 폭 가득, 크게 */
+button.tselect { width: 100%; padding: 10px 16px; font-size: 15px; }
+button.tselect.primary { background: linear-gradient(180deg, #34d399, #10b981); border-color: #6ee7b7; color: #052e1f; }
+button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg, #4ade9f, #16c08b); }
+.trest button.tselect { width: auto; min-width: 200px; }
+/* 칩 버튼은 가볍게 (그림자 작게) */
+.cchip { box-shadow: none; font-weight: normal; padding: 3px 9px; }
+.cchip.on { background: var(--accent); color: #fff; border-color: #93c5fd; font-weight: bold; }

@@ -206,7 +206,7 @@ function trainingCardHTML(t, badges) {
     '<p class="muted small">체력 ' + signed1(exp.stamina) + (exp.ladder ? " · 솔로 랭크 " + exp.ladder + "판" : "") + "</p>" +
     (t.effects.mastery ? champChipsHTML("practice") : "") +
     (t.effects.masteryFocus ? champChipsHTML("focus") : "") +
-    '<button data-plan="' + t.id + '"' + (selected ? ' class="primary"' : "") + ">" + (selected ? "✔ 선택됨" : "이번 주 훈련으로 선택") + "</button>" +
+    '<button class="tselect' + (selected ? " primary" : "") + '" data-plan="' + t.id + '">' + (selected ? "✔ 이번 주 훈련 (선택됨)" : "▶ 이 훈련 하기") + "</button>" +
   "</div>";
 }
 
@@ -219,7 +219,7 @@ function restRowHTML(t, badges) {
     '<span class="small">체력 <b class="up">' + signed1(exp.stamina) + "</b> · 컨디션 <b class=\"up\">+" + fmt1(exp.condition) + "</b>" +
       (conditionCap() < 100 ? ' <span class="muted">(상한 ' + conditionCap() + ")</span>" : "") + (statParts.length ? " · " + statParts.join(" · ") : "") + "</span>" +
     '<span class="muted small">' + t.desc + "</span>" +
-    '<button data-plan="rest"' + (selected ? ' class="primary"' : "") + ">" + (selected ? "✔ 선택됨" : "이번 주 휴식으로 선택") + "</button></div>";
+    '<button class="tselect' + (selected ? " primary" : "") + '" data-plan="rest">' + (selected ? "✔ 이번 주 휴식 (선택됨)" : "💤 이번 주 쉬기") + "</button></div>";
 }
 
 // ----- 한눈에 비교표 -----
