@@ -177,13 +177,13 @@ function champChipsHTML(kind) {
   const meta = myPositionChampions().filter(function (n) { return isMeta(n); });
   const top = myPositionChampions().filter(function (n) { return !isMeta(n); })
     .sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 3);
-  const cur = kind === "practice" ? (state.practiceChamp || "") : focusChamp();
+  const cur = kind === "practice" ? (state.practiceChamp || "") : (focusIsAuto() ? "" : focusChamp());
   const chip = function (name, label) {
     return '<button class="cchip' + (cur === name ? " on" : "") + '" data-' + kind + '="' + escapeHTML(name) + '">' + label + "</button>";
   };
   const champLabel = function (n) { return escapeHTML(n) + metaTagHTML(n, pos) + ' <span class="muted">' + state.mastery[n] + "</span>"; };
   const others = myPositionChampions().filter(function (n) { return meta.indexOf(n) === -1 && top.indexOf(n) === -1; });
-  return '<div class="cchips">' + (kind === "practice" ? chip("", "🔄 자동") : "") +
+  return '<div class="cchips">' + (kind === "practice" ? chip("", "🔄 자동") : chip("", "🔄 자동 <span class=\"muted\">(" + escapeHTML(autoFocusChamp()) + ")</span>")) +
     meta.map(function (n) { return chip(n, champLabel(n)); }).join("") +
     top.map(function (n) { return chip(n, champLabel(n)); }).join("") +
     (others.length ? '<select class="cchip-more" data-' + kind + 'sel="1"><option value="">다른 챔피언…</option>' +

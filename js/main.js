@@ -276,7 +276,21 @@ function champOptionsHTML(selected) {
 
 // 챔피언 집중 연습: 한 명 고르기 (안 골랐으면 S급 메타)
 function focusChamp() {
-  return state.focusChamp && state.mastery[state.focusChamp] !== undefined ? state.focusChamp : mySMeta();
+  return state.focusChamp && state.mastery[state.focusChamp] !== undefined ? state.focusChamp : autoFocusChamp();
+}
+
+// 집중 연습 '자동': S급 메타 챔피언 → (숙련도 최대면) 숙련도가 가장 높은 다른 메타 챔피언(최대 미만)
+function autoFocusChamp() {
+  const s = mySMeta();
+  if ((state.mastery[s] || 0) < MASTERY.max) return s;
+  const meta = myPositionChampions().filter(function (n) { return isMeta(n) && state.mastery[n] < MASTERY.max; })
+    .sort(function (a, b) { return state.mastery[b] - state.mastery[a]; });
+  return meta[0] || s;
+}
+
+// 집중 연습을 자동으로 고른 상태인가?
+function focusIsAuto() {
+  return !(state.focusChamp && state.mastery[state.focusChamp] !== undefined);
 }
 
 // 훈련 화면은 js/training_page.js
@@ -493,7 +507,7 @@ function planBadgeHTML() {
   if (!state.plan) return '<button id="plan-badge" class="plan-badge none">🏋️ 훈련 미선택</button>';
   const t = findTraining(state.plan);
   let extra = "";
-  if (state.plan === "champ_focus") extra = " · " + focusChamp();
+  if (state.plan === "champ_focus") extra = focusIsAuto() ? " · 자동(" + focusChamp() + ")" : " · " + focusChamp();
   else if (state.plan === "champion") extra = state.practiceChamp ? " · " + state.practiceChamp : " · 자동";
   return '<button id="plan-badge" class="plan-badge tip" data-tip="[다음 주로 진행]을 누르면 할 훈련이에요. 눌러서 바꾸기">🏋️ ' + t.name + extra + "</button>";
 }

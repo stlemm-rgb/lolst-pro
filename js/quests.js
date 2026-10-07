@@ -48,6 +48,17 @@ function progressQuests(training, changes) {
       else if (state.weekReport) state.weekReport.questLines.push("📋 " + tpl.title + ": 리그 " + q.rank + "위 (목표 " + q.need + "위)");
       return;
     }
+    // 숙련도가 최대(100)가 되면 남은 횟수와 상관없이 완료
+    //   S급 메타 장악: 그 챔피언이 최대 / 주력 챔피언 만들기: 이번 주 집중 연습한 챔피언이 최대에 도달
+    const maxed = function (n) { return n && (state.mastery[n] || 0) >= MASTERY.max; };
+    const maxedNow = (tpl.kind === "metaS" && maxed(q.champ)) ||
+      (tpl.kind === "training" && tpl.training === "champ_focus" && hit &&
+        practiced.some(function (n) { return maxed(n) && changes["m:" + n] > 0; }));
+    if (maxedNow) {
+      q.maxedEarly = true;
+      done.push(q);
+      return;
+    }
     if (!hit) return;
     q.progress++;
     if (q.progress >= q.need) done.push(q);
@@ -62,7 +73,7 @@ function progressQuests(training, changes) {
     const r = applyEffects(reward, { champ: q.champ });
     state.quests.splice(state.quests.indexOf(q), 1);
     state.career.questsDone = (state.career.questsDone || 0) + 1;
-    const line = "✅ 퀘스트 완료: " + tpl.title + " → " + rewardText(q);
+    const line = "✅ 퀘스트 완료: " + tpl.title + (q.maxedEarly ? " (숙련도 " + MASTERY.max + " 달성)" : "") + " → " + rewardText(q);
     if (state.weekReport) state.weekReport.questLines.push(line);
     state.log.unshift({ when: state.year + "년 " + state.week + "주차", training: "퀘스트 완료 · " + tpl.title, message: QUEST_GIVERS[tpl.giver] + "의 과제를 끝냈다!", changes: r.changes });
     postMessage("news", "✅ 퀘스트 완료: " + tpl.title, QUEST_GIVERS[tpl.giver] + ": \"잘했다. 약속한 대로다.\"", { changes: r.changes, notes: r.notes });
@@ -109,7 +120,7 @@ function updateQuests() {
 //   training → 그 훈련 / metaS → 챔피언 집중 연습(그 S급 챔피언) / metaAny → 챔피언 연습(자동 = 메타 챔피언 위주)
 function questPlan(q) {
   const tpl = findQuest(q.id);
-  if (tpl.kind === "training") return { plan: tpl.training };
+  if (tpl.kind === "training") return tpl.training === "champ_focus" ? { plan: "champ_focus", focusChamp: "" } : { plan: tpl.training }; // 집중 연습은 챔피언 자동
   if (tpl.kind === "metaS") return { plan: "champ_focus", focusChamp: q.champ };
   if (tpl.kind === "metaAny") return { plan: "champion", practiceChamp: "" };
   if (tpl.kind === "ladderTop") return { plan: "solo_rank" };
@@ -136,6 +147,7 @@ function questPlanActive(q) {
 function questPlanLabel(q) {
   const qp = questPlan(q);
   if (!qp) return "";
+  if (qp.plan === "champ_focus" && !qp.focusChamp) return findTraining(qp.plan).name + " · 자동(" + autoFocusChamp() + ")";
   return findTraining(qp.plan).name + (qp.focusChamp ? " · " + qp.focusChamp : qp.plan === "champion" ? " · 자동(메타 위주)" : "");
 }
 
