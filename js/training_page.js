@@ -136,6 +136,19 @@ function trainForecastHTML(t, exp) {
     '<p class="muted small">평균값이에요. 실제로는 범위 안에서 무작위로 정해져요.</p></div>';
 }
 
+// 맨 위 한 줄: 지금 고른 훈련과 이번 주 예상 (자세한 건 아래 '이번 주 예상' 칸)
+function trainForecastStripHTML(t, exp) {
+  if (!t) return '<div class="tstrip">👇 이번 주 훈련을 골라 주세요. 카드의 초록 숫자 = 이번 주 예상 상승치</div>';
+  const top = Object.keys(exp.stats).filter(function (id) { return exp.stats[id] > 0.05; })
+    .map(function (id) { return statName(id) + ' <b class="up">+' + fmt1(exp.stats[id]) + "</b>"; });
+  if (exp.masteryTotal > 0.05) top.push('숙련도 <b class="up">+' + fmt1(exp.masteryTotal) + "</b>");
+  if (exp.condition) top.push('컨디션 <b class="up">+' + fmt1(exp.condition) + "</b>");
+  const after = Math.max(0, Math.min(state.staminaMax, Math.round(state.stamina + exp.stamina)));
+  return '<div class="tstrip' + (exp.tired ? " warn" : "") + '">✔ <b>' + escapeHTML(t.name) + "</b> · " + (top.join(" · ") || "스탯 변화 없음") +
+    ' · 체력 ' + state.stamina + " → <b" + (after < TIRED_LIMIT ? ' class="down"' : "") + ">" + after + "</b>" +
+    (exp.tired ? ' · <span class="down">⚠️ 지쳐서 효과 절반</span>' : "") + "</div>";
+}
+
 function trainHistoryHTML() {
   const list = (state.trainHistory || []).slice(-4);
   if (!list.length) return '<div class="card tpanel"><h2>📈 최근 4주 성장</h2><p class="muted small">훈련을 하면 여기에 쌓여요.</p></div>';
@@ -242,12 +255,14 @@ pages.training = function () {
   const statCards = TRAININGS.filter(function (t) { return t.id !== "rest" && !isChamp(t); }).map(function (t) { return trainingCardHTML(t, badges[t.id]); }).join("");
   const champCards = TRAININGS.filter(function (t) { return isChamp(t); }).map(function (t) { return trainingCardHTML(t, badges[t.id]); }).join("");
   const rest = findTraining("rest");
+  // 고르는 칸(카드)을 맨 위에: 이번 주 예상 한 줄 → 카드 → 휴식 → (아래) 내 스탯·예상·최근 4주·퀘스트 → 비교표
   return (
-    "<h1>훈련</h1>" + tired + questsHTML(false) +
-    '<div class="tpanels">' + trainStatsPanelHTML(exp) + '<div class="tpanel-col">' + trainForecastHTML(cur, exp) + trainHistoryHTML() + "</div></div>" +
-    '<div class="tcards tcards-3">' + statCards + "</div>" +
+    "<h1>훈련</h1>" + tired + trainForecastStripHTML(cur, exp) +
+    '<div class="tcards tcards-3 tfirst">' + statCards + "</div>" +
     '<div class="tcards tcards-2">' + champCards + "</div>" +
     (rest ? restRowHTML(rest, badges.rest) : "") +
+    '<div class="tpanels tbelow">' + trainStatsPanelHTML(exp) + '<div class="tpanel-col">' + trainForecastHTML(cur, exp) + trainHistoryHTML() + "</div></div>" +
+    questsHTML(false) +
     trainCompareHTML() +
     '<details class="card tmore"><summary>📉 성장 곡선 · ❓ 각 스탯이 하는 일</summary>' +
       '<p class="muted small">스탯이 높을수록 덜 올라요. ' + GROWTH_CURVE.map(function (g, i) {

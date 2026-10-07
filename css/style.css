@@ -725,3 +725,8 @@ table.calc.mastery-table td:last-child { text-align: center; }
 .tcards-2 { grid-template-columns: repeat(2, 1fr); }
 .trest { margin-top: 16px; }
 @media (max-width: 900px) { .tcards-3, .tcards-2 { grid-template-columns: 1fr; } }
+/* 훈련 화면: 맨 위 한 줄 예상, 카드가 먼저 */
+.tstrip { background: var(--panel); border: 1px solid var(--accent); border-radius: 8px; padding: 9px 14px; font-size: 14px; margin-bottom: 4px; }
+.tstrip.warn { border-color: var(--bad); }
+.tcards.tfirst { margin-top: 10px; }
+.tbelow { margin-top: 16px; }
