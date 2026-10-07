@@ -22,6 +22,15 @@
 //     ★ laneBonus: 라인전에서 이기면 팀 보너스 +n         ★ soloEasy: 솔로킬 기준이 n만큼 쉬워짐
 //     ★ teamMood: 한타 때 우리 팀 전력 +n                 ✅ lossMental: 패배 후 컨디션 하락 배율
 //     ✅ metaPenalty: 패치 후 4주 메타 페널티 +n           ✅ noMetaPenalty: 메타 페널티 없음
+//   [경기 흐름 사건] (data/match_events.js) — 숫자는 "그 사건의 주인공이 될 확률" 배율에 더함 (0.6 = ×1.6, −0.4 = ×0.6)
+//     ★ evGood: 좋은 사건 ({ all, early 초반, object 오브젝트, macro 운영, fight 한타, play 슈퍼플레이 })
+//     ★ evBad: 실수 사건 ({ all, object…, greedy 무리하다 생기는 실수 })
+//     ★ evGoodBig / evBadBig: 큰 경기에서 좋은 사건 / 실수    ★ evClutch: 승부처(풀세트 또는 경기 후반) 좋은 사건
+//     ★ evGoodBehind / evBadBehind: 세트 스코어에서 지고 있을 때 좋은 사건 / 실수   ★ evSwing: 내 사건 점수 크기 (0.3 = 1.3배, 좋은 것·나쁜 것 모두)
+//     ★ psychImmune: 위축·멘탈 흔들림·집중 견제에 안 걸림      ★ psychFragile: 위축이 더 잘 걸리고 더 크게 흔들림
+//     ★ teamCall: 우리 팀 콜 충돌 없음 + 호흡 상승 확률 ×(1+n)  ★ teamBad: 우리 팀 모두 실수 확률
+//     ★ teamStartMood: 경기 시작 때 팀 분위기 +n             ✅ signatureEv: 숙련도 1위 챔피언을 고르면 좋은 사건
+//     ★ evPower: 내 사건 점수 크기 ({ all 좋은 사건 모두, object… 분류별, bad 실수(−면 작아짐) }, 0.3 = 1.3배)
 //   [솔로 랭크]
 //     ✅ ladderGames: 랭크 판 수 (0.5 = +50%)            ✅ ladderWin: 랭크 승률 +n
 //     ✅ tilt: 랭크에서 진 판이 더 많은 주에 컨디션 −n      ✅ challengerPopularity: 챌린저인 주마다 인기도 +n
@@ -46,17 +55,22 @@ const TRAITS = [
   // ===== 좋은 특성: 챔피언 =====
   { id: "champ_lab",    type: "good", group: "챔피언", name: "챔피언 연구가", desc: "챔피언 폭 훈련 +30%, 모든 챔피언 숙련도 성장 +20%",        effects: { trainingStat: { pool: 0.3 }, masteryGrowth: 0.2 } },
   { id: "meta_reader",  type: "good", group: "챔피언", name: "메타 리더",     desc: "메타 챔피언 숙련도 성장 +40%",                           effects: { metaMastery: 0.4 } },
-  { id: "one_trick",    type: "good", group: "챔피언", name: "장인",         desc: "숙련도 1위 챔피언을 고르면 경기력 +5%",                   effects: { signature: 0.05 } },
+  { id: "one_trick",    type: "good", group: "챔피언", name: "장인",         desc: "숙련도 1위 챔피언을 고르면 경기력 +8%, 좋은 장면 ×1.5",      effects: { signature: 0.08, signatureEv: 0.5 } },
   { id: "carry_instinct", type: "good", group: "챔피언", name: "캐리 본능",   desc: "캐리형 챔피언 숙련도 성장 +30%",                         effects: { typeMastery: { carry: 0.3 } } },
   { id: "support_sense", type: "good", group: "챔피언", name: "서포트 감각",  desc: "지원형 챔피언 숙련도 성장 +30%",                         effects: { typeMastery: { utility: 0.3 } } },
   { id: "aggro_instinct", type: "good", group: "챔피언", name: "공격 본능",   desc: "공격형 챔피언 숙련도 성장 +30%",                         effects: { typeMastery: { aggro: 0.3 } } },
   { id: "macro_mind",   type: "good", group: "챔피언", name: "판짜기 달인",   desc: "운영형 챔피언 숙련도 성장 +30%",                         effects: { typeMastery: { macro: 0.3 } } },
 
   // ===== 좋은 특성: 경기 =====
-  { id: "big_stage",    type: "good", npc: true, group: "경기", name: "큰 무대 체질",  desc: "결승·플레이오프·월드 토너먼트·승강전 경기력 +6%",          effects: { bigMatch: 0.06 } },
-  { id: "clutch",       type: "good", npc: true, group: "경기", name: "클러치",        desc: "마지막 세트(풀세트) 경기력 +8%",                         effects: { clutch: 0.08 } },
-  { id: "steel_mental", type: "good", group: "경기", name: "강철 멘탈",     desc: "패배 후 컨디션 하락 절반, 비난 소식 영향 없음",            effects: { lossMental: -0.5 } },
-  { id: "born_leader",  type: "good", npc: true, group: "경기", name: "타고난 리더",   desc: "오더 훈련 효과 +30%, 한타 때 우리 팀 전력 +1.5",          effects: { trainingStat: { shotcall: 0.3 }, teamMood: 1.5 } },
+  // (2026-10-07 리뉴얼) 경기 특성은 경기 흐름 사건(슈퍼플레이·실수·심리)과 연결 — 경기 결과 타임라인에 [특성]으로 표시
+  { id: "big_stage",    type: "good", npc: true, group: "경기", name: "큰 무대 체질",  desc: "큰 경기(결승·플레이오프·월드 토너먼트·승강전)에서 좋은 장면 ×1.6, 실수 −40%, 경기력 +6%", effects: { bigMatch: 0.06, evGoodBig: 0.6, evBadBig: -0.4 } },
+  { id: "clutch",       type: "good", npc: true, group: "경기", name: "클러치",        desc: "승부처(풀세트, 경기 후반)에서 좋은 장면 ×1.9, 풀세트 경기력 +10%",   effects: { clutch: 0.1, evClutch: 0.9 } },
+  { id: "steel_mental", type: "good", npc: true, group: "경기", name: "강철 멘탈",     desc: "경기 중 위축·멘탈 흔들림·집중 견제에 안 흔들림, 지고 있을 때 좋은 장면 ×1.5, 패배 후 컨디션 하락 절반", effects: { lossMental: -0.5, psychImmune: true, evGoodBehind: 0.5 } },
+  { id: "born_leader",  type: "good", npc: true, group: "경기", name: "타고난 리더",   desc: "우리 팀 콜 충돌 없음, 팀 호흡 상승 ×2, 팀원 모두 실수 −35%, 오더 훈련 +30%", effects: { trainingStat: { shotcall: 0.3 }, teamCall: 1, teamBad: -0.35 } },
+  { id: "steal_master", type: "good", npc: true, group: "경기", name: "스틸 장인",     desc: "오브젝트 장면(바론·드래곤 스틸, 몰래 바론 등) ×2.5, 장면 크기 +40%, 오브젝트 실수 −50%", effects: { evGood: { object: 1.5 }, evBad: { object: -0.5 }, evPower: { object: 0.4 } } },
+  { id: "highlight",    type: "good", npc: true, group: "경기", name: "하이라이트 메이커", desc: "개인 슈퍼플레이(1대2, 블라인드 스킬샷, 슈퍼 세이브 등) ×3.2, 장면 크기 2배",         effects: { evGood: { play: 2.2 }, evPower: { play: 1.0 } } },
+  { id: "machine",      type: "good", npc: true, group: "경기", name: "기계 같은 정확함", desc: "실수(페이스체크, 궁 허공, 플래시 실수 등) −80%, 실수해도 피해 −60%, 정교한 슈퍼플레이 ×2",                  effects: { evBad: { all: -0.8 }, evPower: { bad: -0.6 }, evGood: { play: 1.0 } } },
+  { id: "map_reader",   type: "good", npc: true, group: "경기", name: "맵 리더",        desc: "운영 장면(뒷텔, 1-3-1, 시야 장악 후 픽 등) ×4, 장면 크기 2배, 초반 장면 ×1.8",   effects: { evGood: { macro: 3.0, early: 0.8 }, evPower: { macro: 1.0, early: 0.3 } } },
 
   // ===== 좋은 특성: 솔로 랭크·인기·돈 =====
   { id: "ladder_addict", type: "good", group: "솔로 랭크·인기·돈", name: "솔랭 중독자",  desc: "훈련 중 솔로 랭크 판 수 +50%, 랭크 승률 +5%",              effects: { ladderGames: 0.5, ladderWin: 0.05 } },
@@ -74,33 +88,34 @@ const TRAITS = [
   { id: "potential",    type: "good", group: "한계", npc: true, name: "무한한 잠재력", desc: "모든 스탯 상한선 +5",                                    effects: { statCap: { all: 5 } } },
 
   // ===== 나쁜 특성 (이벤트로만 생김, 극복 이벤트 있음) =====
-  { id: "glass_mental", type: "bad", name: "유리멘탈",     desc: "패배 후 컨디션 하락 1.5배",                          effects: { lossMental: 0.5 } },
+  { id: "glass_mental", type: "bad", npc: true, name: "유리멘탈",     desc: "패배 후 컨디션 하락 1.5배, 경기 중 위축이 잘 걸리고 크게 흔들림, 지고 있을 때 실수 ×2", effects: { lossMental: 0.5, psychFragile: 0.6, evBadBehind: 1.0 } },
   { id: "injury_prone", type: "bad", name: "부상 잦음",    desc: "손목 통증 이벤트 확률 2배",                          effects: { injuryRate: 2 } },
   { id: "lazy",         type: "bad", npc: true, name: "게으름",       desc: "모든 훈련 효과 −20%",                                effects: { trainingAll: -0.2 } },
-  { id: "stubborn",     type: "bad", name: "고집",         desc: "패치 후 4주 동안 메타 페널티 +5",                     effects: { metaPenalty: 5 } },
-  { id: "stage_fright", type: "bad", npc: true, name: "무대 공포증",  desc: "결승·플레이오프·월드 토너먼트·승강전 경기력 −6%",       effects: { bigMatch: -0.06 } },
+  { id: "stubborn",     type: "bad", name: "고집",         desc: "패치 후 4주 동안 메타 페널티 +8",                     effects: { metaPenalty: 8 } },
+  { id: "stage_fright", type: "bad", npc: true, name: "무대 공포증",  desc: "큰 경기에서 실수 ×2, 좋은 장면 −40%, 경기력 −6%",       effects: { bigMatch: -0.06, evBadBig: 1.0, evGoodBig: -0.4 } },
   { id: "scandal",      type: "bad", name: "구설수",       desc: "악성 루머 이벤트 확률 2배",                          effects: { scandalRate: 2 } },
-  { id: "inconsistent", type: "bad", npc: true, name: "기복",         desc: "세트마다 경기력이 ±10% 흔들림",                      effects: { variance: 0.1 } },
-  { id: "slow_starter", type: "bad", npc: true, name: "슬로 스타터",   desc: "시즌 초(1~12주) 경기력 −4%",                         effects: { earlyPenalty: 0.04 } },
+  { id: "inconsistent", type: "bad", npc: true, name: "기복",         desc: "모 아니면 도: 장면 크기 +30%, 좋은 장면 ×1.2지만 실수 ×2.5, 세트마다 경기력 ±10%", effects: { variance: 0.1, evSwing: 0.3, evGood: { all: 0.2 }, evBad: { all: 1.5 }, evPower: { bad: 0.3 } } },
+  { id: "slow_starter", type: "bad", npc: true, name: "슬로 스타터",   desc: "시즌 초(1~12주) 경기력 −8%",                         effects: { earlyPenalty: 0.08 } },
+  { id: "greedy",       type: "bad", npc: true, name: "과욕",         desc: "무리하다 생기는 실수(바론 버프 들고 무리, 추격하다 역전, 다이브 실패 등) ×8, 실수 크기 +50%", effects: { evBad: { greedy: 7.0 }, evPower: { bad: 0.5 } } },
   { id: "tilt",         type: "bad", name: "랭크 틸트",     desc: "솔로 랭크에서 진 판이 더 많은 주에 컨디션 −3",          effects: { tilt: 3 } },
   { id: "spender",      type: "bad", name: "낭비벽",       desc: "주급의 20%를 써 버림",                               effects: { spend: 0.2 } },
   { id: "night_owl",    type: "bad", name: "올빼미",       desc: "휴식 체력 회복 −30%",                                effects: { restBonus: -0.3 } },
 
   // ===== 칭호 (잠깐만 붙는 특성) =====
-  { id: "ladder_king", type: "title", npc: true, name: "👑 솔랭 1위", desc: "지난 랭크 시즌 리그 솔로 랭크 1위. 모든 경기 경기력 +3% (다음 랭크 초기화 때 새 1위에게 넘어감)", effects: { power: 0.03 } },
+  { id: "ladder_king", type: "title", npc: true, name: "👑 솔랭 1위", desc: "지난 랭크 시즌 리그 솔로 랭크 1위. 경기력 +3%, 좋은 장면 ×1.15 (다음 랭크 초기화 때 새 1위에게 넘어감)", effects: { power: 0.03, evGood: { all: 0.15 } } },
 
   // ===== S급 특성 (게임 중 큰 업적으로만 얻음. 다른 선수도 조건을 채우면 얻음) =====
-  { id: "s_emperor",   type: "s", npc: true, name: "황제",           desc: "모든 경기 경기력 +5%, 인기도 상승 +50%",                        effects: { power: 0.05, popularityGain: 0.5 } },
-  { id: "s_demon",     type: "s", npc: true, name: "불사대마왕",     desc: "결승·플레이오프·월드 토너먼트·승강전 경기력 +10%",              effects: { bigMatch: 0.1 } },
-  { id: "s_lane_lord", type: "s", npc: true, name: "라인 지배자",    desc: "라인전에서 이기면 팀 보너스 +2, 솔로킬 기준 3 쉬워짐",          effects: { laneBonus: 2, soloEasy: 3 } },
-  { id: "s_comeback",  type: "s", npc: true, name: "역전의 명수",    desc: "세트 스코어에서 지고 있을 때 경기력 +10%",                      effects: { comeback: 0.1 } },
+  { id: "s_emperor",   type: "s", npc: true, name: "황제",           desc: "좋은 장면 ×1.9, 장면 크기 +70%, 모든 경기 경기력 +5%, 인기도 상승 +50%",          effects: { power: 0.05, evGood: { all: 0.9 }, evPower: { all: 0.7 }, popularityGain: 0.5 } },
+  { id: "s_demon",     type: "s", npc: true, name: "불사대마왕",     desc: "큰 경기에서 좋은 장면 ×2.2, 실수 −70%, 경기력 +12%",            effects: { bigMatch: 0.12, evGoodBig: 1.2, evBadBig: -0.7 } },
+  { id: "s_lane_lord", type: "s", npc: true, name: "라인 지배자",    desc: "라인전에서 이기면 팀 보너스 +3, 솔로킬 기준 5 쉬워짐, 초반 장면 ×4(크기 3배), 슈퍼플레이 ×2", effects: { laneBonus: 3, soloEasy: 5, evGood: { early: 3.0, play: 1.0 }, evPower: { early: 2.0, play: 0.5 } } },
+  { id: "s_comeback",  type: "s", npc: true, name: "역전의 명수",    desc: "세트 스코어에서 지고 있을 때 좋은 장면 ×2.5, 경기력 +12%",           effects: { comeback: 0.12, evGoodBehind: 1.5 } },
   { id: "s_iron_will", type: "s", npc: true, name: "철의 의지",      desc: "노화로 줄어드는 양 절반, 최대 은퇴 나이 +3",                    effects: { agingCut: 0.5, maxAgeBonus: 3 } },
-  { id: "s_one_club",  type: "s", npc: true, name: "원클럽맨",       desc: "한타 때 우리 팀 전력 +3, 연봉 +30%",                           effects: { teamMood: 3, salaryBonus: 0.3 } },
+  { id: "s_one_club",  type: "s", npc: true, name: "원클럽맨",       desc: "경기 시작부터 팀 분위기 +1, 팀원 모두 실수 −15%, 한타 때 팀 전력 +3, 연봉 +30%", effects: { teamMood: 3, teamStartMood: 1, teamBad: -0.15, salaryBonus: 0.3 } },
   { id: "s_breakthrough", type: "s", npc: true, name: "한계 돌파",   desc: "모든 스탯 상한선 +5",                                          effects: { statCap: { all: 5 } } },
   { id: "s_champ_master", type: "s", name: "챔피언 마스터",          desc: "모든 챔피언 숙련도 성장 2배, 메타 페널티 없음",                effects: { masteryGrowth: 1, noMetaPenalty: true } },
   { id: "s_rank_god",  type: "s", name: "랭크의 신",                 desc: "솔로 랭크 승률 +10%, 챌린저인 주마다 인기도 +1",               effects: { ladderWin: 0.1, challengerPopularity: 1 } },
   { id: "s_weed",      type: "s", name: "잡초",                      desc: "나쁜 특성이 생기지 않음, 패배해도 컨디션이 떨어지지 않음",       effects: { badImmune: true, lossMental: -1 } },
-  { id: "s_goat",      type: "s", npc: true, name: "GOAT",           desc: "역대 최고. 모든 훈련 효과 +30%, 모든 경기력 +3%, 모든 스탯 상한선 +5", effects: { trainingAll: 0.3, power: 0.03, statCap: { all: 5 } } },
+  { id: "s_goat",      type: "s", npc: true, name: "GOAT",           desc: "역대 최고. 좋은 장면 ×1.8(크기 +60%), 실수 −60%, 모든 훈련 +30%, 경기력 +3%, 모든 스탯 상한선 +5", effects: { trainingAll: 0.3, power: 0.03, statCap: { all: 5 }, evGood: { all: 0.8 }, evBad: { all: -0.6 }, evPower: { all: 0.6, bad: -0.4 } } },
 ];
 
 // S급 특성 얻는 조건 (숫자는 바꿔도 돼요)

@@ -232,7 +232,13 @@ function playSet(a, b, userCtx, setCtx) {
   });
   // 경기 흐름: 스틸·슈퍼플레이·실수·심리 사건이 점수를 흔듦 (js/match_events.js) + 남은 작은 운
   const series = setCtx.series || newSeriesMood();
-  const ev = rollSetEvents(la, lb, a, b, laneResults, series);
+  // 장인: 숙련도 1위 챔피언을 골랐는지 (특성 사건 효과)
+  if (userCtx && typeof signatureBonus === "function" && signatureBonus(userCtx.pick) > 0) {
+    la.concat(lb).forEach(function (p) { if (p.id === USER_ID) p.sig = true; });
+  }
+  const ev = rollSetEvents(la, lb, a, b, laneResults, series, {
+    big: !!(setCtx.match && isBigMatch(setCtx.match)), deciding: !!setCtx.deciding, behind: setCtx.behind || null,
+  });
   const R = MATCH_EVENT_RULES.residual;
   const luckA = randFloat(-R, R), luckB = randFloat(-R, R);
   const avgA = average(la.map(function (p) { return p.power; })), avgB = average(lb.map(function (p) { return p.power; }));

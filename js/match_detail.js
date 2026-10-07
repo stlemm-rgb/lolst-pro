@@ -115,7 +115,7 @@ function timelineHTML(m, s) {
     return '<tr class="ev-row ev-' + side + " ev-" + (info.cat || "") + (e.p === USER_ID ? " me" : "") + '">' +
       '<td class="r muted small">' + (e.t < 10 ? "0" : "") + e.t + "분</td>" +
       '<td class="c">' + info.icon + "</td>" +
-      '<td><span class="ev-team">' + escapeHTML(teamShort(teams[e.s])) + "</span> " + matchEventText(e, nameOf) + "</td>" +
+      '<td><span class="ev-team">' + escapeHTML(teamShort(teams[e.s])) + "</span> " + matchEventText(e, nameOf) + (e.tr ? miniChips([e.tr]) : "") + "</td>" +
       '<td class="r">' + num + "</td></tr>";
   }).join("");
   return '<h2 class="sub">경기 흐름 <span class="muted small">숫자 = 그 팀 점수 ±(실수는 −) · 심리 = 이후 실수·슈퍼플레이 확률이 바뀜' +
@@ -260,7 +260,7 @@ function seriesSummaryHTML(m) {
     key.slice(0, 10).map(function (k) {
       const teams = [m.a, m.b];
       const nameOf = function (id, side, pos) { return detailName(id, teams[side], pos); };
-      return "<li>" + '<span class="muted small">' + (k.set + 1) + "세트 " + k.e.t + "분</span> " + k.info.icon + " " + matchEventText(k.e, nameOf) +
+      return "<li>" + '<span class="muted small">' + (k.set + 1) + "세트 " + k.e.t + "분</span> " + k.info.icon + " " + matchEventText(k.e, nameOf) + (k.e.tr ? miniChips([k.e.tr]) : "") +
         (k.e.x ? ' <b class="' + (k.e.x > 0 ? "up" : "down") + '">' + (k.e.x > 0 ? "+" : "−") + Math.abs(k.e.x).toFixed(0) + "</b>" : "") + "</li>";
     }).join("") + "</ul></div>" : "";
   return (

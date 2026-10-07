@@ -22,6 +22,7 @@
 //   kind: good / bad / psych · size: s / m / l · w: 자주 나오는 정도
 //   vs: 당하는 상대 — "lane"(같은 포지션) / "carry"(상대 원딜·미드 중 잘하는 쪽) / "any"(아무나) / 없음
 //   psy (psych만): { who: "self"(주인공) 또는 "team"(주인공 팀), mood: +1 자신감·호흡 / −1 위축·불안 }
+//   greedy: true → 무리하다 생기는 실수 (특성 '과욕'이면 더 잘 걸림)
 //   finisher: true → 승부가 정해진 뒤 이긴 팀에만 가끔 붙는 마무리 장면 (점수 없음)
 
 const MATCH_EVENT_RULES = {
@@ -44,6 +45,7 @@ const MATCH_EVENT_RULES = {
   moodBad: 0.2,
   moodMax: 2,
   mentalMin: 0.3,
+  clutchFrom: 28,         // 특성 '클러치': 풀세트이거나 사건 시간이 이 분 이후(경기 후반)면 승부처 (화면 시간은 실제 경기 길이로 줄어듦)
   finisherChance: 0.15,   // 이긴 팀 마무리 장면이 붙을 확률
   // 세트가 끝난 뒤 자동으로 생기는 심리 변화 (아래 AUTO_PSYCH 글자 사용)
   tiltBadCount: 2,        // 한 세트에 실수 이만큼 → 그 선수 위축
@@ -87,7 +89,7 @@ const MATCH_EVENTS = [
   { id: "smite_lose",      cat: "object", icon: "🐲", name: "스마이트 싸움 패배", kind: "bad", size: "m", w: 1.2, t: [8, 38], pos: { jungle: 1 }, stats: ["reaction"], vs: "lane", text: "{p}, 스마이트 싸움에서 {v}에게 패배" },
   { id: "obj_burst",       cat: "object", icon: "🐉", name: "오브젝트 버스트", kind: "good", size: "m", w: 1, t: [15, 38], pos: { jungle: 2, mid: 1, adc: 2 }, stats: ["macro", "teamfight"], text: "{p} 주도로 바론 순삭 (오브젝트 버스트)" },
   { id: "obj_wipe",        cat: "object", icon: "☠️", name: "오브젝트 치다 전멸", kind: "bad", size: "l", w: 0.6, t: [20, 38], pos: { jungle: 2, support: 2, mid: 1 }, stats: ["shotcall", "vision"], text: "{p}의 콜로 바론을 치다가 전멸" },
-  { id: "baron_throw",     cat: "object", icon: "☠️", name: "바론 먹고 대량 사망", kind: "bad", size: "l", w: 0.5, t: [25, 40], stats: ["focus", "mental"], text: "바론을 먹고도 {p} 앞장서다 3~4명 사망" },
+  { id: "baron_throw",     cat: "object", icon: "☠️", name: "바론 먹고 대량 사망", kind: "bad", size: "l", w: 0.5, t: [25, 40], stats: ["focus", "mental"], greedy: true, text: "바론을 먹고도 {p} 앞장서다 3~4명 사망" },
   { id: "sneaky_baron",    cat: "object", icon: "🐉", name: "몰래 바론", kind: "good", size: "m", w: 0.8, t: [22, 38], pos: { jungle: 3, support: 2, mid: 1 }, stats: ["macro", "vision"], text: "{p}의 판단으로 몰래 바론 성공" },
   { id: "sneaky_elder",    cat: "object", icon: "🐉", name: "몰래 장로", kind: "good", size: "l", w: 0.4, t: [32, 40], pos: { jungle: 3, support: 2 }, stats: ["macro", "vision"], text: "{p}의 판단으로 몰래 장로 성공" },
   { id: "obj_fake",        cat: "object", icon: "🎭", name: "오브젝트 페이크 매복", kind: "good", size: "m", w: 0.8, t: [15, 36], pos: { support: 3, jungle: 3, mid: 1 }, stats: ["shotcall", "vision"], text: "{p}의 오브젝트 페이크, 매복 성공" },
@@ -143,11 +145,11 @@ const MATCH_EVENTS = [
   { id: "ult_whiff",       cat: "mistake", icon: "❌", name: "궁극기 허공", kind: "bad", size: "m", w: 1, t: [12, 40], stats: ["accuracy", "focus"], text: "{p}, 궁극기를 허공에 사용" },
   { id: "no_smite",        cat: "mistake", icon: "🐲", name: "스마이트 없음", kind: "bad", size: "m", w: 0.6, t: [15, 40], pos: { jungle: 1 }, stats: ["focus", "macro"], text: "오브젝트 싸움인데 {p}의 스마이트가 없음" },
   { id: "recall_miss",     cat: "mistake", icon: "😵", name: "귀환 타이밍 실수", kind: "bad", size: "s", w: 1, t: [8, 36], stats: ["macro"], text: "{p}의 귀환 타이밍 실수, 한타 합류 실패" },
-  { id: "baron_overstay",  cat: "mistake", icon: "💀", name: "바론 버프 들고 무리", kind: "bad", size: "m", w: 0.8, t: [25, 40], stats: ["focus", "mental"], text: "{p}, 바론 버프를 믿고 무리하다 사망" },
-  { id: "bounty",          cat: "mistake", icon: "💰", name: "현상금 헌납", kind: "bad", size: "m", w: 0.8, t: [18, 38], pos: { adc: 2, mid: 2, top: 2 }, stats: ["focus", "vision"], text: "{p}, 쌓인 현상금을 헌납" },
-  { id: "invade_fail",     cat: "mistake", icon: "💀", name: "정글 침범하다 사망", kind: "bad", size: "s", w: 1, t: [6, 30], pos: { jungle: 3, support: 1, mid: 1 }, stats: ["vision", "macro"], text: "{p}, 상대 정글에 들어갔다가 역으로 사망" },
-  { id: "dive_fail",       cat: "mistake", icon: "💀", name: "다이브 실패", kind: "bad", size: "m", w: 0.8, t: [6, 30], pos: { jungle: 3, top: 2, support: 1 }, stats: ["shotcall", "macro"], text: "{p} 주도 다이브 실패, 2명 사망" },
-  { id: "chase_reverse",   cat: "mistake", icon: "😵", name: "추격하다 역전당함", kind: "bad", size: "s", w: 1, t: [8, 40], stats: ["focus", "mental"], text: "{p}, 무리하게 쫓다가 역으로 당함" },
+  { id: "baron_overstay",  cat: "mistake", icon: "💀", name: "바론 버프 들고 무리", kind: "bad", size: "m", w: 0.8, t: [25, 40], stats: ["focus", "mental"], greedy: true, text: "{p}, 바론 버프를 믿고 무리하다 사망" },
+  { id: "bounty",          cat: "mistake", icon: "💰", name: "현상금 헌납", kind: "bad", size: "m", w: 0.8, t: [18, 38], pos: { adc: 2, mid: 2, top: 2 }, stats: ["focus", "vision"], greedy: true, text: "{p}, 쌓인 현상금을 헌납" },
+  { id: "invade_fail",     cat: "mistake", icon: "💀", name: "정글 침범하다 사망", kind: "bad", size: "s", w: 1, t: [6, 30], pos: { jungle: 3, support: 1, mid: 1 }, stats: ["vision", "macro"], greedy: true, text: "{p}, 상대 정글에 들어갔다가 역으로 사망" },
+  { id: "dive_fail",       cat: "mistake", icon: "💀", name: "다이브 실패", kind: "bad", size: "m", w: 0.8, t: [6, 30], pos: { jungle: 3, top: 2, support: 1 }, stats: ["shotcall", "macro"], greedy: true, text: "{p} 주도 다이브 실패, 2명 사망" },
+  { id: "chase_reverse",   cat: "mistake", icon: "😵", name: "추격하다 역전당함", kind: "bad", size: "s", w: 1, t: [8, 40], stats: ["focus", "mental"], greedy: true, text: "{p}, 무리하게 쫓다가 역으로 당함" },
 
   // ----- 7. 심리·팀 상태 (점수 대신 다음 판단·한타·실수 확률이 바뀜) -----
   { id: "call_clash",      cat: "psych", icon: "🗯️", name: "팀 콜 충돌", kind: "psych", size: "s", w: 1, t: [12, 36], stats: ["shotcall"], low: true, psy: { who: "team", mood: -1 }, text: "{p}의 팀, 콜이 엇갈리며 우왕좌왕" },
