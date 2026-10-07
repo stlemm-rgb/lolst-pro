@@ -55,11 +55,12 @@ function grantSTrait(id, traitId) {
   }
 }
 
-// 상한선에 닿은 스탯 개수
+// 한계 돌파 기준(S_TRAIT_RULES의 atLeast, 없으면 상한선)에 닿은 스탯 개수
 function statsAtCap(id) {
   const stats = id === USER_ID ? state.stats : findPlayer(id).stats;
   const tr = traitsOf(id);
-  return STATS.filter(function (s) { return stats[s.id] >= statCapOf(tr, s.id); }).length;
+  const need = (sRule("s_breakthrough") || {}).atLeast;
+  return STATS.filter(function (s) { return stats[s.id] >= (need || statCapOf(tr, s.id)); }).length;
 }
 
 // ----- 기록 시점마다 부르는 확인 -----
@@ -122,7 +123,7 @@ function sTraitsOnSeasonEnd() {
       // 라인 지배자: 한 시즌 솔로킬
       const st = stats[id];
       if (st && st.solo >= sRule("s_lane_lord").solo) grantSTrait(id, "s_lane_lord");
-      // 한계 돌파: 상한선에 닿은 스탯
+      // 한계 돌파: 95 이상 스탯
       if (statsAtCap(id) >= sRule("s_breakthrough").atCap) grantSTrait(id, "s_breakthrough");
     });
   });

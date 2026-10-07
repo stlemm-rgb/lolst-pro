@@ -107,7 +107,7 @@ function playerAbilityHTML() {
   const c = state.career;
   const info = playerInfo(USER_ID);
   const bars = STATS.map(function (s) {
-    return barHTML(s.name, state.stats[s.id], s.desc + " (상한선 " + userStatCap(s.id) + ") · " + (s.roles || []).join(" · "), isBonusStat(s.id), userStatCap(s.id));
+    return barHTML(s.name, state.stats[s.id], s.desc + " · " + (s.roles || []).join(" · "), isBonusStat(s.id), userStatCap(s.id));
   }).join("");
   // 변화: 데뷔 · 시즌 시작 · 4주 전 → 지금
   const log = c.statLog || [];
@@ -129,7 +129,7 @@ function playerAbilityHTML() {
     "</div>";
   const scoreCard = '<div class="card"><h2>시즌별 종합 능력</h2>' + careerRecordParts().scoreBars + "</div>";
   return (
-    '<div class="card"><h2>스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점 · 숫자/상한선</span></h2>' +
+    '<div class="card"><h2>스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점 · 최대 100</span></h2>' +
       posScoresHTML(USER_ID, info) + strengthLineHTML(info) +
       '<div class="stat-columns">' + bars + "</div>" +
       statGuideHTML(state.player.position) +
@@ -206,7 +206,7 @@ function sTraitProgressHTML() {
       case "s_lane_lord":    return { cur: season.solo || 0, max: r.solo, unit: "솔로킬 (이번 시즌)" };
       case "s_comeback":     return { cur: rec.reverseSweeps || 0, max: r.reverseSweeps, unit: "번 역전" };
       case "s_one_club":     return { cur: rec.clubTeam === myTeam().id ? rec.clubYears || 0 : 0, max: r.seasons, unit: "시즌 (지금 팀, 시즌이 끝날 때 셈)" };
-      case "s_breakthrough": return { cur: statsAtCap(USER_ID), max: r.atCap, unit: "개 상한선" };
+      case "s_breakthrough": return { cur: statsAtCap(USER_ID), max: r.atCap, unit: "개 " + (r.atLeast || STAT_CAP) + " 이상" };
       case "s_champ_master": return { cur: mastered, max: r.mastered, unit: "명 숙련도 100" };
       case "s_rank_god":     return { cur: state.soloRank ? state.soloRank.peak : 0, max: r.ladder, unit: "점 (역대 최고)" };
       case "s_goat":         return { cur: sCount, max: r.sCount, unit: "개 S급 특성" };
@@ -273,7 +273,7 @@ function playerGrowthHTML() {
     const pos = isBonusStat(s.id) ? POSITION_BONUS.trainingBonus : 0;
     const shop = shopEffectSum("trainingAll") + shopEffectKey("trainingStat", s.id);
     const sum = a + t + pos + shop + dorm;
-    const gm = growthMultiplier(state.stats[s.id]);
+    const gm = growthMultiplier(state.stats[s.id], tr, s.id);
     const ag = agingTrainingMultiplier(s.id);
     const real = Math.max(0, 1 + sum) * gm * ag;
     return "<tr><td" + (isBonusStat(s.id) ? ' class="bonus"' : "") + ">" + (isBonusStat(s.id) ? "★ " : "") + s.name + "</td>" +
@@ -282,7 +282,7 @@ function playerGrowthHTML() {
       '<td class="r"><b>×' + real.toFixed(2) + "</b></td></tr>";
   }).join("");
   const trainCard =
-    '<div class="card"><h2>훈련 효과 <span class="muted small">스탯이 오를 때 곱해지는 값 · 실제 배율 = (1 + 보너스 합계) × 높은 스탯 감소 × 노화</span></h2>' +
+    '<div class="card"><h2>훈련 효과 <span class="muted small">스탯이 오를 때 곱해지는 값 · 실제 배율 = (1 + 보너스 합계) × 높은 스탯 감소(한계 특성 포함) × 노화</span></h2>' +
       '<div class="table-wrap"><table class="roster growth-table"><tr><th>스탯</th><th class="r">시작 유형</th><th class="r">특성</th><th class="r">포지션★</th><th class="r">장비·고용</th><th class="r">합숙</th><th class="r">보너스 합계</th>' +
         '<th class="r">높은 스탯 감소</th><th class="r">노화</th><th class="r">실제 배율</th></tr>' + rows + "</table></div>" +
       '<p class="muted small">높은 스탯 감소: 스탯이 높을수록 덜 올라요. 노화: ' + agingStartAge() + "세부터 반응속도·입력 정확도만 덜 올라요. 체력이 20 아래면 이 값이 다시 절반이 돼요.</p>" +

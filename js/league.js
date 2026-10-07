@@ -427,10 +427,10 @@ function newSeasonLeague() {
     STATS.forEach(function (s) {
       let d = randInt(rule.change[0], rule.change[1]);
       const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +50%
-      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id]) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + styleGrowthBias(p, s.id)));
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id], tr, s.id) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + styleGrowthBias(p, s.id)));
       else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
       const before = p.stats[s.id];
-      p.stats[s.id] = Math.max(1, capRise(before, Math.min(99, before + d), statCapOf(tr, s.id)));
+      p.stats[s.id] = Math.max(1, capRise(before, Math.min(100, before + d), statCapOf(tr, s.id)));
     });
     const retireAge = LEAGUE.retireFromAge + traitSumOf(tr, "agingDelay") + traitSumOf(tr, "maxAgeBonus");
     if (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear) {

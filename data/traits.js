@@ -9,7 +9,8 @@
 // - effects: 실제 효과 (모두 적용됨. ★ = 다른 선수에게도 적용)
 //   [훈련]
 //     ★ trainingAll: 모든 훈련 효과 (0.2 = +20%)      ★ trainingStat: 특정 스탯 훈련 효과 ({ laning: 0.3 })  (NPC는 시즌 성장에 적용)
-//     ★ statCap: 스탯 상한선 +n ({ reaction: 10 } 또는 { all: 5 }). 기본 상한은 data/growth.js의 STAT_CAP
+//     ★ topGrowth: 85 이상 스탯의 성장 배율 ({ reaction: 1 } 또는 { all: 0.5 }, 1 = ×2). 시작 값은 data/growth.js의 TOP_GROWTH_FROM
+//       (예전 statCap(상한선 +n)은 2026-10-07에 상한 100 통일로 없앰. 코드는 남아 있어서 써도 100을 넘지는 않음)
 //     ✅ staminaCost: 훈련·경기 체력 소모 (-0.25 = 25% 덜)  ✅ restBonus: 휴식 체력 회복 (0.5 = +50%)
 //     ✅ staminaRegen: 매주 체력 자연 회복 (+n)
 //   [챔피언]
@@ -80,13 +81,13 @@ const TRAITS = [
   { id: "negotiator",   type: "good", group: "솔로 랭크·인기·돈", name: "협상가",        desc: "계약 협상 성공률 +20%, 연봉 +10%",                        effects: { negotiate: 0.2, salaryBonus: 0.1 } },
   { id: "late_bloomer", type: "good", npc: true, group: "솔로 랭크·인기·돈", name: "늦게 피는 꽃",  desc: "노화가 2년 늦게 시작 (29세부터)",                       effects: { agingDelay: 2 } },
 
-  // ===== 좋은 특성: 한계 (스탯 상한선을 올림) =====
-  { id: "god_hands",    type: "good", group: "한계", npc: true, name: "신의 손",       desc: "반응속도·입력 정확도 상한선 +10",                        effects: { statCap: { reaction: 10, accuracy: 10 } } },
-  { id: "tactician",    type: "good", group: "한계", npc: true, name: "전술 두뇌",     desc: "운영·시야·오더 상한선 +10",                              effects: { statCap: { macro: 10, vision: 10, shotcall: 10 } } },
-  { id: "battle_sense", type: "good", group: "한계", npc: true, name: "전장의 감각",   desc: "한타·거리 조절 상한선 +10",                              effects: { statCap: { teamfight: 10, spacing: 10 } } },
-  { id: "lane_king",    type: "good", group: "한계", npc: true, name: "라인의 왕",     desc: "라인전·챔피언 폭 상한선 +10",                            effects: { statCap: { laning: 10, pool: 10 } } },
-  { id: "iron_heart",   type: "good", group: "한계", npc: true, name: "강심장",        desc: "멘탈·집중력·적응력 상한선 +10",                          effects: { statCap: { mental: 10, focus: 10, adapt: 10 } } },
-  { id: "potential",    type: "good", group: "한계", npc: true, name: "무한한 잠재력", desc: "모든 스탯 상한선 +5",                                    effects: { statCap: { all: 5 } } },
+  // ===== 좋은 특성: 한계 (85 이상 높은 구간에서 더 잘 오름) =====
+  { id: "god_hands",    type: "good", group: "한계", npc: true, name: "신의 손",       desc: "반응속도·입력 정확도가 85 이상일 때 성장 ×2",            effects: { topGrowth: { reaction: 1, accuracy: 1 } } },
+  { id: "tactician",    type: "good", group: "한계", npc: true, name: "전술 두뇌",     desc: "운영·시야·오더가 85 이상일 때 성장 ×2",                  effects: { topGrowth: { macro: 1, vision: 1, shotcall: 1 } } },
+  { id: "battle_sense", type: "good", group: "한계", npc: true, name: "전장의 감각",   desc: "한타·거리 조절이 85 이상일 때 성장 ×2",                  effects: { topGrowth: { teamfight: 1, spacing: 1 } } },
+  { id: "lane_king",    type: "good", group: "한계", npc: true, name: "라인의 왕",     desc: "라인전·챔피언 폭이 85 이상일 때 성장 ×2",                effects: { topGrowth: { laning: 1, pool: 1 } } },
+  { id: "iron_heart",   type: "good", group: "한계", npc: true, name: "강심장",        desc: "멘탈·집중력·적응력이 85 이상일 때 성장 ×2",              effects: { topGrowth: { mental: 1, focus: 1, adapt: 1 } } },
+  { id: "potential",    type: "good", group: "한계", npc: true, name: "무한한 잠재력", desc: "모든 스탯이 85 이상일 때 성장 ×1.5",                     effects: { topGrowth: { all: 0.5 } } },
 
   // ===== 나쁜 특성 (이벤트로만 생김, 극복 이벤트 있음) =====
   { id: "glass_mental", type: "bad", npc: true, name: "유리멘탈",     desc: "패배 후 컨디션 하락 1.5배, 경기 중 위축이 잘 걸리고 크게 흔들림, 지고 있을 때 실수 ×2", effects: { lossMental: 0.5, psychFragile: 0.6, evBadBehind: 1.0 } },
@@ -115,11 +116,11 @@ const TRAITS = [
   { id: "s_comeback",  type: "s", npc: true, name: "역전의 명수",    desc: "세트 스코어에서 지고 있을 때 좋은 장면 ×2.5, 경기력 +12%",           effects: { comeback: 0.12, evGoodBehind: 1.5 } },
   { id: "s_iron_will", type: "s", npc: true, name: "철의 의지",      desc: "노화로 줄어드는 양 절반, 최대 은퇴 나이 +3",                    effects: { agingCut: 0.5, maxAgeBonus: 3 } },
   { id: "s_one_club",  type: "s", npc: true, name: "원클럽맨",       desc: "경기 시작부터 팀 분위기 +1, 팀원 모두 실수 −15%, 한타 때 팀 전력 +3, 연봉 +30%", effects: { teamMood: 3, teamStartMood: 1, teamBad: -0.15, salaryBonus: 0.3 } },
-  { id: "s_breakthrough", type: "s", npc: true, name: "한계 돌파",   desc: "모든 스탯 상한선 +5",                                          effects: { statCap: { all: 5 } } },
+  { id: "s_breakthrough", type: "s", npc: true, name: "한계 돌파",   desc: "85 이상 스탯 성장 ×2, 노화로 줄어드는 양 −30%",                effects: { topGrowth: { all: 1 }, agingCut: 0.3 } },
   { id: "s_champ_master", type: "s", name: "챔피언 마스터",          desc: "모든 챔피언 숙련도 성장 2배, 메타 페널티 없음",                effects: { masteryGrowth: 1, noMetaPenalty: true } },
   { id: "s_rank_god",  type: "s", name: "랭크의 신",                 desc: "솔로 랭크 승률 +10%, 챌린저인 주마다 인기도 +1",               effects: { ladderWin: 0.1, challengerPopularity: 1 } },
   { id: "s_weed",      type: "s", name: "잡초",                      desc: "나쁜 특성이 생기지 않음, 패배해도 컨디션이 떨어지지 않음",       effects: { badImmune: true, lossMental: -1 } },
-  { id: "s_goat",      type: "s", npc: true, name: "GOAT",           desc: "역대 최고. 좋은 장면 ×1.8(크기 +60%), 실수 −60%, 모든 훈련 +30%, 경기력 +3%, 모든 스탯 상한선 +5", effects: { trainingAll: 0.3, power: 0.03, statCap: { all: 5 }, evGood: { all: 0.8 }, evBad: { all: -0.6 }, evPower: { all: 0.6, bad: -0.4 } } },
+  { id: "s_goat",      type: "s", npc: true, name: "GOAT",           desc: "역대 최고. 좋은 장면 ×1.8(크기 +60%), 실수 −60%, 모든 훈련 +30%, 경기력 +3%, 85 이상 스탯 성장 ×1.5", effects: { trainingAll: 0.3, power: 0.03, topGrowth: { all: 0.5 }, evGood: { all: 0.8 }, evBad: { all: -0.6 }, evPower: { all: 0.6, bad: -0.4 } } },
 ];
 
 // S급 특성 얻는 조건 (숫자는 바꿔도 돼요)
@@ -131,7 +132,7 @@ const S_TRAIT_RULES = [
   { trait: "s_comeback",     who: "all",  text: "5판 경기에서 0:2를 3:2로 뒤집기 2번",            reverseSweeps: 2 },
   { trait: "s_iron_will",    who: "all",  text: "30세 이후 정규 시즌 MVP",                      age: 30 },
   { trait: "s_one_club",     who: "all",  text: "한 팀에서 1부 주전으로 8시즌 (다른 팀으로 가면 처음부터)", seasons: 8 },
-  { trait: "s_breakthrough", who: "all",  text: "스탯 6개가 상한선에 닿기",                     atCap: 6 },
+  { trait: "s_breakthrough", who: "all",  text: "스탯 6개를 95 이상으로",                       atCap: 6, atLeast: 95 },
   { trait: "s_champ_master", who: "user", text: "숙련도 100인 챔피언 10명",                     mastered: 10 },
   { trait: "s_rank_god",     who: "user", text: "솔로 랭크 3,500점 달성",                       ladder: 3500 },
   { trait: "s_weed",         who: "user", text: "2군(후보)에 내려간 시즌에 우승" },

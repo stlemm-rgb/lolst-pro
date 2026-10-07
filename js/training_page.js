@@ -21,7 +21,7 @@ function trainingExpect(t) {
     if (state.stats[id] !== undefined) {
       if (r[1] <= 0) { out.stats[id] = avg(r); return; }
       const cur = state.stats[id];
-      const g = avg(r) * (1 + trainingBonusFor(id)) * growthMultiplier(cur) * agingTrainingMultiplier(id) * half;
+      const g = avg(r) * (1 + trainingBonusFor(id)) * growthMultiplier(cur, state.player.traits, id) * agingTrainingMultiplier(id) * half;
       out.stats[id] = Math.max(0, Math.min(g, userStatCap(id) - cur));
     } else if (id === "stamina") {
       out.stamina = r[0] < 0 ? avg(r) * staminaCostMultiplier() : avg(r) * (1 + traitEffectSum("restBonus"));

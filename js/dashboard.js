@@ -371,10 +371,10 @@ function championCardHTML() {
 function statsCardHTML() {
   let statsHTML = "";
   STATS.forEach(function (s) {
-    statsHTML += barHTML(s.name, state.stats[s.id], s.desc + " (상한선 " + userStatCap(s.id) + ") · " + (s.roles || []).join(" · "), isBonusStat(s.id), userStatCap(s.id)); // 값/상한선
+    statsHTML += barHTML(s.name, state.stats[s.id], s.desc + " · " + (s.roles || []).join(" · "), isBonusStat(s.id), userStatCap(s.id)); // 값/상한선
   });
   return (
-    '<div class="card"><h2>📊 내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점 · 숫자/상한선</span></h2>' +
+    '<div class="card"><h2>📊 내 스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점 · 최대 100</span></h2>' +
       '<div class="stat-columns">' + statsHTML + "</div>" +
       statGuideHTML(state.player.position) +
       '<h2 class="sub">유형 스탯 <span class="muted small">높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)</span></h2>' +

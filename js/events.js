@@ -81,7 +81,8 @@ function applyEffects(eff, ctx) {
     let before;
     if (state.stats[key] !== undefined) {
       before = state.stats[key];
-      state.stats[key] = capRise(before, clamp(before + v), userStatCap(key)); // 상한선에서 멈춤
+      const gain = v > 0 ? roundRandom(v * rewardMultiplier(before, state.player.traits, key)) : v; // 높은 스탯은 보상도 덜 오름
+      state.stats[key] = capRise(before, clamp(before + gain), userStatCap(key)); // 상한선에서 멈춤
       add(key, state.stats[key] - before);
     } else if (key === "stamina") {
       before = state.stamina;

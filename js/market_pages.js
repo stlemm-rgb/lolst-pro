@@ -92,7 +92,7 @@ function playerDetailHTML(id) {
   const bonus = findPosition(p.pos).bonus;
   const bars = STATS.map(function (s) {
     const cap = statCapOf(traitsOf(id), s.id);
-    return barHTML(s.name, p.stats[s.id], s.desc + " (상한선 " + cap + ")", bonus.indexOf(s.id) !== -1, cap);
+    return barHTML(s.name, p.stats[s.id], s.desc + (cap < 100 ? " (상한선 " + cap + ")" : ""), bonus.indexOf(s.id) !== -1, cap);
   }).join("");
   const team = p.teamId ? findTeam(p.teamId) : null;
   const traits = traitsOf(id);
@@ -105,7 +105,6 @@ function playerDetailHTML(id) {
       strengthLineHTML(p) +
       champLineHTML(id) +
       '<div class="stat-columns">' + bars + "</div>" +
-      '<p class="muted small">숫자 옆 /값은 스탯 상한선이에요.</p>' +
     "</div>"
   );
 }

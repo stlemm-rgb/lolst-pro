@@ -127,9 +127,23 @@ function traitChipsMini(id) {
 }
 
 // 성장 곡선 배율: 스탯이 높을수록 덜 오름 (data/growth.js)
-function growthMultiplier(value) {
+// traits·statId를 주면 한계 특성의 '85 이상 성장 ×n'(topGrowth)까지 넣어요
+function growthMultiplier(value, traits, statId) {
   const row = GROWTH_CURVE.find(function (g) { return value < g.upTo; });
-  return row ? row.mult : GROWTH_CURVE[GROWTH_CURVE.length - 1].mult;
+  const base = row ? row.mult : GROWTH_CURVE[GROWTH_CURVE.length - 1].mult;
+  return base * topGrowthMultiplier(value, traits, statId);
+}
+
+// 퀘스트·이벤트 스탯 보상 배율 (높은 스탯일수록 덜 오름, data/growth.js REWARD_CURVE)
+function rewardMultiplier(value, traits, statId) {
+  const row = REWARD_CURVE.find(function (r) { return value >= r.from; });
+  return row ? Math.min(1, row.mult * topGrowthMultiplier(value, traits, statId)) : 1;
+}
+
+// 한계 특성: 스탯이 TOP_GROWTH_FROM(85) 이상이면 성장 ×(1 + topGrowth)
+function topGrowthMultiplier(value, traits, statId) {
+  if (!traits || value < TOP_GROWTH_FROM) return 1;
+  return 1 + traitKeyOf(traits, "topGrowth", statId) + traitKeyOf(traits, "topGrowth", "all");
 }
 
 // 내 특성 효과 중 { 키: 값 } 모양(예: typeMastery: { carry: 0.3 })에서 한 키의 합
