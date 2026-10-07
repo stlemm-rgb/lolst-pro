@@ -9,6 +9,7 @@
 //     {pos}   내 포지션 (탑·정글·미드·원딜·서포트)
 //     {champ} 챔피언 이름          (patch: 이번 패치 내 포지션 S급 메타 챔피언)
 //     {cup}   우승한 대회 이름      (champion에서만)
+//     {streak} 연승·연패 수 (winStreak·streakBreak에서만) · {oldteam} 전 소속팀 (transfer에서만) · {award} 상 이름 (award에서만)
 // - 글 안에 큰따옴표(")는 쓰지 말고, 필요하면 작은따옴표(')나 「」를 써요
 // - 욕설·실존 인물 비방은 빼 주세요
 //
@@ -32,6 +33,18 @@
 //   rookie    내 선수가 18세 이하일 때
 //   veteran   내 선수가 29세 이상일 때
 //   general   아무 때나 (분위기용)
+//   [커리어·경기 사건] (2026-10-07 추가)
+//   winStreak   이번 주 이겨서 3연승 이상          {streak} = 연승 수 (숫자만, 예: '{streak}연승')
+//   streakBreak 3연패 이상 하다가 이번 주에 이김    {streak} = 끊은 연패 수
+//   superPlay   이번 주 경기에서 내 선수가 슈퍼플레이(큰 활약 장면)
+//   blunder     이번 주 경기에서 내 선수가 큰 실수
+//   promoted    우리 팀이 2부 → 1부 승격           relegated  1부 → 2부 강등
+//   benchReturn 2군에 있다가 주전으로 복귀
+//   transfer    내 선수가 다른 팀으로 이적          {team} = 새 팀, {oldteam} = 전 소속팀
+//   renewal     지금 팀과 재계약
+//   award       개인상 수상 (시즌 MVP·올프로·신인왕·결승 MVP 등)  {award} = 상 이름
+//   ladderTop   리그 솔로 랭크 1위 달성 / 👑 솔랭 1위 칭호
+//   streaming   개인 방송 중 (가끔)               sponsor  스폰서 계약 중 (가끔)
 //
 // ■ 글쓴이: 반은 리그의 다른 선수(@선수이름, 글은 data/social_posts_pro.js), 반은 아래 SOCIAL_FAN_NAMES 중 하나 + 숫자 (이 파일의 글)
 //
@@ -421,6 +434,46 @@ const SOCIAL_POSTS = {
     "쉴 땐 확실히 쉬는 게 프로지! 맛집 투어나 다녀와라",
     "{name} 휴가 끝나면 폼 더 좋아져서 오겠네 기대된다",
   ],
+  // ----- 커리어·경기 사건 (2026-10-07 추가, 다른 AI로 보충 예정) -----
+  winStreak: [
+    "{team} 벌써 {streak}연승 ㄷㄷ 이 팀 막을 사람 있냐",
+  ],
+  streakBreak: [
+    "드디어 이겼다 ㅠㅠ {streak}연패 끊었다 {team} 수고했다",
+  ],
+  superPlay: [
+    "방금 {name} 플레이 뭐냐 ㄷㄷ 클립 각이다",
+  ],
+  blunder: [
+    "{name} 오늘 그 장면은 좀 아쉽다… 다음엔 잘하자",
+  ],
+  promoted: [
+    "{team} 1부 승격 축하한다!! 이제 진짜 시작이다",
+  ],
+  relegated: [
+    "{team} 강등이라니 ㅠㅠ 내년에 바로 올라오자",
+  ],
+  benchReturn: [
+    "{name} 주전 복귀 ㅠㅠ 기다렸다",
+  ],
+  transfer: [
+    "{name} {oldteam} 떠나서 {team} 간다고? 대박",
+  ],
+  renewal: [
+    "{name} {team} 재계약 오피셜 떴다 ㅠㅠ 의리 미쳤다",
+  ],
+  award: [
+    "{name} {award} 축하해!! 받을 자격 충분하다",
+  ],
+  ladderTop: [
+    "{name} 솔랭 1위 찍었네 ㄷㄷ 손이 살아있다",
+  ],
+  streaming: [
+    "{name} 방송 오늘도 꿀잼 ㅋㅋ 채팅 반응 미쳤음",
+  ],
+  sponsor: [
+    "{name} 광고 또 나왔네 ㅋㅋ 이제 완전 스타다",
+  ],
   general: [
     "요즘 솔랭에서 {name} 만났는데 진짜 잘하더라",
     "이번 패치 메타 너무 어렵다",
@@ -462,11 +515,14 @@ const SOCIAL_RULES = {
   //   언급 가능 비율 = minRate + (1 − minRate) × 인기도 ÷ fullAt  (fullAt 이상이면 100% = 글 목록 그대로)
   //   2부 리그면 프로 선수 글은 여기에 × tier2ProFactor (2부 선수는 다른 프로들이 잘 모름)
   //   always 분류는 크게 활약한 주라서 인기도와 상관없이 그대로
-  mention: { minRate: 0.1, fullAt: 70, tier2ProFactor: 0.4, always: ["pog", "soloKill", "champion"] },
+  mention: { minRate: 0.1, fullAt: 70, tier2ProFactor: 0.4, always: ["pog", "soloKill", "champion", "superPlay", "transfer", "award", "ladderTop"] },
   // 분류별로 글이 올라올 확률 (경기 결과 글은 경기가 있으면 항상 1개). training = train_ 분류 모두
   chance: {
     pog: 0.6, training: 0.4,
     soloKill: 0.6, loseStreak: 0.7, champion: 1, patch: 0.5,
     benched: 0.3, popular: 0.2, rookie: 0.15, veteran: 0.15, general: 0.3,
+    // 2026-10-07 추가
+    winStreak: 0.6, streakBreak: 0.8, superPlay: 0.6, blunder: 0.4, promoted: 1, relegated: 1,
+    benchReturn: 0.8, transfer: 1, renewal: 0.7, award: 1, ladderTop: 0.8, streaming: 0.15, sponsor: 0.1,
   },
 };

@@ -185,6 +185,10 @@ button.primary:hover:not(:disabled) { background: linear-gradient(180deg, #63a0f
   margin-bottom: 16px;
 }
 
+.notice-go { display: block; cursor: pointer; }
+.notice-go b { color: var(--accent); white-space: nowrap; }
+.notice:has(.notice-go):hover { border-color: var(--accent); }
+
 /* 주간 기록 */
 .log-entry { padding: 10px 0; border-bottom: 1px solid var(--border); }
 .log-entry:last-child { border-bottom: none; }

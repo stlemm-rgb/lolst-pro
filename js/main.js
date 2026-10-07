@@ -548,6 +548,11 @@ function renderPage() {
   page.innerHTML = html;
   linkifyNames(page); // 선수·구단 이름을 누르면 선수 검색·구단 탐색으로 (js/links.js)
   maybeShowNews(); // 대회 결과 뉴스 팝업 (js/news_popup.js)
+  // 안내 문구에서 SNS로 바로 가기 (예: 선수 SNS 언급 알림 → 💬 선수 SNS 탭)
+  page.querySelectorAll("[data-gosns]").forEach(function (el) {
+    el.onclick = function () { snsTab = el.getAttribute("data-gosns"); openMsgId = null; selectMenu("sns"); };
+    el.onkeydown = function (e) { if (e.key === "Enter") el.onclick(); };
+  });
   page.querySelectorAll("[data-subtab]").forEach(function (btn) {
     btn.onclick = function () { selectMenu(btn.getAttribute("data-subtab")); };
   });
@@ -804,7 +809,7 @@ function nextWeek(restWeek) {
   enforceConditionCap(); // 이벤트로 오른 컨디션도 상한까지만 (js/housing.js)
   state.currentMenu = "dashboard";
   state.notice = state.newMentions
-    ? "📣 선수 SNS에서 " + escapeHTML(state.player.name) + " 선수를 언급한 글이 " + state.newMentions + "개 올라왔어요. [SNS] → 💬 선수 SNS에서 확인하세요."
+    ? '<span class="notice-go no-link" data-gosns="social" tabindex="0" title="눌러서 선수 SNS 보기">📣 선수 SNS에서 ' + escapeHTML(state.player.name) + " 선수를 언급한 글이 " + state.newMentions + '개 올라왔어요. <b>💬 선수 SNS 보기 ▶</b></span>'
     : "";
   state.newMentions = 0;
   if (state.settings.autoSave) saveGame();

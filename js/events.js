@@ -18,7 +18,7 @@ function hasTrait(id) {
 
 // ----- 이번 주에 일어난 일 (이벤트 조건 판단용, 저장 안 함) -----
 function resetWeekCtx() {
-  state.weekCtx = { wins: 0, losses: 0, solos: 0, opp: null, champion: null, wonSemi: false, newChamps: [], patch: false, nerfChamp: null, results: [], training: null };
+  state.weekCtx = { wins: 0, losses: 0, solos: 0, opp: null, champion: null, wonSemi: false, newChamps: [], patch: false, nerfChamp: null, results: [], training: null, superPlays: 0, blunders: 0 };
 }
 
 // 최근 연패 수
@@ -31,6 +31,40 @@ function loseStreak() {
     n++;
   }
   return n;
+}
+
+// 최근 연승 수
+function winStreak() {
+  const mine = myTeam();
+  const done = userMatches().filter(function (m) { return m.winner; });
+  let n = 0;
+  for (let i = done.length - 1; i >= 0; i--) {
+    if (done[i].winner !== mine.id) break;
+    n++;
+  }
+  return n;
+}
+
+// 이번 주에 끊은 연패 수 (이번 주 승리로 끝난 연패, 없으면 0)
+function brokenLoseStreak(winsThisWeek) {
+  const mine = myTeam();
+  const done = userMatches().filter(function (m) { return m.winner; });
+  let i = done.length - 1, wins = 0, losses = 0;
+  while (i >= 0 && done[i].winner === mine.id) { wins++; i--; }
+  if (!wins || wins > winsThisWeek) return 0;
+  while (i >= 0 && done[i].winner !== mine.id) { losses++; i--; }
+  return losses;
+}
+
+// 선수 SNS용: 지난번 글 올릴 때와 비교할 내 상태 (이적·재계약·승강·2군 복귀·시상·솔랭 1위)
+function socialSnapshot() {
+  const t = myTeam();
+  return {
+    teamId: t ? t.id : null, tier: t ? t.tier : 0, benched: !!state.benched,
+    endYear: state.contract ? state.contract.endYear : 0,
+    awards: (state.career.awards || []).length,
+    king: hasTrait(LADDER.kingTrait), rank: myLadderRank(),
+  };
 }
 
 // ----- 글자 채우기 -----
@@ -46,6 +80,9 @@ function fillText(text, ctx) {
     .replace(/\{player\}/g, c.player || "")
     .replace(/\{pteam\}/g, c.pteam || "")
     .replace(/\{trait\}/g, c.traitName || "")
+    .replace(/\{oldteam\}/g, c.oldteam || "전 소속팀")
+    .replace(/\{award\}/g, c.award || "개인상")
+    .replace(/\{streak\}/g, c.streak || "")
     .replace(/\{opp\}/g, c.opp || "상대 팀");
 }
 
@@ -362,7 +399,32 @@ function postSocial() {
   if (state.popularity >= 70) cats.push("popular");
   if (state.player.age <= 18) cats.push("rookie");
   if (state.player.age >= 29) cats.push("veteran");
+  if (hasActivity("stream")) cats.push("streaming");
+  if (hasActivity("sponsor")) cats.push("sponsor");
   cats.push("general");
+
+  // 지난번과 비교해서 생긴 일 (2026-10-07 추가) — 중요한 일이라 앞쪽에 끼워 넣음
+  const snap = state.career.socialSnap;
+  const now = socialSnapshot();
+  const early = [];
+  if (snap) {
+    const sameTeam = snap.teamId === now.teamId;
+    if (!sameTeam && snap.teamId) { early.push("transfer"); ctx.oldteam = findTeam(snap.teamId) ? findTeam(snap.teamId).name : ""; }
+    if (sameTeam && now.endYear > snap.endYear) early.push("renewal");
+    if (sameTeam && now.tier < snap.tier) early.push("promoted");
+    if (sameTeam && now.tier > snap.tier) early.push("relegated");
+    if (now.awards > snap.awards) { early.push("award"); ctx.award = state.career.awards.slice(snap.awards).map(function (a) { return a.title; }).join(", "); }
+    if ((now.king && !snap.king) || (now.rank === 1 && snap.rank !== 1)) early.push("ladderTop");
+    if (sameTeam && snap.benched && !now.benched) early.push("benchReturn");
+  }
+  state.career.socialSnap = now;
+  if (w.superPlays > 0) early.push("superPlay");
+  if (w.blunders > 0) early.push("blunder");
+  const broken = w.wins > 0 ? brokenLoseStreak(w.wins) : 0;
+  if (broken >= 3) { early.push("streakBreak"); ctx.streak = broken; }
+  else if (w.wins > 0 && winStreak() >= 3) { early.push("winStreak"); ctx.streak = winStreak(); }
+  const at = resultCat ? cats.indexOf(resultCat) + 1 : (w.champion ? 1 : 0);
+  Array.prototype.splice.apply(cats, [at, 0].concat(early));
 
   let posted = 0, mentions = 0;
   // 리그 우승·월드 우승 주에는 우승 글을 2~3개 꼭 올림 (한 주 최대 개수와 따로)

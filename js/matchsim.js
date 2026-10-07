@@ -306,6 +306,7 @@ function playMatch(m) {
     if (userIn) {
       userEventHighlights(set.events).forEach(function (h) { userEvents.push(h); });
       tallyUserEvents(set.events); // [선수 정보] 내 경기 장면 통계 (js/player_page.js)
+      countSocialPlays(set.events); // 선수 SNS용: 내 슈퍼플레이·실수 수 (js/match_events.js)
     }
     recordSet(set, m, perf);
     if (detail) {

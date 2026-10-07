@@ -255,6 +255,19 @@ function afterSetEvents(out, la, lb, teamA, teamB, win, flipped, series) {
 
 // ----- 글자 -----
 // 사건 정보 (아이콘·이름·문장) — 솔로킬·마무리·심리 변화 포함
+// 선수 SNS용: 이번 주 내 선수의 슈퍼플레이(cat play 또는 큰 좋은 장면)·실수(cat mistake 또는 큰 나쁜 장면) 수 → state.weekCtx
+function countSocialPlays(list) {
+  const w = state.weekCtx;
+  if (!w) return;
+  list.forEach(function (e) {
+    if (e.p !== USER_ID || e.e === "solo" || e.e.indexOf("fin:") === 0 || e.e.indexOf("auto:") === 0) return;
+    const info = matchEventInfo(e);
+    if (!info) return;
+    if (e.k === "good" && (info.cat === "play" || info.size === "l")) w.superPlays = (w.superPlays || 0) + 1;
+    if (e.k === "bad" && (info.cat === "mistake" || info.size === "l")) w.blunders = (w.blunders || 0) + 1;
+  });
+}
+
 function matchEventInfo(e) {
   if (e.e === "solo") return { cat: "lane", icon: "⚔️", name: "솔로킬", text: "{p}의 솔로킬 (상대 {v})" };
   if (e.e.indexOf("auto:") === 0) { const a = AUTO_PSYCH[e.e.slice(5)]; return a ? Object.assign({ cat: "psych" }, a) : null; }
