@@ -89,6 +89,25 @@ function questMastered(tpl) {
 }
 
 // 기한 지난 퀘스트 정리, 새 퀘스트 주기 (주가 넘어간 뒤 부름)
+// 새 퀘스트 비중 (data/quests.js QUEST_RULES.lowMastery)
+function questWeight(tpl) {
+  const L = QUEST_RULES.lowMastery;
+  const lowBoost = function (m) { return 1 + L.boost * Math.max(0, Math.min(1, (L.pivot - m) / L.range)); };
+  if (tpl.kind === "metaAny") {
+    const meta = state.meta.champs[state.player.position];
+    return lowBoost(meta.reduce(function (a, n) { return a + (state.mastery[n] || 0); }, 0) / meta.length);
+  }
+  if (tpl.kind === "metaS" || (tpl.kind === "training" && tpl.training === "champ_focus")) return lowBoost(state.mastery[mySMeta()] || 0);
+  return 1;
+}
+
+function weightedPickBy(list, weightOf) {
+  const ws = list.map(weightOf);
+  let r = Math.random() * ws.reduce(function (a, b) { return a + b; }, 0);
+  for (let i = 0; i < list.length; i++) { r -= ws[i]; if (r < 0) return list[i]; }
+  return list[list.length - 1];
+}
+
 function updateQuests() {
   if (!state.quests) state.quests = [];
   const now = absWeek();
@@ -106,7 +125,7 @@ function updateQuests() {
   const active = state.quests.map(function (q) { return q.id; });
   const pool = QUESTS.filter(function (t) { return !t.offseason && active.indexOf(t.id) === -1 && !questMastered(t); });
   if (!pool.length) return;
-  const tpl = pick(pool);
+  const tpl = weightedPickBy(pool, questWeight); // 숙련도가 낮으면 챔피언 퀘스트 비중 ↑
   const range = tpl.need || QUEST_RULES.need;
   state.questSeq = (state.questSeq || 0) + 1;
   const q = { uid: state.questSeq, id: tpl.id, need: randInt(range[0], range[1]), progress: 0, champ: tpl.kind === "metaS" ? mySMeta() : null, deadline: now + QUEST_RULES.deadlineWeeks };
