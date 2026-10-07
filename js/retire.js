@@ -140,6 +140,7 @@ function seasonEndRetireReason() {
 
 // ----- 엔딩 요약 · 등급 -----
 function awardKeyOf(title) {
+  title = title.replace(/^컵 대회/, "LCK 컵"); // 예전 세이브의 결승 MVP도 같은 상으로 인정
   const keys = Object.keys(AWARD_NAMES).sort(function (a, b) { return AWARD_NAMES[b].length - AWARD_NAMES[a].length; });
   return keys.find(function (k) { return title.indexOf(AWARD_NAMES[k]) === 0; }) || "";
 }
@@ -165,7 +166,7 @@ function careerSummary(includeCurrent) {
       else if (t.indexOf("MSI") === 0) titles.msi++;
       else if (t.indexOf("First Stand") === 0) titles.firststand++;
       else if (t.indexOf("리그") === 0) titles.playoffs++;
-      else if (t.indexOf("컵") === 0) titles.cup++;
+      else if (t.indexOf("LCK 컵") === 0 || t.indexOf("컵") === 0) titles.cup++;
       titleList.push(r.year + " " + t);
     });
   });
@@ -257,7 +258,7 @@ function hallOfFameHTML(highlightId) {
   if (!list.length) return '<p class="muted">아직 은퇴한 선수가 없어요. 은퇴하면 여기에 기록돼요. (새 게임을 해도 남아요)</p>';
   const rows = list.map(function (h, i) {
     const t = h.titles || {};
-    const titleText = [t.worlds ? "월드 " + t.worlds : "", t.msi ? "MSI " + t.msi : "", t.playoffs ? "리그 " + t.playoffs : "", t.firststand ? "FS " + t.firststand : "", t.cup ? "컵 " + t.cup : ""].filter(Boolean).join(" · ") || "-";
+    const titleText = [t.worlds ? "월드 " + t.worlds : "", t.msi ? "MSI " + t.msi : "", t.playoffs ? "리그 " + t.playoffs : "", t.firststand ? "FS " + t.firststand : "", t.cup ? "LCK 컵 " + t.cup : ""].filter(Boolean).join(" · ") || "-";
     return '<tr class="' + (h.id === highlightId ? "me" : "") + '"><td>' + (i + 1) + "</td><td><b>" + escapeHTML(h.name) + "</b> " +
       '<span class="muted small">' + findPosition(h.position).name + " · " + h.debutYear + "~" + h.retireYear + "</span></td>" +
       "<td>" + starsText(h.stars) + " " + escapeHTML(h.grade) + "</td>" +
@@ -288,7 +289,7 @@ function renderEnding() {
       '<div class="small muted">커리어 점수 ' + s.points + "점" + (s.repPoints !== undefined ? " (인성 점수 " + (s.repPoints > 0 ? "+" : "") + s.repPoints + " · 평균 평판 " + s.avgRep + (s.allstars ? " · 올스타 " + s.allstars + "회" : "") + (s.peakFame ? " · 최고 스타 등급 " + escapeHTML(s.peakFame) : "") + ")" : "") + " · 명예의 전당에 기록됐어요</div></div>" +
     '<div class="summary-row">' +
       '<div class="card"><div class="sum-label">우승</div><div class="sum-main">' + (t.worlds + (t.msi || 0) + t.playoffs + (t.firststand || 0) + t.cup) + "회</div>" +
-        '<div class="sum-sub muted">월드 ' + t.worlds + " · MSI " + (t.msi || 0) + " · 리그 " + t.playoffs + " · First Stand " + (t.firststand || 0) + " · 컵 " + t.cup + "</div></div>" +
+        '<div class="sum-sub muted">월드 ' + t.worlds + " · MSI " + (t.msi || 0) + " · 리그 " + t.playoffs + " · First Stand " + (t.firststand || 0) + " · LCK 컵 " + t.cup + "</div></div>" +
       '<div class="card"><div class="sum-label">통산 경기</div><div class="sum-main">' + s.seriesWins + "승 " + (s.series - s.seriesWins) + "패</div>" +
         '<div class="sum-sub muted">세트 ' + s.setWins + "승 " + (s.sets - s.setWins) + "패 · 평점 " + (s.sets ? s.rating.toFixed(2) : "-") + " · POG " + s.pog + "</div></div>" +
       '<div class="card"><div class="sum-label">최고 종합 능력</div><div class="sum-main">' + s.peak + "</div>" +

@@ -109,7 +109,7 @@ function standingsTableHTML(rows, notes) {
 
 pages.standings = function () {
   const season = seasonOf();
-  const tabs = [["tier1", "1부 정규 시즌"], ["cup", "1부 컵 대회"], ["tier2", "2부 리그"], ["worlds", "월드 조별 리그"]];
+  const tabs = [["tier1", "1부 정규 시즌"], ["cup", "LCK 컵"], ["tier2", "2부 리그"], ["worlds", "월드 조별 리그"]];
   const tabHTML = tabs.map(function (t) {
     return '<button data-stab="' + t[0] + '"' + (standingsTab === t[0] ? ' class="primary"' : "") + ">" + t[1] + "</button>";
   }).join("");
@@ -130,7 +130,7 @@ pages.standings = function () {
         standingsTableHTML(standings("split1", tier1Ids()), ["상위 그룹", "상위 그룹", "상위 그룹", "상위 그룹", "상위 그룹", "하위 그룹", "하위 그룹", "하위 그룹", "하위 그룹", "하위 그룹"]);
     }
   } else if (standingsTab === "cup") {
-    body = '<p class="muted small">상위 6팀이 컵 플레이오프에 진출해요.</p>' +
+    body = '<p class="muted small">그룹 배틀 전체 성적 상위 6팀이 LCK 컵 플레이오프에 진출해요.</p>' +
       standingsTableHTML(standings("cup", tier1Ids()), ["플레이오프", "플레이오프", "플레이오프", "플레이오프", "플레이오프", "플레이오프"]);
   } else if (standingsTab === "tier2") {
     body = '<p class="muted small">전반기 + 후반기 합산. 1·2위는 승강전에 나가요.</p>' +
@@ -151,7 +151,7 @@ pages.standings = function () {
 pages.tournament = function () {
   const season = seasonOf();
   const champ = season.champions;
-  const champHTML = [["cup", "컵 대회"], ["firststand", "First Stand 🌏"], ["msi", "MSI 🌏"], ["playoffs", "리그 (플레이오프)"], ["worlds", "월드 챔피언십 🌏"]].map(function (c) {
+  const champHTML = [["cup", "LCK 컵"], ["firststand", "First Stand 🌏"], ["msi", "MSI 🌏"], ["playoffs", "리그 (플레이오프)"], ["worlds", "월드 챔피언십 🌏"]].map(function (c) {
     return "<tr><td>" + c[1] + "</td><td>" + (champ[c[0]] ? "🏆 " + teamLabel(champ[c[0]]) : '<span class="muted">미정</span>') + "</td></tr>";
   }).join("");
 
@@ -188,7 +188,7 @@ pages.tournament = function () {
 // - slots(season): 아직 경기가 없을 때 칸에 미리 넣을 팀 [[팀 id 또는 null, 팀 id 또는 null], ...]
 const TOURNAMENT_BRACKETS = [
   {
-    title: "컵 대회 플레이오프", sub: "조별 리그 상위 6팀 · 1·2위는 4강 직행 · 결승 5판 3선승", champKey: "cup", when: "8주차",
+    title: "LCK 컵 플레이오프", sub: "그룹 배틀 전체 성적 상위 6팀 · 1·2위는 4강 직행 · 결승 5판 3선승", champKey: "cup", when: "8주차",
     seeds: function (s) { return s.cupSeeds; },
     rounds: [
       { name: "1라운드", pick: function (s) { return koMatches(s, "cup_po", "1라운드"); }, size: 2,
@@ -199,7 +199,7 @@ const TOURNAMENT_BRACKETS = [
     ],
   },
   {
-    title: "First Stand 🌏", sub: "컵 대회 우승팀 + 해외 4팀 · 조별 리그 상위 4팀 · 5판 3선승", champKey: "firststand", when: "11주차",
+    title: "First Stand 🌏", sub: "LCK 컵 우승팀 + 해외 4팀 · 조별 리그 상위 4팀 · 5판 3선승", champKey: "firststand", when: "11주차",
     seeds: function (s) { return s.fs ? s.fs.seeds || null : null; },
     rounds: [
       { name: "4강", pick: function (s) { return koMatches(s, "fs_ko", "4강"); }, size: 2,

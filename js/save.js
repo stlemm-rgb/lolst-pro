@@ -121,6 +121,12 @@ function stateFromSave(save) {
   if (L && Array.isArray(L.teams) && L.players && L.season && Array.isArray(L.season.matches) &&
       L.teams.some(function (t) { return Array.isArray(t.roster) && t.roster.indexOf("USER") !== -1; })) {
     fresh.league = L;
+    // 기존 세이브에 이미 잡힌 컵 경기 일정에도 새 명칭 적용.
+    L.season.matches.forEach(function (m) {
+      if (typeof m.label !== "string") return;
+      if (m.comp === "cup") m.label = m.label.replace(/^컵 대회 /, "LCK 컵 그룹 배틀 ");
+      if (m.comp === "cup_po") m.label = m.label.replace(/^컵 플레이오프/, "LCK 컵 플레이오프").replace(/^컵 대회/, "LCK 컵");
+    });
     TEAM_ORG_RENAMES.forEach(function (rename) {
       const team = L.teams.find(function (t) { return t.id === rename.id && rename.from.indexOf(t.short) !== -1; });
       if (!team) return;

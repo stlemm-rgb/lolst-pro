@@ -34,7 +34,7 @@ const NEWS_ARTICLES = {
     { who: "myRunnerUp", headline: "{myTeam}, 준우승으로 대회 마감", body: "{myTeam}이(가) {year} {event} 결승에서 {winner}의 벽을 넘지 못했다. 최종 스코어는 {score}, 결승 MVP는 {mvp}(이)었다. 정상까지 한 걸음이 부족했던 결과였다." },
 
     { who: "other", headline: "{winner}, {event} 우승", body: "{winner}이(가) {event} 결승에서 {loser}을(를) {score}로 꺾고 정상에 올랐다. 결승 MVP는 {mvp}이(가) 선정됐다. {winner}은(는) 우승팀 자격으로 First Stand에 출전한다." },
-    { who: "other", headline: "{winner}, 컵 정상과 세계행", body: "{year} {event}의 우승팀은 {winner}(으)로 결정됐다. {winner}이(가) 결승에서 {loser}을(를) {score}로 제압했고, {mvp}이(가) MVP를 차지했다. 다음 무대는 국제대회 First Stand다." },
+    { who: "other", headline: "{winner}, LCK 컵 정상과 세계행", body: "{year} {event}의 우승팀은 {winner}(으)로 결정됐다. {winner}이(가) 결승에서 {loser}을(를) {score}로 제압했고, {mvp}이(가) MVP를 차지했다. 다음 무대는 국제대회 First Stand다." },
     { who: "other", headline: "{event} 챔피언은 {winner}", body: "{winner}이(가) {loser}을(를) 상대로 {score} 승리를 거두며 {event} 우승컵을 들어 올렸다. 결승 MVP는 {mvp}(이)었다. 이로써 First Stand에 나설 팀도 {winner}(으)로 확정됐다." },
   ],
 

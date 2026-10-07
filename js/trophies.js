@@ -9,7 +9,7 @@ const TROPHY_TYPES = [
   { key: "msi",        word: "MSI",         name: "MSI",           h: 38 },
   { key: "firststand", word: "First Stand", name: "First Stand",   h: 34 },
   { key: "playoffs",   word: "리그",        name: "리그",          h: 31 },
-  { key: "cup",        word: "컵",          name: "컵 대회",       h: 26 },
+  { key: "cup",        word: "LCK 컵",          name: "LCK 컵",       h: 26 },
 ];
 
 // 대회별 트로피 그림 (viewBox 0 0 40 48, 바닥 = 48)
@@ -53,7 +53,7 @@ const TROPHY_SVG = {
     '<rect x="17.5" y="29" width="5" height="7" fill="url(#tg-l)"/>' +
     '<rect x="12" y="36" width="16" height="4" rx="1" fill="url(#tg-l)"/>' +
     '<rect x="10" y="40" width="20" height="8" rx="1.5" fill="#6b4a12"/>',
-  // 컵 대회: 작은 동색 사발 컵
+  // LCK 컵: 작은 동색 사발 컵
   cup:
     '<defs><linearGradient id="tg-c" x1="0" x2="1"><stop offset="0" stop-color="#7a4a24"/><stop offset=".5" stop-color="#f0b98a"/><stop offset="1" stop-color="#9c5f2e"/></linearGradient></defs>' +
     '<path d="M7 10 H33 Q33 26 20 30 Q7 26 7 10 Z" fill="url(#tg-c)"/>' +
@@ -67,7 +67,7 @@ function trophyShelfHTML() {
   const s = careerSummary(true);
   const items = TROPHY_TYPES.filter(function (t) { return s.titles[t.key] > 0; }).map(function (t) {
     const n = s.titles[t.key];
-    const years = s.titleList.filter(function (x) { return x.split(" ").slice(1).join(" ").indexOf(t.word) === 0; })
+    const years = s.titleList.filter(function (x) { return x.split(" ").slice(1).join(" ").replace(/^컵 대회/, "LCK 컵").indexOf(t.word) === 0; })
       .map(function (x) { return x.split(" ")[0]; });
     const w = Math.round(t.h * 40 / 48);
     return '<span class="trophy tip" tabindex="0" data-tip="' + t.name + " 우승 " + n + "회 · " + years.join(", ") + '">' +

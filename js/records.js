@@ -174,7 +174,7 @@ function currentSeasonRecord() {
   const st = (state.league.season.playerStats || {})[USER_ID] || { g: 0, w: 0, r: 0, solo: 0, pog: 0 };
   const titles = [];
   const champ = state.league.season.champions || {};
-  [["cup", "컵 대회"], ["firststand", "First Stand"], ["msi", "MSI"], ["playoffs", "리그"], ["worlds", "월드"]].forEach(function (c) {
+  [["cup", "LCK 컵"], ["firststand", "First Stand"], ["msi", "MSI"], ["playoffs", "리그"], ["worlds", "월드"]].forEach(function (c) {
     if (champ[c[0]] === team.id) titles.push(c[1] + " 우승");
   });
   const rankList = team.tier === 1 ? tier1FinalOrder() : standings(["tier2", "tier2b"], tier2Ids()).map(function (x) { return x.id; });

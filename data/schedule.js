@@ -1,6 +1,6 @@
 // 한 시즌(52주) 일정표
 // 실제 한국 1부 리그(2025년) 일정을 바탕으로 만들었어요. (국내 대회는 실제와 1주 안쪽 차이)
-//   LCK Cup 1/15~2/23 → 컵 대회 · First Stand 3/10~16 → 10~11주 · 1·2라운드 4/2~6/1 → 13~22주
+//   LCK Cup 1/15~2/23 → LCK 컵 · First Stand 3/10~16 → 10~11주 · 1·2라운드 4/2~6/1 → 13~22주
 //   Road to MSI 6/7~15 → 23~24주 · MSI 6/27~7/12 → 25~28주 · 3~5라운드·플레이오프 → 30~38주 · 월즈 10/14~11/9 → 42~46주
 // - from ~ to: 주차
 // - id: 코드에서 쓰는 이름 (영어, 바꾸지 마세요)
@@ -9,9 +9,9 @@
 // - empty: 국제대회를 나중에 추가할 수 있게 비워 둔 기간
 const SCHEDULE = [
   { from: 1,  to: 1,  id: "preseason",  name: "프리시즌",            desc: "새 시즌 준비. 패치 적용." },
-  { from: 2,  to: 7,  id: "cup",        name: "컵 대회 조별 리그",     desc: "1부 팀들이 두 조로 나뉘어 상대 조 팀과 한 번씩 경기.", league: true },
-  { from: 8,  to: 9,  id: "cup_po",     name: "컵 대회 플레이오프",    desc: "상위 6팀 토너먼트.", league: true },
-  { from: 10, to: 11, id: "first_stand", name: "First Stand",        desc: "국제대회 (2025년부터). 컵 대회 우승팀 + 해외 4개 지역 우승팀. 우리 리그가 우승하면 MSI에서 2팀 모두 본선 직행.", international: true },
+  { from: 2,  to: 7,  id: "cup",        name: "LCK 컵 그룹 배틀",     desc: "1부 팀들이 두 조로 나뉘어 상대 조 팀과 한 번씩 경기.", league: true },
+  { from: 8,  to: 9,  id: "cup_po",     name: "LCK 컵 플레이오프",    desc: "상위 6팀 토너먼트.", league: true },
+  { from: 10, to: 11, id: "first_stand", name: "First Stand",        desc: "국제대회 (2025년부터). LCK 컵 우승팀 + 해외 4개 지역 우승팀. 우리 리그가 우승하면 MSI에서 2팀 모두 본선 직행.", international: true },
   { from: 12, to: 12, id: "break1",     name: "휴식기",              desc: "정규 시즌 준비." },
   { from: 13, to: 22, id: "split1",     name: "정규 시즌 1·2라운드",   desc: "1부·2부 팀들이 서로 두 번씩 경기 (3판 2선승).", league: true },
   { from: 23, to: 24, id: "road_to_msi", name: "Road to MSI",        desc: "(2015년부터) 1·2라운드 상위 6팀이 계단식 토너먼트로 MSI 대표 2팀을 가려요 (5판 3선승).", league: true },

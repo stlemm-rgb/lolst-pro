@@ -39,7 +39,7 @@ function seasonPremium() {
   const P = CONTRACT.premium;
   const parts = [];
   const r = currentSeasonRecord();
-  const titleKeys = { "월드 우승": "worlds", "MSI 우승": "msi", "리그 우승": "playoffs", "First Stand 우승": "firststand", "컵 대회 우승": "cup" };
+  const titleKeys = { "월드 우승": "worlds", "MSI 우승": "msi", "리그 우승": "playoffs", "First Stand 우승": "firststand", "LCK 컵 우승": "cup", "컵 대회 우승": "cup" };
   r.titles.forEach(function (t) { const k = titleKeys[t]; if (k) parts.push({ label: t, pct: P.titles[k] }); });
   if (!r.titles.length && r.rank > 0 && r.sets > 0) {
     const row = (P.rank[r.tier] || []).find(function (x) { return r.rank <= x[0]; });

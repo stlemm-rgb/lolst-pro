@@ -1,5 +1,5 @@
 // ===== 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) =====
-// 실제 2025년 흐름: 컵 대회 우승 → First Stand(10~11주) → 1·2라운드 상위 6팀 Road to MSI(23~24주) → MSI(25~28주) → 월드
+// 실제 2025년 흐름: LCK 컵 우승 → First Stand(10~11주) → 1·2라운드 상위 6팀 Road to MSI(23~24주) → MSI(25~28주) → 월드
 // - First Stand를 우리 리그 팀이 우승하면 MSI에서 국내 2팀 모두 본선 직행 (season.fsBonus)
 // - MSI를 우리 리그 팀이 우승하면 월드 국내 출전 +1팀 (season.msiBonus)
 // 해외 팀: season.overseas = [{ id, name, short, region, rank, ratio, power }] — 시즌 내내 같은 팀이 나와요
@@ -86,7 +86,7 @@ function setupFirstStand() {
   roundRobin(shuffled(teams)).forEach(function (pairs) {
     pairs.forEach(function (p) { schedule(10, "fs_group", "First Stand 조별 리그", p[0], p[1], INTL.firstStand.groupBo); });
   });
-  addNews("First Stand", teamName(s.champions.cup) + "이(가) 컵 대회 우승팀으로 국제대회 First Stand에 나간다. (10~11주)");
+  addNews("First Stand", teamName(s.champions.cup) + "이(가) LCK 컵 우승팀으로 국제대회 First Stand에 나간다. (10~11주)");
 }
 
 // 11주: 조 1위 vs 4위, 2위 vs 3위 → 같은 주 결승

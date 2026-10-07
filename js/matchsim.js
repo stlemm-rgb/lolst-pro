@@ -3,7 +3,7 @@
 //   winner가 null이면 아직 안 한 경기 (일정에 잡혀 있음)
 
 const COMP_NAMES = {
-  cup: "컵 대회", cup_po: "컵 플레이오프",
+  cup: "LCK 컵", cup_po: "LCK 컵 플레이오프",
   split1: "정규 시즌 전반기", split2: "정규 시즌 후반기",
   tier2: "2부 리그 전반기", tier2b: "2부 리그 후반기",
   playin: "플레이인", playoffs: "플레이오프", promotion: "승강전",
@@ -450,7 +450,7 @@ function tier1Ids() { return tierTeams(1).map(function (t) { return t.id; }); }
 function tier2Ids() { return tierTeams(2).map(function (t) { return t.id; }); }
 
 const WEEK_EVENTS = {
-  // 컵 대회 조 편성: 1부를 두 조로 (10팀이면 5라운드, 8팀이면 4라운드, 2~6주)
+  // LCK 컵 조 편성: 1부를 두 조로 (10팀이면 5라운드, 8팀이면 4라운드, 2~6주)
   2: [function () {
     const ids = shuffled(tier1Ids());
     const h = Math.floor(ids.length / 2);
@@ -458,20 +458,20 @@ const WEEK_EVENTS = {
     seasonOf().cupGroups = { A: A, B: B };
     for (let r = 0; r < h; r++) {
       for (let i = 0; i < h; i++) {
-        schedule(2 + r, "cup", "컵 대회 " + (r + 1) + "라운드", A[i], B[(i + r) % h], LEAGUE.bestOf.cup);
+        schedule(2 + r, "cup", "LCK 컵 그룹 배틀 " + (r + 1) + "라운드", A[i], B[(i + r) % h], LEAGUE.bestOf.cup);
       }
     }
   }],
-  // 컵 플레이오프 1라운드: 3위 vs 6위, 4위 vs 5위
+  // LCK 컵 플레이오프 1라운드: 3위 vs 6위, 4위 vs 5위
   8: [function () {
     const seeds = standings("cup", tier1Ids()).slice(0, 6).map(function (r) { return r.id; });
     seasonOf().cupSeeds = seeds;
-    schedule(8, "cup_po", "컵 플레이오프 1라운드", seeds[2], seeds[5], LEAGUE.bestOf.cup_po);
-    schedule(8, "cup_po", "컵 플레이오프 1라운드", seeds[3], seeds[4], LEAGUE.bestOf.cup_po);
+    schedule(8, "cup_po", "LCK 컵 플레이오프 1라운드", seeds[2], seeds[5], LEAGUE.bestOf.cup_po);
+    schedule(8, "cup_po", "LCK 컵 플레이오프 1라운드", seeds[3], seeds[4], LEAGUE.bestOf.cup_po);
   }],
   // 컵 4강 → 결승
-  9: [function () { koSemis("cup_po", "컵 플레이오프 4강", seasonOf().cupSeeds, 8, 9, LEAGUE.bestOf.cup_po); },
-      function () { koFinal("cup_po", "컵 대회 결승", 9, LEAGUE.bestOf.cup_final, "cup", "컵 대회"); }],
+  9: [function () { koSemis("cup_po", "LCK 컵 플레이오프 4강", seasonOf().cupSeeds, 8, 9, LEAGUE.bestOf.cup_po); },
+      function () { koFinal("cup_po", "LCK 컵 결승", 9, LEAGUE.bestOf.cup_final, "cup", "LCK 컵"); }],
   // 정규 시즌 전반기: 1부 더블 라운드 로빈 18라운드(13~21주), 2부 14라운드(13~19주)
   13: [function () {
     scheduleRounds(shuffledRounds(doubleRoundRobin(shuffled(tier1Ids()))), 13, 2, "split1", "전반기");
@@ -555,7 +555,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
     state.career.finalsWon = (state.career.finalsWon || 0) + 1;
-    addMoment("🏆", mine.name + " " + { cup: "컵 대회 우승", playoffs: "리그 우승", worlds: "월드 챔피언십 우승", firststand: "First Stand 우승", msi: "MSI 우승" }[champKey]);
+    addMoment("🏆", mine.name + " " + { cup: "LCK 컵 우승", playoffs: "리그 우승", worlds: "월드 챔피언십 우승", firststand: "First Stand 우승", msi: "MSI 우승" }[champKey]);
     if (state.weekCtx) state.weekCtx.champion = title;
   }
   if (champKey === "playoffs") {
@@ -652,10 +652,10 @@ function koPreview(week) {
   if (week === 8) {
     if (s.matches.some(function (m) { return m.comp === "cup" && !m.winner; })) return [];
     const seeds = standings("cup", tier1Ids()).slice(0, 6).map(function (r) { return r.id; });
-    return [{ comp: "cup_po", label: "컵 플레이오프 1라운드", a: seeds[2], b: seeds[5], bo: B.cup_po },
-            { comp: "cup_po", label: "컵 플레이오프 1라운드", a: seeds[3], b: seeds[4], bo: B.cup_po }];
+    return [{ comp: "cup_po", label: "LCK 컵 플레이오프 1라운드", a: seeds[2], b: seeds[5], bo: B.cup_po },
+            { comp: "cup_po", label: "LCK 컵 플레이오프 1라운드", a: seeds[3], b: seeds[4], bo: B.cup_po }];
   }
-  if (week === 9) return semisFrom("cup_po", "컵 플레이오프 4강", s.cupSeeds, done("cup_po", 8), B.cup_po);
+  if (week === 9) return semisFrom("cup_po", "LCK 컵 플레이오프 4강", s.cupSeeds, done("cup_po", 8), B.cup_po);
   if (week === 35) {
     if (!playinOn() || s.matches.some(function (m) { return m.comp === "split2" && !m.winner; })) return [];
     const o = tier1FinalOrder();

@@ -31,7 +31,7 @@ function queueFinalNews(champKey, eventName, f) {
   else if (mine && f.loser === mine.id) who = "myRunnerUp";
   else if (INTL_FINALS.indexOf(champKey) !== -1) who = findTeam(f.winner) ? "domestic" : "overseas";
   else who = "other";
-  const EVENT_NAMES = { cup: "컵 대회", playoffs: "리그 플레이오프", worlds: "월드 챔피언십", firststand: "First Stand", msi: "MSI" };
+  const EVENT_NAMES = { cup: "LCK 컵", playoffs: "리그 플레이오프", worlds: "월드 챔피언십", firststand: "First Stand", msi: "MSI" };
   queueHeadline(champKey + "_final", who, {
     event: EVENT_NAMES[champKey] || eventName, winner: teamName(f.winner), loser: teamName(f.loser),
     score: Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]),
