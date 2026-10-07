@@ -813,6 +813,10 @@ function nextWeek(restWeek) {
   if (state.week === SUMMER_MARKET.start) startSummerWindow(); // 여름 이적 기간 (js/summer_market.js)
   if (state.week === SUMMER_MARKET.applyWeek) summerMarket().forEach(function (text) { addNews(text.indexOf("🤝") === 0 ? "임대" : "여름 이적 시장", text.replace(/^(🔁|🤝) /, "")); });
   if (state.week === CONTRACT.windowStart) {
+    if (state.league.grownYear !== state.year) {
+      npcYearGrowth(1); // 다른 선수들 1년치 성장·노화를 이적 시장 전에 (js/league.js)
+      addNews("비시즌", "시즌이 끝나고 다른 선수들의 1년 성장·노화가 반영됐다. 이적 시장에서 바뀐 능력을 확인해 보자.");
+    }
     askRetirement(); // 29세부터 은퇴 권유 (js/retire.js)
     startTransferWindow();
   }

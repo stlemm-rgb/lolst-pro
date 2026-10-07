@@ -419,21 +419,14 @@ function newSeasonLeague() {
     }
   });
 
-  // NPC 성장·노화·은퇴 (특성: 훈련 효과 = 성장, 늦게 피는 꽃 = 노화 늦게, 철의 의지 = 노화 절반, 상한선)
+  // NPC 1년 성장·노화는 보통 비시즌 시작(47주, npcYearGrowth)에 이미 들어갔음. 예전 세이브처럼 안 들어갔으면 여기서
+  const grown = state.league.grownYear === state.year - 1;
+  if (!grown) npcYearGrowth(1, state.year - 1); // 지난 시즌 몫으로 기록
+  // 나이 +1, 은퇴
   Object.keys(state.league.players).forEach(function (id) {
     const p = state.league.players[id];
     const tr = p.traits || [];
     p.age += 1;
-    const bodyAge = p.age - traitSumOf(tr, "agingDelay");
-    const rule = LEAGUE.npcGrowth.find(function (g) { return bodyAge <= g.maxAge; });
-    STATS.forEach(function (s) {
-      let d = randInt(rule.change[0], rule.change[1]);
-      const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +50%
-      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id], tr, s.id) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + styleGrowthBias(p, s.id)));
-      else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
-      const before = p.stats[s.id];
-      p.stats[s.id] = Math.max(1, capRise(before, Math.min(100, before + d), statCapOf(tr, s.id)));
-    });
     const retireAge = LEAGUE.retireFromAge + traitSumOf(tr, "agingDelay") + traitSumOf(tr, "maxAgeBonus");
     if (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear) {
       retirePlayer(p);
@@ -442,6 +435,27 @@ function newSeasonLeague() {
 
   startSeason();
   return news;
+}
+
+// NPC 1년치 성장·노화 (특성: 훈련 효과 = 성장, 늦게 피는 꽃 = 노화 늦게, 철의 의지 = 노화 절반, 상한선)
+// 비시즌 이적 시장이 열리는 주(CONTRACT.windowStart = 47주, 월드 끝난 뒤)에 한 번 → 이적 시장에서 성장한 능력이 보임
+// ageAdd: 나이 기준 보정 (47주에는 아직 나이가 안 올라서 '다음 시즌 나이' = 나이 + 1로 규칙을 고름. 새해에 부르면 +1 전이라 역시 1)
+function npcYearGrowth(ageAdd, forYear) {
+  state.league.grownYear = forYear || state.year; // 몇 년 시즌 몫의 성장인지 (두 번 안 들어가게)
+  Object.keys(state.league.players).forEach(function (id) {
+    const p = state.league.players[id];
+    const tr = p.traits || [];
+    const bodyAge = p.age + ageAdd - traitSumOf(tr, "agingDelay");
+    const rule = LEAGUE.npcGrowth.find(function (g) { return bodyAge <= g.maxAge; }) || LEAGUE.npcGrowth[LEAGUE.npcGrowth.length - 1];
+    STATS.forEach(function (s) {
+      let d = randInt(rule.change[0], rule.change[1]);
+      const dorm = p.teamId && findTeam(p.teamId) && findTeam(p.teamId).tier === 2 ? HOUSING.npcDormGrowth : 0; // 2부는 합숙: 성장 +50%
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id], tr, s.id) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + styleGrowthBias(p, s.id)));
+      else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
+      const before = p.stats[s.id];
+      p.stats[s.id] = Math.max(1, capRise(before, Math.min(100, before + d), statCapOf(tr, s.id)));
+    });
+  });
 }
 
 // 대형 신인: 새 시즌 1주차에 2부 팀에 2~3명 (data/league.js BIG_ROOKIE). 돌려주는 값: 소식 글
