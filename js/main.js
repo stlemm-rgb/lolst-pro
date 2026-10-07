@@ -753,10 +753,10 @@ function nextWeek(restWeek) {
     state.player.age += 1;
     applyAging(); // 27세부터 노화 (js/retire.js)
     expireStartTrait(); // 유망주 전용 특성: 4년차부터 사라짐 (js/creation.js)
-    const leagueNews = newSeasonLeague().concat(contractsNewSeason());
+    const leagueNews = newSeasonLeague().concat(contractsNewSeason()).concat(addBigRookies()); // 대형 신인 (js/league.js)
     initContracts(); // 새로 들어온 신인들 계약
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
-    leagueNews.forEach(function (text) { addNews(text.indexOf("🔁") === 0 ? "이적 시장" : "승강", text.replace(/^🔁 /, "")); });
+    leagueNews.forEach(function (text) { addNews(text.indexOf("🔁") === 0 ? "이적 시장" : text.indexOf("🌟") === 0 ? "대형 신인" : "승강", text.replace(/^(🔁|🌟) /, "")); });
   }
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)

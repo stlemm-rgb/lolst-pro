@@ -63,3 +63,16 @@ const NPC_STYLES = [
     mod: {}, weight: { top: 1, jungle: 1, mid: 1, adc: 1, support: 1 } },
 ];
 const NPC_STYLE_RULES = { growthBias: 0.3 };
+
+// ===== 대형 신인 (js/league.js addBigRookies) — 2026-10-07 =====
+// 해마다 1주차(새 시즌)에 2부 팀에 대형 신인이 count명 입단해요. 포지션은 무작위
+// - 종합 능력 = 1부 주전 평균 + scoreAbove (예: 1부 주전 평균 63이면 65~67)
+// - 나이 ageRange, 특성은 일반 선수처럼 무작위
+// - 들어간 팀은 같은 포지션(또는 선수가 2명 이상인 포지션)에서 가장 약한 선수를 내보내요 (자유 계약)
+// - 내 팀에는 안 들어가요
+const BIG_ROOKIE = {
+  count: [2, 3],
+  scoreAbove: [2, 4],
+  ageRange: [17, 19],
+  contractYears: [2, 3],
+};

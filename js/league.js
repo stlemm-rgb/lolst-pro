@@ -442,6 +442,52 @@ function newSeasonLeague() {
   return news;
 }
 
+// 대형 신인: 새 시즌 1주차에 2부 팀에 2~3명 (data/league.js BIG_ROOKIE). 돌려주는 값: 소식 글
+function addBigRookies() {
+  const R = BIG_ROOKIE;
+  const mine = myTeam();
+  // 1부 주전 평균 종합 능력 (내 선수 제외)
+  const scores = [];
+  tierTeams(1).forEach(function (t) {
+    const st = starters(t.id);
+    Object.keys(st).forEach(function (pos) { if (st[pos] && st[pos] !== USER_ID) scores.push(playerScore(st[pos])); });
+  });
+  if (!scores.length) return [];
+  const avg = scores.reduce(function (a, b) { return a + b; }, 0) / scores.length;
+  const teams = shuffled(tierTeams(2).filter(function (t) { return !mine || t.id !== mine.id; }));
+  const news = [];
+  const count = randInt(R.count[0], R.count[1]);
+  for (let i = 0; i < count && i < teams.length; i++) {
+    const team = teams[i];
+    const pos = pick(POSITIONS).id;
+    const p = makeNpc(pos, { avg: Math.round(avg), spread: 0 }, R.ageRange);
+    // 목표 종합 능력에 맞게 스탯을 한꺼번에 올리거나 내림 (스타일·포지션 가산점은 유지)
+    const target = avg + randInt(R.scoreAbove[0], R.scoreAbove[1]);
+    for (let k = 0; k < 3; k++) {
+      const shift = Math.round(target - statScoreFor(p.stats, pos));
+      if (!shift) break;
+      STATS.forEach(function (s) { p.stats[s.id] = Math.max(1, Math.min(90, p.stats[s.id] + shift)); });
+    }
+    p.bigRookie = state.year;
+    npcMasteryInit(p); // 바뀐 스탯(챔피언 폭)에 맞게 숙련도 다시
+    // 입단: 같은 포지션 선수가 2명 이상이 되므로, 선수가 2명 이상인 포지션에서 가장 약한 선수를 내보냄
+    p.teamId = team.id;
+    team.roster.push(p.id);
+    p.salary = salaryFor(statScoreFor(p.stats, pos), team.tier, 0);
+    p.contractEnd = state.year - 1 + randInt(R.contractYears[0], R.contractYears[1]);
+    const posCount = {};
+    team.roster.forEach(function (id) { const q = playerPos(id); posCount[q] = (posCount[q] || 0) + 1; });
+    const out = team.roster.filter(function (id) {
+      const q = findPlayer(id);
+      return id !== p.id && id !== USER_ID && q && !q.loan && !q.named && posCount[q.pos] >= 2;
+    }).sort(function (a, b) { return playerScore(a) - playerScore(b); })[0];
+    if (out) releaseToFA(out);
+    news.push("🌟 대형 신인 " + p.name + "(" + findPosition(pos).name + ", " + p.age + "세, 종합 능력 " + Math.round(playerScore(p.id)) + ") " + team.name + " 입단" +
+      (out ? " · " + playerName(out) + " 자유 계약" : ""));
+  }
+  return news;
+}
+
 // 은퇴: 팀에서 빠지고 같은 포지션 신인이 들어옴
 function retirePlayer(p) {
   const team = p.teamId && findTeam(p.teamId);
