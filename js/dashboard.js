@@ -184,9 +184,6 @@ function weekReportHTML() {
   if (r.activityIncome) {
     html += '<div class="rep-row"><span class="rep-tag win">수입</span>스폰서 계약 <span class="up">+' + moneyText(r.activityIncome) + "</span></div>";
   }
-  if (r.shopFee) {
-    html += '<div class="rep-row"><span class="rep-tag msg">지출</span>개인 고용 비용 <span class="down">−' + moneyText(r.shopFee) + "</span></div>";
-  }
   if (r.ladder && r.ladder.games) {
     const d = r.ladder.delta;
     html += '<div class="rep-row"><span class="rep-tag rank">랭크</span>솔로 랭크 ' + r.ladder.wins + "승 " + r.ladder.losses + "패 · " +
