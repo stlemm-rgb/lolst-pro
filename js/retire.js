@@ -150,7 +150,7 @@ function careerSummary(includeCurrent) {
   const rows = c.seasons.slice();
   if (includeCurrent) rows.push(currentSeasonRecord());
   const sum = { sets: 0, setWins: 0, ratingSum: 0, pog: 0, solo: 0, series: 0, seriesWins: 0, tier1Seasons: 0 };
-  const titles = { worlds: 0, playoffs: 0, cup: 0 };
+  const titles = { worlds: 0, msi: 0, playoffs: 0, firststand: 0, cup: 0 };
   const titleList = [];
   const teams = [];
   let peak = c.debut.score;
@@ -162,6 +162,8 @@ function careerSummary(includeCurrent) {
     if (teams[teams.length - 1] !== r.team) teams.push(r.team); // 소속 순서 (같은 팀 연속은 한 번)
     r.titles.forEach(function (t) {
       if (t.indexOf("월드") === 0) titles.worlds++;
+      else if (t.indexOf("MSI") === 0) titles.msi++;
+      else if (t.indexOf("First Stand") === 0) titles.firststand++;
       else if (t.indexOf("리그") === 0) titles.playoffs++;
       else if (t.indexOf("컵") === 0) titles.cup++;
       titleList.push(r.year + " " + t);
@@ -171,7 +173,7 @@ function careerSummary(includeCurrent) {
 
   // 커리어 점수
   const P = CAREER.points;
-  let points = titles.worlds * P.worlds + titles.playoffs * P.playoffs + titles.cup * P.cup;
+  let points = titles.worlds * P.worlds + titles.msi * P.msi + titles.playoffs * P.playoffs + titles.firststand * P.firststand + titles.cup * P.cup;
   (c.awards || []).forEach(function (a) { points += P[awardKeyOf(a.title)] || 0; });
   points += Math.max(0, Math.round(peak - P.peakFrom)) + sum.tier1Seasons * P.tier1Season;
   const grade = CAREER.grades.find(function (g) { return points >= g.min; });
@@ -249,7 +251,7 @@ function hallOfFameHTML(highlightId) {
   if (!list.length) return '<p class="muted">아직 은퇴한 선수가 없어요. 은퇴하면 여기에 기록돼요. (새 게임을 해도 남아요)</p>';
   const rows = list.map(function (h, i) {
     const t = h.titles || {};
-    const titleText = [t.worlds ? "월드 " + t.worlds : "", t.playoffs ? "리그 " + t.playoffs : "", t.cup ? "컵 " + t.cup : ""].filter(Boolean).join(" · ") || "-";
+    const titleText = [t.worlds ? "월드 " + t.worlds : "", t.msi ? "MSI " + t.msi : "", t.playoffs ? "리그 " + t.playoffs : "", t.firststand ? "FS " + t.firststand : "", t.cup ? "컵 " + t.cup : ""].filter(Boolean).join(" · ") || "-";
     return '<tr class="' + (h.id === highlightId ? "me" : "") + '"><td>' + (i + 1) + "</td><td><b>" + escapeHTML(h.name) + "</b> " +
       '<span class="muted small">' + findPosition(h.position).name + " · " + h.debutYear + "~" + h.retireYear + "</span></td>" +
       "<td>" + starsText(h.stars) + " " + escapeHTML(h.grade) + "</td>" +
@@ -279,8 +281,8 @@ function renderEnding() {
       '<div class="grade-name">' + escapeHTML(s.grade) + '</div><div class="muted">' + escapeHTML(s.gradeText) + "</div>" +
       '<div class="small muted">커리어 점수 ' + s.points + "점 · 명예의 전당에 기록됐어요</div></div>" +
     '<div class="summary-row">' +
-      '<div class="card"><div class="sum-label">우승</div><div class="sum-main">' + (t.worlds + t.playoffs + t.cup) + "회</div>" +
-        '<div class="sum-sub muted">월드 ' + t.worlds + " · 리그 " + t.playoffs + " · 컵 " + t.cup + "</div></div>" +
+      '<div class="card"><div class="sum-label">우승</div><div class="sum-main">' + (t.worlds + (t.msi || 0) + t.playoffs + (t.firststand || 0) + t.cup) + "회</div>" +
+        '<div class="sum-sub muted">월드 ' + t.worlds + " · MSI " + (t.msi || 0) + " · 리그 " + t.playoffs + " · First Stand " + (t.firststand || 0) + " · 컵 " + t.cup + "</div></div>" +
       '<div class="card"><div class="sum-label">통산 경기</div><div class="sum-main">' + s.seriesWins + "승 " + (s.series - s.seriesWins) + "패</div>" +
         '<div class="sum-sub muted">세트 ' + s.setWins + "승 " + (s.sets - s.setWins) + "패 · 평점 " + (s.sets ? s.rating.toFixed(2) : "-") + " · POG " + s.pog + "</div></div>" +
       '<div class="card"><div class="sum-label">최고 종합 능력</div><div class="sum-main">' + s.peak + "</div>" +

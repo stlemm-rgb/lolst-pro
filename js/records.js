@@ -89,7 +89,7 @@ function giveAward(key, id, value, extraTitle) {
 
 // 결승 MVP: 결승전 POG
 function finalsMvp(champKey, f) {
-  const key = { cup: "cupfmvp", playoffs: "fmvp", worlds: "worldsfmvp" }[champKey];
+  const key = { cup: "cupfmvp", playoffs: "fmvp", worlds: "worldsfmvp", firststand: "fsfmvp", msi: "msifmvp" }[champKey];
   if (!key || !f.pog) return;
   giveAward(key, f.pog, null);
   addNews(AWARD_NAMES[key], f.pogName + " (" + teamName(f.winner) + ")");
@@ -168,7 +168,7 @@ function currentSeasonRecord() {
   const st = (state.league.season.playerStats || {})[USER_ID] || { g: 0, w: 0, r: 0, solo: 0, pog: 0 };
   const titles = [];
   const champ = state.league.season.champions || {};
-  [["cup", "컵 대회"], ["playoffs", "리그"], ["worlds", "월드"]].forEach(function (c) {
+  [["cup", "컵 대회"], ["firststand", "First Stand"], ["msi", "MSI"], ["playoffs", "리그"], ["worlds", "월드"]].forEach(function (c) {
     if (champ[c[0]] === team.id) titles.push(c[1] + " 우승");
   });
   const rankList = team.tier === 1 ? tier1FinalOrder() : standings(["tier2", "tier2b"], tier2Ids()).map(function (x) { return x.id; });

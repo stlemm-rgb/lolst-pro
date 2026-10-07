@@ -28,7 +28,7 @@ const CONTRACT = {
   reputationPct: 0.1,       // 평판 100이면 +10%, −100이면 −10%
   // 시즌 성적 프리미엄/역프리미엄 (이번 시즌 기록 기준. 합계는 premiumClamp 안으로)
   premium: {
-    titles: { worlds: 0.20, playoffs: 0.12, cup: 0.05 },               // 우승
+    titles: { worlds: 0.20, msi: 0.12, playoffs: 0.12, firststand: 0.06, cup: 0.05 }, // 우승
     awards: { mvp: 0.20, worldsfmvp: 0.12, tier2mvp: 0.10, fmvp: 0.08, allpro: 0.08, rookie: 0.05, cupfmvp: 0.04 }, // 개인상
     rank: { 1: [[2, 0.05], [8, 0], [10, -0.08]], 2: [[2, 0.05], [6, 0], [8, -0.05]] }, // 팀 최종 순위: [이 순위까지, 값] (우승 못 했을 때)
     ratingPivot: 6.0,        // 시즌 평균 평점이 이보다 높으면 +, 낮으면 −

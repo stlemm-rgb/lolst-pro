@@ -494,7 +494,7 @@ function thisWeekHTML() {
     (wk.sameWeekFinal ? '<div class="rep-row muted small">4강을 이기면 같은 주에 컵 대회 결승 (' + LEAGUE.bestOf.cup_final + "판 " + Math.ceil(LEAGUE.bestOf.cup_final / 2) + "선승)도 치러요.</div>" : "");
   } else {
     const later = nextUserMatch();
-    const ko = ["cup_po", "playin", "playoffs", "promotion", "worlds"].some(function (id) { return scheduleOfWeek(week).id.indexOf(id) === 0; });
+    const ko = ["cup_po", "first_stand", "road_to_msi", "msi", "playin", "playoffs", "promotion", "worlds"].some(function (id) { return scheduleOfWeek(week).id.indexOf(id) === 0; });
     matchHTML = '<div class="rep-row muted"><span class="rep-tag">경기</span>이번 주는 잡힌 경기가 없어요' +
       (ko ? " (우리 팀은 이번 라운드에 나가지 않아요)" : "") +
       (later ? ". 다음 경기: " + later.week + "주차 " + escapeHTML(later.label) + " vs " + escapeHTML(teamName(later.a === mine.id ? later.b : later.a)) : "") + ".</div>";

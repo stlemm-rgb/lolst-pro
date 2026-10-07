@@ -148,7 +148,7 @@ pages.standings = function () {
 pages.tournament = function () {
   const season = seasonOf();
   const champ = season.champions;
-  const champHTML = [["cup", "컵 대회"], ["playoffs", "리그 (플레이오프)"], ["worlds", "월드 챔피언십"]].map(function (c) {
+  const champHTML = [["cup", "컵 대회"], ["firststand", "First Stand 🌏"], ["msi", "MSI 🌏"], ["playoffs", "리그 (플레이오프)"], ["worlds", "월드 챔피언십 🌏"]].map(function (c) {
     return "<tr><td>" + c[1] + "</td><td>" + (champ[c[0]] ? "🏆 " + teamLabel(champ[c[0]]) : '<span class="muted">미정</span>') + "</td></tr>";
   }).join("");
 
@@ -158,10 +158,22 @@ pages.tournament = function () {
     (promo.length ? '<table class="matches">' + promo.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
       : '<p class="muted small">아직 대진이 정해지지 않았어요. (39·40주차)</p>') + "</div>";
 
+  // Road to MSI: 계단식이라 경기 목록으로 (js/intl.js)
+  const rtm = season.matches.filter(function (m) { return m.comp === "rtmsi"; });
+  const rtmHTML = '<div class="card"><h2>Road to MSI <span class="muted small">1·2라운드 상위 6팀 · 5판 3선승 · MSI 대표 2팀 결정</span></h2>' +
+    (rtm.length ? '<table class="matches">' + rtm.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>" +
+      (season.msiTeams ? '<p class="small">MSI 대표: 1번 시드 ' + teamLabel(season.msiTeams[0]) + " · 2번 시드 " + teamLabel(season.msiTeams[1]) + "</p>" : "")
+      : '<p class="muted small">아직 대진이 정해지지 않았어요. (23·24주차)</p>') + "</div>";
+  const bonus = [];
+  if (season.fsBonus) bonus.push("🌏 First Stand 우승 → MSI 국내 2팀 본선 직행");
+  if (season.msiBonus) bonus.push("🌏 MSI 우승 → 월드 국내 출전 " + worldsSeedCount() + "팀");
+
   return (
     "<h1>대회 일정</h1>" +
-    '<div class="card"><h2>' + state.year + '년 우승</h2><table class="mini">' + champHTML + "</table></div>" +
-    TOURNAMENT_BRACKETS.map(bracketHTML).join("") +
+    '<div class="card"><h2>' + state.year + '년 우승</h2><table class="mini">' + champHTML + "</table>" +
+      (bonus.length ? '<p class="small up">' + bonus.join(" · ") + "</p>" : "") + "</div>" +
+    TOURNAMENT_BRACKETS.slice(0, 2).map(bracketHTML).join("") + rtmHTML +
+    TOURNAMENT_BRACKETS.slice(2).map(bracketHTML).join("") +
     promoHTML + competitionGuideHTML() +
     '<p class="muted small">역대 우승 기록은 [역사관]에서 볼 수 있어요.</p>'
   );
@@ -181,6 +193,30 @@ const TOURNAMENT_BRACKETS = [
       { name: "4강", pick: function (s) { return koMatches(s, "cup_po", "4강"); }, size: 2,
         slots: function (s, seeds) { return seeds ? [[seeds[0], null], [seeds[1], null]] : null; } },
       { name: "결승", pick: function (s) { return koMatches(s, "cup_po", "결승"); }, size: 1 },
+    ],
+  },
+  {
+    title: "First Stand 🌏", sub: "컵 대회 우승팀 + 해외 4팀 · 조별 리그 상위 4팀 · 5판 3선승", champKey: "firststand", when: "11주차",
+    seeds: function (s) { return s.fs ? s.fs.seeds || null : null; },
+    rounds: [
+      { name: "4강", pick: function (s) { return koMatches(s, "fs_ko", "4강"); }, size: 2,
+        slots: function (s) {
+          if (!s.fs) return null;
+          const t = standings("fs_group", s.fs.teams).map(function (r) { return r.id; });
+          return s.matches.some(function (m) { return m.comp === "fs_group" && m.winner; }) ? [[t[0], t[3]], [t[1], t[2]]] : null;
+        } },
+      { name: "결승", pick: function (s) { return koMatches(s, "fs_ko", "결승"); }, size: 1 },
+    ],
+  },
+  {
+    title: "MSI 🌏", sub: "국내 2팀 + 해외 8팀 · 플레이인 4팀 → 8강 · 5판 3선승", champKey: "msi", when: "24주차",
+    seeds: function (s) { return s.msiTeams || null; },
+    rounds: [
+      { name: "플레이인", pick: function (s) { return koMatches(s, "msi_playin", ""); }, size: 2 },
+      { name: "8강", pick: function (s) { return koMatches(s, "msi_ko", "8강"); }, size: 4,
+        slots: function (s) { const d = s.msi && s.msi.direct; return d ? [[d[0], null], [d[2], d[4]], [d[1], null], [d[3], d[5]]] : null; } },
+      { name: "4강", pick: function (s) { return koMatches(s, "msi_ko", "4강"); }, size: 2 },
+      { name: "결승", pick: function (s) { return koMatches(s, "msi_ko", "결승"); }, size: 1 },
     ],
   },
   {

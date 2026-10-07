@@ -24,9 +24,9 @@ const CAREER = {
   // ----- 엔딩 등급 -----
   // 커리어 점수 = 우승·수상 점수 합 + 최고 종합 능력 보너스 + 1부 시즌 수 × tier1Season
   points: {
-    worlds: 30, playoffs: 15, cup: 8,                  // 우승 (우리 팀)
+    worlds: 30, msi: 15, playoffs: 15, firststand: 8, cup: 8, // 우승 (우리 팀)
     mvp: 12, worldsfmvp: 10, fmvp: 6, allpro: 5,       // 수상
-    cupfmvp: 4, rookie: 4, tier2mvp: 2,
+    cupfmvp: 4, rookie: 4, tier2mvp: 2, msifmvp: 6, fsfmvp: 3,
     peakFrom: 60,        // 최고 종합 능력이 이 값을 넘은 만큼 1점씩
     tier1Season: 2,      // 1부에서 보낸 시즌 1개당
   },

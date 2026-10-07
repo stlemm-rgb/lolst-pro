@@ -150,9 +150,9 @@ function championsHistoryHTML() {
   const rows = list.map(function (h) {
     const c = h.champions || {};
     const mark = function (name) { return name ? (name === h.myTeam ? '<b class="my-team">' + escapeHTML(name) + "</b>" : escapeHTML(name)) : "-"; };
-    return "<tr><td>" + h.year + "</td><td>" + mark(c.cup) + "</td><td>" + mark(c.playoffs) + "</td><td>" + mark(c.worlds) + '</td><td class="muted small">' + escapeHTML(h.myTeam) + "</td></tr>";
+    return "<tr><td>" + h.year + "</td><td>" + mark(c.cup) + "</td><td>" + mark(c.firststand) + "</td><td>" + mark(c.msi) + "</td><td>" + mark(c.playoffs) + "</td><td>" + mark(c.worlds) + '</td><td class="muted small">' + escapeHTML(h.myTeam) + "</td></tr>";
   }).join("");
-  return '<div class="card"><h2>역대 우승</h2><table class="roster"><tr><th>시즌</th><th>컵 대회</th><th>리그</th><th>월드</th><th>내 소속</th></tr>' + rows + "</table></div>";
+  return '<div class="card"><h2>역대 우승</h2><table class="roster"><tr><th>시즌</th><th>컵 대회</th><th>First Stand</th><th>MSI</th><th>리그</th><th>월드</th><th>내 소속</th></tr>' + rows + "</table></div>";
 }
 
 // 버튼 연결 (main.js renderPage에서 부름)

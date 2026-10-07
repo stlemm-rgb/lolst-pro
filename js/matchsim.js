@@ -16,8 +16,9 @@ function randFloat(min, max) {
 
 // 해외 가상 팀 찾기
 function findOverseas(id) {
-  const w = state.league.season.worlds;
-  return w ? w.overseas.find(function (t) { return t.id === id; }) : null;
+  const s = state.league.season;
+  const pool = s.overseas || (s.worlds ? s.worlds.overseas : null); // 시즌 해외 팀 (js/intl.js), 예전 세이브는 월드 팀
+  return pool ? pool.find(function (t) { return t.id === id; }) || null : null;
 }
 
 function teamName(id) {
@@ -78,7 +79,7 @@ function scheduleRounds(rounds, startWeek, perWeek, comp, labelPrefix) {
 // 내 선수 경기력 (밴픽·숙련도·메타 페널티 × 컨디션·체력)
 // 큰 경기: 결승·플레이오프·월드 토너먼트·승강전
 function isBigMatch(match) {
-  return ["playoffs", "worlds_ko", "promotion"].indexOf(match.comp) !== -1 || match.label.indexOf("결승") !== -1;
+  return ["playoffs", "worlds_ko", "promotion", "fs_ko", "rtmsi", "msi_playin", "msi_ko"].indexOf(match.comp) !== -1 || match.label.indexOf("결승") !== -1;
 }
 
 // 내 선수 한 세트 준비: 밴·픽·경기력 (세트마다 새로. used = 이번 경기에서 이미 나온 챔피언 → 다시 못 고름)
@@ -463,7 +464,8 @@ function koSemis(comp, label, seeds, r1Week, week, bo) {
 
 // 결승: 같은 주의 4강 승자끼리. 끝나면 우승 기록
 function koFinal(comp, label, week, bo, champKey, title) {
-  const semis = seasonOf().matches.filter(function (m) { return m.comp === comp && m.week === week - (comp === "cup_po" ? 0 : 1) && m.label.indexOf("4강") !== -1; });
+  const sameWeek = comp === "cup_po" || comp === "fs_ko"; // 4강과 결승이 같은 주인 대회
+  const semis = seasonOf().matches.filter(function (m) { return m.comp === comp && m.week === week - (sameWeek ? 0 : 1) && m.label.indexOf("4강") !== -1; });
   const f = schedule(week, comp, label, semis[0].winner, semis[1].winner, bo);
   playMatch(f);
   seasonOf().champions[champKey] = f.winner;
@@ -472,12 +474,14 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
     state.career.finalsWon = (state.career.finalsWon || 0) + 1;
-    addMoment("🏆", mine.name + " " + { cup: "컵 대회 우승", playoffs: "리그 우승", worlds: "월드 챔피언십 우승" }[champKey]);
+    addMoment("🏆", mine.name + " " + { cup: "컵 대회 우승", playoffs: "리그 우승", worlds: "월드 챔피언십 우승", firststand: "First Stand 우승", msi: "MSI 우승" }[champKey]);
     if (state.weekCtx) state.weekCtx.champion = title;
   }
   if (champKey === "playoffs") {
-    // 월드 진출: 결승 두 팀 + 4강 패자 두 팀
-    seasonOf().worldsTeams = [f.winner, f.loser, semis[0].loser, semis[1].loser];
+    // 월드 진출: 결승 두 팀 + 4강 패자 중 정규 시즌 순위가 높은 팀 (MSI 우승 시 남은 4강 패자도) — js/intl.js worldsSeedCount
+    const order = seasonOf().finalOrder || tier1FinalOrder();
+    const losers = [semis[0].loser, semis[1].loser].sort(function (a, b) { return order.indexOf(a) - order.indexOf(b); });
+    seasonOf().worldsTeams = [f.winner, f.loser].concat(losers).slice(0, worldsSeedCount());
   }
   addNews(title + " 우승", teamName(f.winner) + "이(가) " + teamName(f.loser) + "을(를) " +
     Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]) + "로 꺾고 " + title + " 우승!");
@@ -498,22 +502,11 @@ function promoMatch(week, tier1Index, tier2Index) {
 function setupWorlds() {
   const season = seasonOf();
   const domestic = season.worldsTeams || [];
-  // 국내 선수들은 숙련도·메타로 경기력이 달라지니 해외 팀도 같은 비율로 (js/npc_mastery.js)
-  const base = average(tier1Ids().map(teamStrength)) * npcPowerFactor();
-  const names = shuffled(OVERSEAS_TEAM_NAMES);
-  const overseas = [];
-  WORLDS.regions.forEach(function (region) {
-    for (let i = 0; i < region.teams; i++) {
-      const name = names[overseas.length] || ("해외 팀 " + (overseas.length + 1));
-      overseas.push({
-        id: "W" + (overseas.length + 1),
-        name: name + " (" + region.name + ")",
-        short: name.slice(0, 3),
-        region: region.name,
-        power: base * region.strength * randFloat(0.92, 1.08),
-      });
-    }
-  });
+  // 해외 팀: 시즌 해외 팀 중 강한 순으로 16팀을 채움 (First Stand·MSI에 나온 팀도 다시 나옴, js/intl.js)
+  // 전력은 국내 선수들의 숙련도·메타 수준에 맞춰 갱신 (js/npc_mastery.js npcPowerFactor)
+  ensureOverseasPool();
+  refreshOverseasPower();
+  const overseas = overseasByPower().slice(0, 16 - domestic.length);
   season.worlds = { overseas: overseas, groups: [] };
   // 조 편성: 국내 팀은 서로 다른 조에, 나머지는 해외 팀으로
   const pool = shuffled(overseas.map(function (t) { return t.id; }));
@@ -601,7 +594,7 @@ function koPreview(week) {
             { comp: "worlds_ko", label: "월드 4강", a: qf[1].winner, b: qf[3].winner, bo: B.worlds_ko }];
   }
   if (week === 46) return finalFrom("worlds_ko", "월드 결승", done("worlds_ko", 45), B.worlds_ko);
-  return [];
+  return intlPreview(week); // First Stand · Road to MSI · MSI (js/intl.js)
 }
 
 // 이번 주 우리 팀 경기 (이미 잡힌 경기 + 이번 주에 정해질 토너먼트 대진)
@@ -612,7 +605,7 @@ function userWeekMatches(week) {
   const involves = function (m) { return m.a === mine.id || m.b === mine.id; };
   const matches = s.matches.filter(function (m) { return m.week === week && !m.winner && involves(m); });
   const preview = matches.length ? [] : koPreview(week).filter(involves);
-  return { matches: matches, preview: preview, sameWeekFinal: week === 9 && preview.length > 0 };
+  return { matches: matches, preview: preview, sameWeekFinal: (week === 9 || week === 11) && preview.length > 0 };
 }
 
 // 우리 팀의 이번 시즌 경기가 모두 끝났나? (week = 방금 끝난 주)

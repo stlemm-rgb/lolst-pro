@@ -227,13 +227,13 @@ pages.schedule = function () {
   return (
     "<h1>시즌 일정</h1>" +
     '<div class="card"><h2>' + state.year + "년 시즌 · " + state.week + "주차</h2>" +
-      '<p class="muted small">2026년 실제 리그 일정을 바탕으로 한 52주 달력이에요. 경기는 3단계에서 추가돼요.</p>' +
+      '<p class="muted small">실제 한국 1부 리그(2025년) 일정을 바탕으로 한 52주 달력이에요. 국제대회: First Stand(10~11주) · MSI(25~28주) · 월드(42~46주).</p>' +
       '<table class="schedule">' + rows + "</table>" +
     "</div>" +
     userScheduleHTML() +
     '<div class="card"><h2>월드 챔피언십</h2>' +
-      "<p>우리 리그 상위 <b>" + WORLDS.myRegionSlots + "팀</b> + 해외 가상 지역 " +
-        WORLDS.regions.map(function (r) { return r.name + " " + r.teams + "팀"; }).join(", ") + "</p>" +
+      "<p>우리 리그 상위 <b>" + INTL.worldsSeeds + "팀</b> (MSI를 우리 리그 팀이 우승하면 +" + INTL.msiBonusSeeds + "팀) + 해외 가상 지역 " +
+        INTL.regions.map(function (r) { return r.name; }).join(", ") + "의 강팀들 = 16팀</p>" +
       '<p class="muted">' + WORLDS.format + "</p>" +
     "</div>"
   );
