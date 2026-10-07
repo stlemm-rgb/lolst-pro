@@ -243,7 +243,7 @@ button.danger:hover:not(:disabled) { border-color: var(--bad); background: linea
 
 /* ===== 캐릭터 생성 화면 ===== */
 .creation {
-  max-width: 1000px;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 32px 16px 48px;
 }
@@ -277,6 +277,42 @@ button.danger:hover:not(:disabled) { border-color: var(--bad); background: linea
 .pm button { padding: 2px 10px; }
 
 .start-card .buttons { justify-content: flex-start; }
+
+/* 생성 화면: 왼쪽 선택 + 오른쪽 선수 카드 (2026-10-07 리뉴얼) */
+.creation-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 12px; }
+.creation-layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 16px; align-items: start; }
+.creation-side { position: sticky; top: 12px; }
+.name-row { display: flex; gap: 8px; align-items: center; }
+.pcard { padding: 16px; }
+.pc-name { font-size: 22px; font-weight: bold; margin-bottom: 2px; word-break: break-all; }
+.pc-score { margin: 12px 0 4px; }
+.pc-score b { font-size: 22px; }
+.pc-gauge { position: relative; height: 10px; background: var(--border); border-radius: 5px; margin: 4px 0 22px; }
+.pc-fill { height: 100%; background: var(--accent); border-radius: 5px; }
+.pc-mark { position: absolute; top: 12px; transform: translateX(-50%); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.pc-mark::before { content: ""; position: absolute; left: 50%; top: -14px; width: 2px; height: 12px; background: var(--gold); }
+.pc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 12px; font-size: 12px; }
+.pc-stat { display: grid; grid-template-columns: 62px 1fr 22px; gap: 4px; align-items: center; }
+.pc-stat span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pc-stat .bar { height: 6px; display: block; }
+.pc-stat .bar-fill { display: block; height: 100%; }
+.pc-stat b { text-align: right; }
+.pc-sec { margin-top: 12px; }
+.pc-sec .chips { margin-top: 4px; }
+.pc-buttons { margin-top: 14px; flex-direction: column; align-items: stretch; }
+.pc-buttons button { width: 100%; }
+.preset-row { margin: 4px 0 8px; flex-wrap: wrap; justify-content: flex-start; }
+.trait-pick.rec { border-color: rgba(251, 191, 36, 0.45); }
+.trait-pick.rec.selected { border-color: var(--accent); }
+.rec-badge { font-size: 11px; color: var(--gold); font-weight: normal; white-space: nowrap; }
+.trait-pick .impact { font-size: 12px; color: var(--good); margin-top: 4px; }
+.team-stars { color: var(--gold); letter-spacing: 1px; }
+.team-stars.s1, .team-stars.s2 { color: #b08a3a; }
+@media (max-width: 1000px) {
+  .creation-layout { grid-template-columns: 1fr; }
+  .creation-side { position: static; }
+  .creation-head { flex-direction: column; align-items: flex-start; }
+}
 button.big { padding: 12px 28px; font-size: 17px; }
 
 /* 말풍선: data-tip이 있는 요소에 마우스를 올리면 설명이 바로 나옴 */

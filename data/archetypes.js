@@ -8,13 +8,15 @@
 // - masteryGrowth: 챔피언 숙련도 성장 배율 (0.5 = 절반, 3단계에서 사용)
 // - strength / weakness: 화면에 보이는 장점·약점 설명
 // - difficulty: 화면에 보이는 난이도 표시 (선택)
+// - startTrait / startTraitSeasons: 시작할 때 붙는 전용 특성과 유지 시즌 수 (그다음 시즌이 시작되면 사라짐)
 const ARCHETYPES = [
   {
     id: "prospect", name: "유망주",
     desc: "어린 나이에 데뷔한 재능 덩어리.",
     age: 17, statAvg: 30, statBonus: {}, staminaMax: 80,
     trainingBonus: 0, goodTraits: 3, masteryGrowth: 1,
-    strength: "좋은 특성 3개 확정, 가장 긴 커리어",
+    startTrait: "rookie_bloom", startTraitSeasons: 3,
+    strength: "좋은 특성 3개 + 전용 특성 🌱 유망주(3시즌 동안 훈련·숙련도 +30%), 가장 긴 커리어",
     weakness: "시작 스탯이 낮음",
   },
   {
@@ -56,4 +58,14 @@ const CREATION = {
     { year: 2022, statBonus: 20, desc: "모든 스탯 +20" },
   ],
   weeksPerSeason: 52, // 한 시즌 = 52주 (1년)
+  // 스탯 프리셋: 보너스 포인트를 이 스탯들에 고르게 나눔 (앞 스탯부터 남는 점수 하나씩 더)
+  //   stats가 "position"이면 지금 고른 포지션의 ★ 가산점 스탯
+  presets: [
+    { id: "lane",  name: "⚔️ 라인전형", stats: ["laning", "reaction", "accuracy"] },
+    { id: "macro", name: "🗺️ 운영형",   stats: ["macro", "vision", "shotcall"] },
+    { id: "fight", name: "💥 한타형",   stats: ["teamfight", "spacing", "focus"] },
+    { id: "pos",   name: "★ 포지션 맞춤", stats: "position" },
+  ],
+  // 구단 전력: 구단마다 선수 수준이 이만큼 높거나 낮게 만들어짐 (생성 화면에 ★로 보임)
+  teamShift: { 1: [-3, 3], 2: [-2, 2] },
 };

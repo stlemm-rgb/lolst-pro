@@ -183,7 +183,7 @@ function makeTeamDefs() {
   const brands = shuffled(TEAM_BRANDS.map(function (b) { return b[0]; }));
   const defs = [];
   TIER1_ORGS.slice(0, LEAGUE.tier1Teams).forEach(function (org) {
-    defs.push({ name: org + " " + brands.pop(), short: org, tier: 1 });
+    defs.push({ name: org + " " + brands.pop(), short: org, tier: 1, shift: teamShiftRoll(1) });
   });
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const taken = TIER1_ORGS.slice();
@@ -191,9 +191,20 @@ function makeTeamDefs() {
     let tag;
     do { tag = letters[randInt(0, 25)] + letters[randInt(0, 25)]; } while (taken.indexOf(tag) !== -1);
     taken.push(tag);
-    defs.push({ name: tag + " " + brands.pop(), short: tag, tier: 2 });
+    defs.push({ name: tag + " " + brands.pop(), short: tag, tier: 2, shift: teamShiftRoll(2) });
   }
   return defs;
+}
+
+// 구단 전력 보정: 선수 수준이 이만큼 높거나 낮게 (data/archetypes.js CREATION.teamShift)
+function teamShiftRoll(tier) {
+  const r = CREATION.teamShift[tier];
+  return r ? randInt(r[0], r[1]) : 0;
+}
+
+// 구단 수준에 전력 보정을 더한 값
+function shiftLevel(level, shift) {
+  return shift ? { avg: level.avg + shift, spread: level.spread } : level;
 }
 
 // ----- 리그 만들기 (새 게임) -----
@@ -207,13 +218,13 @@ function makeLeague(defs, chosenIndex) {
     const npc = LEAGUE.npc;
     // 주전 5명 (포지션마다 1명)
     POSITION_IDS.forEach(function (pos) {
-      const p = makeNpc(pos, tier === 1 ? npc.tier1Starter : npc.tier2Starter, npc.ageRange);
+      const p = makeNpc(pos, shiftLevel(tier === 1 ? npc.tier1Starter : npc.tier2Starter, n.shift), npc.ageRange);
       p.teamId = team.id;
       team.roster.push(p.id);
     });
     // 후보 2명 (포지션 무작위)
     for (let k = 0; k < LEAGUE.rosterSize - 5; k++) {
-      const p = makeNpc(pick(POSITION_IDS), tier === 1 ? npc.tier1Sub : npc.tier2Sub, npc.ageRange);
+      const p = makeNpc(pick(POSITION_IDS), shiftLevel(tier === 1 ? npc.tier1Sub : npc.tier2Sub, n.shift), npc.ageRange);
       p.teamId = team.id;
       team.roster.push(p.id);
     }

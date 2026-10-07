@@ -5,6 +5,7 @@
 // - group: 캐릭터 생성 화면에서 묶어서 보여줄 분류 (좋은 특성만)
 // - npc: true면 다른 선수(NPC)도 가질 수 있음 (경기·성장·노화에 영향을 주는 특성만. 훈련·돈·인기 특성은 NPC에게 의미가 없어서 제외)
 // - desc: 화면에 보이는 설명 (효과 숫자를 바꾸면 설명도 같이 바꿔 주세요)
+// - impact / when: 캐릭터 생성 화면에 보이는 경기 영향 (세트 승률 +n%p, 측정값 2026-10-07) / 언제 효과가 있는지
 // - effects: 실제 효과 (모두 적용됨. ★ = 다른 선수에게도 적용)
 //   [훈련]
 //     ★ trainingAll: 모든 훈련 효과 (0.2 = +20%)      ★ trainingStat: 특정 스탯 훈련 효과 ({ laning: 0.3 })  (NPC는 시즌 성장에 적용)
@@ -63,14 +64,14 @@ const TRAITS = [
 
   // ===== 좋은 특성: 경기 =====
   // (2026-10-07 리뉴얼) 경기 특성은 경기 흐름 사건(슈퍼플레이·실수·심리)과 연결 — 경기 결과 타임라인에 [특성]으로 표시
-  { id: "big_stage",    type: "good", npc: true, group: "경기", name: "큰 무대 체질",  desc: "큰 경기(결승·플레이오프·월드 토너먼트·승강전)에서 좋은 장면 ×1.6, 실수 −40%, 경기력 +6%", effects: { bigMatch: 0.06, evGoodBig: 0.6, evBadBig: -0.4 } },
-  { id: "clutch",       type: "good", npc: true, group: "경기", name: "클러치",        desc: "승부처(풀세트, 경기 후반)에서 좋은 장면 ×1.9, 풀세트 경기력 +10%",   effects: { clutch: 0.1, evClutch: 0.9 } },
-  { id: "steel_mental", type: "good", npc: true, group: "경기", name: "강철 멘탈",     desc: "경기 중 위축·멘탈 흔들림·집중 견제에 안 흔들림, 지고 있을 때 좋은 장면 ×1.5, 패배 후 컨디션 하락 절반", effects: { lossMental: -0.5, psychImmune: true, evGoodBehind: 0.5 } },
-  { id: "born_leader",  type: "good", npc: true, group: "경기", name: "타고난 리더",   desc: "우리 팀 콜 충돌 없음, 팀 호흡 상승 ×2, 팀원 모두 실수 −35%, 오더 훈련 +30%", effects: { trainingStat: { shotcall: 0.3 }, teamCall: 1, teamBad: -0.35 } },
-  { id: "steal_master", type: "good", npc: true, group: "경기", name: "스틸 장인",     desc: "오브젝트 장면(바론·드래곤 스틸, 몰래 바론 등) ×2.5, 장면 크기 +40%, 오브젝트 실수 −50%", effects: { evGood: { object: 1.5 }, evBad: { object: -0.5 }, evPower: { object: 0.4 } } },
-  { id: "highlight",    type: "good", npc: true, group: "경기", name: "하이라이트 메이커", desc: "개인 슈퍼플레이(1대2, 블라인드 스킬샷, 슈퍼 세이브 등) ×3.2, 장면 크기 2배",         effects: { evGood: { play: 2.2 }, evPower: { play: 1.0 } } },
-  { id: "machine",      type: "good", npc: true, group: "경기", name: "기계 같은 정확함", desc: "실수(페이스체크, 궁 허공, 플래시 실수 등) −80%, 실수해도 피해 −60%, 정교한 슈퍼플레이 ×2",                  effects: { evBad: { all: -0.8 }, evPower: { bad: -0.6 }, evGood: { play: 1.0 } } },
-  { id: "map_reader",   type: "good", npc: true, group: "경기", name: "맵 리더",        desc: "운영 장면(뒷텔, 1-3-1, 시야 장악 후 픽 등) ×4, 장면 크기 2배, 초반 장면 ×1.8",   effects: { evGood: { macro: 3.0, early: 0.8 }, evPower: { macro: 1.0, early: 0.3 } } },
+  { id: "big_stage",    type: "good", npc: true, group: "경기", name: "큰 무대 체질",  impact: 2.2, when: "큰 경기", desc: "큰 경기(결승·플레이오프·월드 토너먼트·승강전)에서 좋은 장면 ×1.6, 실수 −40%, 경기력 +6%", effects: { bigMatch: 0.06, evGoodBig: 0.6, evBadBig: -0.4 } },
+  { id: "clutch",       type: "good", npc: true, group: "경기", name: "클러치",        impact: 2.8, when: "풀세트·경기 후반", desc: "승부처(풀세트, 경기 후반)에서 좋은 장면 ×1.9, 풀세트 경기력 +10%",   effects: { clutch: 0.1, evClutch: 0.9 } },
+  { id: "steel_mental", type: "good", npc: true, group: "경기", name: "강철 멘탈",     impact: 1.4, when: "지고 있을 때", desc: "경기 중 위축·멘탈 흔들림·집중 견제에 안 흔들림, 지고 있을 때 좋은 장면 ×1.5, 패배 후 컨디션 하락 절반", effects: { lossMental: -0.5, psychImmune: true, evGoodBehind: 0.5 } },
+  { id: "born_leader",  type: "good", npc: true, group: "경기", name: "타고난 리더",   impact: 4.1, when: "항상", desc: "우리 팀 콜 충돌 없음, 팀 호흡 상승 ×2, 팀원 모두 실수 −35%, 오더 훈련 +30%", effects: { trainingStat: { shotcall: 0.3 }, teamCall: 1, teamBad: -0.35 } },
+  { id: "steal_master", type: "good", npc: true, group: "경기", name: "스틸 장인",     impact: 3.7, when: "항상 · 정글 기준", desc: "오브젝트 장면(바론·드래곤 스틸, 몰래 바론 등) ×2.5, 장면 크기 +40%, 오브젝트 실수 −50%", effects: { evGood: { object: 1.5 }, evBad: { object: -0.5 }, evPower: { object: 0.4 } } },
+  { id: "highlight",    type: "good", npc: true, group: "경기", name: "하이라이트 메이커", impact: 2.9, when: "항상", desc: "개인 슈퍼플레이(1대2, 블라인드 스킬샷, 슈퍼 세이브 등) ×3.2, 장면 크기 2배",         effects: { evGood: { play: 2.2 }, evPower: { play: 1.0 } } },
+  { id: "machine",      type: "good", npc: true, group: "경기", name: "기계 같은 정확함", impact: 2.7, when: "항상", desc: "실수(페이스체크, 궁 허공, 플래시 실수 등) −80%, 실수해도 피해 −60%, 정교한 슈퍼플레이 ×2",                  effects: { evBad: { all: -0.8 }, evPower: { bad: -0.6 }, evGood: { play: 1.0 } } },
+  { id: "map_reader",   type: "good", npc: true, group: "경기", name: "맵 리더",        impact: 2.9, when: "항상 · 탑 기준", desc: "운영 장면(뒷텔, 1-3-1, 시야 장악 후 픽 등) ×4, 장면 크기 2배, 초반 장면 ×1.8",   effects: { evGood: { macro: 3.0, early: 0.8 }, evPower: { macro: 1.0, early: 0.3 } } },
 
   // ===== 좋은 특성: 솔로 랭크·인기·돈 =====
   { id: "ladder_addict", type: "good", group: "솔로 랭크·인기·돈", name: "솔랭 중독자",  desc: "훈련 중 솔로 랭크 판 수 +50%, 랭크 승률 +5%",              effects: { ladderGames: 0.5, ladderWin: 0.05 } },
@@ -100,6 +101,9 @@ const TRAITS = [
   { id: "tilt",         type: "bad", name: "랭크 틸트",     desc: "솔로 랭크에서 진 판이 더 많은 주에 컨디션 −3",          effects: { tilt: 3 } },
   { id: "spender",      type: "bad", name: "낭비벽",       desc: "주급의 20%를 써 버림",                               effects: { spend: 0.2 } },
   { id: "night_owl",    type: "bad", name: "올빼미",       desc: "휴식 체력 회복 −30%",                                effects: { restBonus: -0.3 } },
+
+  // ===== 시작 유형 전용 특성 (data/archetypes.js의 startTrait, 정해진 시즌 동안만) =====
+  { id: "rookie_bloom", type: "title", name: "🌱 유망주", desc: "유망주 전용 (데뷔 후 3시즌). 모든 훈련 효과 +30%, 모든 챔피언 숙련도 성장 +30%. 4년차 시즌이 시작되면 사라져요", effects: { trainingAll: 0.3, masteryGrowth: 0.3 } },
 
   // ===== 칭호 (잠깐만 붙는 특성) =====
   { id: "ladder_king", type: "title", npc: true, name: "👑 솔랭 1위", desc: "지난 랭크 시즌 리그 솔로 랭크 1위. 경기력 +3%, 좋은 장면 ×1.15 (다음 랭크 초기화 때 새 1위에게 넘어감)", effects: { power: 0.03, evGood: { all: 0.15 } } },
@@ -138,4 +142,13 @@ const S_TRAIT_RULES = [
 const NPC_TRAITS = {
   goodCount: [[0, 0.45], [1, 0.4], [2, 0.15]], // [개수, 확률]: 45% 없음, 40% 1개, 15% 2개
   badChance: 0.12,                              // 나쁜 특성 1개가 붙을 확률
+};
+
+// 캐릭터 생성 화면: 포지션마다 추천하는 특성 (⭐ 추천 표시, 순서대로)
+const TRAIT_RECOMMEND = {
+  top:     ["map_reader", "highlight", "clutch"],
+  jungle:  ["steal_master", "born_leader", "map_reader"],
+  mid:     ["highlight", "machine", "clutch"],
+  adc:     ["machine", "highlight", "clutch"],
+  support: ["born_leader", "map_reader", "machine"],
 };
