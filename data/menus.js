@@ -18,6 +18,7 @@ const MENU_GROUPS = [
       { id: "tournament", name: "대회 일정" },
     ] },
     { id: "standings", name: "리그 순위" },
+    { id: "world",     name: "해외 리그" },
   ] },
   { title: "이적", items: [
     { id: "market", name: "이적 시장", tabs: [
@@ -31,7 +32,6 @@ const MENU_GROUPS = [
       { id: "awards",    name: "개인 시상" },
       { id: "history",   name: "역사관" },
       { id: "ecosystem", name: "리그 생태계" },
-      { id: "world",     name: "해외 리그" },
     ] },
   ] },
 ];
