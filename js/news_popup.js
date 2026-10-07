@@ -3,7 +3,9 @@
 // 다음 화면을 그릴 때 신문처럼 띄워요. 아무 곳이나 누르면 닫힘. '지난주 결과'의 [📰 NEWS]로 다시 보기.
 
 function fillNews(text, vars) {
-  return text.replace(/\{(\w+)\}/g, function (all, k) { return vars[k] !== undefined && vars[k] !== null ? vars[k] : all; });
+  const t = text.replace(/\{(\w+)\}/g, function (all, k) { return vars[k] !== undefined && vars[k] !== null ? vars[k] : all; });
+  // 스코어 뒤 '로': 읽는 소리에 맞게 (3:0 → "삼 대 영"으로, 3:1 → "삼 대 일"로)
+  return t.replace(/(\d+:(\d))로/g, function (all, score, last) { return score + ("0368".indexOf(last) !== -1 ? "으로" : "로"); });
 }
 
 // key: NEWS_ARTICLES의 키, who: 상황, vars: 글자 바꾸기 값
@@ -29,8 +31,9 @@ function queueFinalNews(champKey, eventName, f) {
   else if (mine && f.loser === mine.id) who = "myRunnerUp";
   else if (INTL_FINALS.indexOf(champKey) !== -1) who = findTeam(f.winner) ? "domestic" : "overseas";
   else who = "other";
+  const EVENT_NAMES = { cup: "컵 대회", playoffs: "리그 플레이오프", worlds: "월드 챔피언십", firststand: "First Stand", msi: "MSI" };
   queueHeadline(champKey + "_final", who, {
-    event: eventName, winner: teamName(f.winner), loser: teamName(f.loser),
+    event: EVENT_NAMES[champKey] || eventName, winner: teamName(f.winner), loser: teamName(f.loser),
     score: Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]), mvp: f.pogName || "-",
   });
 }
