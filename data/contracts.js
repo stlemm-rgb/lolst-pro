@@ -5,7 +5,7 @@ const CONTRACT = {
   scorePivot: 50,
   perScorePoint: 2000000,                     // 스탯 점수 1점당 200만
   perPopularity: 500000,                      // 인기도 1당 50만 (내 선수만)
-  minSalary: 5000000,                         // 최저 연봉 500만
+  minSalary: 12000000,                        // 시대·리그에 관계없이 최저 연봉 1,200만
 
   teamBudget: { 1: 600000000, 2: 200000000 }, // 구단 연봉 예산 (1부 6억 / 2부 2억)
   years: [1, 3],                              // 계약 기간 (년)
@@ -75,10 +75,19 @@ const CONTRACT_TEXTS = {
 //   (첫 계약만. 재계약부터는 원래 공식 + 시즌 성적 프리미엄)
 // - 1부에서 시작하면: 계약금 = 연봉 × signingBonus 를 자금으로, 집은 처음부터 tier1Home (월세)
 const FIRST_CONTRACT = {
+  endWeek: 28, // 첫해 여름 이적시장 마감까지 단기 계약 (23주에 재계약 제안)
   perPointAbove: 0.03,
   maxBoost: 0.6,
   signingBonus: 0.1,
   tier1Home: "oneroom",
+};
+
+const FIRST_CONTRACT_TEXTS = {
+  renewalTiming: "\n· 여름 재계약: 수락 즉시 새 연봉 적용 · 계약 만료 {endYear}년 시즌 종료",
+  declineChoice: "거절한다 (여름 이적시장 마감까지 다른 계약 검토)",
+  declined: "재계약을 거절했다. 여름 이적시장 마감까지 다른 계약을 검토할 수 있다. 계약이 정해지지 않으면 현재 팀과 시즌 말까지 자동 연장된다.",
+  fallbackTitle: "단기 계약 자동 연장",
+  fallback: "여름 이적시장 마감까지 새 계약이 정해지지 않아, 현재 팀과 이번 시즌 말까지 같은 연봉으로 계약을 연장했다. 비시즌에 다시 재계약을 논의한다.",
 };
 
 // ===== 구단 수입 (js/club_market.js) — 2026-10-07 =====

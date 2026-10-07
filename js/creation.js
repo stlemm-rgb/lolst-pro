@@ -469,6 +469,8 @@ function applyFirstContract() {
   const F = FIRST_CONTRACT;
   const team = myTeam();
   if (!team || !state.contract) return "";
+  state.contract.endYear = state.year;
+  state.contract.endWeek = F.endWeek;
   // 1) 능력 보너스: 1부 주전 평균보다 높은 만큼
   const scores = [];
   tierTeams(1).forEach(function (t) {
@@ -479,7 +481,7 @@ function applyFirstContract() {
   const boost = Math.min(F.maxBoost, Math.max(0, (playerScore(USER_ID) - avg) * F.perPointAbove));
   if (boost > 0) state.contract.salary = Math.round(state.contract.salary * (1 + boost) / 1000000) * 1000000;
   state.contract.firstBoost = Math.round(boost * 100); // [이적 시장] 내 계약 칸 표시용
-  let text = "연봉 " + moneyText(state.contract.salary) + (boost > 0 ? "(능력 보너스 +" + Math.round(boost * 100) + "%)" : "") + ". ";
+  let text = "연봉 " + moneyText(state.contract.salary) + (boost > 0 ? "(능력 보너스 +" + Math.round(boost * 100) + "%)" : "") + ". 첫 계약은 " + F.endWeek + "주까지이며, " + SUMMER_MARKET.start + "주에 재계약 제안이 와요. ";
   // 2) 1부 시작: 계약금 + 원룸
   if (team.tier === 1) {
     const bonus = Math.round(state.contract.salary * F.signingBonus / 10000) * 10000;

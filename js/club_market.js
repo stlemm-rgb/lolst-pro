@@ -113,6 +113,8 @@ function debtFloor(teamId) {
 // 이적료: 1부 기준 연봉 × 비율 × 나이 배율 × 남은 계약 (계약 없으면 0)
 function transferFee(id) {
   const user = id === USER_ID;
+  // 첫 단기 계약은 여름 합류 시점에 만료되므로 이적료 없음.
+  if (user && firstSummerContract() && state.week >= SUMMER_MARKET.start) return 0;
   const end = user ? (state.contract ? state.contract.endYear : 0) : findPlayer(id).contractEnd;
   const yearsLeft = (end || 0) - state.year + 1;
   if (!(user ? myTeam() : findPlayer(id).teamId) || yearsLeft <= 0) return 0;

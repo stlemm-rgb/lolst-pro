@@ -28,6 +28,11 @@ function startSummerWindow() {
   state.transferRequestsLeft = SUMMER_MARKET.requests;
   if (state.retirePlanned || state.pendingMove || state.loan) return;
   const mine = myTeam();
+  if (firstSummerContract()) {
+    const renewal = makeOffer(mine.id, true);
+    renewal.summer = true;
+    sendOffer(renewal); // 첫 계약은 성적·타 구단 후보 수와 관계없이 재계약 기회 보장
+  }
   const me = playerScore(USER_ID);
   const candidates = state.league.teams.filter(function (t) {
     if (t.id === mine.id) return false;
@@ -35,7 +40,7 @@ function startSummerWindow() {
     return !starter || me > playerScore(starter);
   }).sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); });
   if (!candidates.length) return;
-  if (state.benched) {
+  if (state.benched && !firstSummerContract()) {
     // 후보(2군): 다른 팀이 남은 시즌 임대 제안
     if (Math.random() >= SUMMER_MARKET.benchedOfferChance) return;
     const t = pick(candidates.slice(0, Math.ceil(candidates.length / 2)));
@@ -57,6 +62,10 @@ function startSummerWindow() {
 function summerMarket() {
   const news = [];
   applySummerUserMove(news);
+  if (firstSummerContract()) {
+    delete state.contract.endWeek;
+    postMessage("inbox", FIRST_CONTRACT_TEXTS.fallbackTitle, FIRST_CONTRACT_TEXTS.fallback, {});
+  }
   // 답하지 않은 여름 제안은 정리
   state.inbox.forEach(function (m) {
     if (m.kind === "offer" && m.answered === null && m.offer && m.offer.summer) {

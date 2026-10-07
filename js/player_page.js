@@ -71,7 +71,7 @@ function playerHeaderHTML() {
           findArchetype(p.archetype).name + " · 프로 " + careerYears() + "년차 (" + state.career.debut.year + "년 데뷔)</span></div>" +
         '<div class="chips">' + (p.traits.length ? p.traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
         '<div class="small phead-line">' + teamLinkHTML(team.id) + " " + tierName(team.tier) + " · " + (state.benched ? '<span class="down">2군 (후보)</span>' : '<span class="up">1군 (주전)</span>') +
-          (c ? " · 연봉 " + moneyText(c.salary) + " · " + c.endYear + "년까지" + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : " · 계약 없음") + "</div>" +
+          (c ? " · 연봉 " + moneyText(c.salary) + " · " + contractEndText(c) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : " · 계약 없음") + "</div>" +
         '<div class="small phead-line">' + (home ? home.icon + " " + home.name : "🛏️ 팀 합숙") + " · 💰 " + moneyText(state.money) + "</div>" +
       "</div>" +
       '<div class="phead-nums">' +

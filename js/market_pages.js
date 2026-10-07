@@ -67,7 +67,7 @@ pages.search = function () {
         '<td class="r">' + p.age + "</td>" +
         '<td class="r"><b>' + playerScore(id).toFixed(1) + "</b></td>" +
         '<td class="r">' + (p.salary ? moneyText(p.salary) : "-") + "</td>" +
-        '<td class="r">' + (p.teamId && p.contractEnd ? p.contractEnd + "년" : "-") + "</td>" +
+        '<td class="r">' + (p.teamId && p.contractEnd ? (p.id === USER_ID ? contractEndText(state.contract) : p.contractEnd + "년") : "-") + "</td>" +
       "</tr>"
     );
   }).join("");
@@ -198,7 +198,7 @@ pages.transfer = function () {
       '<table class="mini">' +
         "<tr><td>소속</td><td><b>" + escapeHTML(team.name) + "</b> (" + tierName(team.tier) + ") · " + role + "</td></tr>" +
         "<tr><td>연봉</td><td>" + moneyText(c.salary) + ' <span class="muted small">(매주 ' + moneyText(Math.round(c.salary / CREATION.weeksPerSeason)) + ")</span></td></tr>" +
-        "<tr><td>계약 만료</td><td>" + c.endYear + "년 시즌 종료" + (c.endYear <= state.year ? ' <span class="down">(이번 시즌)</span>' : "") + "</td></tr>" +
+        "<tr><td>계약 만료</td><td>" + contractEndText(c) + (c.endYear <= state.year ? ' <span class="down">(이번 시즌)</span>' : "") + "</td></tr>" +
         "<tr><td>출전 보장</td><td>" + guaranteeText + "</td></tr>" +
         "<tr><td>이번 시즌 출전</td><td>" + state.career.seasonGames + "경기</td></tr>" +
         "<tr><td>지금 기준 예상 연봉</td><td>" + moneyText(userSalaryFor(nextTier(team.id))) + ' <span class="muted small">(재계약·제안 때 기준, 시즌 성적에 따라 바뀜)</span>' +
@@ -264,7 +264,7 @@ function contractSummaryHTML() {
   const c = state.contract;
   if (!c) return "";
   return '<p class="muted small">' + (state.benched ? '<span class="down">후보 (2군)</span>' : '<span class="up">주전</span>') +
-    " · 연봉 " + moneyText(c.salary) + " · 계약 " + c.endYear + "년까지" + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") + "</p>";
+    " · 연봉 " + moneyText(c.salary) + " · 계약 " + contractEndText(c) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") + "</p>";
 }
 
 // ----- 버튼 연결 -----

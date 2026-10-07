@@ -148,6 +148,22 @@ function stateFromSave(save) {
   if (s.newChampBuff && typeof s.newChampBuff === "object") fresh.newChampBuff = s.newChampBuff; // 새 챔피언 출시 버프
   if (s.shakeup && typeof s.shakeup === "object") fresh.shakeup = s.shakeup; // 대격변 패치 (js/shakeup.js)
   applyExtraPositions(fresh.shakeup); // 대격변으로 생긴 챔피언 포지션
+  // 기존 세이브도 현재·예정 계약에 최저 연봉 보장 (과거 수입 기록은 유지).
+  [fresh.contract, fresh.pendingMove].forEach(function (c) {
+    if (c) c.salary = Math.max(CONTRACT.minSalary, Number(c.salary) || 0);
+  });
+  if (fresh.league) Object.keys(fresh.league.players).forEach(function (id) {
+    const p = fresh.league.players[id];
+    p.salary = Math.max(CONTRACT.minSalary, Number(p.salary) || 0);
+  });
+  fresh.inbox.forEach(function (m) {
+    const o = m.offer;
+    if (m.kind !== "offer" || m.answered !== null || !o || o.salary >= CONTRACT.minSalary) return;
+    const oldSalary = o.salary;
+    o.salary = CONTRACT.minSalary;
+    if (typeof m.text === "string") m.text = m.text.split(moneyText(oldSalary)).join(moneyText(o.salary));
+    if (o.breakdown) o.breakdown.total = Math.max(CONTRACT.minSalary, o.breakdown.total || 0);
+  });
   return fresh;
 }
 

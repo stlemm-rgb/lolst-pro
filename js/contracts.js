@@ -5,6 +5,14 @@
 // NPC 계약: 선수마다 salary, contractEnd
 
 // ----- 연봉 -----
+function contractEndText(c) {
+  return c.endYear + "년 " + (c.endWeek ? c.endWeek + "주까지 (단기)" : "시즌 종료");
+}
+
+function firstSummerContract() {
+  return state.contract && state.contract.endYear === state.year && state.contract.endWeek === FIRST_CONTRACT.endWeek;
+}
+
 // 시대 배율(data/era.js ERA.money)을 곱함: 2012년 40% → 2017년 100%. 비시즌 계약은 다음 시즌 기준
 function salaryFor(score, tier, popularity) {
   const y = contractYear();
@@ -215,7 +223,8 @@ function offerText(o) {
       "\n· " + team.name + " (" + tierName(team.tier) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
   }
   return (o.renewal ? "\"계속 함께하고 싶습니다.\" " : "\"주전 " + findPosition(state.player.position).name + " 자리를 맡아 주셨으면 합니다.\" ") +
-    (o.summer ? "\n· 여름 이적: 후반기(" + SUMMER_MARKET.applyWeek + "주)부터 합류 · 원래 팀에 이적료 " + moneyText(o.fee || 0) : "") +
+    (o.summer && o.renewal ? FIRST_CONTRACT_TEXTS.renewalTiming.replace("{endYear}", state.year + o.years - 1)
+      : o.summer ? "\n· 여름 이적: 후반기(" + SUMMER_MARKET.applyWeek + "주)부터 합류 · 원래 팀에 이적료 " + moneyText(o.fee || 0) : "") +
     "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) + (o.raised ? " (인상 반영)" : "") +
     "\n· 출전 보장: " + (o.guarantee ? "시즌 " + o.guarantee + "경기" : "없음") +
     "\n· " + team.name + " (" + nextTierName(team.id) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
@@ -226,7 +235,7 @@ function offerChoices(o) {
   if (o.loan) return list.concat([{ label: "거절한다", act: "decline" }]);
   if (!o.negotiated) list.push({ label: "연봉 인상을 요청한다", act: "raise", hint: "성공률 " + Math.round(negotiateChance() * 100) + "% (평판이 높을수록 올라감)" });
   if (!o.guarantee && !o.guaranteeAsked) list.push({ label: "출전 보장을 요청한다", act: "guarantee", hint: "성공률 " + Math.round(negotiateChance() * 100) + "%" });
-  list.push({ label: o.renewal ? "거절한다 (시즌이 끝나면 FA)" : "거절한다", act: "decline" });
+  list.push({ label: o.renewal ? (o.summer ? FIRST_CONTRACT_TEXTS.declineChoice : "거절한다 (시즌이 끝나면 FA)") : "거절한다", act: "decline" });
   return list;
 }
 
@@ -278,6 +287,7 @@ function answerOffer(msg, index) {
   if (!choice) return;
   const team = findTeam(o.teamId);
   msg.read = true;
+  o.salary = Math.max(minSalaryNow(), o.salary);
 
   if (choice.act === "raise" || choice.act === "guarantee") {
     const ok = Math.random() < negotiateChance();
@@ -302,7 +312,7 @@ function answerOffer(msg, index) {
 
   msg.answered = index;
   if (choice.act === "decline") {
-    msg.notes.push(o.renewal ? "재계약을 거절했다. 시즌이 끝나면 FA가 된다." : "제안을 거절했다.");
+    msg.notes.push(o.renewal ? (o.summer ? FIRST_CONTRACT_TEXTS.declined : "재계약을 거절했다. 시즌이 끝나면 FA가 된다.") : "제안을 거절했다.");
     return;
   }
 
@@ -315,8 +325,9 @@ function answerOffer(msg, index) {
     }
   });
   if (o.renewal) {
-    state.contract = { teamId: team.id, salary: o.salary, endYear: state.year + o.years, guarantee: o.guarantee };
-    msg.notes.push("재계약 완료! " + (state.year + 1) + "~" + (state.year + o.years) + "년, 연봉 " + moneyText(o.salary));
+    const endYear = state.year + o.years - (o.summer ? 1 : 0);
+    state.contract = { teamId: team.id, salary: o.salary, endYear: endYear, guarantee: o.guarantee };
+    msg.notes.push("재계약 완료! " + (o.summer ? "지금부터 " : (state.year + 1) + "년부터 ") + endYear + "년 시즌 종료까지, 연봉 " + moneyText(o.salary));
   } else if (o.summer) {
     // 여름 이적·임대: 29주에 반영 (js/summer_market.js)
     state.pendingMove = { teamId: team.id, salary: o.salary, endYear: o.loan ? state.contract.endYear : state.year + Math.max(1, o.years), guarantee: o.guarantee, summer: true, loan: !!o.loan, fee: o.fee };
@@ -474,7 +485,7 @@ function contractsNewSeason() {
       team = options.length ? pick(options) : pick(tierTeams(2));
     }
     moveUserTo(team.id);
-    state.contract = { teamId: team.id, salary: Math.round(userSalaryFor(team.tier) * 0.8 / 1000000) * 1000000, endYear: state.year, guarantee: 0 };
+    state.contract = { teamId: team.id, salary: Math.max(minSalaryNow(), Math.round(userSalaryFor(team.tier) * 0.8 / 1000000) * 1000000), endYear: state.year, guarantee: 0 };
     postMessage("inbox", CONTRACT_TEXTS.forcedTitle, contractText(CONTRACT_TEXTS.forced), { read: false });
     if (team.id !== mine.id) addMoment("📝", "FA로 " + team.name + "과(와) 1년 계약");
   }

@@ -279,7 +279,7 @@ function dashStripHTML() {
       '<div class="card sum"><div class="sum-label">소속</div>' +
         '<div class="sum-main">' + escapeHTML(team.name) + "</div>" +
         '<div class="sum-sub">' + tierName(team.tier) + " 리그 · " + role + " · 팀 순위 <b>" + leagueRank + "위</b></div>" +
-        '<div class="sum-sub muted">' + (c ? "연봉 " + moneyText(c.salary) + " · 계약 " + c.endYear + "년까지" + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : "계약 없음") + "</div>" +
+        '<div class="sum-sub muted">' + (c ? "연봉 " + moneyText(c.salary) + " · 계약 " + contractEndText(c) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : "계약 없음") + "</div>" +
       "</div>" +
       '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="스탯 12개 평균 (포지션 가산점 스탯은 1.5배). 경기력의 바탕이 돼요.">종합 능력</div>' +
         '<div class="sum-main big">' + score.toFixed(1) + "</div>" +

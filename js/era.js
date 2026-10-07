@@ -26,9 +26,9 @@ function contractYear() {
 function teamBudgetOf(tier, year) {
   return Math.round(CONTRACT.teamBudget[tier] * eraMoney(year));
 }
-// 최저 연봉 (시대 배율 반영, 100만 원 단위)
+// 최저 연봉은 시대 배율과 관계없이 보장.
 function minSalaryNow(year) {
-  return Math.max(1000000, Math.round(CONTRACT.minSalary * eraMoney(year) / 1000000) * 1000000);
+  return CONTRACT.minSalary;
 }
 
 // ----- 구단 수 늘리기 (새 시즌, js/league.js newSeasonLeague에서 승강 반영 뒤) -----
