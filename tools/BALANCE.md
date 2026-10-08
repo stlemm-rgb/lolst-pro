@@ -80,7 +80,16 @@
 
 측정 기준 (126): 보통 진행(퀘스트 신경 안 씀) 38~52, 강한 선수 50~67. 주장(80+)은 평판·퀘스트·동료 관계를 같이 챙겨야 닿음.
 
-## 6. 수집 · 성장
+## 6. 연애 (data/romance_rules.js)
+
+| 경로 | 지금 값 | 뜻 |
+|---|---|---|
+| `ROMANCE_RULES.perYear` / `weeklyChance` | 6 / 0.14 | 1년 연애 연락 상한 / 주마다 확률 |
+| `ROMANCE_RULES.stage` | 썸 30 · 고백 60 · 위기 25 | 호감 단계 |
+| `ROMANCE_RULES.rivalChance` / `rumorChance` | 0.25 / 0.3 | 다른 대상 공세 / 열애설 |
+| `ROMANCE_RULES.officePenalty` | 5 | 사내 연애 공개 시 팀 내 입지 − |
+
+## 7. 수집 · 성장
 
 | 경로 | 지금 값 | 뜻 |
 |---|---|---|

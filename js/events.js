@@ -171,6 +171,10 @@ function applyEffects(eff, ctx) {
       const m = eventMoney(v);
       state.money += m;
       notes.push("자금 " + (m > 0 ? "+" : "−") + Math.abs(m / 10000).toLocaleString() + "만 원");
+    } else if (key === "affection") {
+      if (ctx && ctx.tid) changeAffection(ctx.tid, v, notes); // 연애 호감 (js/romance.js)
+    } else if (key === "romance") {
+      romanceEffect(v, ctx, notes); // 연애 시작·결별·공개·비밀 (js/romance.js)
     } else if (key === "counsel") {
       counselEffect(v, ctx, notes); // 은퇴 상담: retire / stay / coach (js/retirement.js)
     } else if (key === "friendTip") {
@@ -361,6 +365,8 @@ function runWeeklyEvents() {
       if (ev.tab === "inbox" && !ev.always) inboxFired = true;
     }
   });
+
+  inboxFired = romanceWeekly(inboxFired) || inboxFired; // 연애 (부가 요소, js/romance.js)
 
   if (!inboxFired && Math.random() < EVENT_RULES.randomChance) {
     const pool = [];

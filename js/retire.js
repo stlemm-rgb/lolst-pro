@@ -208,6 +208,7 @@ function finishCareer(reason, includeCurrent) {
   s.retiredAt = state.year + "년 " + state.week + "주차";
   addMoment("🎤", s.age + "세, 은퇴 (" + RETIRE_REASONS[reason] + ")");
   s.moments = state.career.moments.slice();
+  s.romance = typeof romanceEndingLine === "function" ? romanceEndingLine() : ""; // 연애 중이면 엔딩에 한 줄 (js/romance.js)
   state.retired = s;
   state.retirePlanned = false;
   addToHallOfFame(s);
@@ -298,6 +299,7 @@ function renderEnding() {
         '<div class="sum-sub muted">소속팀: ' + s.teams.map(escapeHTML).join(" → ") + "</div></div>" +
     "</div>" +
     '<div class="card"><h2>우승</h2><div class="chips">' + chips(s.titleList, "meta") + '</div><h2 class="sub">수상</h2><div class="chips">' + chips(s.awards, "good") + "</div></div>" +
+    (s.romance ? '<div class="card"><h2>💕 그 뒤로</h2><p>' + escapeHTML(s.romance) + "</p></div>" : "") +
     '<div class="card"><h2>커리어 주요 순간</h2>' + (timeline || '<p class="muted">기록이 없어요.</p>') + "</div>" +
     '<div class="card"><h2>🏛 명예의 전당</h2>' + hallOfFameHTML(hofId) + "</div>" +
     '<div class="buttons"><button class="primary" id="ending-new">새 선수로 시작</button><button id="ending-export">세이브 내보내기</button></div>';

@@ -413,5 +413,6 @@ pages.friends = function () {
       '<div class="card"><h2>👋 알고 지내는 선수 <span class="muted small">' + known.length + "명</span></h2>" + table(known, "함께 활동한 선수가 여기에 나와요.") + "</div>" +
     "</div>" +
     (retired ? '<div class="card"><h2>🎓 은퇴한 친구</h2><div class="table-wrap"><table class="roster tlog">' + retired + "</table></div></div>" : "") +
-    '<div class="card"><h2>📒 함께한 활동 기록</h2>' + (log ? '<div class="table-wrap"><table class="roster tlog">' + log + "</table></div>" : '<p class="muted small">아직 기록이 없어요.</p>') + "</div>";
+    '<div class="card"><h2>📒 함께한 활동 기록</h2>' + (log ? '<div class="table-wrap"><table class="roster tlog">' + log + "</table></div>" : '<p class="muted small">아직 기록이 없어요.</p>') + "</div>" +
+    (typeof romanceCardHTML === "function" ? romanceCardHTML() : ""); // 연애 (js/romance.js)
 };
