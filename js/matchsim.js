@@ -103,6 +103,11 @@ function traitPowerMult(traits, teamId, setCtx) {
   if (state.week <= 12) mult *= 1 - traitSumOf(traits, "earlyPenalty");                // 슬로 스타터
   if (setCtx.deciding) mult *= 1 + traitSumOf(traits, "clutch");                      // 클러치
   if (setCtx.behind === teamId) mult *= 1 + traitSumOf(traits, "comeback");           // 역전의 명수
+  const vs = traitSumOf(traits, "vsUser");                                             // ⚔️ 숙명의 라이벌: 내 팀과 경기할 때
+  if (vs && setCtx.match && typeof myTeam === "function" && myTeam()) {
+    const mine = myTeam().id;
+    if (teamId !== mine && (setCtx.match.a === mine || setCtx.match.b === mine)) mult *= 1 + vs;
+  }
   return mult;
 }
 
@@ -170,7 +175,7 @@ function lineup(teamId, userCtx, setCtx) {
   const s = starters(teamId);
   return POSITION_IDS.map(function (pos) {
     const id = s[pos];
-    const tr = traitsOf(id);
+    const tr = matchTraitsOf(id);
     const st = statsOfId(id);
     const v = traitSumOf(tr, "variance"); // 기복: 더 흔들림
     // 입력 정확도: 못하는 쪽 흔들림을 줄임
@@ -221,9 +226,9 @@ function playSet(a, b, userCtx, setCtx) {
     const loser = diff >= 0 ? pb : pa;
     const loserSt = loser.id ? statsOfId(loser.id) : null;
     const dodge = loserSt ? (loserSt.reaction - STAT_ROLES.pivot) * STAT_ROLES.reactionPer : 0; // 반응속도: 솔로킬 피하기
-    const winnerTraits = pa.id || pb.id ? traitsOf(diff >= 0 ? pa.id : pb.id) : [];
+    const winnerTraits = pa.id || pb.id ? matchTraitsOf(diff >= 0 ? pa.id : pb.id) : [];
     const winComp = diff >= 0 ? comps.a : comps.b; // 이긴 쪽 팀 조합 (돌진·누커 시너지)
-    const loserWeak = loser.id ? traitSumOf(traitsOf(loser.id), "soloWeak") : 0; // 초반 약골: 솔로킬을 더 잘 당함
+    const loserWeak = loser.id ? traitSumOf(matchTraitsOf(loser.id), "soloWeak") : 0; // 초반 약골: 솔로킬을 더 잘 당함
     const solo = Math.abs(diff) >= TEAM_MATCH.soloKillGap - traitSumOf(winnerTraits, "soloEasy") - winComp.soloEasy + dodge - loserWeak; // 라인 지배자·돌진·반응속도
     const margin = Math.min(PHASES.lane.marginMax, Math.abs(diff) * PHASES.lane.marginPer); // 크게 이길수록 더 (data/match.js PHASES)
     const add = TEAM_MATCH.laneWinBonus + margin + traitSumOf(winnerTraits, "laneBonus") + winComp.laneExtra + (solo ? TEAM_MATCH.soloKillBonus : 0);
@@ -241,6 +246,7 @@ function playSet(a, b, userCtx, setCtx) {
   const ev = rollSetEvents(la, lb, a, b, laneResults, series, {
     big: !!(setCtx.match && isBigMatch(setCtx.match)), deciding: !!setCtx.deciding, behind: setCtx.behind || null,
     sigUser: !!(userCtx && state.signature && userCtx.pick === state.signature), // 시그니처 픽 (js/signature.js)
+    slump: !!setCtx.slump, // 컨디션 난조 (숨김, js/match_events.js)
   });
   const R = MATCH_EVENT_RULES.residual;
   const luckA = randFloat(-R, R), luckB = randFloat(-R, R);
@@ -253,7 +259,7 @@ function playSet(a, b, userCtx, setCtx) {
   const powerA = avgA + bonusA + playA + compA + ev.a + luckA;
   const powerB = avgB + bonusB + playB + compB + ev.b + luckB;
   // 타고난 리더·원클럽맨: 그 선수가 있는 팀 한타 전력 보너스
-  const mood = function (list) { return list.reduce(function (sum, p) { return sum + (p.id ? traitSumOf(traitsOf(p.id), "teamMood") : 0); }, 0); };
+  const mood = function (list) { return list.reduce(function (sum, p) { return sum + (p.id ? traitSumOf(matchTraitsOf(p.id), "teamMood") : 0); }, 0); };
   const moodA = mood(la), moodB = mood(lb);
   const aWins = powerA + moodA >= powerB + moodB;
   const flipped = aWins !== (powerA + moodA - ev.a >= powerB + moodB - ev.b); // 사건이 승패를 뒤집음
@@ -281,6 +287,7 @@ function playMatch(m) {
   const perf = {}; // 이 경기 선수별 기록 (js/records.js)
   const downTwo = []; // 0:2로 몰렸던 팀 (역전의 명수)
   const series = newSeriesMood(); // 심리 상태: 세트를 넘어 이어짐 (js/match_events.js)
+  const slump = userIn && rollSlump(m); // 정규 시즌 승률이 너무 높으면 가끔 컨디션 난조 (화면에 안 보임, js/match_events.js)
   const userEvents = [];          // 내 선수 하이라이트
   // 경기 상세: 우리 팀 경기와 결승전만 저장 (js/match_detail.js)
   const keepDetail = (mine && (m.a === mine.id || m.b === mine.id)) || m.label.indexOf("결승") !== -1;
@@ -297,6 +304,7 @@ function playMatch(m) {
       plans: plans,
       used: seriesUsed,
       series: series,
+      slump: slump,
     };
     if (userIn) {
       userCtx = userMatchContext(m, myTarget, seriesUsed);

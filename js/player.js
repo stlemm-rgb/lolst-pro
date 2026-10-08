@@ -10,7 +10,40 @@ function findArchetype(id) {
 }
 
 function findTrait(id) {
+  if (typeof id === "string" && id.slice(-5) === "@half") return halfTrait(id.slice(0, -5)); // 포지션이 안 맞는 경기 특성 (아래 matchTraitsOf)
   return TRAITS.find(function (t) { return t.id === id; });
+}
+
+// ----- 경기 특성 포지션 궁합 (124, data/traits.js fit · TRAIT_FIT) -----
+// 경기에서 쓰는 특성 목록: 어울리지 않는 포지션의 경기 특성은 "id@half" (효과 TRAIT_FIT.offMult배)
+function traitFits(t, pos) { return !t || !t.fit || t.fit.indexOf(pos) !== -1; }
+function matchTraitsOf(id) {
+  const list = traitsOf(id);
+  const pos = id === USER_ID ? state.player.position : (findPlayer(id) || {}).pos;
+  if (!pos) return list;
+  return list.map(function (tid) { return traitFits(findTrait(tid), pos) ? tid : tid + "@half"; });
+}
+const HALF_TRAITS = {};
+function scaleEffects(fx, k) {
+  const out = {};
+  Object.keys(fx).forEach(function (key) {
+    const v = fx[key];
+    if (typeof v === "number") out[key] = v * k;
+    else if (v && typeof v === "object") { out[key] = {}; Object.keys(v).forEach(function (x) { out[key][x] = typeof v[x] === "number" ? v[x] * k : v[x]; }); }
+    else out[key] = v; // true/false (강철 멘탈의 위축 면역 등)는 그대로
+  });
+  return out;
+}
+function halfTrait(id) {
+  if (HALF_TRAITS[id]) return HALF_TRAITS[id];
+  const t = TRAITS.find(function (x) { return x.id === id; });
+  if (!t) return undefined;
+  HALF_TRAITS[id] = Object.assign({}, t, { id: id + "@half", effects: scaleEffects(t.effects, TRAIT_FIT.offMult), offFit: true });
+  return HALF_TRAITS[id];
+}
+// "탑·정글"
+function traitFitText(t) {
+  return t && t.fit ? t.fit.map(function (p) { return findPosition(p).name; }).join("·") : "";
 }
 
 // 이 스탯이 내 포지션의 가산점 스탯인가?

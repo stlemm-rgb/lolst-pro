@@ -65,14 +65,16 @@ const TRAITS = [
 
   // ===== 좋은 특성: 경기 =====
   // (2026-10-07 리뉴얼) 경기 특성은 경기 흐름 사건(슈퍼플레이·실수·심리)과 연결 — 경기 결과 타임라인에 [특성]으로 표시
-  { id: "big_stage",    type: "good", npc: true, group: "경기", name: "큰 무대 체질",  impact: 2.2, when: "큰 경기", desc: "큰 경기(결승·플레이오프·월드 토너먼트·승강전)에서 좋은 장면 ×1.6, 실수 −40%, 경기력 +6%", effects: { bigMatch: 0.06, evGoodBig: 0.6, evBadBig: -0.4 } },
-  { id: "clutch",       type: "good", npc: true, group: "경기", name: "클러치",        impact: 2.8, when: "풀세트·경기 후반", desc: "승부처(풀세트, 경기 후반)에서 좋은 장면 ×1.9, 풀세트 경기력 +10%",   effects: { clutch: 0.1, evClutch: 0.9 } },
-  { id: "steel_mental", type: "good", npc: true, group: "경기", name: "강철 멘탈",     impact: 1.4, when: "지고 있을 때", desc: "경기 중 위축·멘탈 흔들림·집중 견제에 안 흔들림, 지고 있을 때 좋은 장면 ×1.5, 패배 후 컨디션 하락 절반", effects: { lossMental: -0.5, psychImmune: true, evGoodBehind: 0.5 } },
-  { id: "born_leader",  type: "good", npc: true, group: "경기", name: "타고난 리더",   impact: 4.1, when: "항상", desc: "우리 팀 콜 충돌 없음, 팀 호흡 상승 ×2, 팀원 모두 실수 −35%, 오더 훈련 +30%", effects: { trainingStat: { shotcall: 0.3 }, teamCall: 1, teamBad: -0.35 } },
-  { id: "steal_master", type: "good", npc: true, group: "경기", name: "스틸 장인",     impact: 3.7, when: "항상 · 정글 기준", desc: "오브젝트 장면(바론·드래곤 스틸, 몰래 바론 등) ×2.5, 장면 크기 +40%, 오브젝트 실수 −50%", effects: { evGood: { object: 1.5 }, evBad: { object: -0.5 }, evPower: { object: 0.4 } } },
-  { id: "highlight",    type: "good", npc: true, group: "경기", name: "하이라이트 메이커", impact: 2.9, when: "항상", desc: "개인 슈퍼플레이(1대2, 블라인드 스킬샷, 슈퍼 세이브 등) ×3.2, 장면 크기 2배",         effects: { evGood: { play: 2.2 }, evPower: { play: 1.0 } } },
-  { id: "machine",      type: "good", npc: true, group: "경기", name: "기계 같은 정확함", impact: 2.7, when: "항상", desc: "실수(페이스체크, 궁 허공, 플래시 실수 등) −80%, 실수해도 피해 −60%, 정교한 슈퍼플레이 ×2",                  effects: { evBad: { all: -0.8 }, evPower: { bad: -0.6 }, evGood: { play: 1.0 } } },
-  { id: "map_reader",   type: "good", npc: true, group: "경기", name: "맵 리더",        impact: 2.9, when: "항상 · 탑 기준", desc: "운영 장면(뒷텔, 1-3-1, 시야 장악 후 픽 등) ×4, 장면 크기 2배, 초반 장면 ×1.8",   effects: { evGood: { macro: 3.0, early: 0.8 }, evPower: { macro: 1.0, early: 0.3 } } },
+  // (124) fit: 어울리는 포지션. 다른 포지션 선수(나·다른 선수 모두)는 효과가 TRAIT_FIT.offMult배 (js/player.js matchTraitsOf)
+  //       캐릭터 생성 때 경기 특성은 TRAIT_FIT.matchLimit개까지만
+  { id: "big_stage",    type: "good", npc: true, group: "경기", fit: ["mid", "adc"], name: "큰 무대 체질",  impact: 2.2, when: "큰 경기", desc: "큰 경기(결승·플레이오프·월드 토너먼트·승강전)에서 좋은 장면 ×1.6, 실수 −40%, 경기력 +6%", effects: { bigMatch: 0.06, evGoodBig: 0.6, evBadBig: -0.4 } },
+  { id: "clutch",       type: "good", npc: true, group: "경기", fit: ["adc", "support"], name: "클러치",        impact: 2.8, when: "풀세트·경기 후반", desc: "승부처(풀세트, 경기 후반)에서 좋은 장면 ×1.9, 풀세트 경기력 +10%",   effects: { clutch: 0.1, evClutch: 0.9 } },
+  { id: "steel_mental", type: "good", npc: true, group: "경기", fit: ["top", "support"], name: "강철 멘탈",     impact: 1.4, when: "지고 있을 때", desc: "경기 중 위축·멘탈 흔들림·집중 견제에 안 흔들림, 지고 있을 때 좋은 장면 ×1.5, 패배 후 컨디션 하락 절반", effects: { lossMental: -0.5, psychImmune: true, evGoodBehind: 0.5 } },
+  { id: "born_leader",  type: "good", npc: true, group: "경기", fit: ["support", "jungle"], name: "타고난 리더",   impact: 4.1, when: "항상", desc: "우리 팀 콜 충돌 없음, 팀 호흡 상승 ×2, 팀원 모두 실수 −35%, 오더 훈련 +30%", effects: { trainingStat: { shotcall: 0.3 }, teamCall: 1, teamBad: -0.35 } },
+  { id: "steal_master", type: "good", npc: true, group: "경기", fit: ["jungle"], name: "스틸 장인",     impact: 3.7, when: "항상 · 정글 기준", desc: "오브젝트 장면(바론·드래곤 스틸, 몰래 바론 등) ×2.5, 장면 크기 +40%, 오브젝트 실수 −50%", effects: { evGood: { object: 1.5 }, evBad: { object: -0.5 }, evPower: { object: 0.4 } } },
+  { id: "highlight",    type: "good", npc: true, group: "경기", fit: ["mid", "top"], name: "하이라이트 메이커", impact: 2.9, when: "항상", desc: "개인 슈퍼플레이(1대2, 블라인드 스킬샷, 슈퍼 세이브 등) ×3.2, 장면 크기 2배",         effects: { evGood: { play: 2.2 }, evPower: { play: 1.0 } } },
+  { id: "machine",      type: "good", npc: true, group: "경기", fit: ["adc", "mid"], name: "기계 같은 정확함", impact: 2.7, when: "항상", desc: "실수(페이스체크, 궁 허공, 플래시 실수 등) −80%, 실수해도 피해 −60%, 정교한 슈퍼플레이 ×2",                  effects: { evBad: { all: -0.8 }, evPower: { bad: -0.6 }, evGood: { play: 1.0 } } },
+  { id: "map_reader",   type: "good", npc: true, group: "경기", fit: ["top", "jungle"], name: "맵 리더",        impact: 2.9, when: "항상 · 탑 기준", desc: "운영 장면(뒷텔, 1-3-1, 시야 장악 후 픽 등) ×4, 장면 크기 2배, 초반 장면 ×1.8",   effects: { evGood: { macro: 3.0, early: 0.8 }, evPower: { macro: 1.0, early: 0.3 } } },
 
   // ===== 좋은 특성: 솔로 랭크·인기·돈 =====
   { id: "ladder_addict", type: "good", group: "솔로 랭크·인기·돈", name: "솔랭 중독자",  desc: "훈련 중 솔로 랭크 판 수 +50%, 랭크 승률 +5%",              effects: { ladderGames: 0.5, ladderWin: 0.05 } },
@@ -137,6 +139,11 @@ const TRAITS = [
   { id: "s_one_club",  type: "s", npc: true, name: "원클럽맨",       desc: "경기 시작부터 팀 분위기 +1, 팀원 모두 실수 −15%, 한타 때 팀 전력 +3, 연봉 +30%", effects: { teamMood: 3, teamStartMood: 1, teamBad: -0.15, salaryBonus: 0.3 } },
   { id: "s_breakthrough", type: "s", npc: true, name: "한계 돌파",   desc: "85 이상 스탯 성장 ×2, 노화로 줄어드는 양 −30%",                effects: { topGrowth: { all: 1 }, agingCut: 0.3 } },
   { id: "s_champ_master", type: "s", name: "챔피언 마스터",          desc: "모든 챔피언 숙련도 성장 2배, 메타 페널티 없음",                effects: { masteryGrowth: 1, noMetaPenalty: true } },
+  // ===== 라이벌 전용 S급 (124): 다른 선수만 얻음 (rival: true). 내 선수가 강해질수록 맞설 상대가 생기게 =====
+  { id: "r_nemesis",  type: "s", rival: true, npc: true, name: "⚔️ 숙명의 라이벌", desc: "라이벌 전용. 내 팀과 경기할 때 경기력 +12%",                         effects: { vsUser: 0.12 } },
+  { id: "r_ace",      type: "s", rival: true, npc: true, name: "🔥 리그의 에이스", desc: "라이벌 전용. 모든 경기 경기력 +5%, 좋은 장면 ×1.5",                effects: { power: 0.05, evGood: { all: 0.5 } } },
+  { id: "r_dynasty",  type: "s", rival: true, npc: true, name: "🏰 왕조의 심장",   desc: "라이벌 전용. 큰 경기 경기력 +8%, 큰 경기 실수 −50%",               effects: { bigMatch: 0.08, evBadBig: -0.5 } },
+  { id: "r_veteran",  type: "s", rival: true, npc: true, name: "🛡️ 베테랑의 품격", desc: "라이벌 전용. 우리 팀 모두 실수 −20%, 한타 때 팀 전력 +2",          effects: { teamBad: -0.2, teamMood: 2 } },
   { id: "s_rank_god",  type: "s", name: "랭크의 신",                 desc: "솔로 랭크 승률 +10%, 챌린저인 주마다 인기도 +1",               effects: { ladderWin: 0.1, challengerPopularity: 1 } },
   { id: "s_weed",      type: "s", name: "잡초",                      desc: "나쁜 특성이 생기지 않음, 패배해도 컨디션이 떨어지지 않음",       effects: { badImmune: true, lossMental: -1 } },
   { id: "s_goat",      type: "s", npc: true, name: "GOAT",           desc: "역대 최고. 좋은 장면 ×1.8(크기 +60%), 실수 −60%, 모든 훈련 +30%, 경기력 +3%, 85 이상 스탯 성장 ×1.5", effects: { trainingAll: 0.3, power: 0.03, topGrowth: { all: 0.5 }, evGood: { all: 0.8 }, evBad: { all: -0.6 }, evPower: { all: 0.6, bad: -0.4 } } },
@@ -156,6 +163,11 @@ const S_TRAIT_RULES = [
   { trait: "s_rank_god",     who: "user", text: "솔로 랭크 3,500점 달성",                       ladder: 3500 },
   { trait: "s_weed",         who: "user", text: "2군(후보)에 내려간 시즌에 우승" },
   { trait: "s_goat",         who: "all",  text: "S급 특성 4개 이상 얻기",                       sCount: 4 },
+  // 라이벌 전용 (who: "npc") — 시즌이 끝날 때·상을 받을 때 확인 (js/straits.js)
+  { trait: "r_nemesis", who: "npc", text: "내 선수가 1부 주전·스탯 점수 72 이상일 때, 다른 1부 팀 같은 포지션 최고 선수 (리그에 1명)", userScore: 72 },
+  { trait: "r_ace",     who: "npc", text: "1부 시즌 평균 평점 상위 3명 (해마다)",             top: 3 },
+  { trait: "r_dynasty", who: "npc", text: "국내 결승 MVP" },
+  { trait: "r_veteran", who: "npc", text: "27세 이상 · 1부 주전 4시즌",                     age: 27, seasons: 4 },
 ];
 
 // 다른 선수(NPC) 특성: 선수를 만들 때 무작위로 (npc: true인 특성 중에서)
@@ -166,10 +178,15 @@ const NPC_TRAITS = {
 };
 
 // 캐릭터 생성 화면: 포지션마다 추천하는 특성 (⭐ 추천 표시, 순서대로)
-const TRAIT_RECOMMEND = {
-  top:     ["map_reader", "highlight", "clutch"],
-  jungle:  ["steal_master", "born_leader", "map_reader"],
-  mid:     ["highlight", "machine", "clutch"],
-  adc:     ["machine", "highlight", "clutch"],
-  support: ["born_leader", "map_reader", "machine"],
+const TRAIT_RECOMMEND = { // (124) 경기 특성 1개 + 성장·챔피언 특성
+  top:     ["map_reader", "lane_monster", "late_bloomer"],
+  jungle:  ["steal_master", "cool_head", "meta_reader"],
+  mid:     ["highlight", "champ_lab", "fast_hands"],
+  adc:     ["machine", "fast_hands", "carry_instinct"],
+  support: ["born_leader", "support_sense", "cool_head"],
 };
+
+// 경기 특성 포지션 궁합 (124)
+// - offMult: 어울리지 않는 포지션이면 경기 특성 효과 배율 (0.5 = 절반)
+// - matchLimit: 캐릭터 생성 때 고를 수 있는 경기 특성 수
+const TRAIT_FIT = { offMult: 0.5, matchLimit: 1 };

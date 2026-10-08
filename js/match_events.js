@@ -39,7 +39,7 @@ function moodMult(series, p, side, teamId, good) {
     const st = p.id ? statsOfId(p.id) : null;
     const mental = st ? st.mental : 60;
     m *= Math.max(R.mentalMin, Math.min(1, 1 - (mental - 50) / 80)); // 멘탈이 높으면 덜 흔들림
-    if (p.id) m *= 1 + traitSumOf(traitsOf(p.id), "psychFragile"); // 유리멘탈: 더 흔들림
+    if (p.id) m *= 1 + traitSumOf(matchTraitsOf(p.id), "psychFragile"); // 유리멘탈: 더 흔들림
   }
   return Math.max(0.2, good ? 1 + m * R.moodGood : 1 - m * R.moodBad);
 }
@@ -84,7 +84,7 @@ function traitEvMult(ev, p, team, t, ctx, teamId) {
   let mult = 1, best = null, bestF = 1;
   team.forEach(function (q) {
     if (!q.id) return;
-    traitsOf(q.id).forEach(function (tid) {
+    matchTraitsOf(q.id).forEach(function (tid) {
       const tr = findTrait(tid);
       if (!tr) return;
       const f = traitEvFactor(tr.effects, ev, t, ctx, teamId, q === p, p);
@@ -139,6 +139,31 @@ function addRate(rate, id, v) {
   if (id) rate[id] = (rate[id] || 0) + v;
 }
 
+// ----- 전승 방지 (124, data/match.js FOCUS_RULES · SLUMP_RULES) -----
+// 내 S급 특성 수 (라이벌 전용·GOAT 제외)
+function userSCount() {
+  return state.player.traits.filter(function (x) { const t = findTrait(x); return t && t.type === "s" && !t.rival && x !== "s_goat"; }).length;
+}
+function focusUserMult() { return Math.max(FOCUS_RULES.userMin, 1 - FOCUS_RULES.userPerS * userSCount()); }
+function focusMateMult() { return 1 + FOCUS_RULES.matePerS * userSCount(); }
+// 좋은 장면 주인공 배율: 집중 견제(나 −, 동료 +) · 컨디션 난조(나만, 숨김)
+function userFocusMult(ev, p, side, teamId, ctx) {
+  if (ev.kind !== "good" || !side.some(function (q) { return q.id === USER_ID; })) return 1;
+  if (p.id !== USER_ID) return focusMateMult();
+  return focusUserMult() * (ctx.slump ? SLUMP_RULES.goodMult : 1);
+}
+// 이번 경기를 컨디션 난조로 할지 (js/matchsim.js playMatch): 정규 시즌 + 최근 승률이 너무 높을 때만
+function rollSlump(m) {
+  if (REGULAR_COMPS.indexOf(m.comp) === -1) return false;
+  const mine = myTeam();
+  const done = userMatches().filter(function (x) { return x.winner && REGULAR_COMPS.indexOf(x.comp) !== -1; }).slice(-SLUMP_RULES.recent);
+  if (done.length < SLUMP_RULES.minGames) return false;
+  const rate = done.filter(function (x) { return x.winner === mine.id; }).length / done.length;
+  if (rate < SLUMP_RULES.winRate || Math.random() >= SLUMP_RULES.chance) return false;
+  state.career.slumps = (state.career.slumps || 0) + 1; // 측정용 (화면에는 안 보임)
+  return true;
+}
+
 // 한 세트 사건 굴리기 → { list, a(a팀 점수 합), b, rate(선수별 평점 ±) }
 // ctx: { big 큰 경기, deciding 풀세트, behind 세트 스코어에서 지고 있는 팀 } — 특성 효과용
 function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
@@ -150,7 +175,7 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
   [0, 1].forEach(function (s) {
     if (series.init[teams[s]]) return;
     series.init[teams[s]] = 1;
-    const start = sides[s].reduce(function (sum, q) { return sum + (q.id ? traitSumOf(traitsOf(q.id), "teamStartMood") : 0); }, 0);
+    const start = sides[s].reduce(function (sum, q) { return sum + (q.id ? traitSumOf(matchTraitsOf(q.id), "teamStartMood") : 0); }, 0);
     if (start) series.t[teams[s]] = clampMood((series.t[teams[s]] || 0) + start);
   });
 
@@ -181,7 +206,7 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
     [0, 1].forEach(function (s) {
       sides[s].forEach(function (p) {
         const tm = traitEvMult(ev, p, sides[s], t, ctx, teams[s]); // 특성 (data/traits.js)
-        cands.push({ p: p, s: s, w: evActorWeight(ev, p, s, teams[s], series) * tm.mult, tr: tm.tr });
+        cands.push({ p: p, s: s, w: evActorWeight(ev, p, s, teams[s], series) * tm.mult * userFocusMult(ev, p, sides[s], teams[s], ctx), tr: tm.tr });
       });
     });
     const who = weightedPick(cands, function (c) { return c.w; });
@@ -191,7 +216,7 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
     let x = 0;
     if (ev.kind !== "psych") {
       const r = R.size[ev.size];
-      const swing = p.id ? evSizeMult(traitsOf(p.id), ev) : 1; // 특성: 장면 크기 (evSwing·evPower)
+      const swing = p.id ? evSizeMult(matchTraitsOf(p.id), ev) : 1; // 특성: 장면 크기 (evSwing·evPower)
       x = Math.round(randFloat(r[0], r[1]) * R.scale * swing * 10) / 10;
       if (ev.kind === "bad") x = -x;
       if (s === 0) out.a += x; else out.b += x;
@@ -236,7 +261,7 @@ function afterSetEvents(out, la, lb, teamA, teamB, win, flipped, series) {
       const bad = mine.filter(function (e) { return e.k === "bad"; }).length;
       const key = moodKey(p, s);
       if (big && (series.p[key] || 0) < R.moodMax) { series.p[key] = clampMood((series.p[key] || 0) + 1); push("confident", s, p); }
-      else if (bad >= R.tiltBadCount && (series.p[key] || 0) > -R.moodMax && !(p.id && traitSumOf(traitsOf(p.id), "psychImmune"))) { series.p[key] = clampMood((series.p[key] || 0) - 1); push("tilted", s, p); }
+      else if (bad >= R.tiltBadCount && (series.p[key] || 0) > -R.moodMax && !(p.id && traitSumOf(matchTraitsOf(p.id), "psychImmune"))) { series.p[key] = clampMood((series.p[key] || 0) - 1); push("tilted", s, p); }
     });
   });
   // 팀: 연속 패배 → 소극적 / 사건으로 뒤집은 승리 → 분위기 반전

@@ -245,6 +245,7 @@ function playerTraitsHTML() {
     let note = "";
     if (t.impact) note += '<span class="up">세트 승률 +' + t.impact.toFixed(1) + "%p</span> · " + escapeHTML(t.when);
     const arch = findArchetype(p.archetype);
+    if (t.fit) note += (note ? " · " : "") + (traitFits(t, p.position) ? '<span class="up">🎯 ' + traitFitText(t) + " 포지션 효과 100%</span>" : '<span class="down">🎯 ' + traitFitText(t) + "용 — 지금 포지션은 효과 절반</span>");
     const until = arch && arch.startTrait === id ? startTraitEndYear(p, state.career) : null; // js/creation.js
     if (until) {
       const left = until - state.year;
@@ -257,6 +258,7 @@ function playerTraitsHTML() {
   const hasBad = p.traits.some(function (id) { return findTrait(id) && findTrait(id).type === "bad"; });
   const mine = '<div class="card"><h2>내 특성 <span class="muted small">' + p.traits.length + "개 · 장면 = 이 특성 덕분에 경기 흐름에서 일어난 내 장면 (이번 시즌 / 통산)</span></h2>" +
     (rows ? '<table class="roster trait-table"><tr><th>특성</th><th>종류</th><th>효과</th><th>경기 영향 · 기간</th><th class="r">장면</th></tr>' + rows + "</table>" : '<p class="muted">특성이 없어요.</p>') +
+    (userSCount() ? '<p class="small">🎯 <b>집중 견제</b>: S급 특성 ' + userSCount() + "개 → 상대가 나를 집중 견제해서 내 좋은 장면 확률 ×" + focusUserMult().toFixed(2) + ", 대신 동료 좋은 장면 ×" + focusMateMult().toFixed(2) + "</p>" : "") +
     (hasBad ? '<p class="small notice-inline">나쁜 특성은 SNS로 오는 극복 이벤트에서 좋은 선택을 하면 사라질 수 있어요.</p>' : "") +
   "</div>";
   return mine + sTraitProgressHTML();

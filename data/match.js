@@ -120,3 +120,11 @@ const PHASES = {
   macro: { name: "운영",   stats: { macro: 0.35, vision: 0.35, shotcall: 0.3 },   devWeight: 0.55, posWeight: { jungle: 1.5, support: 1.5 } },
   fight: { name: "한타",   stats: { teamfight: 0.4, spacing: 0.3, focus: 0.3 },   devWeight: 0.55, posWeight: { adc: 1.3, mid: 1.3 } },
 };
+
+// ===== 전승 방지 (124) — js/match_events.js userFocusMult =====
+// 집중 견제: 내 S급 특성(라이벌 전용·GOAT 제외) 1개마다 상대가 나를 더 견제
+//   userPerS: 내 좋은 장면이 뽑힐 확률 −n (최소 userMin배), matePerS: 같은 팀 동료 좋은 장면 +n
+// 컨디션 난조(화면에 안 보임): 정규 시즌 경기에서 우리 팀 최근 recent경기 승률이 winRate 이상이면
+//   chance 확률로 그 경기 내 좋은 장면 확률 ×goodMult (토너먼트·국제대회는 제외)
+const FOCUS_RULES = { userPerS: 0.15, userMin: 0.35, matePerS: 0.06 };
+const SLUMP_RULES = { recent: 10, minGames: 6, winRate: 0.8, chance: 0.5, goodMult: 0.2 };

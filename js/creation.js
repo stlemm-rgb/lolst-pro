@@ -44,11 +44,23 @@ function draftTraits() {
   return draft.traits.slice(0, traitSlots());
 }
 
+// 경기 특성인가 (캐릭터 생성 때 TRAIT_FIT.matchLimit개까지, data/traits.js)
+function isMatchTrait(id) { const t = findTrait(id); return !!t && t.group === "경기"; }
+
+// 무작위로 채울 때도 경기 특성은 matchLimit개까지
+function fillTraits(chosen, slots) {
+  const out = chosen.slice();
+  shuffled(TRAITS.filter(function (t) { return t.type === "good" && out.indexOf(t.id) === -1; }).map(function (t) { return t.id; })).forEach(function (id) {
+    if (out.length >= slots) return;
+    if (isMatchTrait(id) && out.filter(isMatchTrait).length >= TRAIT_FIT.matchLimit) return;
+    out.push(id);
+  });
+  return out;
+}
+
 // 시작할 때: 덜 고른 칸은 무작위로 채움
 function finalTraits() {
-  const chosen = draftTraits();
-  const rest = shuffled(TRAITS.filter(function (t) { return t.type === "good" && chosen.indexOf(t.id) === -1; }).map(function (t) { return t.id; }));
-  return chosen.concat(rest.slice(0, traitSlots() - chosen.length));
+  return fillTraits(draftTraits(), traitSlots());
 }
 
 function findStartYear(year) {
@@ -102,7 +114,7 @@ function randomizeDraft() {
   draft.archetype = pick(ARCHETYPES.filter(function (a) { return !a.difficulty; })).id;
   draft.startYear = pick(CREATION.startYears).year;
   rerollOffsets();
-  draft.traits = shuffled(TRAITS.filter(function (t) { return t.type === "good"; }).map(function (t) { return t.id; })).slice(0, traitSlots());
+  draft.traits = fillTraits([], traitSlots());
   draft.alloc = {};
   for (let i = 0; i < CREATION.bonusPoints; i++) {
     const sid = pick(STATS).id;
@@ -203,14 +215,17 @@ function creationHTML() {
   const posName = findPosition(draft.position).name;
   const groups = [];
   TRAITS.forEach(function (t) { if (t.type === "good" && groups.indexOf(t.group) === -1) groups.push(t.group); });
+  const matchPicked = pickedTraits.filter(isMatchTrait);
   const traitCardHTML = function (t) {
     const on = pickedTraits.indexOf(t.id) !== -1;
-    const full = !on && pickedTraits.length >= slots;
+    const full = !on && pickedTraits.length >= slots && !(t.group === "경기" && matchPicked.length >= TRAIT_FIT.matchLimit); // 경기 특성끼리는 바꿔 끼울 수 있음
+    const fits = t.fit ? t.fit.indexOf(draft.position) !== -1 : true;
     const isRec = rec.indexOf(t.id) !== -1;
     return '<div class="choice trait-pick' + (on ? " selected" : "") + (full ? " full" : "") + (isRec ? " rec" : "") + '" data-ctrait="' + t.id + '">' +
       "<h3>" + (on ? "✔ " : "") + t.name + (isRec ? ' <span class="rec-badge">⭐ ' + posName + " 추천</span>" : "") + "</h3>" +
       '<p class="muted">' + escapeHTML(t.desc) + "</p>" +
       (t.impact ? '<p class="impact">경기 영향: 세트 승률 <b>+' + t.impact.toFixed(1) + "%p</b> · " + escapeHTML(t.when) + "</p>" : "") +
+      (t.fit ? '<p class="small ' + (fits ? "up" : "down") + '">🎯 어울리는 포지션: ' + traitFitText(t) + (fits ? " (" + posName + " ✔)" : " — " + posName + "은(는) 효과 절반") + "</p>" : "") +
     "</div>";
   };
   const recCards = rec.map(findTrait).filter(Boolean).map(traitCardHTML).join("");
@@ -223,7 +238,8 @@ function creationHTML() {
     '<div class="card"><h2>5. 특성 <span class="muted small">' + pickedTraits.length + " / " + slots + "개 선택</span></h2>" +
       '<p class="muted small">' + arch.name + " 유형은 좋은 특성을 " + slots + "개 고를 수 있어요. 눌러서 고르고, 다시 누르면 빠져요. " +
         "덜 고르고 시작하면 남은 칸은 무작위로 채워져요. 나쁜 특성은 게임 중 이벤트로만 생겨요. " +
-        "경기 영향은 그 특성을 가진 선수 1명이 있을 때 세트 승률이 얼마나 오르는지 잰 값이에요 (스탯 12개 전부 +5 ≈ +2.5%p).</p>" +
+        "경기 영향은 그 특성을 가진 선수 1명이 있을 때 세트 승률이 얼마나 오르는지 잰 값이에요 (어울리는 포지션 기준, 스탯 12개 전부 +5 ≈ +2.5%p).</p>" +
+      '<p class="small">⚔️ <b>경기 특성은 ' + TRAIT_FIT.matchLimit + "개만</b> 고를 수 있어요 (다른 경기 특성을 누르면 바꿔 끼움). 🎯 어울리는 포지션이 아니면 효과가 절반이에요.</p>" +
       (arch.startTrait ? '<p class="small">전용 특성: ' + traitChipHTML(arch.startTrait) + " — 자동으로 붙어요 (" + arch.startTraitSeasons + "시즌 뒤 사라짐)</p>" : "") +
       '<h2 class="sub">⭐ ' + posName + " 추천</h2>" + '<div class="choices trait-choices">' + recCards + "</div>" +
       traitGroups +
@@ -391,6 +407,10 @@ function renderCreation() {
       draft.traits = draftTraits(); // 유형을 바꿔 넘친 것은 정리
       const i = draft.traits.indexOf(id);
       if (i !== -1) draft.traits.splice(i, 1);
+      else if (isMatchTrait(id) && draft.traits.filter(isMatchTrait).length >= TRAIT_FIT.matchLimit) {
+        const old = draft.traits.filter(isMatchTrait)[0]; // 경기 특성은 1개만: 바꿔 끼움
+        draft.traits[draft.traits.indexOf(old)] = id;
+      }
       else if (draft.traits.length < traitSlots()) draft.traits.push(id);
       else if (traitSlots() === 1) draft.traits = [id]; // 1개짜리 유형은 바로 바꿔 끼움
       renderCreation();

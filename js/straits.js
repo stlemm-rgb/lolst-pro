@@ -32,6 +32,7 @@ function grantSTrait(id, traitId) {
   const list = traitListOf(id);
   if (!rule || !list || list.indexOf(traitId) !== -1) return;
   if (rule.who === "user" && id !== USER_ID) return;
+  if (rule.who === "npc" && id === USER_ID) return; // 라이벌 전용 (124)
   list.push(traitId);
   const t = findTrait(traitId);
   const teamId = id === USER_ID ? myTeam().id : findPlayer(id).teamId;
@@ -43,14 +44,18 @@ function grantSTrait(id, traitId) {
   if (id === USER_ID) {
     postMessage("news", "🌟 S급 특성 획득: " + t.name, rule.text + "!\n" + t.desc, { notes: ["S급 특성 '" + t.name + "'을(를) 얻었다!"] });
     addMoment("🌟", "S급 특성 '" + t.name + "' 획득 (" + rule.text + ")");
+  } else if (traitId === "r_nemesis") {
+    // 숙명의 라이벌: 나를 겨냥하는 상대라 연락으로 알림
+    postMessage("news", "⚔️ 숙명의 라이벌: " + playerName(id), team + "의 " + findPosition(findPlayer(id).pos).name + " " + playerName(id) + "이(가) 인터뷰에서 " + state.player.name + "을(를) 이기는 게 목표라고 밝혔다. 우리 팀과 만날 때마다 이를 갈고 나올 것이다.",
+      { notes: [t.desc, "선수가 은퇴하거나 2부로 내려가면 다른 선수가 이어받을 수 있어요"] });
   } else {
-    addNews("S급 특성", playerName(id) + "(" + team + ")이(가) S급 특성 '" + t.name + "'을(를) 얻었다! (" + rule.text + ")");
+    addNews("S급 특성", playerName(id) + "(" + team + ")이(가) " + (t.rival ? "라이벌 전용 " : "") + "S급 특성 '" + t.name + "'을(를) 얻었다! (" + rule.text + ")");
   }
 
   // GOAT: S급 특성이 일정 개수 이상
   const goat = sRule("s_goat");
   if (traitId !== "s_goat" && goat) {
-    const count = list.filter(function (x) { return findTrait(x).type === "s" && x !== "s_goat"; }).length;
+    const count = list.filter(function (x) { const t = findTrait(x); return t && t.type === "s" && !t.rival && x !== "s_goat"; }).length; // 라이벌 전용은 세지 않음
     if (count >= goat.sCount) grantSTrait(id, "s_goat");
   }
 }
@@ -104,6 +109,7 @@ function sTraitsOnAward(id, key) {
     if (both) grantSTrait(id, "s_demon");
   }
   if (key === "mvp" && playerAge(id) >= sRule("s_iron_will").age) grantSTrait(id, "s_iron_will");
+  if (key === "fmvp" && id !== USER_ID) grantSTrait(id, "r_dynasty"); // 라이벌 전용: 국내 결승 MVP
 }
 
 // 시즌이 끝날 때 (새해 직전, 이번 시즌 기록이 남아 있을 때)
@@ -125,8 +131,37 @@ function sTraitsOnSeasonEnd() {
       if (st && st.solo >= sRule("s_lane_lord").solo) grantSTrait(id, "s_lane_lord");
       // 한계 돌파: 95 이상 스탯
       if (statsAtCap(id) >= sRule("s_breakthrough").atCap) grantSTrait(id, "s_breakthrough");
+      // 라이벌 전용 베테랑: 1부 주전 시즌 수 (팀을 옮겨도 이어짐)
+      if (t.tier === 1 && !benched && id !== USER_ID) rec.t1Years = (rec.t1Years || 0) + 1;
+      const vet = sRule("r_veteran");
+      if (vet && id !== USER_ID && rec.t1Years >= vet.seasons && playerAge(id) >= vet.age) grantSTrait(id, "r_veteran");
     });
   });
+  rivalSTraitsOnSeasonEnd(stats);
+}
+
+// 라이벌 전용 S급 (124): 에이스(평점 상위) · 숙명의 라이벌(나를 겨냥)
+function rivalSTraitsOnSeasonEnd(stats) {
+  const P = state.league.players;
+  const t1 = state.league.teams.filter(function (t) { return t.tier === 1; });
+  // 리그의 에이스: 1부 선수 중 시즌 평균 평점 상위 n명 (세트 20개 이상)
+  const ace = sRule("r_ace");
+  const nem = sRule("r_nemesis");
+  if (!ace || !nem) return;
+  const ids = [];
+  t1.forEach(function (t) { t.roster.forEach(function (id) { if (id !== USER_ID && P[id] && stats[id] && stats[id].g >= 20) ids.push(id); }); });
+  ids.sort(function (a, b) { return stats[b].r / stats[b].g - stats[a].r / stats[a].g; });
+  ids.slice(0, ace.top).forEach(function (id) { grantSTrait(id, "r_ace"); });
+  // 숙명의 라이벌: 리그에 1명. 지금 주인이 없거나 1부를 떠났으면, 내 선수가 강할 때 새로
+  const mine = myTeam();
+  const holder = Object.keys(P).find(function (id) { return (P[id].traits || []).indexOf("r_nemesis") !== -1; });
+  const holderOk = holder && P[holder].teamId && findTeam(P[holder].teamId) && findTeam(P[holder].teamId).tier === 1 && P[holder].teamId !== (mine && mine.id);
+  if (holder && !holderOk) P[holder].traits.splice(P[holder].traits.indexOf("r_nemesis"), 1); // 2부로 가거나 우리 팀에 오면 내려놓음
+  if (holderOk || !mine || mine.tier !== 1 || state.benched || playerScore(USER_ID) < nem.userScore) return;
+  const rivals = [];
+  t1.forEach(function (t) { if (t.id !== mine.id) t.roster.forEach(function (id) { if (P[id] && P[id].pos === state.player.position) rivals.push(id); }); });
+  rivals.sort(function (a, b) { return playerScore(b) - playerScore(a); });
+  if (rivals.length) grantSTrait(rivals[0], "r_nemesis");
 }
 
 // 내 선수만: 매주 확인 (events.js checkTraitGains에서 부름)
@@ -146,7 +181,7 @@ function sTraitLogHTML() {
   }).join("");
   const guide = S_TRAIT_RULES.map(function (r) {
     return "<tr><td>" + traitChipHTML(r.trait) + '</td><td class="small">' + escapeHTML(r.text) + '</td><td class="muted small">' + escapeHTML(findTrait(r.trait).desc) +
-      (r.who === "user" ? " (내 선수만)" : "") + "</td></tr>";
+      (r.who === "user" ? " (내 선수만)" : r.who === "npc" ? " (라이벌 전용 — 다른 선수만)" : "") + "</td></tr>";
   }).join("");
   return (
     '<div class="card"><h2>🌟 S급 특성 기록</h2>' +
