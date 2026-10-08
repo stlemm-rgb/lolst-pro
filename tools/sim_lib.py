@@ -77,7 +77,7 @@ def new_career(page, pos="mid", year=2012, archetype=None, team="tier1-mid", sta
         const t1 = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1);
         const t2 = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 2);
         draft.teamChoice = team === 'tier2' ? t2[0][1] : team === 'tier1-top' ? t1[0][1] : t1[Math.floor(t1.length / 2)][1];
-        startCareer();
+        startCareer(true);
         if (boost) Object.keys(state.stats).forEach(k => state.stats[k] = Math.min(100, state.stats[k] + boost));
         if (mmin) Object.keys(state.mastery).forEach(n => state.mastery[n] = Math.max(state.mastery[n], mmin));
         if (traits) state.player.traits = traits.slice();

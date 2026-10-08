@@ -54,7 +54,7 @@ def run_pos(job):
         browser, page, errors = open_game(pw, overrides)
         seed(page, 42)
         page.evaluate("""(pos) => { draft.name='테스트'; draft.position=pos; draft.startYear=2012; renderCreation();
-            const t1 = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1); draft.teamChoice = t1[Math.floor(t1.length / 2)][1]; startCareer(); }""", pos)
+            const t1 = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1); draft.teamChoice = t1[Math.floor(t1.length / 2)][1]; startCareer(true); }""", pos)
         r = page.evaluate(RUN_JS, [level, n, configs, plus])
         r["pos"] = pos
         r["fit"] = page.evaluate("() => { const o = {}; TRAITS.forEach(t => { if (t.fit) o[t.id] = t.fit; }); return o; }")

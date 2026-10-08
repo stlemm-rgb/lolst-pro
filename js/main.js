@@ -343,8 +343,9 @@ const settingsActions = {
   load: function () {
     const loaded = loadGame();
     if (!loaded) return showNotice("저장된 게임이 없어요.");
-    if (!confirm("마지막으로 저장한 때로 되돌릴까요?\n저장하지 않은 진행은 사라집니다.")) return;
-    replaceState(loaded, "settings", "불러왔어요.");
+    askConfirm("마지막으로 저장한 때로 되돌릴까요?\n저장하지 않은 진행은 사라집니다.", function () {
+      replaceState(loaded, "settings", "불러왔어요.");
+    }, "되돌리기");
   },
   export: function () {
     exportSave();
@@ -362,10 +363,11 @@ const settingsActions = {
     showNotice("이름을 '" + escapeHTML(state.player.name) + "'(으)로 바꿨어요.");
   },
   "new-game": function () {
-    if (!confirm("새 게임을 시작할까요?\n캐릭터 생성 화면으로 이동합니다.\n새 캐릭터로 [커리어 시작]을 누르면 브라우저에 저장된 게임이 새 게임으로 바뀝니다.")) return;
-    const fresh = createNewState();
-    fresh.settings.autoSave = state.settings.autoSave;
-    replaceState(fresh, "dashboard", "");
+    askConfirm("새 게임을 시작할까요?\n캐릭터 생성 화면으로 이동합니다.\n새 캐릭터로 [커리어 시작]을 누르면 브라우저에 저장된 게임이 새 게임으로 바뀝니다.", function () {
+      const fresh = createNewState();
+      fresh.settings.autoSave = state.settings.autoSave;
+      replaceState(fresh, "dashboard", "");
+    }, "새 게임");
   },
 };
 
@@ -390,9 +392,10 @@ function bindSettings(page) {
     if (!file) return;
     importSave(file, function (loaded, error) {
       if (!loaded) return showNotice("가져오지 못했어요: " + escapeHTML(error));
-      if (!confirm("이 세이브 파일로 바꿀까요?\n지금 진행은 사라집니다.")) return;
-      replaceState(loaded, "settings", "세이브 파일을 가져왔어요.");
-      saveGame();
+      askConfirm("이 세이브 파일로 바꿀까요?\n지금 진행은 사라집니다.", function () {
+        replaceState(loaded, "settings", "세이브 파일을 가져왔어요.");
+        saveGame();
+      }, "바꾸기");
     });
   };
 }
@@ -897,6 +900,25 @@ function newYearArticle(lines) {
   r.headlines.push({ key: "newyear", headline: state.year + "년 새 시즌, 이렇게 달라진다", body: lines.join("\n"), mine: false });
   r.headlinesSeen = false;
   addNews("새 시즌 기사", "📰 " + state.year + "년 새 시즌 기사: 승강·리그·해외·대형 신인 소식 " + lines.length + "건 (대시보드 [📰 NEWS])");
+}
+
+// ----- 확인 상자 (133): 브라우저 confirm() 대신 화면 안 상자 (웹 링크·아티팩트에서는 confirm이 막혀 있음) -----
+// askConfirm("물어볼 말", 예를 눌렀을 때 할 일, "예 버튼 글자")
+function askConfirm(message, onYes, yesLabel) {
+  const old = document.getElementById("confirm-box");
+  if (old) old.remove();
+  const box = document.createElement("div");
+  box.id = "confirm-box";
+  box.innerHTML = '<div class="cb-panel" role="dialog" aria-modal="true"><p class="cb-text">' + escapeHTML(message) + "</p>" +
+    '<div class="cb-buttons"><button id="cb-no">취소</button><button class="primary" id="cb-yes">' + escapeHTML(yesLabel || "확인") + "</button></div></div>";
+  document.body.appendChild(box);
+  const close = function () { box.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = function (e) { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  box.onclick = function (e) { if (e.target === box) close(); };
+  document.getElementById("cb-no").onclick = close;
+  document.getElementById("cb-yes").onclick = function () { close(); onYes(); };
+  document.getElementById("cb-yes").focus();
 }
 
 // 소식 기록 (새 시즌, 새 챔피언, 패치 등)

@@ -331,10 +331,11 @@ function bindMarket(page) {
   page.querySelectorAll("[data-request]").forEach(function (btn) {
     btn.onclick = function () {
       const t = findTeam(btn.getAttribute("data-request"));
-      if (!confirm(t.name + "에 이적을 요청할까요? (남은 횟수 " + state.transferRequestsLeft + "회)")) return;
-      requestTransfer(t.id);
-      if (state.settings.autoSave) saveGame();
-      renderAll();
+      askConfirm(t.name + "에 이적을 요청할까요? (남은 횟수 " + state.transferRequestsLeft + "회)", function () {
+        requestTransfer(t.id);
+        if (state.settings.autoSave) saveGame();
+        renderAll();
+      }, "이적 요청");
     };
   });
   const go = page.querySelector("[data-go-sns]");

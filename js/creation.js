@@ -436,8 +436,8 @@ function renderCreation() {
   };
 }
 
-// [커리어 시작]: 초안을 진짜 게임 상태로 바꾸기
-function startCareer() {
+// [커리어 시작]: 초안을 진짜 게임 상태로 바꾸기 (sure: 보너스 포인트가 남아도 묻지 않음)
+function startCareer(sure) {
   const name = draft.name.trim();
   if (!name) {
     draft.error = "이름을 한 글자 이상 입력해 주세요.";
@@ -445,7 +445,10 @@ function startCareer() {
     document.getElementById("c-name").focus();
     return;
   }
-  if (pointsLeft() > 0 && !confirm("보너스 포인트가 " + pointsLeft() + "점 남았어요. 이대로 시작할까요?")) return;
+  if (pointsLeft() > 0 && sure !== true) {
+    askConfirm("보너스 포인트가 " + pointsLeft() + "점 남았어요. 이대로 시작할까요?", function () { startCareer(true); }, "이대로 시작");
+    return;
+  }
 
   const arch = findArchetype(draft.archetype);
   const fresh = createNewState();

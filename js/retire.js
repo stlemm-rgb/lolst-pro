@@ -219,9 +219,10 @@ const RETIRE_REASONS = { "선택": "스스로 은퇴를 결정", "나이": "최�
 
 // [선수 정보] → ⏳ 나이·은퇴의 은퇴 버튼
 function retireNowButton() {
-  if (!confirm("지금 바로 은퇴할까요?\n커리어가 끝나고 엔딩 화면으로 넘어가요. 되돌릴 수 없어요.")) return;
-  finishCareer("즉시", true);
-  renderAll();
+  askConfirm("지금 바로 은퇴할까요?\n커리어가 끝나고 엔딩 화면으로 넘어가요. 되돌릴 수 없어요.", function () {
+    finishCareer("즉시", true);
+    renderAll();
+  }, "은퇴하기");
 }
 
 // ----- 명예의 전당 (브라우저 저장소, 새 게임을 해도 남음) -----
