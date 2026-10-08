@@ -7,7 +7,7 @@ const SAVE_GAME_ID = "progamer-career";
 const SAVE_VERSION = 10; // 10: NPC 특성·S급 특성·스탯 상한선 / 9: 노화·은퇴·역사관 / 8: 메타 S급·퀘스트 / 7: 솔로 랭크·지난주 결과 / 6: 계약·이적 / 5: SNS·이벤트 / 4: 리그 / 2: 캐릭터 생성·스탯 12개 / 3: 연도·챔피언 숙련도·평판
 
 // 저장할 항목 (화면 상태처럼 저장할 필요 없는 것은 빼고)
-const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp", "retirePlanned", "retired", "compPlan", "shop", "activities", "pendingEvents", "tutorial", "housing", "loan", "trainHistory", "shakeup", "newChampBuff", "dormWeeks", "world", "fame", "signature", "sig100", "sigGrowth", "achievements", "eventLog", "flags", "relations", "trigQueue"];
+const SAVED_FIELDS = ["player", "team", "money", "year", "week", "stats", "stamina", "staminaMax", "condition", "popularity", "reputation", "mastery", "meta", "practiceChamp", "plan", "log", "settings", "league", "inbox", "msgSeq", "eventCooldown", "career", "skipTraining", "matchBoost", "contract", "pendingMove", "benched", "benchWeeks", "transferListed", "transferRequestsLeft", "soloRank", "weekReport", "quests", "questSeq", "focusChamp", "retirePlanned", "retired", "compPlan", "shop", "activities", "pendingEvents", "tutorial", "housing", "loan", "trainHistory", "shakeup", "newChampBuff", "dormWeeks", "world", "fame", "signature", "sig100", "sigGrowth", "achievements", "eventLog", "flags", "relations", "trigQueue", "friends"];
 
 // 현재 게임 상태를 세이브 모양으로 만들기
 function makeSaveData() {
@@ -149,7 +149,7 @@ function stateFromSave(save) {
   if (s.sigGrowth && typeof s.sigGrowth === "object") fresh.sigGrowth = s.sigGrowth; // 시그니처 성장 (js/collection.js)
   if (s.achievements && typeof s.achievements === "object") fresh.achievements = s.achievements; // 업적 도감
   // 받은 연락 리뉴얼 (js/stories.js): 연락 기록·이야기 기억·선수 관계·시스템 트리거 대기열
-  ["eventLog", "flags", "relations"].forEach(function (k) { if (s[k] && typeof s[k] === "object") fresh[k] = s[k]; });
+  ["eventLog", "flags", "relations", "friends"].forEach(function (k) { if (s[k] && typeof s[k] === "object") fresh[k] = s[k]; });
   if (Array.isArray(s.trigQueue)) fresh.trigQueue = s.trigQueue;
   if (Array.isArray(s.sig100)) fresh.sig100 = s.sig100; // 스타·평판 등급 (js/fame.js) // 합숙한 주 수 (합숙 피로)
   if (s.newChampBuff && typeof s.newChampBuff === "object") fresh.newChampBuff = s.newChampBuff; // 새 챔피언 출시 버프

@@ -65,9 +65,11 @@ function changeRelation(id, n, notes) {
   if (!n || !state.league.players[id]) return;
   if (!state.relations) state.relations = {};
   const before = relationOf(id);
-  const after = Math.max(-100, Math.min(100, before + n));
+  let after = Math.max(-100, Math.min(100, before + n));
+  if (typeof friendGate === "function") after = friendGate(id, before, after); // 절친 칸 (js/friends.js)
   state.relations[id] = after;
   if (notes) notes.push((n > 0 ? "🤝 " : "💢 ") + playerName(id) + "와(과)의 관계 " + (n > 0 ? "+" : "") + n + " (" + relationLabel(after).name + ")");
+  if (typeof friendStageCheck === "function") friendStageCheck(id, after, !!notes); // 친구·절친 단계 이야기 (js/friends.js)
 }
 const RELATION_LABELS = [
   { min: 50,   icon: "💙", name: "절친" },
@@ -147,7 +149,7 @@ function storyTriggerContext(trigger) {
 }
 
 // 시스템 트리거: 다른 코드가 queueTrigger로 넣으면 그 주(또는 다음 주) 연락 처리 때 해당 trigger 연락 하나
-const QUEUE_TRIGGERS = ["rivalSigned", "fameUp", "skinMade", "benchedNow", "friendLeft"];
+const QUEUE_TRIGGERS = ["rivalSigned", "fameUp", "skinMade", "benchedNow", "friendLeft", "friendVs", "friendTitle", "friendRetire"]; // 친구 트리거: js/friends.js
 function queueTrigger(name, ctx) {
   if (!state.trigQueue) state.trigQueue = [];
   state.trigQueue.push({ name: name, ctx: ctx || {} });

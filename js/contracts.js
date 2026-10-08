@@ -279,6 +279,7 @@ function startTransferWindow() {
   // 강한 팀일수록 조금 더 잘 뽑히게: 앞쪽 절반에서 먼저 고름
   const picked = shuffled(candidates.slice(0, Math.max(count, Math.ceil(candidates.length / 2)))).slice(0, count);
   picked.forEach(function (t) { sendOffer(makeOffer(t.id, false)); });
+  friendTipAtWindow(); // 다른 팀 친구가 알려 준 구단 제안 (js/friends.js)
 }
 
 // ----- 제안에 답하기 (events.js의 answerMessage에서 부름) -----

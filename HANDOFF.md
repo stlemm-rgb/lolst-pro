@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-08, PROGRESS 120까지
+# 다음 세션 이어가기 — 2026-10-08, PROGRESS 121까지
 
 새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 114~120) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
@@ -37,6 +37,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 118 | 수집·강화: 🎨 월드 우승 스킨(경기력 +2%), ✒️ 시그니처 ★1~★5 성장, 🏅 업적 도감 47개. 왼쪽 메뉴 '수집' 묶음 | data/collection.js, js/collection.js |
 | 119 | **받은 연락 리뉴얼**: 반복·개수 조절, 결과 이야기, 🎲 능력치 판정, 연작, 시즌 흐름 연락, 시스템 연결 연락, 🤝 선수 관계·팀 케미, 선수 생활 연락 (연락 60 → 109개) | data/events.js, data/events_story.js, data/events_life.js, js/events.js, js/stories.js |
 | 120 | 업적 보상(인기도·평판·돈) 삭제 — 업적은 소식만, 동·은·금은 난이도 표시 | data/collection.js, js/collection.js |
+| 121 | 🤝 친구 시스템: 분기(3·16·29·49주) 친구 활동 연락, 친구 25·절친 50(최대 3명), 친구 전용 연락, friendTip 이적 제안, 왼쪽 메뉴 '친구' 화면 (state.friends) | data/friends.js, js/friends.js |
 
 자세한 수치·측정은 PROGRESS.md 114~120 참고.
 

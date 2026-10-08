@@ -84,6 +84,7 @@ function fillText(text, ctx) {
     .replace(/\{award\}/g, c.award || "개인상")
     .replace(/\{streak\}/g, c.streak || "")
     .replace(/\{opp\}/g, c.opp || "상대 팀")
+    .replace(/\{me\}/g, state.player.name)
     .replace(/\{year\}/g, String(state.year))
     .replace(/\{window\}/g, String(CONTRACT.windowStart))
     .replace(/\{(\w+)\}/g, function (all, k) { return c[k] !== undefined && c[k] !== null && typeof c[k] !== "object" ? String(c[k]) : all; }); // 그 밖의 빈칸은 ctx 값
@@ -170,6 +171,8 @@ function applyEffects(eff, ctx) {
       const m = eventMoney(v);
       state.money += m;
       notes.push("자금 " + (m > 0 ? "+" : "−") + Math.abs(m / 10000).toLocaleString() + "만 원");
+    } else if (key === "friendTip") {
+      friendTip(ctx, notes); // 다른 팀 친구의 이적 정보 (js/friends.js)
     } else if (key === "activity") {
       startActivity(v, ctx, notes);
     } else if (key === "cureOther") {
@@ -339,7 +342,8 @@ function traitWeight(ev) {
 // 매주 한 번: 조건 이벤트 → 무작위 이벤트 → 특성 얻기 → 선수 SNS → 답 안 한 연락 정리
 function runWeeklyEvents() {
   // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/stories.js) → 조건 연락 → 무작위
-  let inboxFired = runQueuedTriggers();
+  let inboxFired = friendWeekly(); // 분기 친구 활동 · 친구 트리거 (js/friends.js)
+  inboxFired = runQueuedTriggers() || inboxFired;
   shuffled(EVENTS).forEach(function (ev) {
     if (ev.trigger === "random" || ev.trigger === "followUp" || ev.trigger === "signature" || QUEUE_TRIGGERS.indexOf(ev.trigger) !== -1 || !eventReady(ev)) return;
     if (ev.tab === "inbox" && !ev.always && inboxFired) return;
@@ -535,6 +539,7 @@ function autoIgnore() {
 
 // 자금이 모자라서 고를 수 없는 선택지인가?
 function choiceTooExpensive(msg, index) {
+  if (msg.kind === "friend") return friendChoiceTooExpensive(msg, index); // js/friends.js
   const ev = findEvent(msg.eventId);
   const c = ev && ev.choices[index];
   return !!(c && c.effects && c.effects.money < 0 && state.money < -eventMoney(c.effects.money));
@@ -546,6 +551,7 @@ function answerMessage(msgId, index) {
   if (!msg || msg.answered !== null) return;
   if (msg.kind === "offer") { answerOffer(msg, index); return; } // 계약 제안 (js/contracts.js)
   if (msg.kind === "retire") { answerRetire(msg, index); return; } // 은퇴 권유 (js/retire.js)
+  if (msg.kind === "friend") { answerFriend(msg, index); return; } // 분기 친구 활동 (js/friends.js)
   const ev = findEvent(msg.eventId);
   let choice = ev && ev.choices[index];
   // 예전에 온 연락이라 선택지 순서가 바뀌었으면 글자로 찾기
@@ -622,6 +628,8 @@ function whoContext(who) {
     const f = Object.keys(state.relations || {}).filter(function (id) { return P[id] && P[id].teamId && relationOf(id) <= -30; });
     return f.length ? make(pick(f)) : null;
   }
+  const fw = friendWhoContext(who); // 친구 연락: bestFriend · friendMate · friendOther · retiredFriend (js/friends.js)
+  if (fw !== undefined) return fw;
   if (who === "teammate") return mates.length ? make(pick(mates)) : null;
   if (who === "teammateBad") {
     const bad = [];

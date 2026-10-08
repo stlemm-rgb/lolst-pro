@@ -527,6 +527,7 @@ function addBigRookies() {
 function retirePlayer(p) {
   const team = p.teamId && findTeam(p.teamId);
   recordRetiree(p, team);
+  friendOnRetire(p); // 친한 선수 은퇴 → 작별 연락·은퇴한 친구 (js/friends.js)
   delete state.league.players[p.id];
   const fa = state.league.freeAgents.indexOf(p.id);
   if (fa !== -1) state.league.freeAgents.splice(fa, 1);

@@ -7,6 +7,7 @@ const MENU_GROUPS = [
     { id: "dashboard", name: "대시보드" },
     { id: "training",  name: "훈련" },
     { id: "sns",       name: "SNS" },
+    { id: "friends",   name: "친구" },
     { id: "career",    name: "선수 정보" },
     { id: "shop",      name: "상점" },
   ] },
