@@ -1,6 +1,6 @@
 // ===== 팀 내 입지 (126) — 값·글: data/standing.js =====
 // state.standing = { teamId, since(이 팀에 온 해), qDone, qFail, captain, captainAskYear, pickYear, earlyYear, last }
-// 입지 = 기본 50 + 퀘스트 + 감독 신뢰(평판) + 동료 관계 + 최근 경기력 + 근속 (+ 주장) → 0~100
+// 입지 = 기본 50 + 퀘스트 + 감독 신뢰(평판) + 경력(4강 이상) + 최근 경기력 + 근속 (+ 주장) → 0~100
 // 효과: 재계약 연봉·제안(조기 재계약·재계약 없음), 주장(팀 분위기 +1, 이적 시장 영입 후보 고르기)
 
 function ensureStanding() {
@@ -31,8 +31,7 @@ function standingParts() {
   parts.quest = clampN(qh.reduce(function (s, x) { return s + (x ? R.quest.done : R.quest.fail); }, 0), R.quest.min, R.quest.max);
   parts.trust = repTier().trust * R.trustMult; // 평판 등급 (js/fame.js)
   const mates = t ? t.roster.filter(function (id) { return id !== USER_ID && P[id]; }) : [];
-  const avgRel = mates.length ? mates.reduce(function (s, id) { return s + relationOf(id); }, 0) / mates.length : 0;
-  parts.mates = clampN(avgRel * R.mates.mult, -R.mates.max, R.mates.max);
+  parts.career = Math.min(R.career.max, deepRunList().reduce(function (s, r) { return s + deepRunPoints(r); }, 0));
   const ps = (state.league.season && state.league.season.playerStats) || {};
   const me = ps[USER_ID];
   let form = 0;
@@ -57,13 +56,72 @@ function standingParts() {
 
 function standingValue() {
   const p = standingParts();
-  const sum = STANDING_RULES.base + p.quest + p.trust + p.mates + p.form + p.tenure + p.captain;
+  const sum = STANDING_RULES.base + p.quest + p.trust + p.career + p.form + p.tenure + p.captain;
   return Math.round(Math.max(0, Math.min(100, sum)));
 }
 
 function standingGrade(v) {
   const val = v === undefined ? standingValue() : v;
   return STANDING_RULES.grades.find(function (g) { return val >= g.min; });
+}
+
+// ----- 경력: 리그·컵·국제대회 4강 이상 (state.career.deepRuns = [{ year, ev, stage }]) -----
+const DEEP_EVENTS = {
+  cup_po:    { name: "LCK 컵",      intl: false },
+  playoffs:  { name: "리그",        intl: false },
+  fs_ko:     { name: "First Stand", intl: true },
+  msi_ko:    { name: "MSI",         intl: true },
+  worlds_ko: { name: "월드",        intl: true },
+};
+const DEEP_STAGE_NAMES = { semi: "4강", final: "준우승", win: "우승" };
+
+// 이번 시즌 우리 팀 기록 (경기 결과에서)
+function seasonDeepRuns() {
+  const t = myTeam();
+  const s = state.league.season;
+  if (!t || !s) return [];
+  const best = {};
+  const rank = { semi: 1, final: 2, win: 3 };
+  s.matches.forEach(function (m) {
+    if (!DEEP_EVENTS[m.comp] || !m.winner || (m.a !== t.id && m.b !== t.id)) return;
+    let stage = null;
+    if (m.label.indexOf("결승") !== -1) stage = m.winner === t.id ? "win" : "final";
+    else if (m.label.indexOf("4강") !== -1) stage = "semi";
+    if (stage && (!best[m.comp] || rank[stage] > rank[best[m.comp]])) best[m.comp] = stage;
+  });
+  return Object.keys(best).map(function (ev) { return { year: s.year || state.year, ev: ev, stage: best[ev] }; });
+}
+
+// 지난 시즌까지 + 이번 시즌
+function deepRunList() {
+  const c = state.career;
+  if (!c.deepRuns) {
+    // 예전 세이브: 시즌 기록의 우승만 옮김 (4강·준우승은 남아 있지 않음)
+    const map = { "LCK 컵 우승": "cup_po", "리그 우승": "playoffs", "First Stand 우승": "fs_ko", "MSI 우승": "msi_ko", "월드 우승": "worlds_ko" };
+    c.deepRuns = [];
+    (c.seasons || []).forEach(function (s) { (s.titles || []).forEach(function (tt) { if (map[tt]) c.deepRuns.push({ year: s.year, ev: map[tt], stage: "win" }); }); });
+  }
+  const done = c.deepRuns.some(function (r) { return r.year === state.year; });
+  return c.deepRuns.concat(done ? [] : seasonDeepRuns());
+}
+
+function deepRunPoints(r) {
+  const R = STANDING_RULES.career;
+  return R[r.stage] * (DEEP_EVENTS[r.ev] && DEEP_EVENTS[r.ev].intl ? R.intlMult : 1);
+}
+
+function deepRunSummary() {
+  const list = deepRunList();
+  if (!list.length) return "리그·컵·국제대회 4강 이상 없음";
+  const n = function (st) { return list.filter(function (r) { return r.stage === st; }).length; };
+  return "우승 " + n("win") + " · 준우승 " + n("final") + " · 4강 " + n("semi");
+}
+
+// 시즌이 끝날 때 기록 (js/main.js saveSeasonHistory)
+function recordDeepRuns() {
+  deepRunList(); // 예전 세이브 옮기기
+  if (state.career.deepRuns.some(function (r) { return r.year === state.year; })) return;
+  seasonDeepRuns().forEach(function (r) { state.career.deepRuns.push(r); });
 }
 
 // ----- 매주 (js/events.js runWeeklyEvents) -----
@@ -238,7 +296,7 @@ function standingCardHTML() {
   const next = R.grades.slice().reverse().find(function (x) { return x.min > v; });
   const rows = standingBarRow("📋 최근 퀘스트 " + (S.qHist || []).length + "개 (완료 " + (S.qHist || []).filter(Boolean).length + " · 만료 " + (S.qHist || []).filter(function (x) { return !x; }).length + ")", p.quest, R.quest.max) +
     standingBarRow("👔 감독 신뢰 (평판 " + repTier().name + ")", p.trust, 3 * R.trustMult) +
-    standingBarRow("🤝 동료 관계", p.mates, R.mates.max) +
+    standingBarRow("🏆 경력 (" + deepRunSummary() + ")", p.career, R.career.max) +
     standingBarRow("📈 이번 시즌 경기력", p.form, R.form.max) +
     standingBarRow("⏳ 근속 (" + S.since + "년~)", p.tenure, R.tenure.max) +
     (S.captain ? standingBarRow("🎖️ 주장 (최근 패배만큼 −)", p.captain, R.captain.bonus + R.captain.lossPenalty * R.captain.recent) : "");

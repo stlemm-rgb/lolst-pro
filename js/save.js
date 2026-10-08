@@ -83,6 +83,7 @@ function stateFromSave(save) {
     ["seasonGames", "games", "wins", "seasonWins", "questsDone", "questsGiven", "earned", "repSum", "repWeeks", "allstars", "allStarYear"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
     if (Array.isArray(s.career.seasons)) fresh.career.seasons = s.career.seasons;
     if (Array.isArray(s.career.awards)) fresh.career.awards = s.career.awards;
+    if (Array.isArray(s.career.deepRuns)) fresh.career.deepRuns = s.career.deepRuns; // 팀 내 입지 경력 (js/standing.js)
     if (s.career.debut) fresh.career.debut = s.career.debut;
     if (s.career.statStart) fresh.career.statStart = s.career.statStart;
     if (Array.isArray(s.career.moments)) fresh.career.moments = s.career.moments.slice(-120);

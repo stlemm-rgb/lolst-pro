@@ -71,7 +71,7 @@
 | `STANDING_RULES.base` | 50 | 기본 |
 | `STANDING_RULES.quest` | 완료 +3 / 만료 −4, 최근 10개, ±15 | 퀘스트 |
 | `STANDING_RULES.trustMult` | 4 | 평판 등급 감독 신뢰(−3~+3) × 4 |
-| `STANDING_RULES.mates` | 관계 평균 × 0.24, ±12 | 동료 관계 |
+| `STANDING_RULES.career` | 4강 2 / 준우승 3 / 우승 5, 국제 ×1.5, 최대 15 | 경력 (리그·컵·국제대회 4강 이상, 커리어 전체) |
 | `STANDING_RULES.form` | (내 평점 − 동료 평균) × 8, ±10 | 이번 시즌 경기력 |
 | `STANDING_RULES.tenure` | 시즌 × 2, 최대 6 | 근속 |
 | `STANDING_RULES.captain` | 80 이상 제안, 60 아래 해제, 분위기 +1, +4 − 최근 5경기 패배 × 3, 후보 3명 | 주장 |

@@ -42,7 +42,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 123 | 🌱 유망주 특성 2시즌(3년차 시작 때 사라짐) + 불러온 게임에서 안 사라지던 버그 | data/archetypes.js, js/creation.js, js/save.js |
 | 124 | 특성 밸런스: 경기 특성 포지션 궁합(안 맞으면 절반)·생성 때 1개 제한, 라이벌 전용 S급 4개, 🎯 집중 견제, 숨은 컨디션 난조 (S급 시즌 시리즈 승률 95~100% → 약 85%) | data/traits.js, data/match.js, js/player.js, js/straits.js, js/match_events.js |
 | 125 | 밸런스 측정 도구 tools/ (README·BALANCE.md) | tools/ |
-| 126 | 🏠 팀 내 입지 (퀘스트·평판·동료·경기력·근속 → 재계약 연봉·제안, 🎖️ 주장: 분위기 +1·이적 시장 영입 후보 3명) | data/standing.js, js/standing.js |
+| 126 | 🏠 팀 내 입지 (퀘스트·평판·경력(4강 이상)·경기력·근속 → 재계약 연봉·제안, 🎖️ 주장: 분위기 +1·이적 시장 영입 후보 3명) | data/standing.js, js/standing.js |
 
 자세한 수치·측정은 PROGRESS.md 114~120 참고.
 

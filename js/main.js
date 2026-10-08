@@ -863,6 +863,7 @@ function nextWeek(restWeek) {
 function saveSeasonHistory() {
   sTraitsOnSeasonEnd(); // 원클럽맨·라인 지배자·한계 돌파 (js/straits.js)
   saveCareerSeason(); // 내 시즌 기록 (js/records.js)
+  recordDeepRuns(); // 리그·컵·국제대회 4강 이상 → 팀 내 입지 경력 (js/standing.js)
   const season = state.league.season;
   if (!state.league.history) state.league.history = [];
   const names = {};
