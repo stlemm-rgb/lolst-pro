@@ -1,6 +1,6 @@
-# 다음 세션 이어가기 — 2026-10-08, PROGRESS 129까지
+# 다음 세션 이어가기 — 2026-10-09, PROGRESS 133까지
 
-새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 114~120) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
+새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 121~133) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
 ## 1. 프로젝트와 사용자 작업 방식
 
@@ -21,12 +21,29 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 - 커밋 여부는 `git status --short`, `git log`로 확인. PROGRESS.md의 `(커밋 필요)` 표시는 커밋 뒤에도 남아 있으므로 믿지 않는다.
 - "검토만" 요청이면 결과만 설명. 다른 AI·도구의 검토 결과를 붙이면 코드로 확인해서 답한다.
 
-## 2. git 상태 (작성 시점)
+### ⭐ '작업완료' 규칙 (사용자 요청, 2026-10-09)
 
-- 113 + 이전 HANDOFF.md까지는 커밋된 것으로 확인했다.
-- **114~120과 이 HANDOFF.md는 작성 시점에 커밋 여부 미확인** (사용자가 중간에 했을 수 있음). 새 세션에서 반드시 `git status`로 확인할 것.
+사용자가 **"작업완료"**라고 하면, 그 작업의 답변 끝에 **항상 아래 체크리스트를 다시 알려 준다** (짧은 한국어 + 표). 두 PC에서 git으로 원본을 최신으로 맞추고, 웹 주소(GitHub Pages)도 같이 업데이트하기 위해서다.
 
-## 3. 최근 변경 (114~120, Claude 클라우드 세션에서 작업)
+| 순서 | 할 일 | 명령 |
+|---|---|---|
+| 1 | 커밋 | `git add -A` → `git commit -m "..."` |
+| 2 | GitHub에 올리기 (웹 주소도 1분 뒤 자동 업데이트) | `git push` |
+| 3 | 다른 PC에서 작업을 시작할 때는 먼저 받아 오기 | `git pull` |
+
+- push가 `rejected`면 → `git pull` 후 다시 `git push`. 충돌(conflict)이 나면 화면을 보여 달라고 안내.
+- 한 번에 한 PC에서만 작업하는 게 가장 안전하다고 함께 알려 준다.
+- 세이브(브라우저 localStorage)는 git으로 옮겨지지 않음 → 세이브 내보내기·가져오기.
+
+## 2. git 상태와 GitHub (작성 시점)
+
+- 133(`07720a5 확인 창을 화면 안 상자로 교체`)까지 커밋 + GitHub push 완료. 이 HANDOFF.md·CLAUDE.md 수정은 커밋 필요.
+- GitHub 저장소: https://github.com/stlemm-rgb/lolst-pro (공개, 브랜치 `master`, remote `origin`).
+- 웹 주소 (GitHub Pages, 로그인 없이 친구가 플레이): **https://stlemm-rgb.github.io/lolst-pro/** — Settings → Pages에서 master /(root). `git push`하면 1분쯤 뒤 자동 반영. 무료(사이트 1GB·월 100GB 권장 한도, 게임은 약 1.5MB).
+- Claude 아티팩트 링크도 있음(https://claude.ai/artifact/VS5wFNae86znoPr7vjp7UQ) — 로그인이 필요해서 GitHub Pages를 주로 씀. 자동 업데이트 안 됨.
+- 다른 PC: `git clone https://github.com/stlemm-rgb/lolst-pro.git Game` 후 위 '작업완료' 규칙대로 pull/push.
+
+## 3. 최근 변경 (114~133, Claude 클라우드 세션에서 작업)
 
 | 번호 | 내용 | 주요 파일 |
 |---|---|---|
@@ -46,8 +63,12 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 127 | 다른 선수 스탯 모양: 스탯 차이 크게(표준편차 6→10), 포지션 중요 스탯 3개는 평균보다 꼭 높게, 스탯 점수는 그대로 | data/league.js NPC_STAT_SHAPE, js/league.js shapeNpcStats |
 | 128 | 💕 연애 요소 엔진 (인기도 40+, 1년 6개, 관심→썸→연애, 공개·열애설·응원·공세, 사생팬·스토커, 은퇴 엔딩 한 줄) — data/romance.js는 다른 AI | data/romance_rules.js, js/romance.js |
 | 129 | 신년 소식 → 신문 기사 하나, 대형 신인 1명 1부 직행, 솔랭 1위 기사·연락, 주력 챔피언 너프 반복 수정(메타 유지 25%/내 주력 50%), 숙명의 라이벌은 리그의 에이스만 | js/main.js, js/league.js, js/dashboard.js, data/champions.js |
+| 130 | 퀘스트: 5회짜리가 있으면 다음 퀘스트 최대 3회, 체력 회복 퀘스트는 체력 40 이하일 때만, 상단바 훈련 배지가 퀘스트와 같으면 연한 노란 배경으로 진행 단계 표시 | data/quests.js, js/quests.js, js/main.js planBadgeHTML, css |
+| 131 | 지난주 결과에서 스폰서 계약 수입 줄 삭제 | js/dashboard.js |
+| 132 | 스크롤해도 상단바가 가려지지 않게 (z-index) | css/style.css |
+| 133 | 웹 공유용: confirm() 6곳 → 화면 안 확인 상자 askConfirm (웹/아티팩트에서 confirm이 막힘), startCareer(sure) | js/main.js, js/creation.js, js/market_pages.js, js/retire.js, css, tools/ |
 
-자세한 수치·측정은 PROGRESS.md 114~120 참고.
+자세한 수치·측정은 PROGRESS.md 114~133 참고.
 
 ## 4. 기술 규칙과 코드 위치
 
@@ -57,6 +78,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 - 저장은 localStorage. **새 최상위 필드는 js/save.js의 SAVED_FIELDS와 stateFromSave 둘 다** 수정. state.league·soloRank·contract는 통째로 저장 (league 안에 넣은 필드는 따로 등록 불필요). career 숫자 필드는 stateFromSave 숫자 키 목록에.
   - 최근 추가된 최상위 필드: signature·sig100 (114), sigGrowth·achievements (118), eventLog·flags·relations·trigQueue (119).
 - 초기 상태 createNewState는 js/main.js, 캐릭터 생성·첫 계약은 js/creation.js. 화면 pages.<id>, 메뉴 data/menus.js MENU_GROUPS (내 선수 / 경기 / 수집 / 이적 / 기록), 이동은 selectMenu.
+- **confirm()/alert()/prompt() 금지** — 웹 링크에서 막힘. 확인이 필요하면 js/main.js `askConfirm(문장, 예일때함수, "예 버튼 글자")`.
 - 화면 안 버튼 클릭은 js/main.js renderPage 안의 `querySelectorAll("[data-…]")` 묶음에 추가 (예: data-radar, data-tlog-year).
 - 특성: traitSumOf / traitKeyOf / traitsOf. 내 선수 ID는 USER_ID.
 - 주간 흐름은 js/main.js nextWeek: 훈련 → 경기 → 급여·활동·인기도·업적 → 주 넘김(새해면 새 시즌) → 대진 미리 만들기 → 새 챔피언·패치 → 2군 판정·올스타·여름/비시즌 시장 → 시그니처 체크 → 받은 연락(runWeeklyEvents) → 퀘스트.
@@ -90,7 +112,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 - 문법 검사: 바뀐 JS마다 `node --check`, 변경 내용은 `git diff --check`.
 - 이전 Codex 세션 메모: Playwright + Edge headless가 중간에 종료되어 화면 검증을 못 했고, 대신 Node vm으로 index.html 순서대로 스크립트(start.js 제외)를 불러 게임 함수를 실행했다 (DOM 렌더링만 대체).
 - 클라우드 세션에서는 Playwright(Chromium)로 화면까지 확인했다. 쓸 수 있으면 이 방법이 가장 확실하다:
-  - 새 게임: `draft.name='테스트'; draft.startYear=2012; renderCreation(); startCareer();` (**시작 연도는 2012·2017·2022만** 가능). 1부 팀: `draft.teamChoice = draft.teams.findIndex(d=>d.tier===1)` (startCareer 전).
+  - 새 게임: `draft.name='테스트'; draft.startYear=2012; renderCreation(); startCareer(true);` (true = 남은 포인트 확인 상자 건너뜀) (**시작 연도는 2012·2017·2022만** 가능). 1부 팀: `draft.teamChoice = draft.teams.findIndex(d=>d.tier===1)` (startCareer 전).
   - 강한 내 선수: startCareer 뒤 `Object.keys(state.stats).forEach(k=>state.stats[k]+=33)`.
   - **state.plan이 있어야 nextWeek()가 진행된다** (`state.plan='scrim'`, 체력 30 미만이면 'rest').
   - 연락 자동 답: `state.inbox.filter(m=>m.tab==='inbox'&&m.choices&&m.answered===null&&m.kind!=='offer'&&m.kind!=='retire').forEach(m=>answerMessage(m.id, 0))`.
@@ -123,6 +145,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 ## 8. 다음 세션 시작 시
 
-1. `git status --short`, `git log --oneline -10`으로 114~120·HANDOFF 커밋 여부 확인.
+1. `git pull`(다른 PC에서 올린 게 있을 수 있음) → `git status --short`, `git log --oneline -10`.
 2. 새 사용자 요청을 우선한다. 현재 요청된 작업은 모두 끝났고, 로드맵의 다음 기능은 미선택 상태다.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 121), 이 HANDOFF.md도 갱신한다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 134), 이 HANDOFF.md도 갱신한다.
+4. 사용자가 "작업완료"라고 하면 위 '작업완료' 체크리스트(커밋 → push → 다른 PC는 pull)를 다시 알려 준다.
