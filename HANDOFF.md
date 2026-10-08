@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-08, PROGRESS 122까지
+# 다음 세션 이어가기 — 2026-10-08, PROGRESS 125까지
 
 새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 114~120) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
@@ -39,6 +39,9 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 120 | 업적 보상(인기도·평판·돈) 삭제 — 업적은 소식만, 동·은·금은 난이도 표시 | data/collection.js, js/collection.js |
 | 121 | 🤝 친구 시스템: 분기(3·16·29·49주) 친구 활동 연락, 친구 25·절친 50(최대 3명), 친구 전용 연락, friendTip 이적 제안, 왼쪽 메뉴 '친구' 화면 (state.friends) | data/friends.js, js/friends.js |
 | 122 | 은퇴·세대교체: 시작 때 노장 섞기, 은퇴도 이적 목록에, 50주 메타 적응 은퇴 기사('메타 적응 불가'), 51주 은퇴 상담(은퇴/한 시즌 더/우리 팀 코치→2년 뒤 감독) | js/retirement.js, data/league.js, data/retire_stories.js(다른 AI) |
+| 123 | 🌱 유망주 특성 2시즌(3년차 시작 때 사라짐) + 불러온 게임에서 안 사라지던 버그 | data/archetypes.js, js/creation.js, js/save.js |
+| 124 | 특성 밸런스: 경기 특성 포지션 궁합(안 맞으면 절반)·생성 때 1개 제한, 라이벌 전용 S급 4개, 🎯 집중 견제, 숨은 컨디션 난조 (S급 시즌 시리즈 승률 95~100% → 약 85%) | data/traits.js, data/match.js, js/player.js, js/straits.js, js/match_events.js |
+| 125 | 밸런스 측정 도구 tools/ (README·BALANCE.md) | tools/ |
 
 자세한 수치·측정은 PROGRESS.md 114~120 참고.
 
@@ -78,6 +81,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 ## 5. 실행 환경과 검증
 
+- **밸런스 측정은 `tools/`** (125): `tools/README.md` 사용법, `tools/BALANCE.md` 조절 값 위치·지금 값·측정 기준. `measure_traits.py`(특성 효과, 포지션 궁합 평균) · `measure_seasons.py`(여러 시즌 시리즈 승률·연락·은퇴·절친, `--variant`로 값 후보 비교). 파일을 고치지 않고 `--set 경로=값`으로 바꿔 끼워 비교한 뒤 좋은 값만 data/*.js에 반영하고 BALANCE.md도 고친다.
 - 이 PC에서는 PowerShell·Node로 저장소 파일을 직접 수정하면 된다 (클라우드 세션의 업로드/커밋 절차는 필요 없음).
 - 문법 검사: 바뀐 JS마다 `node --check`, 변경 내용은 `git diff --check`.
 - 이전 Codex 세션 메모: Playwright + Edge headless가 중간에 종료되어 화면 검증을 못 했고, 대신 Node vm으로 index.html 순서대로 스크립트(start.js 제외)를 불러 게임 함수를 실행했다 (DOM 렌더링만 대체).
