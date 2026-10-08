@@ -181,9 +181,7 @@ function weekReportHTML() {
   (r.investLines || []).forEach(function (l) {
     html += '<div class="rep-row"><span class="rep-tag ' + (l.up ? "win" : "lose") + '">투자</span>' + escapeHTML(l.text) + "</div>";
   });
-  if (r.activityIncome) {
-    html += '<div class="rep-row"><span class="rep-tag win">수입</span>스폰서 계약 <span class="up">+' + moneyText(r.activityIncome) + "</span></div>";
-  }
+  // 스폰서 계약 수입(r.activityIncome)은 지난주 결과에 보이지 않음 (131, 돈은 그대로 들어옴)
   if (r.ladder && r.ladder.games) {
     const d = r.ladder.delta;
     html += '<div class="rep-row"><span class="rep-tag rank">랭크</span>솔로 랭크 ' + r.ladder.wins + "승 " + r.ladder.losses + "패 · " +
