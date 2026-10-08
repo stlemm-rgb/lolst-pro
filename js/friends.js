@@ -285,13 +285,16 @@ function friendWhoContext(who) {
 
 // ----- 친구 은퇴 (js/league.js retirePlayer에서 부름) -----
 function friendOnRetire(p) {
-  if (!state.friends || !state.player || relationOf(p.id) < FRIEND_RULES.friendFrom) return;
+  if (!state.friends || !state.player) return;
+  const coach = coachJoin(p); // 상담에서 '우리 팀 코치로' (js/retirement.js)
+  if (!coach && relationOf(p.id) < FRIEND_RULES.friendFrom) return;
   const F = state.friends;
-  const role = pick(FRIEND_RULES.roles);
+  const role = coach ? teamName(p.coachFor) + " 코치" : pick(FRIEND_RULES.roles);
   F.retired.unshift({ pid: p.id, name: p.name, pos: p.pos, year: state.year, role: role, rel: relationOf(p.id) });
   F.retired = F.retired.slice(0, 12);
   const i = F.best.indexOf(p.id);
   if (i !== -1) F.best.splice(i, 1);
+  if (p.counselled) return; // 은퇴 상담을 한 친구는 작별 연락 대신 상담으로 끝
   const t = p.teamId && findTeam(p.teamId);
   queueTrigger("friendRetire", { pid: p.id, player: p.name, pteam: t ? t.name : "FA", pos: findPosition(p.pos).name, role: role });
 }
@@ -403,6 +406,7 @@ pages.friends = function () {
     '<div class="card"><h2>🤝 친구 활동 <span class="muted small">1년에 4번 (' + Object.keys(R.quarters).join("·") + "주)</span></h2>" +
       "<p>다음 친구 활동: <b>" + (nx.year !== state.year ? nx.year + "년 " : "") + nx.week + "주</b> (" + R.quarterNames[R.quarters[nx.week]] + ")</p>" +
       '<p class="muted small">받은 연락으로 후보 3명과 활동이 와요. 같이 시간을 보낼수록 친해져요. 관계 ' + R.friendFrom + " 이상 = 친구, " + R.bestFrom + " 이상 = 절친 (최대 " + R.bestMax + "명). 같은 팀 주전 절친은 내 경기력 +0.5%, 다른 팀 친구는 이적 소식을 알려 주기도 해요.</p></div>" +
+    coachCardHTML() + // 친구 코치·감독 (js/retirement.js)
     '<div class="card"><h2>💙 절친 <span class="muted small">' + best.length + " / " + R.bestMax + '</span></h2><div class="friend-slots">' + slots + "</div></div>" +
     '<div class="grid">' +
       '<div class="card"><h2>🙂 친구 <span class="muted small">' + friends.length + "명</span></h2>" + table(friends, "아직 친구가 없어요. 친구 활동으로 관계를 " + R.friendFrom + " 이상 올려 보세요.") + "</div>" +

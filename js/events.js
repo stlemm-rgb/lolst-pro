@@ -171,6 +171,8 @@ function applyEffects(eff, ctx) {
       const m = eventMoney(v);
       state.money += m;
       notes.push("자금 " + (m > 0 ? "+" : "−") + Math.abs(m / 10000).toLocaleString() + "만 원");
+    } else if (key === "counsel") {
+      counselEffect(v, ctx, notes); // 은퇴 상담: retire / stay / coach (js/retirement.js)
     } else if (key === "friendTip") {
       friendTip(ctx, notes); // 다른 팀 친구의 이적 정보 (js/friends.js)
     } else if (key === "activity") {
@@ -343,6 +345,7 @@ function traitWeight(ev) {
 function runWeeklyEvents() {
   // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/stories.js) → 조건 연락 → 무작위
   let inboxFired = friendWeekly(); // 분기 친구 활동 · 친구 트리거 (js/friends.js)
+  inboxFired = retirementWeekly() || inboxFired; // 메타 적응 은퇴 기사 · 은퇴 상담 · 코치→감독 (js/retirement.js)
   inboxFired = runQueuedTriggers() || inboxFired;
   shuffled(EVENTS).forEach(function (ev) {
     if (ev.trigger === "random" || ev.trigger === "followUp" || ev.trigger === "signature" || QUEUE_TRIGGERS.indexOf(ev.trigger) !== -1 || !eventReady(ev)) return;

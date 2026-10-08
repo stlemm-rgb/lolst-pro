@@ -21,7 +21,7 @@ function repTier(rep) {
 }
 
 // 감독 신뢰: 2군행 판정에서 경쟁 선수와 점수 차이에 더하는 값
-function managerTrust() { return repTier().trust; }
+function managerTrust() { return repTier().trust + (typeof coachTrust === "function" ? coachTrust() : 0); } // + 친구 감독 (js/retirement.js)
 
 function fansCount(pop) {
   const p = pop === undefined ? state.popularity : pop;

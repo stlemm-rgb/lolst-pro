@@ -186,7 +186,9 @@ function clubRosterHTML(teamId) {
 // ----- 이적 목록 (js/club_market.js logTransfer) -----
 let tlogYear = 0;      // 0 = 올해, 1 = 작년
 let tlogFilter = "all"; // all · t1 · mine
-const TLOG_KIND = { buy: "🔁 보강", star: "💥 주전 이적", depth: "🧩 경쟁 후보", loan: "🤝 임대" };
+const TLOG_KIND = { buy: "🔁 보강", star: "💥 주전 이적", depth: "🧩 경쟁 후보", loan: "🤝 임대", retire: "🎓 은퇴" };
+// 은퇴 사유 표시 (js/retirement.js logRetire tag)
+const TLOG_TAG = { meta: { name: "메타 적응 불가", tip: "바뀐 메타를 따라가지 못해 이적 시장 도중 은퇴했다" } };
 function transferLogCardHTML() {
   const log = state.league.transferLog || [];
   const year = state.year - tlogYear;
@@ -201,8 +203,9 @@ function transferLogCardHTML() {
   const when = function (e) { return e.w >= SUMMER_MARKET.start && e.w < CONTRACT.windowStart ? "여름" : "비시즌"; };
   const rows = list.map(function (e) {
     const mineRow = e.team === mine.id || e.from === mine.id;
-    return "<tr" + (mineRow ? ' class="me"' : "") + "><td>" + when(e) + "</td><td>" + TLOG_KIND[e.kind] + "</td><td><b>" + escapeHTML(e.name) + '</b> <span class="muted small">' + findPosition(e.pos).name + " · " + e.age + "세</span></td>" +
-      '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(teamName(e.from)) + " → <b>" + escapeHTML(teamName(e.team)) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
+    return "<tr" + (mineRow ? ' class="me"' : "") + "><td>" + when(e) + "</td><td>" + TLOG_KIND[e.kind] + "</td><td><b>" + escapeHTML(e.name) + '</b> <span class="muted small">' + findPosition(e.pos).name + " · " + e.age + "세</span>" +
+      (e.tag && TLOG_TAG[e.tag] ? ' <span class="joker-tag tip" data-tip="' + escapeHTML(TLOG_TAG[e.tag].tip) + '">' + TLOG_TAG[e.tag].name + "</span>" : "") + "</td>" +
+      '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(teamName(e.from)) + " → <b>" + (e.kind === "retire" ? "은퇴" : escapeHTML(teamName(e.team))) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
   }).join("");
   const count = {};
   list.forEach(function (e) { count[e.kind] = (count[e.kind] || 0) + 1; });
@@ -213,7 +216,7 @@ function transferLogCardHTML() {
       btn("tlog-filter", "all", tlogFilter, "전체") + " " + btn("tlog-filter", "t1", tlogFilter, "1부 관련") + " " + btn("tlog-filter", "mine", tlogFilter, "우리 팀") + "</div>" +
     (rows ? '<div class="table-wrap"><table class="roster tlog"><tr><th>시기</th><th>종류</th><th>선수</th><th class="r">스탯 점수</th><th>이동</th><th class="r">이적료</th></tr>' + rows + "</table></div>"
       : '<p class="muted">' + year + "년 이적 기록이 없어요. 이적은 비시즌(새 시즌 시작)과 여름(" + SUMMER_MARKET.applyWeek + "주)에 일어나요.</p>") +
-    '<p class="muted small">💥 주전 이적: 돈 많은 1부 팀이 다른 1부 팀 주전을 비싸게 데려감 · 🧩 경쟁 후보: 주전과 실력이 비슷한 후보를 데려와 주전 경쟁 · 스탯 점수는 이적할 때 기준</p>' +
+    '<p class="muted small">💥 주전 이적: 돈 많은 1부 팀이 다른 1부 팀 주전을 비싸게 데려감 · 🧩 경쟁 후보: 주전과 실력이 비슷한 후보를 데려와 주전 경쟁 · 🎓 은퇴: 은퇴한 자리는 신인이 채움 · 스탯 점수는 이적할 때 기준</p>' +
     "</div>";
 }
 

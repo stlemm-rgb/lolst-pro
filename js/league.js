@@ -244,6 +244,7 @@ function makeLeague(defs, chosenIndex) {
   });
   placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
   placeNamedPlayers(); // 네임드 선수 (data/named_players.js)
+  addVeterans(); // 나이 많은 선수 몇 명 (세대교체, js/retirement.js)
   startSeason();
   initContracts(); // 선수들 연봉·계약 기간, 내 첫 계약 (2년)
 }
@@ -444,8 +445,10 @@ function newSeasonLeague() {
     const p = state.league.players[id];
     const tr = p.traits || [];
     p.age += 1;
+    const ov = retireOverride(p); // 은퇴 상담 결과: 한 시즌 더 / 은퇴 (js/retirement.js)
+    if (ov === "stay") return;
     const retireAge = LEAGUE.retireFromAge + traitSumOf(tr, "agingDelay") + traitSumOf(tr, "maxAgeBonus");
-    if (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear) {
+    if (ov === "now" || (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear)) {
       retirePlayer(p);
     }
   });
@@ -527,6 +530,7 @@ function addBigRookies() {
 function retirePlayer(p) {
   const team = p.teamId && findTeam(p.teamId);
   recordRetiree(p, team);
+  logRetire(p, team); // 이적 목록에 은퇴 (js/retirement.js)
   friendOnRetire(p); // 친한 선수 은퇴 → 작별 연락·은퇴한 친구 (js/friends.js)
   delete state.league.players[p.id];
   const fa = state.league.freeAgents.indexOf(p.id);

@@ -27,6 +27,8 @@ const LEAGUE = {
   retireFromAge: 29,       // 이 나이부터 은퇴 가능
   retireChancePerYear: 0.25, // 29세 25%, 30세 50%, 31세 75%...
   rookie: { avg: 46, spread: 8, ageRange: [17, 19] }, // 은퇴한 자리를 채우는 신인
+  // 새 게임: 처음부터 나이 많은 선수를 섞어서 몇 년 안에 은퇴·세대교체가 일어나게 (능력은 보통 선수와 같은 무작위)
+  veterans: { chancePerTeam: 0.7, ageRange: [28, 31] },
 
   // 대회별 경기 방식 (bestOf: 3 = 3판 2선승, 5 = 5판 3선승, 1 = 단판)
   bestOf: {
@@ -75,4 +77,16 @@ const BIG_ROOKIE = {
   scoreAbove: [2, 4],
   ageRange: [17, 19],
   contractYears: [2, 3],
+};
+
+// ===== 은퇴 이야기 (js/retirement.js, 글: data/retire_stories.js) =====
+// - metaWeek: 비시즌 이적 시장 중간, 1부 선수 1명이 '메타 적응이 힘들다'며 은퇴 (1년 1번, 기사 + 이적 목록에 '메타 적응 불가')
+// - counselWeek / counselChance: 은퇴 전주(새 시즌 직전), 관계 25 이상 선수가 있으면 이 확률로 은퇴 상담 연락
+// - coach: 상담에서 '우리 팀 코치로' → 은퇴 후 우리 팀 코치 (내 훈련 효과 +trainingBonus), toManagerYears년 뒤 감독 (감독 신뢰 +managerTrust)
+//          내가 다른 팀으로 가면 효과 없음
+const RETIRE_RULES = {
+  metaWeek: 50,
+  counselWeek: 51,
+  counselChance: 0.2,
+  coach: { trainingBonus: 0.05, toManagerYears: 2, managerTrust: 2 },
 };
