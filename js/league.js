@@ -99,6 +99,7 @@ function makeNpc(pos, level, ageRange) {
     style: pickStyle(pos), // 플레이 스타일: 강점·약점 스탯 (data/league.js NPC_STYLES)
   };
   applyStyle(p);
+  shapeNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (점수는 그대로)
   if (state.year) npcMasteryInit(p); // 챔피언 숙련도 (js/npc_mastery.js)
   state.league.players[p.id] = p;
   return p;
@@ -121,6 +122,33 @@ function applyStyle(p) {
     const v = p.stats[id] + st.mod[id];
     p.stats[id] = Math.max(1, Math.min(statCapOf(p.traits || [], id), v));
   });
+}
+
+// ----- 스탯 모양 (127, data/league.js NPC_STAT_SHAPE) -----
+// 스탯 점수는 그대로, 강점은 더 높게·약점은 더 낮게, 포지션 중요 스탯은 평균보다 꼭 높게
+function shapeNpcStats(p) {
+  const S = typeof NPC_STAT_SHAPE !== "undefined" ? NPC_STAT_SHAPE : null;
+  if (!S) return;
+  const st = p.stats;
+  const ids = STATS.map(function (s) { return s.id; });
+  const goal = statScoreFor(st, p.pos);
+  const cap = function (id) { return statCapOf(p.traits || [], id); };
+  const mean = function () { return ids.reduce(function (a, id) { return a + st[id]; }, 0) / ids.length; };
+  const avg = mean();
+  ids.forEach(function (id) { st[id] = avg + (st[id] - avg) * S.widen + randInt(-S.noise, S.noise); });
+  const keys = (S.keyStats && S.keyStats[p.pos]) || [];
+  const keyFloor = function () {
+    const m = mean();
+    keys.forEach(function (id) { if (st[id] < m + S.keyAbove) st[id] = m + S.keyAbove + randInt(0, S.keyExtra); });
+  };
+  keyFloor();
+  // 점수 맞추기: 같이 올리고 내림 → 1~상한 자르기 → 중요 스탯 다시 확인 (몇 번 반복)
+  for (let i = 0; i < 6; i++) {
+    const d = goal - statScoreFor(st, p.pos);
+    ids.forEach(function (id) { st[id] = Math.max(1, Math.min(cap(id), st[id] + d)); });
+    keyFloor();
+  }
+  ids.forEach(function (id) { st[id] = Math.max(1, Math.min(cap(id), Math.round(st[id]))); });
 }
 
 // 예전 세이브: 스타일이 없는 선수에게 붙이고 강점·약점 반영

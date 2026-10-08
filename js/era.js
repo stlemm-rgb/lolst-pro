@@ -122,6 +122,7 @@ function makeWorldPlayer(pos, avg, ageRange) {
   W.seq = (W.seq || 0) + 1;
   const p = { id: "X" + W.seq, name: worldNick(), pos: pos, age: randInt(ageRange[0], ageRange[1]), stats: stats, traits: randomNpcTraits(), style: pickStyle(pos) };
   applyStyle(p);
+  shapeNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (js/league.js)
   W.players[p.id] = p;
   return p;
 }

@@ -44,6 +44,7 @@
 | `LEAGUE.veterans` | 팀마다 70%, 28~31세 | 새 게임 노장 | seasons (은퇴 수) |
 | `LEAGUE.retireFromAge` / `retireChancePerYear` | 29 / 0.25 | 다른 선수 은퇴 나이·확률 | seasons (은퇴 수) |
 | `LEAGUE.npcGrowth` | 나이별 스탯 변화 | 다른 선수 성장·노화 | — |
+| `NPC_STAT_SHAPE` | widen 1.6, noise 4, 중요 스탯 평균 +5~+11 | 다른 선수 스탯 차이 크기·포지션 중요 스탯 (점수는 그대로) | traits (기준 승률) |
 | `RETIRE_RULES.metaWeek` / `counselWeek` | 50 / 51 | 메타 은퇴 기사 / 은퇴 상담 주 (메타 친구 상담은 49) | — |
 | `RETIRE_RULES.counselChance` | 0.2 | 은퇴 상담 확률 | — |
 | `RETIRE_RULES.coach` | 훈련 +5%, 2년 뒤 감독, 신뢰 +2 | 친구 코치·감독 효과 | — |

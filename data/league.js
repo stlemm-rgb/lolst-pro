@@ -66,6 +66,26 @@ const NPC_STYLES = [
 ];
 const NPC_STYLE_RULES = { growthBias: 0.3 };
 
+// ===== 다른 선수 스탯 모양 (127) — js/league.js shapeNpcStats =====
+// 선수를 만들 때 (makeNpc·해외 선수): 스탯 점수는 예전과 똑같이 두고, 스탯끼리의 차이만 크게
+// - widen: 그 선수 스탯 평균에서 떨어진 정도 × widen (1 = 예전 그대로)
+// - noise: 스탯마다 추가로 ±noise
+// - keyStats: 포지션 중요 스탯 → 그 선수 스탯 평균보다 keyAbove + (0~keyExtra) 이상
+// 마지막에 전체를 같이 올리고 내려서 스탯 점수(statScoreFor)를 예전 방식 값에 맞춤
+const NPC_STAT_SHAPE = {
+  widen: 1.6,
+  noise: 4,
+  keyAbove: 5,
+  keyExtra: 6,
+  keyStats: {
+    top:     ["laning", "mental", "reaction"],
+    jungle:  ["macro", "vision", "shotcall"],
+    mid:     ["reaction", "pool", "laning"],
+    adc:     ["accuracy", "spacing", "teamfight"],
+    support: ["shotcall", "teamfight", "vision"],
+  },
+};
+
 // ===== 대형 신인 (js/league.js addBigRookies) — 2026-10-07 =====
 // 해마다 1주차(새 시즌)에 2부 팀에 대형 신인이 count명 입단해요. 포지션은 무작위
 // - 종합 능력 = 1부 주전 평균 + scoreAbove (예: 1부 주전 평균 63이면 65~67)
