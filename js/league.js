@@ -521,6 +521,9 @@ function addBigRookies() {
   if (!scores.length) return [];
   const avg = scores.reduce(function (a, b) { return a + b; }, 0) / scores.length;
   const teams = shuffled(tierTeams(2).filter(function (t) { return !mine || t.id !== mine.id; }));
+  // 한 명은 1부 팀으로 바로 (R.tier1Count, 가장 약한 1부 팀부터 무작위)
+  const t1 = shuffled(tierTeams(1).filter(function (t) { return !mine || t.id !== mine.id; }));
+  for (let k = 0; k < (R.tier1Count || 0) && t1.length; k++) teams.unshift(t1[k]);
   const news = [];
   const count = randInt(R.count[0], R.count[1]);
   for (let i = 0; i < count && i < teams.length; i++) {
@@ -548,7 +551,7 @@ function addBigRookies() {
       return id !== p.id && id !== USER_ID && q && !q.loan && !q.named && posCount[q.pos] >= 2;
     }).sort(function (a, b) { return playerScore(a) - playerScore(b); })[0];
     if (out) releaseToFA(out);
-    news.push("🌟 대형 신인 " + p.name + "(" + findPosition(pos).name + ", " + p.age + "세, 종합 능력 " + Math.round(playerScore(p.id)) + ") " + team.name + " 입단" +
+    news.push("🌟 대형 신인 " + p.name + "(" + findPosition(pos).name + ", " + p.age + "세, 종합 능력 " + Math.round(playerScore(p.id)) + ") " + team.name + (team.tier === 1 ? " 입단 — 1부 직행!" : " 입단") +
       (out ? " · " + playerName(out) + " 자유 계약" : ""));
   }
   return news;

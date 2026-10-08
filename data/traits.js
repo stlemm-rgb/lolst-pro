@@ -164,7 +164,7 @@ const S_TRAIT_RULES = [
   { trait: "s_weed",         who: "user", text: "2군(후보)에 내려간 시즌에 우승" },
   { trait: "s_goat",         who: "all",  text: "S급 특성 4개 이상 얻기",                       sCount: 4 },
   // 라이벌 전용 (who: "npc") — 시즌이 끝날 때·상을 받을 때 확인 (js/straits.js)
-  { trait: "r_nemesis", who: "npc", text: "내 선수가 1부 주전·스탯 점수 72 이상일 때, 다른 1부 팀 같은 포지션 최고 선수 (리그에 1명)", userScore: 72 },
+  { trait: "r_nemesis", who: "npc", text: "내 선수가 1부 주전·스탯 점수 72 이상일 때, 🔥 리그의 에이스를 가진 다른 1부 팀 같은 포지션 최고 선수 (리그에 1명)", userScore: 72 },
   { trait: "r_ace",     who: "npc", text: "1부 시즌 평균 평점 상위 3명 (해마다)",             top: 3 },
   { trait: "r_dynasty", who: "npc", text: "국내 결승 MVP" },
   { trait: "r_veteran", who: "npc", text: "27세 이상 · 1부 주전 4시즌",                     age: 27, seasons: 4 },

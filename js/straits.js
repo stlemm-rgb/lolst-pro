@@ -159,7 +159,7 @@ function rivalSTraitsOnSeasonEnd(stats) {
   if (holder && !holderOk) P[holder].traits.splice(P[holder].traits.indexOf("r_nemesis"), 1); // 2부로 가거나 우리 팀에 오면 내려놓음
   if (holderOk || !mine || mine.tier !== 1 || state.benched || playerScore(USER_ID) < nem.userScore) return;
   const rivals = [];
-  t1.forEach(function (t) { if (t.id !== mine.id) t.roster.forEach(function (id) { if (P[id] && P[id].pos === state.player.position) rivals.push(id); }); });
+  t1.forEach(function (t) { if (t.id !== mine.id) t.roster.forEach(function (id) { if (P[id] && P[id].pos === state.player.position && (P[id].traits || []).indexOf("r_ace") !== -1) rivals.push(id); }); }); // 🔥 리그의 에이스만
   rivals.sort(function (a, b) { return playerScore(b) - playerScore(a); });
   if (rivals.length) grantSTrait(rivals[0], "r_nemesis");
 }

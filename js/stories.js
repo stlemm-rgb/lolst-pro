@@ -149,7 +149,7 @@ function storyTriggerContext(trigger) {
 }
 
 // 시스템 트리거: 다른 코드가 queueTrigger로 넣으면 그 주(또는 다음 주) 연락 처리 때 해당 trigger 연락 하나
-const QUEUE_TRIGGERS = ["rivalSigned", "fameUp", "skinMade", "benchedNow", "friendLeft", "friendVs", "friendTitle", "friendRetire"]; // 친구 트리거: js/friends.js
+const QUEUE_TRIGGERS = ["rivalSigned", "fameUp", "skinMade", "benchedNow", "friendLeft", "friendVs", "friendTitle", "friendRetire", "ladderKing"]; // 친구 트리거: js/friends.js
 function queueTrigger(name, ctx) {
   if (!state.trigQueue) state.trigQueue = [];
   state.trigQueue.push({ name: name, ctx: ctx || {} });

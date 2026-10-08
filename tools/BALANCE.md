@@ -41,6 +41,7 @@
 | 경로 | 지금 값 | 뜻 | 측정 도구 |
 |---|---|---|---|
 | `LEAGUE.npc.*` | 1부 주전 62±10 등 | 처음 리그 선수 실력 | — |
+| `BIG_ROOKIE.tier1Count` | 1 | 해마다 1부로 바로 가는 대형 신인 수 |
 | `LEAGUE.veterans` | 팀마다 70%, 28~31세 | 새 게임 노장 | seasons (은퇴 수) |
 | `LEAGUE.retireFromAge` / `retireChancePerYear` | 29 / 0.25 | 다른 선수 은퇴 나이·확률 | seasons (은퇴 수) |
 | `LEAGUE.npcGrowth` | 나이별 스탯 변화 | 다른 선수 성장·노화 | — |
@@ -97,4 +98,5 @@
 | `WORLDS_SKIN.powerBonus` | 0.02 | 월드 우승 스킨 경기력 |
 | `SIGNATURE_GROWTH.stars` / `perStar` | 0·15·40·80·140 / +3·+1%·+5% | 시그니처 ★ |
 | `CAREER.aging*` | 27세부터 | 내 선수 노화 |
+| `MASTERY.metaKeep` / `metaKeepMine` | 0.25 / 0.5 | 패치 때 메타 챔피언이 남을 확률 / 내 숙련도 1위가 메타였으면 |
 | `MASTERY.*` | data/champions.js | 숙련도 성장 |

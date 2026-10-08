@@ -771,10 +771,14 @@ function nextWeek(restWeek) {
     initContracts(); // 새로 들어온 신인들 계약
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
     const NEWS_TAGS = { "🔁": "이적 시장", "🌟": "대형 신인", "📈": "리그 확장", "🆕": "신생 구단", "🌏": "해외 리그" };
+    const ARTICLE_TAGS = ["📈", "🆕", "🌏", "🌟"]; // 승강·리그 크기·해외 리그·대형 신인은 신년 신문 기사 하나로 (소식 줄이기)
+    const article = [];
     leagueNews.forEach(function (text) {
       const tag = Object.keys(NEWS_TAGS).find(function (k) { return text.indexOf(k) === 0; });
+      if (!tag || ARTICLE_TAGS.indexOf(tag) !== -1) { article.push(tag ? text : "⬆️ " + text); return; } // 승강(태그 없음)도 기사로
       addNews(tag ? NEWS_TAGS[tag] : "승강", tag ? text.slice(tag.length).trim() : text);
     });
+    if (article.length) newYearArticle(article);
   }
 
   // 이번 주·다음 주 리그 일정(대진) 미리 만들기 → 대시보드 '이번 주'·'다음 경기'에 바로 보임 (js/matchsim.js)
@@ -806,6 +810,17 @@ function nextWeek(restWeek) {
     const keep = {};
     newlyReleased(state.year, state.week).forEach(function (c) { keep[c.name] = true; }); // 패치 주에 나온 챔피언은 버프 유지
     state.newChampBuff = keep;
+    // 메타 유지: 지난 메타 챔피언 일부는 다음 메타에도 남음 (내 숙련도 1위가 메타였으면 더 잘 남음). 대격변 해는 제외
+    const myTop = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
+    const topWasMeta = !!(myTop && state.meta && isMeta(myTop));
+    if (state.meta && !(typeof isShakeupYear === "function" && isShakeupYear(state.year))) {
+      POSITION_IDS.forEach(function (pos) {
+        (state.meta.champs[pos] || []).forEach(function (n) {
+          const keepP = pos === state.player.position && n === myTop ? MASTERY.metaKeepMine : MASTERY.metaKeep;
+          if (Math.random() < keepP && findChampion(n)) prefer[pos] = (prefer[pos] || []).concat([n]);
+        });
+      });
+    }
     state.meta = makePatch(state.year, state.week, prefer);
     const mine = state.meta.champs[state.player.position].join(", ");
     addNews("패치", state.meta.label + " 적용! 메타 조합: " + findComp(metaComp()).icon + " " + findComp(metaComp()).name + " · " + findPosition(state.player.position).name + " 메타 챔피언: " + mine);
@@ -816,9 +831,8 @@ function nextWeek(restWeek) {
     // 패치마다 솔로 랭크 초기화
     const oldPoints = resetLadder(finalLadderBoard);
     if (oldPoints !== undefined) addNews("랭크 초기화", "패치로 솔로 랭크가 초기화됐다. (" + ladderTier(oldPoints) + " " + oldPoints.toLocaleString() + "점 → " + ladderTier(LADDER.resetPoints) + " " + LADDER.resetPoints.toLocaleString() + "점)");
-    // 숙련도 1위 챔피언이 메타에서 빠졌으면 "너프" 소식 후보
-    const top = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
-    if (top && !isMeta(top)) state.weekCtx.nerfChamp = top;
+    // 숙련도 1위 챔피언이 메타였다가 빠졌을 때만 "너프" 소식 후보 (원래 메타가 아니었으면 너프가 아님)
+    if (myTop && topWasMeta && !isMeta(myTop)) state.weekCtx.nerfChamp = myTop;
   }
 
   // 패치 바로 전 주(28주·52주): 솔로 랭크 초기화 예고
@@ -869,6 +883,16 @@ function saveSeasonHistory() {
   const names = {};
   Object.keys(season.champions).forEach(function (k) { names[k] = teamName(season.champions[k]); });
   state.league.history.push({ year: season.year, champions: names, myTeam: myTeam().name });
+}
+
+// 신년 신문 기사: 리그 확장·신생 구단·해외 리그·대형 신인을 한 기사로 (js/news_popup.js 팝업)
+function newYearArticle(lines) {
+  const r = state.weekReport;
+  if (!r) { lines.forEach(function (t) { addNews("새 시즌", t); }); return; }
+  r.headlines = r.headlines || [];
+  r.headlines.push({ key: "newyear", headline: state.year + "년 새 시즌, 이렇게 달라진다", body: lines.join("\n"), mine: false });
+  r.headlinesSeen = false;
+  addNews("새 시즌 기사", "📰 " + state.year + "년 새 시즌 기사: 승강·리그·해외·대형 신인 소식 " + lines.length + "건 (대시보드 [📰 NEWS])");
 }
 
 // 소식 기록 (새 시즌, 새 챔피언, 패치 등)

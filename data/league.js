@@ -97,6 +97,7 @@ const BIG_ROOKIE = {
   scoreAbove: [2, 4],
   ageRange: [17, 19],
   contractYears: [2, 3],
+  tier1Count: 1,          // 이 중 몇 명은 1부 팀으로 바로 입단 (신문 기사에 '1부 직행')
 };
 
 // ===== 은퇴 이야기 (js/retirement.js, 글: data/retire_stories.js) =====

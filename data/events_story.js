@@ -307,5 +307,16 @@ EVENTS.push(
         fail: { effects: { popularity: 2, stamina: -4 }, result: "말이 자꾸 꼬였다. 그래도 \"선수 시점 이야기가 신선하다\"는 반응." } },
       { label: "선수로만 경기장에 서고 싶다", effects: { condition: 2 } },
     ],
-  }
+  },
+  // 솔로 랭크 시즌 1위 (js/dashboard.js crownLadderKing → queueTrigger ladderKing)
+  {
+    id: "ladder_king", tab: "inbox", trigger: "ladderKing", always: true,
+    title: "👑 솔로 랭크 시즌 1위!",
+    text: "랭크 초기화 직전, 순위표 맨 위에 내 이름이 찍혀 있었다. {points}점. 프로 선수들이 모인 구간에서 끝까지 버텼다. 휴대폰에는 축하 메시지가 쏟아지고, 커뮤니티에는 '랭크 1위 인증' 글이 올라왔다.",
+    choices: [
+      { label: "1위 인증 방송을 켠다", effects: { popularity: 4, stamina: -3 }, result: "마지막 판 다시 보기를 틀자 채팅창이 왕관 이모티콘으로 가득 찼다." },
+      { label: "팀원들에게 한턱낸다", effects: { teamRelation: 4, money: -300000, condition: 4 }, result: "\"다음 시즌엔 내가 1위 한다.\" 고기 굽는 소리 사이로 도발이 오갔다." },
+      { label: "다음 시즌도 1위를 노린다", effects: { focus: 1, condition: 2 }, result: "왕관은 잠깐이다. 초기화된 점수판을 보며 다시 큐를 잡았다." },
+    ],
+  },
 );
