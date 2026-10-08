@@ -125,10 +125,17 @@ function updateQuests() {
   if (state.quests.length >= QUEST_RULES.maxActive) return;
   if (!first && Math.random() >= QUEST_RULES.newChance) return;
   const active = state.quests.map(function (q) { return q.id; });
-  const pool = QUESTS.filter(function (t) { return !t.offseason && active.indexOf(t.id) === -1 && !questMastered(t); });
+  const pool = QUESTS.filter(function (t) {
+    if (t.maxStamina !== undefined && state.stamina > t.maxStamina) return false; // 컨디션 관리: 체력 40 이하일 때만
+    return !t.offseason && active.indexOf(t.id) === -1 && !questMastered(t);
+  });
   if (!pool.length) return;
   const tpl = weightedPickBy(pool, questWeight); // 숙련도가 낮으면 챔피언 퀘스트 비중 ↑
-  const range = tpl.need || QUEST_RULES.need;
+  let range = tpl.need || QUEST_RULES.need;
+  // 이미 5회짜리 퀘스트가 있으면 새 퀘스트는 최대 3회
+  if (state.quests.some(function (q) { return q.need >= QUEST_RULES.bigNeed && findQuest(q.id).kind !== "ladderTop"; })) {
+    range = [Math.min(range[0], QUEST_RULES.capAfterBig), Math.min(range[1], QUEST_RULES.capAfterBig)];
+  }
   state.questSeq = (state.questSeq || 0) + 1;
   const q = { uid: state.questSeq, id: tpl.id, need: randInt(range[0], range[1]), progress: 0, champ: tpl.kind === "metaS" ? mySMeta() : null, deadline: now + QUEST_RULES.deadlineWeeks };
   state.quests.push(q);

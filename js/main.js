@@ -511,7 +511,10 @@ function planBadgeHTML() {
   let extra = "";
   if (state.plan === "champ_focus") extra = focusIsAuto() ? " · 자동(" + focusChamp() + ")" : " · " + focusChamp();
   else if (state.plan === "champion") extra = state.practiceChamp ? " · " + state.practiceChamp : " · 자동";
-  return '<button id="plan-badge" class="plan-badge tip" data-tip="[다음 주로 진행]을 누르면 할 훈련이에요. 눌러서 바꾸기">🏋️ ' + t.name + extra + "</button>";
+  // 이 훈련으로 진행되는 퀘스트가 있으면 진행도 (노란 막대)
+  const q = (state.quests || []).find(function (x) { const tpl = findQuest(x.id); return tpl && tpl.kind === "training" && tpl.training === state.plan; });
+  const qHTML = q ? ' <span class="plan-quest">📋 ' + q.progress + "/" + q.need + '<span class="bar"><span class="bar-fill gold" style="width:' + Math.round(q.progress / q.need * 100) + '%"></span></span></span>' : "";
+  return '<button id="plan-badge" class="plan-badge tip" data-tip="[다음 주로 진행]을 누르면 할 훈련이에요. 눌러서 바꾸기' + (q ? " · 퀘스트 '" + findQuest(q.id).title + "' 진행 중" : "") + '">🏋️ ' + t.name + extra + qHTML + "</button>";
 }
 
 // 상단바 체력 표시 (낮으면 빨간색)

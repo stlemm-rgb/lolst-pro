@@ -905,3 +905,8 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 
 /* 신문 기사 여러 줄 (신년 기사) */
 .np-article p { white-space: pre-line; }
+
+/* 상단 훈련 배지: 같은 훈련 퀘스트 진행도 */
+.plan-quest { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; font-size: 0.85em; color: var(--gold); }
+.plan-quest .bar { display: inline-block; width: 44px; height: 6px; margin: 0; }
+.plan-quest .bar-fill { display: block; height: 100%; }
