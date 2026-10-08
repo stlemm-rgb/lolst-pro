@@ -104,19 +104,19 @@ EVENTS.push(
     ],
   },
   {
-    id: "rc_meta_crossroads", tab: "inbox", trigger: "retireCounsel", always: true,
+    id: "rc_meta_crossroads", tab: "inbox", trigger: "retireCounsel", always: true, meta: true,
     title: "🖱️ 익숙한 픽을 지우는 밤",
-    text: "{pteam}의 {player}와(과) 공개 경기 영상을 보다가 새 시즌 이야기가 나왔다. \"{age}살인 지금도 매번 처음부터 배우는 기분이야, 언제까지 따라갈 수 있을까.\" 익숙한 챔피언 이름을 지운 연습 목록이 화면 옆에 놓여 있었다.",
+    text: "{pteam}의 {player}와(과) 공개 경기 영상을 보다가 새 시즌 이야기가 나왔다. \"요즘 메타를 못 따라가겠어. 새 챔피언을 익히기도 전에 운영 방식이 또 바뀌니까, 다음 시즌을 준비할 자신이 없어.\" 익숙한 챔피언 이름을 지운 연습 목록이 화면 옆에 놓여 있었다.",
     choices: [
       {
         label: "\"여기까지 충분히 고민했다면 은퇴도 네 선택이야\"",
-        note: "{player} 이번 겨울 은퇴",
+        note: "{player} 은퇴 결정, 다음 주 개인 방송에서 발표",
         effects: { counsel: "retire", relation: 10 },
-        result: "더 잘하던 시절 이야기로 붙잡지 않고 지금 마음을 들었다. {player}은(는) 은퇴를 결정한 뒤에야 영상을 멈추고 내 쪽을 편하게 바라봤다.",
+        result: "더 잘하던 시절 이야기로 붙잡지 않고 지금 마음을 들었다. {player}은(는) 은퇴를 결정하고 다음 주 개인 방송에서 팬들에게 직접 설명하겠다며, 함께 감사 인사를 정리해 달라고 했다.",
       },
       {
         label: "\"배울 것을 좁혀서 한 시즌만 더 해 보자\"",
-        note: "성공하면 한 시즌 더, 실패하면 은퇴",
+        note: "성공: 한 시즌 더 / 실패: 은퇴 결정, 다음 주 개인 방송에서 발표",
         check: { stat: "shotcall", diff: 50 },
         success: {
           effects: { counsel: "stay", relation: 8, condition: 2 },
@@ -124,20 +124,20 @@ EVENTS.push(
         },
         fail: {
           effects: { counsel: "retire", relation: 3 },
-          result: "함께 목록을 줄여 봐도 다시 시작할 마음은 생기지 않는다고 했다. 은퇴 결정을 듣고 연습 화면 대신 둘이 좋아하는 음악을 틀었다.",
+          result: "함께 목록을 줄여 봐도 메타를 따라갈 자신은 돌아오지 않는다고 했다. {player}은(는) 은퇴를 결정하고 다음 주 개인 방송에서 알리겠다며, 팬들에게 전할 첫 문장을 노트에 적었다.",
         },
       },
       {
         label: "\"변화를 읽는 경험을 우리 팀 코치로 나눠 줘\"",
-        note: "성공: 은퇴 후 우리 팀 코치(내 훈련 효과 +5%, 2년 뒤 감독) / 실패: 은퇴",
+        note: "다음 주 개인 방송에서 은퇴 발표 / 성공: 우리 팀 코치(내 훈련 효과 +5%, 2년 뒤 감독) / 실패: 은퇴",
         check: { stat: "reputation", diff: 45 },
         success: {
           effects: { counsel: "coach", relation: 13 },
-          result: "직접 모든 픽을 다루는 일과 선수의 판단을 함께 살피는 일은 다르다는 이야기를 나눴다. {player}은(는) 은퇴 후 우리 팀 코치로 배우면서 돕고 싶다고 했다.",
+          result: "직접 모든 픽을 다루는 일과 선수의 판단을 함께 살피는 일은 다르다는 이야기를 나눴다. {player}은(는) 다음 주 개인 방송에서 선수 은퇴를 발표한 뒤, 우리 팀 코치로 배우면서 돕고 싶다고 했다.",
         },
         fail: {
           effects: { counsel: "retire", relation: 5 },
-          result: "가르치는 자리도 지금은 부담스럽다는 답이 돌아왔다. 은퇴한 뒤에는 실력 확인 없이 즐기는 게임부터 같이 하기로 했다.",
+          result: "가르치는 자리도 지금은 부담스럽다는 답이 돌아왔다. {player}은(는) 코치 제안은 고맙지만 은퇴 후에는 쉬겠다며, 다음 주 개인 방송에서 팬들에게 직접 인사하기로 했다.",
         },
       },
     ],
