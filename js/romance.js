@@ -126,6 +126,7 @@ function romanceWeekly(inboxFired) {
   const pool = EVENTS.filter(function (ev) { return ev.trigger === pickEv.trigger; });
   if (!pool.length) return false;
   R.yearN.n++;
+  if (pickEv.ctx.tid && R.met[pickEv.ctx.tid]) R.met[pickEv.ctx.tid].lastW = absWeek(); // 같은 사람 연속 연락 방지
   fireEvent(pick(pool), pickEv.ctx);
   return true;
 }
@@ -145,6 +146,7 @@ function romancePickEvent() {
   if (R.partner) {
     const p = R.partner;
     if (affOf(p) < S.crisis) return { trigger: "rm_crisis", ctx: romanceCtx(p, "crisis") };
+    if (R.met[p].lastW && now - R.met[p].lastW < RR.sameGap) return null; // 연인 연락도 최소 간격
     if (R.secret && R.decided && Math.random() < RR.rumorChance) return { trigger: "rm_rumor", ctx: romanceCtx(p, "secret") };
     if (!R.decided) return { trigger: "rm_public", ctx: romanceCtx(p, "public") };
     if (bigMatchSoon() && Math.random() < 0.6) return { trigger: "rm_cheer", ctx: romanceCtx(p, "cheer") };
@@ -155,21 +157,26 @@ function romancePickEvent() {
     if (r < RR.rivalChance + 0.3) return { trigger: "rm_gift", ctx: romanceCtx(p, "gift") }; // 연인의 선물
     return { trigger: "rm_date", ctx: romanceCtx(p, "date") };
   }
-  // 연애 중이 아닐 때: 고백 → 썸(데이트·선물) → 새 만남
+  // 연애 중이 아닐 때: 고백 → 이미 호감 있는 사람과 이어 가기 → 새 만남(1년 newPerYear명까지)
   const met = unlocked.filter(function (t) { return R.met[t.id]; });
   const confess = met.filter(function (t) { return affOf(t.id) >= S.confess; });
   if (confess.length) return { trigger: "rm_confess", ctx: romanceCtx(pick(confess).id, "date") };
-  const crush = met.filter(function (t) { return affOf(t.id) >= S.crush; });
+  const warm = met.filter(function (t) { return affOf(t.id) >= RR.warmFrom && !(R.met[t.id].lastW && now - R.met[t.id].lastW < RR.sameGap); });
   const fresh = unlocked.filter(function (t) { return !R.met[t.id]; });
-  const r = Math.random();
-  if (crush.length && r < 0.5) { const t = pick(crush); return Math.random() < 0.6 ? { trigger: "rm_date", ctx: romanceCtx(t.id, "date") } : { trigger: "rm_gift", ctx: romanceCtx(t.id, "gift") }; }
-  if (fresh.length && (r < 0.85 || !met.length)) {
+  if (!R.newYear || R.newYear.y !== state.year) R.newYear = { y: state.year, n: 0 };
+  const canMeet = fresh.length && R.newYear.n < RR.newPerYear;
+  if (warm.length && (!canMeet || Math.random() < RR.warmChance)) {
+    // 호감이 높을수록 잘 뽑힘
+    const t = weightedPickBy(warm, function (x) { return affOf(x.id); });
+    const dateP = affOf(t.id) >= S.crush ? 0.6 : 0.4;
+    return Math.random() < dateP ? { trigger: "rm_date", ctx: romanceCtx(t.id, "date") } : { trigger: "rm_gift", ctx: romanceCtx(t.id, "gift") };
+  }
+  if (canMeet) {
     const t = pick(fresh);
-    ensureRomance().met[t.id] = { name: pick(t.names), aff: 0 }; // 처음 만남: 이름 정하기
+    R.newYear.n++;
+    R.met[t.id] = { name: pick(t.names), aff: 0 }; // 처음 만남: 이름 정하기
     return { trigger: "rm_meet", ctx: romanceCtx(t.id, "meet") };
   }
-  const warm = met.filter(function (t) { return affOf(t.id) > 0; });
-  if (warm.length) { const t = pick(warm); return { trigger: "rm_gift", ctx: romanceCtx(t.id, "gift") }; }
   return null;
 }
 

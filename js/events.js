@@ -170,7 +170,7 @@ function applyEffects(eff, ctx) {
     } else if (key === "money") {
       const m = eventMoney(v);
       state.money += m;
-      notes.push("자금 " + (m > 0 ? "+" : "−") + Math.abs(m / 10000).toLocaleString() + "만 원");
+      if (m) notes.push("자금 " + (m > 0 ? "+" : "−") + Math.abs(m / 10000).toLocaleString() + "만 원"); // 0원이면 안 보임
     } else if (key === "affection") {
       if (ctx && ctx.tid) changeAffection(ctx.tid, v, notes); // 연애 호감 (js/romance.js)
     } else if (key === "romance") {
@@ -260,7 +260,7 @@ function choiceHint(choice, ctx) {
   const parts = [];
   if (choice.note) parts.push(fillText(choice.note, ctx)); // {player} 등 채우기
   const e = choice.effects || {};
-  if (e.money) parts.push("자금 " + (e.money > 0 ? "+" : "−") + moneyText(Math.abs(eventMoney(e.money))));
+  if (e.money && eventMoney(e.money)) parts.push("자금 " + (e.money > 0 ? "+" : "−") + moneyText(Math.abs(eventMoney(e.money))));
   if (e.activity && ACTIVITIES[e.activity] && !choice.note) parts.push(ACTIVITIES[e.activity].icon + " " + fillText(ACTIVITIES[e.activity].desc, ctx));
   if (e.cureOther) parts.push("💚 " + Math.round(e.cureOther * 100) + "% 확률로 동료의 나쁜 특성 극복");
   if (choice.risk) parts.push("⚠️ 낮은 확률(" + Math.round(Math.min(EVENT_RULES.maxRisk, choice.risk.chance) * 100) + "%)로 나쁜 특성 '" + findTrait(choice.risk.trait).name + "'");

@@ -84,7 +84,8 @@
 
 | 경로 | 지금 값 | 뜻 |
 |---|---|---|
-| `ROMANCE_RULES.perYear` / `weeklyChance` | 6 / 0.14 | 1년 연애 연락 상한 / 주마다 확률 |
+| `ROMANCE_RULES.perYear` / `weeklyChance` | 6 / 0.2 | 1년 연애 연락 상한 / 주마다 확률 |
+| `ROMANCE_RULES.newPerYear` / `warmChance` / `sameGap` | 2 / 0.7 / 4주 | 새 만남 수 / 기존 관계 이어 가기 / 같은 사람 간격 |
 | `ROMANCE_RULES.stage` | 썸 30 · 고백 60 · 위기 25 | 호감 단계 |
 | `ROMANCE_RULES.rivalChance` / `rumorChance` | 0.25 / 0.3 | 다른 대상 공세 / 열애설 |
 | `ROMANCE_RULES.officePenalty` | 5 | 사내 연애 공개 시 팀 내 입지 − |
