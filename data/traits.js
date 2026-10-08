@@ -123,7 +123,7 @@ const TRAITS = [
   { id: "night_owl",    type: "bad", name: "올빼미",       desc: "휴식 체력 회복 −30%",                                effects: { restBonus: -0.3 } },
 
   // ===== 시작 유형 전용 특성 (data/archetypes.js의 startTrait, 정해진 시즌 동안만) =====
-  { id: "rookie_bloom", type: "title", name: "🌱 유망주", desc: "유망주 전용 (데뷔 후 3시즌). 모든 훈련 효과 +30%, 모든 챔피언 숙련도 성장 +30%. 4년차 시즌이 시작되면 사라져요", effects: { trainingAll: 0.3, masteryGrowth: 0.3 } },
+  { id: "rookie_bloom", type: "title", name: "🌱 유망주", desc: "유망주 전용 (데뷔 후 2시즌). 모든 훈련 효과 +30%, 모든 챔피언 숙련도 성장 +30%. 3년차 시즌이 시작되면 사라져요", effects: { trainingAll: 0.3, masteryGrowth: 0.3 } },
 
   // ===== 칭호 (잠깐만 붙는 특성) =====
   { id: "ladder_king", type: "title", npc: true, name: "👑 솔랭 1위", desc: "지난 랭크 시즌 리그 솔로 랭크 1위. 경기력 +3%, 좋은 장면 ×1.15 (다음 랭크 초기화 때 새 1위에게 넘어감)", effects: { power: 0.03, evGood: { all: 0.15 } } },

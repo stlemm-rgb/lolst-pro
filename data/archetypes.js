@@ -15,8 +15,8 @@ const ARCHETYPES = [
     desc: "어린 나이에 데뷔한 재능 덩어리.",
     age: 17, statAvg: 30, statBonus: {}, staminaMax: 80,
     trainingBonus: 0, goodTraits: 3, masteryGrowth: 1,
-    startTrait: "rookie_bloom", startTraitSeasons: 3,
-    strength: "좋은 특성 3개 + 전용 특성 🌱 유망주(3시즌 동안 훈련·숙련도 +30%), 가장 긴 커리어",
+    startTrait: "rookie_bloom", startTraitSeasons: 2,
+    strength: "좋은 특성 3개 + 전용 특성 🌱 유망주(2시즌 동안 훈련·숙련도 +30%), 가장 긴 커리어",
     weakness: "시작 스탯이 낮음",
   },
   {

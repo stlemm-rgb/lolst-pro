@@ -499,10 +499,19 @@ function applyFirstContract() {
   return text;
 }
 
-// 새 시즌 (js/main.js): 전용 특성 기간이 끝났으면 빼기 — 유망주는 4년차 시즌이 시작될 때
+// 전용 특성이 사라지는 해 = 데뷔 연도 + startTraitSeasons (데뷔 기록이 없으면 만들 때 저장한 값)
+function startTraitEndYear(p, career) {
+  const arch = findArchetype(p.archetype);
+  if (!arch || !arch.startTrait) return null;
+  if (career && career.debut && Number.isFinite(career.debut.year)) return career.debut.year + arch.startTraitSeasons;
+  return p.startTraitUntil || null;
+}
+
+// 새 시즌 (js/main.js): 전용 특성 기간이 끝났으면 빼기 — 유망주는 3년차 시즌이 시작될 때
 function expireStartTrait() {
   const p = state.player;
-  if (!p.startTraitUntil || state.year < p.startTraitUntil) return;
+  const until = startTraitEndYear(p, state.career);
+  if (!until || state.year < until) return;
   const arch = findArchetype(p.archetype);
   const id = arch && arch.startTrait;
   p.startTraitUntil = null;

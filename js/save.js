@@ -45,6 +45,7 @@ function stateFromSave(save) {
     traits: Array.isArray(p.traits) ? p.traits.filter(function (id) { return !!findTrait(id); }) : [],
   };
 
+  if (Number.isFinite(p.startTraitUntil)) fresh.player.startTraitUntil = p.startTraitUntil; // 유망주 특성 끝나는 해 (예전엔 저장이 안 됐음)
   if (typeof s.team === "string") fresh.team = s.team;
   if (Number.isFinite(s.money)) fresh.money = s.money;
   if (Number.isFinite(s.year)) fresh.year = s.year;
@@ -171,6 +172,13 @@ function stateFromSave(save) {
     if (typeof m.text === "string") m.text = m.text.split(moneyText(oldSalary)).join(moneyText(o.salary));
     if (o.breakdown) o.breakdown.total = Math.max(CONTRACT.minSalary, o.breakdown.total || 0);
   });
+  // 유망주 특성: 기간(데뷔 후 2시즌)이 지났으면 불러올 때 빼기 (예전 세이브는 3시즌·저장 안 됨)
+  const stEnd = startTraitEndYear(fresh.player, fresh.career);
+  const stId = arch.startTrait;
+  if (stId && fresh.player.traits.indexOf(stId) !== -1 && stEnd && fresh.year >= stEnd) {
+    fresh.player.traits.splice(fresh.player.traits.indexOf(stId), 1);
+    fresh.player.startTraitUntil = null;
+  }
   return fresh;
 }
 

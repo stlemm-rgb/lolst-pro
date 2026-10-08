@@ -245,9 +245,10 @@ function playerTraitsHTML() {
     let note = "";
     if (t.impact) note += '<span class="up">세트 승률 +' + t.impact.toFixed(1) + "%p</span> · " + escapeHTML(t.when);
     const arch = findArchetype(p.archetype);
-    if (arch && arch.startTrait === id && p.startTraitUntil) {
-      const left = p.startTraitUntil - state.year;
-      note += (note ? " · " : "") + "<b>" + (p.startTraitUntil - 1) + "년 시즌까지</b> (이번 시즌 포함 " + left + "시즌 남음)";
+    const until = arch && arch.startTrait === id ? startTraitEndYear(p, state.career) : null; // js/creation.js
+    if (until) {
+      const left = until - state.year;
+      note += (note ? " · " : "") + "<b>" + (until - 1) + "년 시즌까지</b> (이번 시즌 포함 " + left + "시즌 남음)";
     }
     const used = (tally[id] || 0) + "회 / 통산 " + (total[id] || 0) + "회";
     return "<tr><td>" + traitChipHTML(id) + '</td><td class="small muted">' + (TRAIT_TYPE_NAMES[t.type] || "") + '</td><td class="small">' + escapeHTML(t.desc) + "</td>" +
