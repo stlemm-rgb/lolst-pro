@@ -4,7 +4,7 @@
 
 ## 1. 프로젝트와 사용자 작업 방식
 
-- 게임: 오프라인 텍스트 시뮬레이션 「프로게이머 커리어」. 저장소 `C:\Project\Game\Game`, `index.html`을 브라우저에서 직접 열어 실행.
+- 게임: 오프라인 텍스트 시뮬레이션 「프로게이머 커리어」. 저장소 `C:\Project\Game` (2026-10-09에 `C:\Project\Game\Game`에서 옮김), `index.html`을 브라우저에서 직접 열어 실행.
 - 사용자(Shane)는 코딩 초보. **항상 짧고 쉬운 한국어 + 표**로 설명 (영어로 답하면 "한글로 다시"라고 함).
 - 명확한 수정 요청·버그 신고·"~를 삭제해 줘" 같은 요청은 바로 진행한다.
 - 큰 기능이나 "왜 이렇지?" 같은 원인 질문: 먼저 시뮬레이션으로 원인을 측정 → 표로 설명 → 고칠 범위를 여러 개 고를 수 있게 선택지로 묻는다. 사용자는 추천안을 대부분 전부 고르는 편이다.
@@ -13,7 +13,7 @@
 - **커밋은 사용자가 직접** 한다. 직접 커밋하지 말고 답변 끝에 아래 형식으로 준다 (CLAUDE.md의 자동 커밋 규칙보다 이 방식이 우선).
 
 ```powershell
-cd C:\Project\Game\Game
+cd C:\Project\Game
 git add -A
 git commit -m "이번 변경을 설명하는 한국어 메시지"
 ```
@@ -41,7 +41,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 - GitHub 저장소: https://github.com/stlemm-rgb/lolst-pro (공개, 브랜치 `master`, remote `origin`).
 - 웹 주소 (GitHub Pages, 로그인 없이 친구가 플레이): **https://stlemm-rgb.github.io/lolst-pro/** — Settings → Pages에서 master /(root). `git push`하면 1분쯤 뒤 자동 반영. 무료(사이트 1GB·월 100GB 권장 한도, 게임은 약 1.5MB).
 - Claude 아티팩트 링크도 있음(https://claude.ai/artifact/VS5wFNae86znoPr7vjp7UQ) — 로그인이 필요해서 GitHub Pages를 주로 씀. 자동 업데이트 안 됨.
-- 다른 PC: `git clone https://github.com/stlemm-rgb/lolst-pro.git Game` 후 위 '작업완료' 규칙대로 pull/push.
+- 다른 PC: `cd C:\Project` → `git clone https://github.com/stlemm-rgb/lolst-pro.git Game` (→ `C:\Project\Game`) 후 위 '작업완료' 규칙대로 pull/push.
 
 ## 3. 최근 변경 (114~133, Claude 클라우드 세션에서 작업)
 
