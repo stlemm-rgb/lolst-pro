@@ -205,11 +205,16 @@ function makeOffer(teamId, renewal) {
     clubPct = Math.round((randFloat(CONTRACT.offerSalaryBonus[0], CONTRACT.offerSalaryBonus[1]) - 1) * 100) / 100;
     salary = Math.round(salary * (1 + clubPct) / 1000000) * 1000000;
   }
+  let standing = null;
+  if (renewal && teamId === (myTeam() && myTeam().id) && typeof standingSalaryPct === "function") { // 팀 내 입지 (js/standing.js)
+    standing = { pct: standingSalaryPct(), name: standingGrade().name, icon: standingGrade().icon };
+    salary = Math.round(salary * (1 + standing.pct) / 1000000) * 1000000;
+  }
   return {
     teamId: teamId, renewal: renewal, salary: salary, breakdown: breakdown, clubPct: clubPct,
     years: randInt(CONTRACT.years[0], CONTRACT.years[1]),
     guarantee: Math.random() < CONTRACT.guaranteeChance ? CONTRACT.guaranteeGames[tier] : 0,
-    negotiated: false, guaranteeAsked: false,
+    negotiated: false, guaranteeAsked: false, standing: standing,
   };
 }
 
@@ -226,7 +231,9 @@ function offerText(o) {
   return (o.renewal ? "\"계속 함께하고 싶습니다.\" " : "\"주전 " + findPosition(state.player.position).name + " 자리를 맡아 주셨으면 합니다.\" ") +
     (o.summer && o.renewal ? FIRST_CONTRACT_TEXTS.renewalTiming.replace("{endYear}", state.year + o.years - 1)
       : o.summer ? "\n· 여름 이적: 후반기(" + SUMMER_MARKET.applyWeek + "주)부터 합류 · 원래 팀에 이적료 " + moneyText(o.fee || 0) : "") +
+    (o.early ? "\n· 👔 조기 재계약: 팀의 중심이라 시즌이 끝나기 전에 먼저 제안" : "") +
     "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) + (o.raised ? " (인상 반영)" : "") +
+    (o.standing && o.standing.pct ? " (팀 내 입지 " + o.standing.icon + " " + o.standing.name + " " + (o.standing.pct > 0 ? "+" : "") + Math.round(o.standing.pct * 100) + "%)" : "") +
     "\n· 출전 보장: " + (o.guarantee ? "시즌 " + o.guarantee + "경기" : "없음") +
     "\n· " + team.name + " (" + nextTierName(team.id) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
 }
@@ -259,11 +266,11 @@ function startTransferWindow() {
   const me = playerScore(USER_ID);
 
   // 재계약 (계약이 이번 시즌에 끝날 때)
-  if (state.contract.endYear <= state.year) {
+  if (state.contract.endYear <= state.year && !pendingRenewalOffer()) { // 조기 재계약 제안이 남아 있으면 그대로 (js/standing.js)
     const rival = benchRival();
-    const wanted = state.reputation >= CONTRACT.noRenewalReputation && !(rival && playerScore(rival) >= me + 10);
+    const wanted = state.reputation >= CONTRACT.noRenewalReputation && !(rival && playerScore(rival) >= me + 10) && standingRenewOk(); // 팀 내 입지 '방출 위기'면 없음
     if (wanted) sendOffer(makeOffer(mine.id, true));
-    else postMessage("inbox", CONTRACT_TEXTS.noRenewalTitle, contractText(CONTRACT_TEXTS.noRenewal), {});
+    else postMessage("inbox", CONTRACT_TEXTS.noRenewalTitle, contractText(CONTRACT_TEXTS.noRenewal), standingRenewOk() ? {} : { notes: ["팀 내 입지가 '" + standingGrade().name + "'(" + standingValue() + ")라 재계약 제안이 없었다"] });
   }
 
   // 다른 구단 영입 제안: 그 팀 같은 포지션 주전보다 내가 잘하고, 예산이 될 때

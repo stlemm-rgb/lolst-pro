@@ -60,7 +60,7 @@ pages.team = function () {
   const rank = rankList.indexOf(team.id) + 1;
 
   return (
-    "<h1>소속팀</h1>" +
+    "<h1>소속팀</h1>" + standingCardHTML() + // 팀 내 입지 (js/standing.js)
     '<div class="grid">' +
       '<div class="card"><h2>' + escapeHTML(team.name) + ' <span class="muted small">' + team.short + "</span></h2>" +
         "<p>" + tierName(team.tier) + " 리그 · 현재 <b>" + rank + "위</b></p>" +

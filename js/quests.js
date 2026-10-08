@@ -73,6 +73,7 @@ function progressQuests(training, changes) {
     const r = applyEffects(reward, { champ: q.champ });
     state.quests.splice(state.quests.indexOf(q), 1);
     state.career.questsDone = (state.career.questsDone || 0) + 1;
+    standingQuest(true); // 팀 내 입지 (js/standing.js)
     const line = "✅ 퀘스트 완료: " + tpl.title + (q.maxedEarly ? " (숙련도 " + MASTERY.max + " 달성)" : "") + " → " + rewardText(q);
     if (state.weekReport) state.weekReport.questLines.push(line);
     state.log.unshift({ when: state.year + "년 " + state.week + "주차", training: "퀘스트 완료 · " + tpl.title, message: QUEST_GIVERS[tpl.giver] + "의 과제를 끝냈다!", changes: r.changes });
@@ -114,6 +115,7 @@ function updateQuests() {
   state.quests.slice().forEach(function (q) {
     if (now > q.deadline) {
       state.quests.splice(state.quests.indexOf(q), 1);
+      standingQuest(false); // 팀 내 입지 (js/standing.js)
       const prog = findQuest(q.id).kind === "ladderTop" ? "최종 리그 " + (q.rank || "-") + "위 / 목표 " + q.need + "위" : q.progress + "/" + q.need;
       postMessage("news", "⌛ 퀘스트 기한 만료: " + findQuest(q.id).title, "기한 안에 끝내지 못했다. (" + prog + ")", {});
     }

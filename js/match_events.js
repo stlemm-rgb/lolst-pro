@@ -175,7 +175,8 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
   [0, 1].forEach(function (s) {
     if (series.init[teams[s]]) return;
     series.init[teams[s]] = 1;
-    const start = sides[s].reduce(function (sum, q) { return sum + (q.id ? traitSumOf(matchTraitsOf(q.id), "teamStartMood") : 0); }, 0);
+    const start = sides[s].reduce(function (sum, q) { return sum + (q.id ? traitSumOf(matchTraitsOf(q.id), "teamStartMood") : 0); }, 0)
+      + captainMood(teams[s], sides[s]); // 주장 (js/standing.js)
     if (start) series.t[teams[s]] = clampMood((series.t[teams[s]] || 0) + start);
   });
 

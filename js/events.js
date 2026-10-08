@@ -254,7 +254,7 @@ function rollTraitEffects(choice, notes) {
 // 선택지 옆에 보여 줄 위험·극복 안내
 function choiceHint(choice, ctx) {
   const parts = [];
-  if (choice.note) parts.push(choice.note);
+  if (choice.note) parts.push(fillText(choice.note, ctx)); // {player} 등 채우기
   const e = choice.effects || {};
   if (e.money) parts.push("자금 " + (e.money > 0 ? "+" : "−") + moneyText(Math.abs(eventMoney(e.money))));
   if (e.activity && ACTIVITIES[e.activity] && !choice.note) parts.push(ACTIVITIES[e.activity].icon + " " + fillText(ACTIVITIES[e.activity].desc, ctx));
@@ -345,7 +345,8 @@ function traitWeight(ev) {
 function runWeeklyEvents() {
   // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/stories.js) → 조건 연락 → 무작위
   let inboxFired = friendWeekly(); // 분기 친구 활동 · 친구 트리거 (js/friends.js)
-  inboxFired = retirementWeekly() || inboxFired; // 메타 적응 은퇴 기사 · 은퇴 상담 · 코치→감독 (js/retirement.js)
+  inboxFired = retirementWeekly() || inboxFired;
+  inboxFired = standingWeekly() || inboxFired; // 팀 내 입지: 주장 제안·영입 후보·조기 재계약 (js/standing.js) // 메타 적응 은퇴 기사 · 은퇴 상담 · 코치→감독 (js/retirement.js)
   inboxFired = runQueuedTriggers() || inboxFired;
   shuffled(EVENTS).forEach(function (ev) {
     if (ev.trigger === "random" || ev.trigger === "followUp" || ev.trigger === "signature" || QUEUE_TRIGGERS.indexOf(ev.trigger) !== -1 || !eventReady(ev)) return;
@@ -554,7 +555,8 @@ function answerMessage(msgId, index) {
   if (!msg || msg.answered !== null) return;
   if (msg.kind === "offer") { answerOffer(msg, index); return; } // 계약 제안 (js/contracts.js)
   if (msg.kind === "retire") { answerRetire(msg, index); return; } // 은퇴 권유 (js/retire.js)
-  if (msg.kind === "friend") { answerFriend(msg, index); return; } // 분기 친구 활동 (js/friends.js)
+  if (msg.kind === "friend") { answerFriend(msg, index); return; }
+  if (msg.kind === "captain" || msg.kind === "captainPick") { answerStanding(msg, index); return; } // 팀 내 입지 (js/standing.js) // 분기 친구 활동 (js/friends.js)
   const ev = findEvent(msg.eventId);
   let choice = ev && ev.choices[index];
   // 예전에 온 연락이라 선택지 순서가 바뀌었으면 글자로 찾기
