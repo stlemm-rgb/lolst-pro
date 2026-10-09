@@ -638,6 +638,7 @@ details.log-card[open] summary { margin-bottom: 12px; }
 .sum-tier { display: flex; align-items: center; gap: 10px; }
 .sum-tier .sum-points { font-size: 13px; }
 .sum-week { margin-left: auto; text-align: right; font-size: 13px; line-height: 1.35; padding-left: 10px; border-left: 1px solid var(--border, rgba(255,255,255,0.12)); }
+.week-growth .wg-item { white-space: nowrap; }
 .week-growth { line-height: 1.6; padding-top: 6px; margin-top: 8px; border-top: 1px dashed rgba(255,255,255,0.12); }
 .tier-emblem { flex: none; vertical-align: middle; }
 .sum-sub.king { color: var(--gold); font-weight: bold; }

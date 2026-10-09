@@ -262,7 +262,7 @@ function weekGrowthHTML() {
   const ds = playerScore(USER_ID) - b.score;
   STATS.forEach(function (s) {
     const d = (state.stats[s.id] || 0) - (b.stats[s.id] || 0);
-    if (d) parts.push('<span class="' + (d > 0 ? "up" : "down") + '">' + statName(s.id) + " " + (d > 0 ? "+" : "") + d + "</span>");
+    if (d) parts.push('<span class="wg-item"><span class="' + (d > 0 ? "up" : "down") + '">' + statName(s.id) + " " + (d > 0 ? "+" : "") + d + '</span> <span class="muted small">(' + (b.stats[s.id] || 0) + "→" + state.stats[s.id] + ")</span></span>");
   });
   const cur = state.player.traits;
   cur.filter(function (id) { return b.traits.indexOf(id) === -1; }).forEach(function (id) {
@@ -273,8 +273,9 @@ function weekGrowthHTML() {
     const t = findTrait(id);
     if (t) parts.push('<span class="' + (t.type === "bad" ? "up" : "down") + '">' + (t.type === "bad" ? "🧹 " : "💨 ") + escapeHTML(t.name) + (t.type === "bad" ? " 극복" : " 사라짐") + "</span>");
   });
-  const head = '<span class="muted">이번 주</span> ' + (Math.abs(ds) >= 0.05 ? '<b class="' + (ds > 0 ? "up" : "down") + '">' + (ds > 0 ? "+" : "") + ds.toFixed(1) + "</b> " : "");
-  return '<div class="sum-sub week-growth">' + head + (parts.length ? parts.join(" · ") : '<span class="muted">능력·특성 변화 없음</span>') + "</div>";
+  const head = '<div class="muted small">이번 주 변화</div>' +
+    (Math.abs(ds) >= 0.05 ? '<div>종합 능력 <b class="' + (ds > 0 ? "up" : "down") + '">' + (ds > 0 ? "+" : "") + ds.toFixed(1) + '</b> <span class="muted small">(' + b.score.toFixed(1) + "→" + playerScore(USER_ID).toFixed(1) + ")</span></div>" : "");
+  return '<div class="sum-sub week-growth">' + head + (parts.length ? "<div>" + parts.join(" · ") + "</div>" : '<div class="muted">능력·특성 변화 없음</div>') + "</div>";
 }
 
 // 솔로 랭크 칸: 지난주 진행에서 한 랭크 게임 결과 (랭크 오른쪽)

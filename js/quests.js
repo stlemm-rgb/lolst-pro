@@ -24,6 +24,28 @@ function rewardText(q) {
   }).join(", ");
 }
 
+// 퀘스트 완료 줄: 실제로 오른 값 (모범생 보너스·높은 스탯 보상 감소 반영). 높은 스탯이라 덜 올랐으면 (95→96 · 90 이상은 보상이 적게)
+function rewardResultText(reward, changes) {
+  const parts = [];
+  Object.keys(changes || {}).forEach(function (k) {
+    const n = Number(changes[k]) || 0;
+    if (!n && state.stats[k] === undefined) return;
+    let t = statName(k) + " " + (n >= 0 ? "+" : "") + n;
+    if (state.stats[k] !== undefined && reward[k] > n) {
+      const after = state.stats[k], before = after - n;
+      if (before >= REWARD_CURVE[REWARD_CURVE.length - 1].from) t += " (" + before + "→" + after + " · 원래 +" + reward[k] + ", " + REWARD_CURVE[REWARD_CURVE.length - 1].from + " 이상이라 적게 올라요)";
+    }
+    parts.push(t);
+  });
+  Object.keys(reward).forEach(function (k) { // 보상인데 변화 기록이 없는 스탯 (0)
+    if (state.stats[k] !== undefined && changes[k] === undefined) {
+      const lim = REWARD_CURVE[REWARD_CURVE.length - 1].from;
+      parts.push(statName(k) + " +0" + (state.stats[k] >= lim ? " (" + state.stats[k] + " · 원래 +" + reward[k] + ", " + lim + " 이상이라 적게 올라요)" : ""));
+    }
+  });
+  return parts.join(", ") || "변화 없음";
+}
+
 // 이번 주 훈련이 퀘스트에 해당하는지 확인하고 진행/완료 처리
 // training: 이번 주 훈련, changes: 훈련 결과 변화 ("m:챔피언" 숙련도 포함)
 function progressQuests(training, changes) {
@@ -74,7 +96,8 @@ function progressQuests(training, changes) {
     state.quests.splice(state.quests.indexOf(q), 1);
     state.career.questsDone = (state.career.questsDone || 0) + 1;
     standingQuest(true); // 팀 내 입지 (js/standing.js)
-    const line = "✅ 퀘스트 완료: " + tpl.title + (q.maxedEarly ? " (숙련도 " + MASTERY.max + " 달성)" : "") + " → " + rewardText(q);
+    const line = "✅ 퀘스트 완료: " + tpl.title + (q.maxedEarly ? " (숙련도 " + MASTERY.max + " 달성)" : "") + " → " + rewardResultText(reward, r.changes) +
+      (bonus > 1 ? " · 📗 모범생 보상 +" + Math.round((bonus - 1) * 100) + "%" : "");
     if (state.weekReport) state.weekReport.questLines.push(line);
     state.log.unshift({ when: state.year + "년 " + state.week + "주차", training: "퀘스트 완료 · " + tpl.title, message: QUEST_GIVERS[tpl.giver] + "의 과제를 끝냈다!", changes: r.changes });
     postMessage("news", "✅ 퀘스트 완료: " + tpl.title, QUEST_GIVERS[tpl.giver] + ": \"잘했다. 약속한 대로다.\"", { changes: r.changes, notes: r.notes });

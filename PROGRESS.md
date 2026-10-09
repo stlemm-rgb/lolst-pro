@@ -186,6 +186,7 @@
 154. [ver 1.1] 지난주 결과의 솔로 랭크 줄(n승 n패 · ±점)을 대시보드 솔로 랭크 칸의 랭크 오른쪽으로 옮김 (js/dashboard.js weekLadderHTML, css .sum-week)
 155. [ver 1.1] 대시보드 제목 옆 우승 트로피 말풍선이 상단바(z-index 40)에 가려지던 문제 → 트로피 말풍선은 아래쪽으로 뜨게 (css .trophy.tip::after top)
 156. [ver 1.1] 올해 열리지 않는 일정·대회는 반투명 + '올해 없음 · 2015년부터' 표시, 연도(또는 1부 팀 수)가 맞아 열리면 원래대로: First Stand(2025~), Road to MSI·MSI(2015~), 플레이인(1부 10팀일 때만). [시즌 일정] 표, [대회 일정] 올해 우승 표·First Stand/Road to MSI/MSI 대진표 카드·대회 안내 표. js/main.js scheduleOffReason·offTagHTML, js/league_pages.js offBracketHTML, js/records_pages.js, css .off·.off-tag
+157. [ver 1.1] 퀘스트 보상 표시 고침 (사용자 질문: 적응력 95에서 'S급 메타 장악 → 적응력 +2'인데 실제 +1, 모범생이 안 먹는지). 원인: 완료 줄이 데이터의 기본 보상만 보여 줬음. 실제로는 모범생 +50%(적응력 2 → 3, 숙련도 5 → 7~8)가 들어가고, 90 이상 스탯은 보상 곡선(90+ ×0.3 · 93+ ×0.1 · 96+ ×0.02, data/growth.js REWARD_CURVE) 때문에 95면 3 × 0.1 = 0.3 → 30% 확률로 +1. → 완료 줄에 실제로 오른 값 + '(95→96 · 원래 +3, 90 이상이라 적게 올라요)' + '📗 모범생 보상 +50%' (js/quests.js rewardResultText). 대시보드 종합 능력 칸 '이번 주 변화'는 '종합 능력 +0.1 (91.2→91.3)'·'적응력 +1 (95→96)'처럼 뜻과 전후 값을 보여 줌
 
 ## 파일 구성
 
