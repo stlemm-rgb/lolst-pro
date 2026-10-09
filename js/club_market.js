@@ -195,6 +195,7 @@ function sellable(id, buyer) {
   if (id === USER_ID) return false;
   const p = findPlayer(id);
   if (leftThisYear(p, buyer)) return false;   // 우승 뒤 연봉 문제로 떠난 선수는 그해 원래 팀이 다시 못 데려감 (js/dynasty.js)
+  if (!foreignOk(id, buyer.id)) return false;  // 외국인 선수 수 제한 (js/world_moves.js)
   if (!p.teamId) return true;                 // FA
   if (p.teamId === buyer.id) return false;
   if (p.loan) return false;                    // 임대 중인 선수는 못 데려감
@@ -313,7 +314,7 @@ function starTransfers(moved, news) {
       const base = starter ? playerScore(starter) : 0;
       const best = tierTeams(1).filter(function (o) { return o.id !== t.id && !sold[o.id]; }).map(function (o) {
         const id = starterAt(o.id, pos);
-        if (!id || id === USER_ID || moved[id] || findPlayer(id).loan || playerScore(id) < base + S.margin) return null;
+        if (!id || id === USER_ID || moved[id] || findPlayer(id).loan || playerScore(id) < base + S.margin || !foreignOk(id, t.id)) return null; // 외국인 수 제한
         return { id: id, fee: Math.round(transferFee(id) * S.feeMult / 1000000) * 1000000, salary: npcContractSalary(id, 1), score: playerScore(id) };
       }).filter(function (c) {
         return c && teamMoney(t.id) - c.fee >= S.keepMoney && clubRoom(t.id) - c.fee >= payrollDelta(t, c.id, c.salary);
@@ -357,7 +358,7 @@ function depthSignings(order, moved, news) {
       };
       const best = Object.keys(state.league.players).filter(function (id) {
         const p = state.league.players[id];
-        if (p.pos !== g.pos || moved[id] || !(sellable(id, t) || rivalStarter(id, p))) return false;
+        if (p.pos !== g.pos || moved[id] || !(sellable(id, t) || rivalStarter(id, p)) || !foreignOk(id, t.id)) return false; // 외국인 수 제한
         const sc = playerScore(id);
         return sc >= g.base + win[0] && sc <= g.base + win[1];
       }).map(function (id) {

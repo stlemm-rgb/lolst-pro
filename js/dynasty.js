@@ -97,7 +97,7 @@ function abroadMoves(champs, news) {
   const W = state.world;
   if (!W || !W.teams || !W.teams.length) return;
   const regions = activeRegions().slice().sort(function (a, b) { return b.strength - a.strength; }).slice(0, A.topRegions).map(function (r) { return r.id; });
-  const dest = W.teams.filter(function (t) { return regions.indexOf(t.region) !== -1; });
+  const dest = W.teams.filter(function (t) { return regions.indexOf(t.region) !== -1 && foreignRoom(t.id); }); // 외국인 1명까지 (js/world_moves.js)
   if (!dest.length) return;
   const champTeam = champs.worlds && findTeam(champs.worlds) ? champs.worlds : null;
   const champStarters = champTeam ? POSITION_IDS.map(function (pos) { return starters(champTeam)[pos]; }) : [];
@@ -118,7 +118,9 @@ function abroadMoves(champs, news) {
   shuffled(cands).forEach(function (c) {
     if (count >= A.perYear || (perTeam[c.team.id] || 0) >= A.perTeam || Math.random() >= c.chance) return;
     if (!findPlayer(c.id) || findPlayer(c.id).teamId !== c.team.id) return; // 이미 떠남
-    moveAbroad(c.id, c.team, pick(dest), news);
+    const open = dest.filter(function (t) { return foreignRoom(t.id); }); // 이번 해에 이미 외국인이 들어간 팀은 빼고
+    if (!open.length) return;
+    moveAbroad(c.id, c.team, pick(open), news);
     perTeam[c.team.id] = (perTeam[c.team.id] || 0) + 1;
     count++;
   });
@@ -138,13 +140,14 @@ function moveAbroad(id, team, wt, news) {
   // 해외 선수로
   W.seq = (W.seq || 0) + 1;
   const np = { id: "X" + W.seq, name: p.name, pos: p.pos, age: p.age, stats: Object.assign({}, p.stats),
-    traits: (p.traits || []).filter(function (x) { const t = findTrait(x); return t && !t.rival; }), style: p.style, fromLeague: team.name, origin: p.origin || HOME_ORIGIN.id };
+    traits: (p.traits || []).filter(function (x) { const t = findTrait(x); return t && !t.rival; }), style: p.style, fromLeague: team.name, origin: p.origin || HOME_ORIGIN.id, mastery: p.mastery, langs: p.langs, abroadYear: state.year };
   W.players[np.id] = np;
   if (W.names && W.names.indexOf(p.name) === -1) W.names.push(p.name);
   const same = wt.roster.filter(function (x) { return worldPlayer(x) && worldPlayer(x).pos === p.pos; })
     .sort(function (a, b) { return worldScore(worldPlayer(a)) - worldScore(worldPlayer(b)); });
   if (same.length) { wt.roster.splice(wt.roster.indexOf(same[0]), 1); delete W.players[same[0]]; }
   wt.roster.push(np.id);
+  noteLangJoin(np, wt.id); // 팀 언어 실력 시작 (js/world_moves.js)
   // 국내에서 빠짐
   team.money = teamMoney(team.id) + fee;
   team.roster.splice(team.roster.indexOf(id), 1);

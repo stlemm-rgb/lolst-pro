@@ -417,7 +417,7 @@ function weakestPlayer(teamId) {
 
 // 포지션이 비면 FA 중 가장 잘하는 선수, 없으면 신인으로 채움
 function fillPosition(teamId, pos) {
-  const fa = state.league.freeAgents.filter(function (id) { return findPlayer(id).pos === pos; })
+  const fa = state.league.freeAgents.filter(function (id) { return findPlayer(id).pos === pos && foreignOk(id, teamId); }) // 외국인 수 제한
     .sort(function (a, b) { return playerScore(b) - playerScore(a); });
   if (fa.length) { signFA(fa[0], teamId); return; }
   const rookie = makeNpc(pos, LEAGUE.rookie, LEAGUE.rookie.ageRange);
@@ -446,7 +446,8 @@ function fillRosters() {
       if (!has) fillPosition(t.id, pos);
     });
     while (t.roster.length < LEAGUE.rosterSize && state.league.freeAgents.length) {
-      const best = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
+      const best = state.league.freeAgents.filter(function (id) { return foreignOk(id, t.id); }).sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
+      if (!best) break;
       signFA(best, t.id);
     }
     while (t.roster.length > LEAGUE.rosterSize) {
@@ -507,6 +508,9 @@ function contractsNewSeason() {
   // 1.5) 강팀 쏠림 막기 (v1.1, js/dynasty.js): 우승 팀 연봉 압박 · 해외 러브콜 → 소식은 이적 소식과 같이
   const moves = [];
   dynastyNewSeason(moves);
+  langNewSeason(); // 팀 언어 실력 +1년 (js/world_moves.js)
+  returnHomeMoves(moves); // 해외에 간 한국 선수 복귀 → 국내 FA
+  foreignReturnMoves(moves); // 우리 리그 외국인 선수 고향으로
 
   // 2) NPC 계약 만료: 재계약(성적 프리미엄 포함) 또는 FA
   //    2부 선수가 1부 주전 평균보다 확실히 잘하면 1부에 가려고 재계약을 거절
@@ -524,9 +528,11 @@ function contractsNewSeason() {
   });
 
   // 3) 리빌딩: 지난 시즌 하위 팀부터 FA·2부 스타·다른 팀 후보를 영입 (이적료·빚 50%까지, js/club_market.js)
+  importMoves({}, moves); // 국내 구단의 해외 선수 영입 (외국인 1명까지, js/world_moves.js)
   offseasonRebuild(moves);
   // 4) 빈 포지션 채우기, 선수단 인원 맞추기
   fillRosters();
+  faAbroadMoves(moves); // 팀을 못 구한 FA → 해외 팀 (js/world_moves.js)
 
   // 5) FA가 너무 많으면 실력 낮은 순으로 은퇴 처리 (최대 40명 유지)
   const fa = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); });

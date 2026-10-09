@@ -46,6 +46,31 @@ const WORLD_STORY = {
   kr: " (한국 출신!)",
 };
 
+// ③ 선수 오가기 (v1.1, js/world_moves.js) — 새 시즌 비시즌 이적 때
+//   foreignMax: 한 팀의 외국인(다른 출신) 선수 최대 수 (국내·해외 팀 공통, 사용자 결정 1명)
+//   import: 국내 구단의 해외 선수 영입 — 외국인이 없는 팀마다 chance 확률로, 가장 약한 주전 포지션에 margin 이상 나은 해외 선수(나이 maxAge 이하)를 이적료(1부 기준 연봉 × feeMult)로. 한 해 최대 perYear명
+//   faAbroad: 국내에서 팀을 못 구한 FA(종합 능력이 2부 주전 평균 − below 이상, 나이 maxAge 이하)가 chance 확률로 해외 팀으로 (외국인이 없고 그 포지션 주전보다 잘하는 팀). 한 해 최대 perYear명
+//   returnHome: 해외에 간 지 minYears년 넘은 한국 출신 선수가 chance 확률로 국내 FA로 돌아옴 (국내 구단들이 이어서 영입). 한 해 최대 perYear명
+const WORLD_MOVES = {
+  foreignMax: 1,
+  import: { chance: 0.2, margin: 3, maxAge: 28, feeMult: 1.2, perYear: 3 },
+  faAbroad: { chance: 0.5, below: 2, maxAge: 29, perYear: 4 },
+  returnHome: { minYears: 2, chance: 0.3, perYear: 2 },
+};
+
+// 언어 소통 (v1.1, 사용자 결정 '보통') — 팀 언어: 국내 팀 한국어, 해외 팀은 그 지역 언어 (REGION_LANG)
+//   선수마다 팀 언어 실력 0~100 (모국어 100, 처음 가면 start, 영어 팀이면 startEn). 새해마다 그 팀에 있으면 +perYear (3년이면 거의 적응)
+//   팀 점수: (1 − 실력/100)을 주전끼리 더한 값 × teamplay 만큼 운영·한타 점수 −
+//   콜 충돌·오브젝트 콜 실패 사건: 그 팀 쪽 주인공 확률 × (1 + clash × 같은 값)
+const LANG_RULES = {
+  start: 0,
+  startEn: 30,
+  perYear: 35,
+  teamplay: 2,
+  clash: 0.5,
+  clashEvents: ["call_clash", "obj_call_fail"],
+};
+
 // 월드 챔피언십 지역 (우리 리그 = 한국은 여기 없음). from: 처음 참가하는 해
 // strength: 우리 리그 1부 평균 대비 전력 (1.0 = 같음), teams: 그 지역 팀 수 (선수 명단을 가진 가상 팀)
 //   v1.1 (사용자 결정): 3단계 — 우리 리그(LCK) 1.0 > 중국·북미·유럽 0.94 > 나머지 0.86. 해마다 새해에 이 수준 쪽으로 반쯤 맞춤 (WORLD_RULES.tierPull)

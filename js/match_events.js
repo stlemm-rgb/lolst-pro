@@ -188,6 +188,8 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
   ctx = ctx || {};
   const out = { list: [], a: 0, b: 0, rate: {} };
   const sides = [la, lb], teams = [teamA, teamB];
+  // 언어 소통 (v1.1): 팀 언어가 서툰 주전이 많을수록 콜 충돌·오브젝트 콜 실패 ↑ (js/world_moves.js)
+  const langGap = [langGapOf(la, teamA), langGapOf(lb, teamB)];
   // 집중 견제 (v1.1): 이 세트 S급 선수 → { id: S급 수 }, 화면용 목록 out.focus [{ s, id, pos, n }]
   ctx.focus = {};
   out.focus = [];
@@ -233,7 +235,8 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
     [0, 1].forEach(function (s) {
       sides[s].forEach(function (p) {
         const tm = traitEvMult(ev, p, sides[s], t, ctx, teams[s]); // 특성 (data/traits.js)
-        cands.push({ p: p, s: s, w: evActorWeight(ev, p, s, teams[s], series) * tm.mult * userFocusMult(ev, p, sides[s], teams[s], ctx), tr: tm.tr });
+        const lang = LANG_RULES.clashEvents.indexOf(ev.id) !== -1 ? 1 + LANG_RULES.clash * langGap[s] : 1;
+        cands.push({ p: p, s: s, w: evActorWeight(ev, p, s, teams[s], series) * tm.mult * userFocusMult(ev, p, sides[s], teams[s], ctx) * lang, tr: tm.tr });
       });
     });
     const who = weightedPick(cands, function (c) { return c.w; });

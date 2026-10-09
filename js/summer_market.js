@@ -97,6 +97,7 @@ function tryLoan(t, pos, margin, moved) {
     const p = state.league.players[id];
     if (p.pos !== pos || !p.teamId || p.teamId === t.id || p.loan || moved[id]) return false;
     if (starterAt(p.teamId, pos) === id) return false; // 원래 팀 주전은 안 빌려줌
+    if (!foreignOk(id, t.id)) return false; // 외국인 선수 수 제한 (js/world_moves.js)
     return playerScore(id) >= base + margin && clubRoom(t.id) >= payrollDelta(t, id, p.salary || 0);
   }).sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
   if (!best) return null;

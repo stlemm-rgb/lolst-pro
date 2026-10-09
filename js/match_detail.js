@@ -42,7 +42,7 @@ function activeTraits(id, teamId, setCtx, laneWon) {
 
 // 한 세트 기록 만들기 (playMatch에서 부름)
 function setDetail(set, setCtx, m, userPick) {
-  const team = function (t) { return { avg: round1(t.avg), lane: round1(t.lane), play: round1(t.play), macro: round1(t.macro || 0), fight: round1(t.fight || 0), comp: round1(t.comp || 0), ev: round1(t.ev || 0), luck: round1(t.luck), mood: round1(t.mood) }; };
+  const team = function (t) { return { avg: round1(t.avg), lane: round1(t.lane), play: round1(t.play), macro: round1(t.macro || 0), fight: round1(t.fight || 0), comp: round1(t.comp || 0), ev: round1(t.ev || 0), luck: round1(t.luck), mood: round1(t.mood), lang: t.lang ? round1(t.lang) : undefined }; };
   const comp = function (c) { return c ? { main: c.main, n: c.n, plan: c.plan, target: c.target, match: c.match, syn: c.syn, bonus: round1(c.bonus) } : null; };
   const box = makeBoxScore(set, m, userPick);
   const end = Math.floor(box.min);
@@ -95,7 +95,7 @@ function teamScoreText(t) {
   return "<b>" + total.toFixed(1) + "</b> " +
     '<span class="muted small">= 선수 평균 ' + t.avg.toFixed(1) + " + 라인전 " + t.lane.toFixed(1) +
     (t.play !== undefined ? " " + (play >= 0 ? "+ " : "− ") + "운영·한타 " + Math.abs(play).toFixed(1) +
-      (t.macro !== undefined && (t.macro || t.fight) ? " (스타일: 운영 " + (t.macro >= 0 ? "+" : "") + t.macro.toFixed(1) + " · 한타 " + (t.fight >= 0 ? "+" : "") + t.fight.toFixed(1) + ")" : "") : "") +
+      (t.macro !== undefined && (t.macro || t.fight) ? " (스타일: 운영 " + (t.macro >= 0 ? "+" : "") + t.macro.toFixed(1) + " · 한타 " + (t.fight >= 0 ? "+" : "") + t.fight.toFixed(1) + (t.lang ? ' · <span class="down">🗣️ 언어 소통 ' + t.lang.toFixed(1) + "</span>" : "") + ")" : "") : "") +
     (comp ? " " + (comp >= 0 ? "+ " : "− ") + "조합 " + Math.abs(comp).toFixed(1) : "") +
     (t.mood ? " + 한타 특성 " + t.mood.toFixed(1) : "") +
     (t.ev !== undefined ? " " + (ev >= 0 ? "+ " : "− ") + "<b>경기 흐름 " + Math.abs(ev).toFixed(1) + "</b>" : "") +

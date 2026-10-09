@@ -257,7 +257,9 @@ function playSet(a, b, userCtx, setCtx) {
   // 운영·한타 = 기본(운영 스탯 평균) + 운영 단계 + 한타 단계 (스타일 차이)
   const macroA = phaseTeamScore(la, "macro"), macroB = phaseTeamScore(lb, "macro");
   const fightA = phaseTeamScore(la, "fight"), fightB = phaseTeamScore(lb, "fight");
-  const playA = teamplayScore(la) + macroA + fightA, playB = teamplayScore(lb) + macroB + fightB;
+  // 언어 소통 (v1.1, js/world_moves.js): 팀 언어가 서툰 주전이 있으면 운영·한타 점수 −
+  const langA = -langGapOf(la, a) * LANG_RULES.teamplay, langB = -langGapOf(lb, b) * LANG_RULES.teamplay;
+  const playA = teamplayScore(la) + macroA + fightA + langA, playB = teamplayScore(lb) + macroB + fightB + langB;
   const compA = comps.a.bonus, compB = comps.b.bonus;
   const powerA = avgA + bonusA + playA + compA + ev.a + luckA;
   const powerB = avgB + bonusB + playB + compB + ev.b + luckB;
@@ -270,8 +272,8 @@ function playSet(a, b, userCtx, setCtx) {
   return {
     winner: aWins ? a : b, userLane: userLane, la: la, lb: lb,
     lanes: laneResults, comps: comps, events: ev.list, evRate: ev.rate, flipped: flipped, focus: ev.focus, // 집중 견제 받은 선수 (v1.1)
-    teamA: { avg: avgA, lane: bonusA, play: playA, macro: macroA, fight: fightA, comp: compA, ev: ev.a, luck: luckA, mood: moodA },
-    teamB: { avg: avgB, lane: bonusB, play: playB, macro: macroB, fight: fightB, comp: compB, ev: ev.b, luck: luckB, mood: moodB },
+    teamA: { avg: avgA, lane: bonusA, play: playA, macro: macroA, fight: fightA, comp: compA, ev: ev.a, luck: luckA, mood: moodA, lang: langA },
+    teamB: { avg: avgB, lane: bonusB, play: playB, macro: macroB, fight: fightB, comp: compB, ev: ev.b, luck: luckB, mood: moodB, lang: langB },
   };
 }
 
