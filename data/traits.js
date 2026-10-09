@@ -165,10 +165,17 @@ const S_TRAIT_RULES = [
   { trait: "s_goat",         who: "all",  text: "S급 특성 4개 이상 얻기",                       sCount: 4 },
   // 라이벌 전용 (who: "npc") — 시즌이 끝날 때·상을 받을 때 확인 (js/straits.js)
   { trait: "r_nemesis", who: "npc", text: "내 선수가 1부 주전·스탯 점수 72 이상일 때, 🔥 리그의 에이스를 가진 다른 1부 팀 같은 포지션 최고 선수 (리그에 1명)", userScore: 72 },
-  { trait: "r_ace",     who: "npc", text: "1부 시즌 평균 평점 상위 3명 (1년짜리 — 다음 시즌 끝에 새 상위 3명에게)",             top: 3 },
-  { trait: "r_dynasty", who: "npc", text: "리그 결승 MVP (1년짜리 — 다음 해 리그 결승 MVP에게)" },
+  { trait: "r_ace",     who: "npc", text: "1부 시즌 평균 평점 상위 선수 (1년짜리). 인원은 내 S급 특성 수에 따라: 0개 → 없음, 1개 → 1명, 2개 이상 → 3명",             top: 3 },
+  { trait: "r_dynasty", who: "npc", text: "리그 결승 MVP (1년짜리). 내 S급 특성이 1개 이상일 때만" },
   { trait: "r_veteran", who: "npc", text: "27세 이상 · 1부 주전 4시즌",                     age: 27, seasons: 4 },
 ];
+
+// 라이벌 전용 특성 수를 내 S급 특성 수에 맞춤 (v1.1, 사용자 요청: S급이 없을 때 리그 진행이 너무 어려움)
+//   index = 내 S급 특성 수(라이벌 전용·GOAT 제외, 마지막 값은 그 이상): 🔥 리그의 에이스 인원 / 🏰 왕조의 심장 줄지
+const RIVAL_SCALE = {
+  aceTop:  [0, 1, 3],          // 내 S급 0개 → 없음, 1개 → 1명, 2개 이상 → 3명 (예전과 같음)
+  dynasty: [false, true, true], // 내 S급 0개 → 없음, 1개 이상 → 리그 결승 MVP 1명
+};
 
 // 다른 선수(NPC) 특성: 선수를 만들 때 무작위로 (npc: true인 특성 중에서)
 const NPC_TRAITS = {

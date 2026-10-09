@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-09, PROGRESS 142까지 (ver 1.1 작업 중)
+# 다음 세션 이어가기 — 2026-10-09, PROGRESS 143까지 (ver 1.1 작업 중)
 
 새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 121~133) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
@@ -71,6 +71,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 130 | 퀘스트: 5회짜리가 있으면 다음 퀘스트 최대 3회, 체력 회복 퀘스트는 체력 40 이하일 때만, 상단바 훈련 배지가 퀘스트와 같으면 연한 노란 배경으로 진행 단계 표시 | data/quests.js, js/quests.js, js/main.js planBadgeHTML, css |
 | 131 | 지난주 결과에서 스폰서 계약 수입 줄 삭제 | js/dashboard.js |
 | 132 | 스크롤해도 상단바가 가려지지 않게 (z-index) | css/style.css |
+| 143 | ver 1.1 라이벌 전용 특성 규모 = 내 S급 수 (0개 없음 / 1개 에이스1+왕조 / 2개+ 예전대로) | data/traits.js RIVAL_SCALE, js/straits.js |
 | 142 | ver 1.1 선수 검색·이적 목록에 출신 칸·출신 필터·해외 리그 선수 검색 | js/market_pages.js, js/club_market.js |
 | 141 | ver 1.1 해외 리그 ② 시즌 이야기: 38주 지역 우승·MVP 기사, 해외 리그 화면 스타·역대 우승, 해외 선수 링크 | data/era.js, js/era.js, js/matchsim.js, js/links.js, js/market_pages.js |
 | 140 | ver 1.1 출신 리그 태그(p.origin)·모국어, 지역 수준을 출신 기준으로 | data/era.js, js/era.js, js/league.js makeNpc, js/dynasty.js |
@@ -117,6 +118,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 - 새해: saveSeasonHistory가 `state.league.lastChamps {year, ids}` 저장 → contractsNewSeason '1.5)'에서 dynastyNewSeason(moves) (계약 만료 처리 전). 연봉이 오른 선수는 contractEnd를 올해 이상으로 (만료 처리에서 덮어쓰지 않게). FA로 나간 선수 p.leftFrom/leftYear → sellable에서 원래 팀 재영입 막음.
 - 해외 진출: 국내 선수를 state.world 해외 선수로 다시 만들고 league.players에서 삭제 (은퇴처럼). 이적 목록 kind 'leave'·'abroad'(e.to).
 - 집중 견제: js/match_events.js sCountOfId (내 선수 = userSCount, 다른 선수는 라이벌 전용도 셈, GOAT 제외), rollSetEvents에서 ctx.focus·out.focus → set.focus → 세트 상세 fo. 사건 rec.call(해설 외침 번호)·rec.fm(견제받는 동료 덕분). 화면 match_detail.js focusNoteHTML·decoyCallHTML.
+- 라이벌 규모(143): RIVAL_SCALE — 내 S급 0개면 에이스·왕조의 심장 없음, 1개면 에이스 1명+왕조, 2개 이상 에이스 3명+왕조. 불러올 때 enforceRivalScale, 새해 refillRivalAces.
 - 라이벌 1년짜리: straits.js clearRivalTitle (r_ace는 시즌 끝, r_dynasty는 리그 결승 MVP 때 교체), 예전 세이브 trimRivalTitles (ensureNpcTraits에서, state.league.rivalYearDone).
 
 ### 수집·강화 (118, 120)
@@ -175,5 +177,5 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 1. `git pull`(다른 PC에서 올린 게 있을 수 있음) → `git status --short`, `git log --oneline -10`.
 2. 새 사용자 요청을 우선한다. 지금은 **ver 1.1: 친구들이 발견한 문제 수정** 단계 — 사용자가 문제를 하나씩 알려 줌. 다 끝나면 커밋 → push(웹 반영). 참고: 해외 팀이 월드를 여러 번 가져가는 판이 있음(134 측정, 아직 손대지 않음).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 143), 이 HANDOFF.md도 갱신한다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 144), 이 HANDOFF.md도 갱신한다.
 4. 사용자가 "작업완료"라고 하면 위 '작업완료' 체크리스트(커밋 → push → 다른 PC는 pull)를 다시 알려 준다.

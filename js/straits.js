@@ -110,9 +110,42 @@ function sTraitsOnAward(id, key) {
   }
   if (key === "mvp" && playerAge(id) >= sRule("s_iron_will").age) grantSTrait(id, "s_iron_will");
   if (key === "fmvp") { // 라이벌 전용: 국내(리그) 결승 MVP — 1년짜리, 다음 해 결승 MVP에게 넘어감 (v1.1)
-    clearRivalTitle("r_dynasty", id);
-    if (id !== USER_ID) grantSTrait(id, "r_dynasty");
+    const give = id !== USER_ID && rivalScale().dynasty; // 내 S급이 없으면 왕조의 심장 없음 (v1.1)
+    clearRivalTitle("r_dynasty", give ? id : []);
+    if (give) grantSTrait(id, "r_dynasty");
   }
+}
+
+// 내 S급 특성 수에 따른 라이벌 전용 특성 규모 (data/traits.js RIVAL_SCALE)
+function rivalScale() {
+  const i = Math.min(userSCount(), RIVAL_SCALE.aceTop.length - 1);
+  return { aceTop: RIVAL_SCALE.aceTop[i], dynasty: RIVAL_SCALE.dynasty[Math.min(i, RIVAL_SCALE.dynasty.length - 1)] };
+}
+
+// 지금 내 S급 수보다 많이 퍼져 있는 라이벌 특성 정리 (불러올 때·매주): 에이스는 점수 높은 순으로 aceTop명만, 왕조의 심장은 없어야 하면 모두
+function enforceRivalScale() {
+  if (!state.league || !state.player) return;
+  const sc = rivalScale();
+  const P = state.league.players;
+  const aces = Object.keys(P).filter(function (id) { return (P[id].traits || []).indexOf("r_ace") !== -1; })
+    .sort(function (a, b) { return playerScore(b) - playerScore(a); });
+  if (aces.length > sc.aceTop) clearRivalTitle("r_ace", aces.slice(0, sc.aceTop));
+  if (!sc.dynasty) clearRivalTitle("r_dynasty", []);
+}
+
+// 새해 은퇴·해외 진출 뒤: 에이스가 은퇴해서 모자라면 지난 시즌 평점 다음 순위 선수로 채움 (main.js 새해)
+function refillRivalAces() {
+  const L = state.league, snap = L.marketSnap;
+  if (!snap || !snap.ratings) return;
+  const need = rivalScale().aceTop;
+  const P = L.players;
+  const have = Object.keys(P).filter(function (id) { return (P[id].traits || []).indexOf("r_ace") !== -1; });
+  if (have.length >= need) return;
+  const t1 = {};
+  tierTeams(1).forEach(function (t) { t1[t.id] = true; });
+  Object.keys(snap.ratings).filter(function (id) { return P[id] && t1[P[id].teamId] && have.indexOf(id) === -1 && snap.ratings[id][1] >= 20; })
+    .sort(function (a, b) { return snap.ratings[b][0] - snap.ratings[a][0]; })
+    .slice(0, need - have.length).forEach(function (id) { grantSTrait(id, "r_ace"); });
 }
 
 // 1년짜리 라이벌 특성 (v1.1): 지금 가진 선수에게서 떼어 냄 (keep: 남길 선수 id 또는 id 목록)
@@ -185,7 +218,7 @@ function rivalSTraitsOnSeasonEnd(stats) {
   const ids = [];
   t1.forEach(function (t) { t.roster.forEach(function (id) { if (id !== USER_ID && P[id] && stats[id] && stats[id].g >= 20) ids.push(id); }); });
   ids.sort(function (a, b) { return stats[b].r / stats[b].g - stats[a].r / stats[a].g; });
-  const aces = ids.slice(0, ace.top);
+  const aces = ids.slice(0, rivalScale().aceTop); // 내 S급 수에 따라 0·1·3명 (v1.1)
   clearRivalTitle("r_ace", aces); // 1년짜리: 작년 에이스는 내려놓음 (v1.1)
   aces.forEach(function (id) { grantSTrait(id, "r_ace"); });
   // 숙명의 라이벌: 리그에 1명. 지금 주인이 없거나 1부를 떠났으면, 내 선수가 강할 때 새로

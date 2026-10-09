@@ -215,6 +215,7 @@ function ensureNpcTraits() {
   });
   state.league.lockedDone = true;
   trimRivalTitles(); // 예전 세이브(v1.0): 쌓인 1년짜리 라이벌 특성 정리 (js/straits.js)
+  enforceRivalScale(); // 내 S급 수에 맞게 라이벌 전용 특성 정리 (js/straits.js)
 }
 
 // ----- 구단 이름 정하기 -----
