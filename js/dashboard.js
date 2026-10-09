@@ -512,13 +512,11 @@ function thisWeekHTML() {
       (ko ? " (우리 팀은 이번 라운드에 나가지 않아요)" : "") +
       (later ? ". 다음 경기: " + later.week + "주차 " + escapeHTML(later.label) + " vs " + escapeHTML(teamName(later.a === mine.id ? later.b : later.a)) : "") + ".</div>";
   }
-  const plan = state.plan ? findTraining(state.plan).name : '<span class="down">아직 안 정함</span>';
-  const trainHTML = '<div class="rep-row"><span class="rep-tag train">훈련</span><b>' + plan + '</b> <button class="small-btn" data-go="training">훈련 바꾸기</button></div>';
+  // 훈련 줄은 없앰 (바로 아래 퀘스트·상단 훈련 배지와 겹침). 훈련을 안 골랐으면 💡 추천 줄에 [훈련 고르기]
 
   return (
     '<div class="card upcoming"><h2>▶ 이번 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + "</span></h2>" +
       adviceRowsHTML() + // 💡 이번 주 추천 (js/guide.js)
-      trainHTML +
       matchHTML +
       ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고
       compPlanHTML() + // 조합 전략 (js/comps.js)

@@ -153,9 +153,9 @@ function goalLineHTML() {
     '<div class="goal-ladder small">' + ladder + "</div></div>";
 }
 
-// 💡 이번 주 추천 줄들 ('이번 주' 카드 맨 위, js/dashboard.js). 훈련 미선택은 바로 아래 훈련 줄에 이미 보여서 뺌
+// 💡 이번 주 추천 줄들 ('이번 주' 카드 맨 위, js/dashboard.js). 훈련 미선택도 여기서 알려 줌 (훈련 줄은 없앰)
 function adviceRowsHTML() {
-  const advice = weekAdvice().filter(function (a) { return !(a.act && a.act.go === "training"); });
+  const advice = weekAdvice();
   adviceActions = advice.map(function (a) { return a.act; });
   return advice.map(function (a, i) {
     return '<div class="rep-row advice"><span class="rep-tag tip-tag">💡</span><span>' + escapeHTML(a.text) + '</span><button class="small-btn" data-advice="' + i + '">' + escapeHTML(a.label) + "</button></div>";

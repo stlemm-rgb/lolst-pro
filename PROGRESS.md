@@ -180,6 +180,7 @@
 
 149. [ver 1.1] 평판 등급 하락 유예 (사용자 요청): 평판 등급이 오르면 그 주 + 4주(1개월) 동안은 평판이 떨어져도 등급이 내려가지 않음 (감독 신뢰·팀 내 입지도 오른 등급 그대로). 유예가 끝났을 때 평판이 기준 아래면 그때 내려감. 상태 칸 평판 옆 '🛡️n주', 마우스 오버에 남은 주와 실제 평판 수준, 등급 상승 소식에 안내, 게임 방법 문장. 값 data/fame.js REPUTATION.holdWeeks 4, 코드 js/fame.js repTier(유예 반영)·rawRepTier·repHoldLeft, 저장 state.fame.repHold {idx, until}. 시험: 보통→모범 선수 뒤 평판 5로 떨어뜨려도 4주 유지, 5주째 '보통'
 150. [ver 1.1] 월드 우승 스킨 고르기 (사용자 요청): 월드 결승의 모든 세트 픽을 기록(m.finalSets, js/matchsim.js). 우승 팀 다른 선수는 결승에서 쓴 챔피언 중 무작위, 내 선수는 [수집] → 컬렉션 맨 위 '챔피언 고르기' 카드에서 결승에서 쓴 챔피언 중 직접 고름 (1개뿐이면 자동). 고르기 전에는 스킨 효과 없음·역대 표에 '고르는 중…', 💡 이번 주 추천에 [컬렉션 열기]. 고르면 주요 순간·디자인 회의 연락(skinMade)·소식. js/collection.js recordWorldsSkins·pendingSkins·chooseSkin·skinChosen, js/main.js data-skin-champ, css .skin-choice. 시험: 2012 한 시즌 진행(다른 팀 우승 스킨 정상) + 내 팀 우승 가짜 결승 3세트 → 후보 2개 표시·고르기·저장 정상, 오류 없음
+151. [ver 1.1] 대시보드 '이번 주' 카드에서 '훈련 (이름) [훈련 바꾸기]' 줄 삭제 (사용자 요청: 바로 아래 퀘스트와 겹침). 훈련을 안 골랐을 때는 💡 추천 줄에 '이번 주 훈련을 아직 안 골랐어요 [훈련 고르기]'가 나옴 (js/dashboard.js, js/guide.js adviceRowsHTML). 상단 훈련 배지는 그대로
 
 ## 파일 구성
 
