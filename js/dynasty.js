@@ -138,7 +138,7 @@ function moveAbroad(id, team, wt, news) {
   // 해외 선수로
   W.seq = (W.seq || 0) + 1;
   const np = { id: "X" + W.seq, name: p.name, pos: p.pos, age: p.age, stats: Object.assign({}, p.stats),
-    traits: (p.traits || []).filter(function (x) { const t = findTrait(x); return t && !t.rival; }), style: p.style, fromLeague: team.name };
+    traits: (p.traits || []).filter(function (x) { const t = findTrait(x); return t && !t.rival; }), style: p.style, fromLeague: team.name, origin: p.origin || HOME_ORIGIN.id };
   W.players[np.id] = np;
   if (W.names && W.names.indexOf(p.name) === -1) W.names.push(p.name);
   const same = wt.roster.filter(function (x) { return worldPlayer(x) && worldPlayer(x).pos === p.pos; })

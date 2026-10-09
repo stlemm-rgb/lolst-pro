@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-09, PROGRESS 139까지 (ver 1.1 작업 중)
+# 다음 세션 이어가기 — 2026-10-09, PROGRESS 140까지 (ver 1.1 작업 중)
 
 새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 121~133) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
@@ -39,7 +39,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 - **버전**: GitHub에 올라간 133까지가 **ver 1.0** (git 태그 `v1.0`). 지금은 **ver 1.1** 작업 중 — 사용자 요청: **이번 버전 업데이트(친구 피드백 수정)가 모두 끝날 때까지 push하지 않음.** 화면 왼쪽 위 로고 아래에 'ver 1.1' 표시(index.html). 버전을 올리면 이 글자도 바꾼다.
 - 실제 저장소 폴더는 **`C:\Project\Game\Game`** (아래 '옮김' 기록과 달리 아직 한 단계 안쪽). 명령 안내도 이 경로로.
-- 134~139 (ver 1.1 수정)는 push 전. 해외 리그 확장은 ①단계(국제대회 해외 선수 등장)까지 완료, ②지역 리그 이야기 ③선수 오가기 ④내 선수 해외 진출은 미착수.
+- 134~139 (ver 1.1 수정)는 push 전. 해외 리그 확장은 ①단계(국제대회 해외 선수 등장) + 출신 리그 태그·모국어(140)까지 완료, ②지역 리그 이야기 ③선수 오가기 ④내 선수 해외 진출은 미착수.
 - 주의: PC 저장소 파일은 줄바꿈이 CRLF(윈도우식)인 것이 있음. 클라우드에서 고쳐 넣을 때 원래 CRLF였던 파일은 CRLF로 맞춰서 넣기 (줄바꿈만 바뀌면 diff가 파일 전체로 보임).
 
 - 133(`07720a5 확인 창을 화면 안 상자로 교체`)까지 커밋 + GitHub push 완료. 이 HANDOFF.md·CLAUDE.md 수정은 커밋 필요.
@@ -71,6 +71,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 130 | 퀘스트: 5회짜리가 있으면 다음 퀘스트 최대 3회, 체력 회복 퀘스트는 체력 40 이하일 때만, 상단바 훈련 배지가 퀘스트와 같으면 연한 노란 배경으로 진행 단계 표시 | data/quests.js, js/quests.js, js/main.js planBadgeHTML, css |
 | 131 | 지난주 결과에서 스폰서 계약 수입 줄 삭제 | js/dashboard.js |
 | 132 | 스크롤해도 상단바가 가려지지 않게 (z-index) | css/style.css |
+| 140 | ver 1.1 출신 리그 태그(p.origin)·모국어, 지역 수준을 출신 기준으로 | data/era.js, js/era.js, js/league.js makeNpc, js/dynasty.js |
 | 139 | ver 1.1 해외 리그 ①: 국제대회 해외 선수 실명 경기, 지역 3단계 수준(1.0/0.94/0.86) | js/matchsim.js, js/era.js, js/league.js findPlayer, js/npc_mastery.js |
 | 138 | ver 1.1 2012년 시작 2주차 리그 규모 소개 기사 | data/era.js, js/era.js, js/main.js |
 | 137 | ver 1.1 훈련 특성: 천재적 감각 +12%, 라인전 괴물·냉철한 판단·분석의 눈(예전 빠른 손) = 훈련 하나 스탯 3개 +30% | data/traits.js |
@@ -101,6 +102,11 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 - js/club_market.js, 값 data/contracts.js CLUB_MARKET. 비시즌: offseasonRebuild = fireSale → starTransfers(1부 주전 이적) → 보강 라운드 tryBuy → depthSignings(경쟁 후보, 내 포지션 포함) → fillRosters.
 - 여름(23~28주, 29주 적용)은 js/summer_market.js. 모든 NPC 이동은 npcTransfer/tryLoan에서 logTransfer → state.league.transferLog → [이적 시장] 📋 이적 목록.
 - 47주 순서: NPC 성장 → 구단 정산 → 내 계약 제안 (다음 시즌 리그는 nextTier/nextTierName, 계약 연도는 contractYear).
+
+### 해외 리그 (139~140, ver 1.1)
+- 사용자가 고른 순서: ① 국제대회 해외 선수(완료) → 출신 태그(완료) → ② 지역 리그 시즌 이야기 → ③ 선수 오가기 + 외국인 수 제한 + **언어 소통 효과**(팀 언어 실력 평균 → 운영·한타 −, 콜 충돌 ↑, 해마다 적응) → ④ 내 선수 해외 진출 + 내 언어 실력.
+- 지역 수준 3단계 (사용자 결정): 우리 리그 1.0 > 중국·북미·유럽 0.94 > 나머지 0.86. 출신 기준으로 새해마다 50%씩 맞춤.
+- 해외 선수는 state.world.players (id 'X…'), findPlayer가 같이 찾음. 해외 선수 이름 링크는 아직 없음.
 
 ### 강팀 쏠림 막기 (134, ver 1.1)
 - 값: data/dynasty.js (DYNASTY 연봉 압박 · ABROAD 해외 러브콜 · SCOUTED 분석 −3% · PRIZE_SHARE 상금 절반 선수 몫 · DECOY 미끼 장면·해설 외침). 코드: js/dynasty.js.
@@ -165,5 +171,5 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 1. `git pull`(다른 PC에서 올린 게 있을 수 있음) → `git status --short`, `git log --oneline -10`.
 2. 새 사용자 요청을 우선한다. 지금은 **ver 1.1: 친구들이 발견한 문제 수정** 단계 — 사용자가 문제를 하나씩 알려 줌. 다 끝나면 커밋 → push(웹 반영). 참고: 해외 팀이 월드를 여러 번 가져가는 판이 있음(134 측정, 아직 손대지 않음).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 140), 이 HANDOFF.md도 갱신한다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 141), 이 HANDOFF.md도 갱신한다.
 4. 사용자가 "작업완료"라고 하면 위 '작업완료' 체크리스트(커밋 → push → 다른 PC는 pull)를 다시 알려 준다.

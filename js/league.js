@@ -98,6 +98,7 @@ function makeNpc(pos, level, ageRange) {
     teamId: null,
     traits: randomNpcTraits(),
     style: pickStyle(pos), // 플레이 스타일: 강점·약점 스탯 (data/league.js NPC_STYLES)
+    origin: HOME_ORIGIN.id, // 출신 리그 (v1.1, data/era.js)
   };
   applyStyle(p);
   shapeNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (점수는 그대로)

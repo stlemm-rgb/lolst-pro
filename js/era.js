@@ -109,7 +109,7 @@ function worldNick() {
 }
 
 // 해외 선수 하나 (리그 선수 목록에는 안 들어감)
-function makeWorldPlayer(pos, avg, ageRange) {
+function makeWorldPlayer(pos, avg, ageRange, origin) {
   const W = state.world;
   const target = avg + randInt(-WORLD_RULES.levelSpread, WORLD_RULES.levelSpread);
   const bonus = findPosition(pos).bonus;
@@ -120,7 +120,7 @@ function makeWorldPlayer(pos, avg, ageRange) {
     stats[s.id] = Math.max(1, Math.min(99, v));
   });
   W.seq = (W.seq || 0) + 1;
-  const p = { id: "X" + W.seq, name: worldNick(), pos: pos, age: randInt(ageRange[0], ageRange[1]), stats: stats, traits: randomNpcTraits(), style: pickStyle(pos) };
+  const p = { id: "X" + W.seq, name: worldNick(), pos: pos, age: randInt(ageRange[0], ageRange[1]), stats: stats, traits: randomNpcTraits(), style: pickStyle(pos), origin: origin || null };
   applyStyle(p);
   shapeNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (js/league.js)
   npcMasteryInit(p); // 챔피언 숙련도 (국제대회에서 국내 선수와 같은 밴픽·숙련도 규칙, v1.1)
@@ -160,8 +160,8 @@ function addWorldRegion(region) {
     const name = names[i] || (region.name + " " + (i + 1));
     W.tseq = (W.tseq || 0) + 1;
     const team = { id: "O" + W.tseq, name: name, short: name.split(" ").map(function (w) { return w[0]; }).join("").toUpperCase().slice(0, 3), region: region.id, roster: [] };
-    POSITION_IDS.forEach(function (pos) { team.roster.push(makeWorldPlayer(pos, goal, LEAGUE.npc.ageRange).id); });
-    for (let k = 0; k < WORLD_RULES.rosterSize - 5; k++) team.roster.push(makeWorldPlayer(pick(POSITION_IDS), goal - 6, LEAGUE.npc.ageRange).id);
+    POSITION_IDS.forEach(function (pos) { team.roster.push(makeWorldPlayer(pos, goal, LEAGUE.npc.ageRange, region.id).id); });
+    for (let k = 0; k < WORLD_RULES.rosterSize - 5; k++) team.roster.push(makeWorldPlayer(pick(POSITION_IDS), goal - 6, LEAGUE.npc.ageRange, region.id).id);
     // 목표 전력과 차이만큼 모든 선수 스탯을 조금 옮김
     const diff = Math.round(goal - worldTeamStrength(team));
     if (diff) team.roster.forEach(function (id) { const p = worldPlayer(id); STATS.forEach(function (s) { p.stats[s.id] = Math.max(1, Math.min(99, p.stats[s.id] + diff)); }); });
@@ -190,7 +190,9 @@ function worldNewSeason() {
   if (!state.world) return;
   const W = state.world;
   W.teams.forEach(function (team) {
-    const avg = worldTeamStrength(team);
+    // 은퇴한 자리 신인: 그 팀의 '그 지역 출신' 선수 평균 기준 (한국인 용병 같은 다른 출신 선수 실력은 빼고, v1.1)
+    const locals = team.roster.map(worldPlayer).filter(function (q) { return q && q.origin === team.region; });
+    const avg = locals.length ? average(locals.map(worldScore)) : worldTeamStrength(team);
     team.roster = team.roster.map(function (id) {
       const p = worldPlayer(id);
       if (!p) return id;
@@ -199,7 +201,7 @@ function worldNewSeason() {
       const retireAge = LEAGUE.retireFromAge + traitSumOf(tr, "agingDelay") + traitSumOf(tr, "maxAgeBonus");
       if (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear) {
         delete W.players[id];
-        return makeWorldPlayer(p.pos, avg - WORLD_RULES.rookieBelow, LEAGUE.rookie.ageRange).id;
+        return makeWorldPlayer(p.pos, avg - WORLD_RULES.rookieBelow, LEAGUE.rookie.ageRange, team.region).id;
       }
       return id;
     });
@@ -214,21 +216,34 @@ function worldTeamIdOf(id) {
   return t ? t.id : null;
 }
 
-// 지역 수준 맞추기 (v1.1): 지역 주전 평균을 '1부 평균 × strength' 쪽으로 pull만큼 (스탯을 한꺼번에 올리거나 내림)
+// ----- 출신 리그 (v1.1, data/era.js HOME_ORIGIN · REGION_LANG) -----
+function originOf(p) {
+  if (!p) return null;
+  return p.origin || (state.world && state.world.players[p.id] ? null : HOME_ORIGIN.id);
+}
+function originName(o) { return o === HOME_ORIGIN.id ? HOME_ORIGIN.name : (findRegion(o) || {}).name || "?"; }
+function originShort(o) { return o === HOME_ORIGIN.id ? HOME_ORIGIN.short : REGION_SHORT[o] || "?"; }
+function langOf(p) { const o = originOf(p); return o === HOME_ORIGIN.id ? HOME_ORIGIN.lang : REGION_LANG[o] || "en"; }
+function langName(code) { return LANGUAGES[code] || code; }
+
+// 지역 수준 맞추기 (v1.1): '그 지역 출신' 주전 평균을 '1부 평균 × strength' 쪽으로 pull만큼 (그 출신 선수 스탯만 한꺼번에 옮김)
+//   해외로 간 국내 선수(출신 한국)는 건드리지 않아요 → 실력 그대로, 그 팀이 강해짐
 function normalizeWorldTiers(pull) {
   if (!state.world) return;
   const base = domesticBase();
+  const W = state.world;
   activeRegions().forEach(function (r) {
-    const teams = state.world.teams.filter(function (t) { return t.region === r.id; });
-    if (!teams.length) return;
-    const avg = average(teams.map(worldTeamStrength));
-    const shift = Math.round((base * r.strength - avg) * pull);
+    const starterScores = [];
+    W.teams.filter(function (t) { return t.region === r.id; }).forEach(function (t) {
+      const st = worldStarters(t);
+      POSITION_IDS.forEach(function (pos) { const q = st[pos] && worldPlayer(st[pos]); if (q && q.origin === r.id) starterScores.push(worldScore(q)); });
+    });
+    if (!starterScores.length) return;
+    const shift = Math.round((base * r.strength - average(starterScores)) * pull);
     if (!shift) return;
-    teams.forEach(function (t) {
-      t.roster.forEach(function (id) {
-        const p = worldPlayer(id);
-        if (p) STATS.forEach(function (s) { p.stats[s.id] = Math.max(1, Math.min(100, p.stats[s.id] + shift)); });
-      });
+    Object.keys(W.players).forEach(function (id) {
+      const p = W.players[id];
+      if (p.origin === r.id) STATS.forEach(function (s) { p.stats[s.id] = Math.max(1, Math.min(100, p.stats[s.id] + shift)); });
     });
   });
 }
@@ -238,6 +253,9 @@ function ensureWorldV11() {
   const W = state.world;
   if (!W) return;
   Object.keys(W.players).forEach(function (id) { if (!W.players[id].mastery) npcMasteryInit(W.players[id]); });
+  // 출신 리그: 국내 선수는 한국, 해외 선수는 지금 팀 지역 (국내에서 해외로 간 선수는 한국)
+  Object.keys(state.league.players).forEach(function (id) { if (!state.league.players[id].origin) state.league.players[id].origin = HOME_ORIGIN.id; });
+  W.teams.forEach(function (t) { t.roster.forEach(function (id) { const p = W.players[id]; if (p && !p.origin) p.origin = p.fromLeague ? HOME_ORIGIN.id : t.region; }); });
   if (!W.tierDone) { normalizeWorldTiers(1); W.tierDone = true; }
 }
 
@@ -300,7 +318,10 @@ pages.world = function () {
       const st = worldStarters(t);
       const lineup = POSITION_IDS.map(function (pos) {
         const p = st[pos] && worldPlayer(st[pos]);
-        return p ? '<span class="tip" tabindex="0" data-tip="' + escapeHTML(findPosition(pos).name + " · " + p.age + "세 · 종합 " + worldScore(p).toFixed(1)) + '">' + escapeHTML(p.name) + "</span>" : "-";
+        if (!p) return "-";
+        const o = originOf(p), foreign = o && o !== t.region; // 다른 출신 (예: 한국인 용병)
+        return '<span class="tip" tabindex="0" data-tip="' + escapeHTML(findPosition(pos).name + " · " + p.age + "세 · 종합 " + worldScore(p).toFixed(1) + " · 출신 " + originName(o) + " · 모국어 " + langName(langOf(p))) + '">' + escapeHTML(p.name) + "</span>" +
+          (foreign ? ' <span class="chip meta" title="' + escapeHTML(originName(o)) + ' 출신">' + originShort(o) + "</span>" : "");
       }).join(" · ");
       const rk = rankOf(t.id);
       return "<tr><td class=\"r\">" + (rk ? rk + "위" : "-") + "</td><td><b>" + escapeHTML(t.name) + "</b>" + (wt.indexOf(t.id) !== -1 ? ' <span class="chip meta">월드</span>' : "") + "</td><td class=\"r\">" + worldTeamStrength(t).toFixed(1) + '</td><td class="small">' + lineup + "</td></tr>";
@@ -312,7 +333,7 @@ pages.world = function () {
   return "<h1>해외 리그</h1>" +
     '<div class="card"><p class="muted small">국제대회(월드' + (msiOn() ? " · MSI" : "") + (firstStandOn() ? " · First Stand" : "") + ")에 나오는 해외 지역과 팀이에요. 전력 = 주전 5명 종합 능력 평균 (우리 리그 1부 평균 " + domestic.toFixed(1) +
       "). 선수들도 해마다 성장·노화·은퇴해요. 순위는 이번 시즌 지역 순위예요 (전력 + 운).</p>" +
-      '<p class="muted small">지역 수준은 3단계: 우리 리그가 가장 강하고, 중국·북미·유럽이 그다음(약 94%), 나머지 지역이 가장 아래(약 86%)예요. 국제대회에서는 해외 팀도 실제 선수 5명이 뛰어서 경기 결과에 이름·평점·POG가 나와요.</p>' +
+      '<p class="muted small">지역 수준은 3단계: 우리 리그가 가장 강하고, 중국·북미·유럽이 그다음(약 94%), 나머지 지역이 가장 아래(약 86%)예요. 국제대회에서는 해외 팀도 실제 선수 5명이 뛰어서 경기 결과에 이름·평점·POG가 나와요. 수준은 선수의 <b>출신 리그</b> 기준이라, 해외로 간 우리 리그 선수(KR 표시)는 실력이 그대로예요. 이름에 마우스를 올리면 출신·모국어가 보여요.</p>' +
       (future.length ? '<p class="muted small">앞으로 참가할 지역: ' + future.map(function (r) { return r.name + "(" + r.from + ")"; }).join(", ") + "</p>" : "") +
       '<p class="muted small">MSI ' + ERA.msiFrom + "년부터 · First Stand " + ERA.firstStandFrom + "년부터</p></div>" + cards;
 };

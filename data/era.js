@@ -28,6 +28,13 @@ const ERA_INTRO = {
   noChange: "  · 큰 변화 없이 올해 규모가 이어진다",
 };
 
+// 출신 리그 (v1.1): 선수마다 p.origin. 수준은 출신 기준으로 맞춤 (팀을 옮겨도 출신 수준 그대로 → 해외로 간 국내 스타는 실력 유지)
+//   우리 리그 출신 = "kr", 해외 출신 = 지역 id (아래 WORLD_REGIONS). lang = 모국어 (언어 소통 효과는 ③단계 선수 오가기 때 연결 예정, 지금은 표시만)
+const HOME_ORIGIN = { id: "kr", name: "한국", short: "KR", lang: "ko" };
+const LANGUAGES = { ko: "한국어", zh: "중국어", en: "영어", pt: "포르투갈어", tr: "터키어", ru: "러시아어", ja: "일본어", es: "스페인어", vi: "베트남어", th: "태국어" };
+const REGION_LANG = { na: "en", eu: "en", cn: "zh", tw: "zh", sea: "th", br: "pt", tr: "tr", cis: "ru", jp: "ja", lat: "es", vn: "vi", oce: "en" };
+const REGION_SHORT = { na: "NA", eu: "EU", cn: "CN", tw: "TW", sea: "SEA", br: "BR", tr: "TR", cis: "CIS", jp: "JP", lat: "LAT", vn: "VN", oce: "OCE" };
+
 // 월드 챔피언십 지역 (우리 리그 = 한국은 여기 없음). from: 처음 참가하는 해
 // strength: 우리 리그 1부 평균 대비 전력 (1.0 = 같음), teams: 그 지역 팀 수 (선수 명단을 가진 가상 팀)
 //   v1.1 (사용자 결정): 3단계 — 우리 리그(LCK) 1.0 > 중국·북미·유럽 0.94 > 나머지 0.86. 해마다 새해에 이 수준 쪽으로 반쯤 맞춤 (WORLD_RULES.tierPull)
@@ -55,7 +62,7 @@ const WORLD_RULES = {
   rookieBelow: 8,         // 은퇴한 자리를 채우는 신인: 그 팀 평균보다 이만큼 낮게
   rankNoise: 2,           // 시즌마다 지역 순위를 정할 때 전력 흔들림 ±
   openSlots: 4,           // 월드에서 지역 1위가 아니라 전력 순으로 주는 자리 수
-  tierPull: 0.5,          // 새해마다 지역 주전 평균을 '1부 평균 × strength' 쪽으로 차이의 이만큼 옮김 (스타 유입·성장으로 수준이 흐트러지지 않게)
+  tierPull: 0.5,          // 새해마다 '그 지역 출신' 주전 평균을 '1부 평균 × strength' 쪽으로 차이의 이만큼 옮김 (다른 출신 선수는 그대로)
 };
 
 // 해외 팀 이름 (지역마다 앞에서부터 사용, 모자라면 공용 목록) — 모두 가상의 이름
