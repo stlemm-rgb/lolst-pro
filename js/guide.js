@@ -12,7 +12,7 @@ function tutorialState() {
 function tutorialChecks(check) {
   const t = tutorialState();
   switch (check) {
-    case "plan": return !!state.plan;
+    case "plan": return !!state.plan && state.plan !== t.startPlan; // 처음 골라져 있는 솔로 랭크에서 다른 훈련으로 바꿔 봐야 완료 (v1.1)
     case "advance": return !!state.weekReport;
     case "sns": return state.inbox.some(function (m) { return m.tab === "inbox" && m.choices && m.answered !== null && m.answered !== "ignored"; });
     case "schedule": return !!t.visited.schedule;

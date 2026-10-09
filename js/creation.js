@@ -483,7 +483,7 @@ function startCareer(sure) {
   makeLeague(teams, teamChoice); // 리그·구단·선수 만들고 내 소속팀 정하기
   const extra = applyFirstContract(); // 첫 계약: 능력 보너스·계약금·원룸 (data/contracts.js FIRST_CONTRACT)
   enforceConditionCap(); // 2부는 합숙으로 시작 (js/housing.js)
-  replaceState(fresh, "dashboard", escapeHTML(fresh.player.name) + " 선수의 커리어가 시작됐어요! " + extra + "훈련을 고르고 [다음 주로 진행]을 눌러 보세요.");
+  replaceState(fresh, "dashboard", escapeHTML(fresh.player.name) + " 선수의 커리어가 시작됐어요! " + extra + "훈련은 솔로 랭크가 골라져 있어요. 원하는 훈련으로 바꾸고 [다음 주로 진행]을 눌러 보세요.");
   saveGame();
 }
 

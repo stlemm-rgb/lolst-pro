@@ -43,7 +43,7 @@ function createNewState() {
     focusChamp: "",               // 챔피언 집중 연습에서 고른 챔피언
     skipTraining: false,          // true면 다음 주 훈련 대신 휴식 (이벤트 효과)
     matchBoost: 0,                // 다음 경기 경기력 보너스 (이벤트 효과)
-    plan: null,                   // 이번 주에 고른 훈련 id
+    plan: "solo_rank",            // 이번 주에 고른 훈련 id (새 게임은 솔로 랭크가 기본 선택, v1.1)
     log: [],                      // 최근 주간 결과 (최신이 맨 앞)
     settings: { autoSave: true }, // 게임 설정
     notice: "",                   // 화면에 잠깐 띄울 안내 문구
