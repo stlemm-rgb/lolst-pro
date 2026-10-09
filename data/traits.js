@@ -46,10 +46,10 @@
 //     ✅ maxAgeBonus: 최대 은퇴 나이 +n
 const TRAITS = [
   // ===== 좋은 특성: 훈련 =====
-  { id: "genius",       type: "good", npc: true, group: "훈련", name: "천재적 감각",   desc: "모든 훈련 효과 +20%",                                  effects: { trainingAll: 0.2 } },
-  { id: "lane_monster", type: "good", npc: true, group: "훈련", name: "라인전 괴물",   desc: "라인전 훈련 효과 +30%, 반응속도 +15%",                  effects: { trainingStat: { laning: 0.3, reaction: 0.15 } } },
-  { id: "fast_hands",   type: "good", npc: true, group: "훈련", name: "빠른 손",       desc: "반응속도·입력 정확도 훈련 효과 +20%",                    effects: { trainingStat: { reaction: 0.2, accuracy: 0.2 } } },
-  { id: "cool_head",    type: "good", npc: true, group: "훈련", name: "냉철한 판단",   desc: "운영·시야 훈련 효과 +20%",                              effects: { trainingStat: { macro: 0.2, vision: 0.2 } } },
+  { id: "genius",       type: "good", npc: true, group: "훈련", name: "천재적 감각",   desc: "모든 훈련 효과 +12% (여러 훈련을 고루 할 때 좋음)",      effects: { trainingAll: 0.12 } }, // v1.1: +20%는 전문 특성보다 모든 훈련에서 좋아서 낮춤
+  { id: "lane_monster", type: "good", npc: true, group: "훈련", name: "라인전 괴물",   desc: "솔로 랭크 스탯(라인전·반응속도·입력 정확도) 훈련 효과 +30%", effects: { trainingStat: { laning: 0.3, reaction: 0.3, accuracy: 0.3 } } }, // v1.1: 훈련 하나의 스탯 3개
+  { id: "fast_hands",   type: "good", npc: true, group: "훈련", name: "분석의 눈",     desc: "리플레이 분석 스탯(시야·거리 조절·집중력) 훈련 효과 +30%", effects: { trainingStat: { vision: 0.3, spacing: 0.3, focus: 0.3 } } }, // v1.1: 예전 '빠른 손'(반응·정확 +20%)을 바꿈 (id는 그대로)
+  { id: "cool_head",    type: "good", npc: true, group: "훈련", name: "냉철한 판단",   desc: "팀 스크림 스탯(한타·운영·오더) 훈련 효과 +30%",         effects: { trainingStat: { teamfight: 0.3, macro: 0.3, shotcall: 0.3 } } }, // v1.1: 훈련 하나의 스탯 3개
   { id: "iron_body",    type: "good", group: "훈련", name: "철인",         desc: "훈련·경기 체력 소모 −25%",                              effects: { staminaCost: -0.25 } },
   { id: "fast_recovery", type: "good", group: "훈련", name: "회복력",       desc: "휴식 체력 회복 +50%, 매주 체력 +3 자연 회복",            effects: { restBonus: 0.5, staminaRegen: 3 } },
   { id: "diligent",     type: "good", group: "훈련", name: "모범생",        desc: "퀘스트 보상 +50%",                                     effects: { questBonus: 0.5 } },
@@ -181,7 +181,7 @@ const NPC_TRAITS = {
 const TRAIT_RECOMMEND = { // (124) 경기 특성 1개 + 성장·챔피언 특성
   top:     ["map_reader", "lane_monster", "late_bloomer"],
   jungle:  ["steal_master", "cool_head", "meta_reader"],
-  mid:     ["highlight", "champ_lab", "fast_hands"],
+  mid:     ["highlight", "champ_lab", "lane_monster"],
   adc:     ["machine", "fast_hands", "carry_instinct"],
   support: ["born_leader", "support_sense", "cool_head"],
 };

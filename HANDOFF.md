@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-09, PROGRESS 136까지 (ver 1.1 작업 중)
+# 다음 세션 이어가기 — 2026-10-09, PROGRESS 137까지 (ver 1.1 작업 중)
 
 새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 121~133) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
@@ -39,7 +39,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 - **버전**: GitHub에 올라간 133까지가 **ver 1.0** (git 태그 `v1.0`). 지금은 **ver 1.1** 작업 중 — 사용자 요청: **이번 버전 업데이트(친구 피드백 수정)가 모두 끝날 때까지 push하지 않음.** 화면 왼쪽 위 로고 아래에 'ver 1.1' 표시(index.html). 버전을 올리면 이 글자도 바꾼다.
 - 실제 저장소 폴더는 **`C:\Project\Game\Game`** (아래 '옮김' 기록과 달리 아직 한 단계 안쪽). 명령 안내도 이 경로로.
-- 134~136 (ver 1.1 수정)는 push 전.
+- 134~137 (ver 1.1 수정)는 push 전.
 
 - 133(`07720a5 확인 창을 화면 안 상자로 교체`)까지 커밋 + GitHub push 완료. 이 HANDOFF.md·CLAUDE.md 수정은 커밋 필요.
 - GitHub 저장소: https://github.com/stlemm-rgb/lolst-pro (공개, 브랜치 `master`, remote `origin`).
@@ -70,6 +70,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 130 | 퀘스트: 5회짜리가 있으면 다음 퀘스트 최대 3회, 체력 회복 퀘스트는 체력 40 이하일 때만, 상단바 훈련 배지가 퀘스트와 같으면 연한 노란 배경으로 진행 단계 표시 | data/quests.js, js/quests.js, js/main.js planBadgeHTML, css |
 | 131 | 지난주 결과에서 스폰서 계약 수입 줄 삭제 | js/dashboard.js |
 | 132 | 스크롤해도 상단바가 가려지지 않게 (z-index) | css/style.css |
+| 137 | ver 1.1 훈련 특성: 천재적 감각 +12%, 라인전 괴물·냉철한 판단·분석의 눈(예전 빠른 손) = 훈련 하나 스탯 3개 +30% | data/traits.js |
 | 136 | ver 1.1 네임드 선수 Jimul(원딜)·Kibai(탑) 추가 (7명, 같은 포지션 네임드는 다른 팀) | data/named_players.js, js/league.js |
 | 135 | ver 1.1 새 게임 훈련 기본값 = 솔로 랭크, 처음 안내 1단계 '훈련 바꿔 보기'(다른 훈련으로 바꿔야 완료, tutorial.startPlan) | js/main.js, js/guide.js, data/guide.js, js/creation.js |
 | 134 | **ver 1.1** 친구 피드백: 강팀 쏠림 — 라이벌 특성 1년짜리, 집중 견제 NPC에도(+미끼 장면 해설), 월드 우승팀 분석 −3%, 왕조 연봉 압박(FA), 해외 러브콜, 상금 선수 분배, 평판 음수 진행 멈춤 버그 | data/dynasty.js, js/dynasty.js, js/straits.js, js/match_events.js, js/match_detail.js |
@@ -161,5 +162,5 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 1. `git pull`(다른 PC에서 올린 게 있을 수 있음) → `git status --short`, `git log --oneline -10`.
 2. 새 사용자 요청을 우선한다. 지금은 **ver 1.1: 친구들이 발견한 문제 수정** 단계 — 사용자가 문제를 하나씩 알려 줌. 다 끝나면 커밋 → push(웹 반영). 참고: 해외 팀이 월드를 여러 번 가져가는 판이 있음(134 측정, 아직 손대지 않음).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 137), 이 HANDOFF.md도 갱신한다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 138), 이 HANDOFF.md도 갱신한다.
 4. 사용자가 "작업완료"라고 하면 위 '작업완료' 체크리스트(커밋 → push → 다른 PC는 pull)를 다시 알려 준다.
