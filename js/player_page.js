@@ -277,7 +277,7 @@ function sTraitProgressHTML() {
     switch (r.trait) {
       case "s_emperor":      return { cur: rec.worlds || 0, max: r.worlds, unit: "회 우승" };
       case "s_lane_lord":    return { cur: season.solo || 0, max: r.solo, unit: "솔로킬 (이번 시즌)" };
-      case "s_comeback":     return { cur: rec.reverseSweeps || 0, max: r.reverseSweeps, unit: "번 역전" };
+      case "s_comeback":     return { cur: rec.reverseSweeps || 0, max: r.reverseSweeps, unit: "번 역전" + (rec.reverseList && rec.reverseList.length ? " (" + rec.reverseList.join(" · ") + ")" : "") }; // 어떤 경기였는지 (v1.1)
       case "s_one_club":     return { cur: rec.clubTeam === myTeam().id ? rec.clubYears || 0 : 0, max: r.seasons, unit: "시즌 (지금 팀, 시즌이 끝날 때 셈)" };
       case "s_breakthrough": return { cur: statsAtCap(USER_ID), max: r.atCap, unit: "개 " + (r.atLeast || STAT_CAP) + " 이상" };
       case "s_champ_master": return { cur: mastered, max: r.mastered, unit: "명 숙련도 100" };

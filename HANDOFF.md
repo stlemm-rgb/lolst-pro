@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-09, PROGRESS 147까지 (ver 1.1 작업 중)
+# 다음 세션 이어가기 — 2026-10-09, PROGRESS 148까지 (ver 1.1 작업 중)
 
 새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 121~133) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
@@ -71,6 +71,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 130 | 퀘스트: 5회짜리가 있으면 다음 퀘스트 최대 3회, 체력 회복 퀘스트는 체력 40 이하일 때만, 상단바 훈련 배지가 퀘스트와 같으면 연한 노란 배경으로 진행 단계 표시 | data/quests.js, js/quests.js, js/main.js planBadgeHTML, css |
 | 131 | 지난주 결과에서 스폰서 계약 수입 줄 삭제 | js/dashboard.js |
 | 132 | 스크롤해도 상단바가 가려지지 않게 (z-index) | css/style.css |
+| 148 | ver 1.1 역전의 명수: 판정은 정확(시험 5,500경기), 역전마다 소식·기록 목록 표시 | js/straits.js, js/player_page.js |
 | 147 | ver 1.1 숙련도·메타 강화: 손맛(cf³ 사건 확률), 메타 S15/A8%, 페널티 ÷2, 조커 3% | data/match.js, js/match_events.js, js/matchsim.js, js/npc_mastery.js |
 | 146 | ver 1.1 50주 은퇴 기사: 1부 주전 평균 위 선수만, 이름(종합 능력) | js/retirement.js |
 | 145 | ver 1.1 해외 지역 간판 스타(상위 5명) 국내 영입 불가 | data/era.js, js/world_moves.js |
@@ -181,5 +182,5 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 1. `git pull`(다른 PC에서 올린 게 있을 수 있음) → `git status --short`, `git log --oneline -10`.
 2. 새 사용자 요청을 우선한다. 지금은 **ver 1.1: 친구들이 발견한 문제 수정** 단계 — 사용자가 문제를 하나씩 알려 줌. 다 끝나면 커밋 → push(웹 반영). 참고: 해외 팀이 월드를 여러 번 가져가는 판이 있음(134 측정, 아직 손대지 않음).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 148), 이 HANDOFF.md도 갱신한다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 149), 이 HANDOFF.md도 갱신한다.
 4. 사용자가 "작업완료"라고 하면 위 '작업완료' 체크리스트(커밋 → push → 다른 PC는 pull)를 다시 알려 준다.

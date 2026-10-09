@@ -42,7 +42,8 @@ function grantSTrait(id, traitId) {
   state.league.sTraitLog = state.league.sTraitLog.slice(-100);
 
   if (id === USER_ID) {
-    postMessage("news", "🌟 S급 특성 획득: " + t.name, rule.text + "!\n" + t.desc, { notes: ["S급 특성 '" + t.name + "'을(를) 얻었다!"] });
+    const why = traitId === "s_comeback" && recOf(USER_ID).reverseList ? "\n역전 기록: " + recOf(USER_ID).reverseList.join(" · ") : ""; // 어떤 경기로 얻었는지 (v1.1)
+    postMessage("news", "🌟 S급 특성 획득: " + t.name, rule.text + "!\n" + t.desc + why, { notes: ["S급 특성 '" + t.name + "'을(를) 얻었다!"] });
     addMoment("🌟", "S급 특성 '" + t.name + "' 획득 (" + rule.text + ")");
   } else if (traitId === "r_nemesis") {
     // 숙명의 라이벌: 나를 겨냥하는 상대라 연락으로 알림
@@ -97,6 +98,9 @@ function sTraitsOnMatch(m, perf, downTwo) {
     const rec = recOf(id);
     if (!rec) return;
     rec.reverseSweeps = (rec.reverseSweeps || 0) + 1;
+    // 어떤 경기였는지 기록 (v1.1: 확인용) — 예: "2017 플레이오프 4강 vs KT HYDRA"
+    rec.reverseList = (rec.reverseList || []).concat([state.year + " " + m.label + " vs " + teamName(m.loser)]).slice(-5);
+    if (id === USER_ID) addNews("역전승", "🔥 0:2에서 3:2 역전승! (" + m.label + " vs " + teamName(m.loser) + ") — 역전의 명수 " + Math.min(rec.reverseSweeps, sRule("s_comeback").reverseSweeps) + "/" + sRule("s_comeback").reverseSweeps);
     if (rec.reverseSweeps >= sRule("s_comeback").reverseSweeps) grantSTrait(id, "s_comeback");
   });
 }
