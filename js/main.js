@@ -25,7 +25,7 @@ function createNewState() {
     career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0, earned: 0, moments: [] }, // 커리어 기록
     retirePlanned: false,         // true면 이번 시즌이 끝날 때 은퇴 (js/retire.js)
     shop: { gear: {}, staff: {}, fame: {}, invest: [], investProfit: 0 }, // 상점 (js/shop.js)
-    tutorial: { on: true, done: {}, visited: {} }, // 처음 안내 (js/guide.js). 예전 세이브를 불러오면 꺼짐
+    tutorial: { on: true, done: {}, visited: {}, startPlan: "solo_rank" }, // 처음 안내 (js/guide.js). startPlan = 처음 골라져 있는 훈련 (다른 훈련으로 바꾸면 첫 단계 완료). 예전 세이브를 불러오면 꺼짐
     activities: [],               // 오래 가는 계약·활동 (스폰서·개인 방송·라이벌, js/events.js)
     pendingEvents: [],            // 몇 주 뒤에 올 후속 연락
     compPlan: "auto",             // 조합 전략: meta / counter / auto (js/comps.js)
