@@ -35,6 +35,17 @@ const LANGUAGES = { ko: "한국어", zh: "중국어", en: "영어", pt: "포르�
 const REGION_LANG = { na: "en", eu: "en", cn: "zh", tw: "zh", sea: "th", br: "pt", tr: "tr", cis: "ru", jp: "ja", lat: "es", vn: "vi", oce: "en" };
 const REGION_SHORT = { na: "NA", eu: "EU", cn: "CN", tw: "TW", sea: "SEA", br: "BR", tr: "TR", cis: "CIS", jp: "JP", lat: "LAT", vn: "VN", oce: "OCE" };
 
+// ② 해외 리그 시즌 이야기 (v1.1, js/era.js worldSeasonStory): 우리 리그 결승 주(38주)에 지역 리그 결산
+//   mvpRankBonus: 지역 MVP 고를 때 팀 순위 보너스 [1위, 2위, 3위] (종합 능력에 더함) · historyKeep: 지역마다 기록 보관 연수 · stars: 화면 스타 선수 수
+const WORLD_STORY = {
+  mvpRankBonus: [3, 1.5, 0.5],
+  historyKeep: 15,
+  stars: 3,
+  headline: "🌏 {year} 해외 리그 결산 — 지역 우승팀 확정",
+  intro: "월드 챔피언십을 앞두고 해외 각 지역 리그의 우승팀과 MVP가 정해졌다.",
+  kr: " (한국 출신!)",
+};
+
 // 월드 챔피언십 지역 (우리 리그 = 한국은 여기 없음). from: 처음 참가하는 해
 // strength: 우리 리그 1부 평균 대비 전력 (1.0 = 같음), teams: 그 지역 팀 수 (선수 명단을 가진 가상 팀)
 //   v1.1 (사용자 결정): 3단계 — 우리 리그(LCK) 1.0 > 중국·북미·유럽 0.94 > 나머지 0.86. 해마다 새해에 이 수준 쪽으로 반쯤 맞춤 (WORLD_RULES.tierPull)
@@ -60,7 +71,7 @@ const WORLD_RULES = {
   topBonus: [1.08, 1.04, 1.01, 0.98, 0.96, 0.94, 0.92, 0.9], // 지역 안 순위별 전력 배율 (1위가 가장 강함)
   levelSpread: 5,         // 같은 팀 선수끼리 실력 차이 ±
   rookieBelow: 8,         // 은퇴한 자리를 채우는 신인: 그 팀 평균보다 이만큼 낮게
-  rankNoise: 2,           // 시즌마다 지역 순위를 정할 때 전력 흔들림 ±
+  rankNoise: 4,           // 시즌마다 지역 순위를 정할 때 전력 흔들림 ± (v1.1: 2 → 4, 작은 지역에서 같은 팀만 우승하던 문제)
   openSlots: 4,           // 월드에서 지역 1위가 아니라 전력 순으로 주는 자리 수
   tierPull: 0.5,          // 새해마다 '그 지역 출신' 주전 평균을 '1부 평균 × strength' 쪽으로 차이의 이만큼 옮김 (다른 출신 선수는 그대로)
 };

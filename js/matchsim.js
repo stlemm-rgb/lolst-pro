@@ -496,7 +496,7 @@ const WEEK_EVENTS = {
     schedule(36, "playoffs", "플레이오프 1라운드", seeds[3], seeds[4], LEAGUE.bestOf.playoffs);
   }],
   37: [function () { koSemis("playoffs", "플레이오프 4강", seasonOf().seeds, 36, 37, LEAGUE.bestOf.playoffs); }],
-  38: [function () { koFinal("playoffs", "결승전", 38, LEAGUE.bestOf.playoffs, "playoffs", "리그 우승"); }],
+  38: [function () { koFinal("playoffs", "결승전", 38, LEAGUE.bestOf.playoffs, "playoffs", "리그 우승"); }, function () { worldSeasonStory(); }], // 해외 리그 결산 (js/era.js)
   // 승강전: 1부 꼴찌 vs 2부 1위, 1부 끝에서 2번째 vs 2부 2위
   39: [function () { promoMatch(39, tier1Ids().length - 1, 0); }],
   40: [function () { promoMatch(40, tier1Ids().length - 2, 1); }],

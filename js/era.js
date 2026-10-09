@@ -301,6 +301,62 @@ function eraIntroArticle() {
   addNews("리그 소개", "📰 " + fill(I.headline) + " (대시보드 [📰 NEWS])");
 }
 
+// ----- ② 해외 리그 시즌 이야기 (v1.1, data/era.js WORLD_STORY) -----
+// 우리 리그 결승 주(38주): 지역마다 우승팀(이번 시즌 지역 순위 1위)과 지역 MVP → state.world.history, 신문 기사
+function worldSeasonStory() {
+  const W = state.world, s = state.league.season;
+  if (!W || !s || W.storyYear === state.year) return;
+  W.storyYear = state.year;
+  const pool = ensureOverseasPool();
+  const S = WORLD_STORY;
+  const lines = [];
+  W.history = W.history || [];
+  activeRegions().slice().sort(function (a, b) { return b.strength - a.strength; }).forEach(function (r) {
+    const ranked = pool.filter(function (t) { return t.regionId === r.id; }).sort(function (a, b) { return a.rank - b.rank; });
+    if (!ranked.length) return;
+    const champ = findWorldTeam(ranked[0].id);
+    if (!champ) return;
+    // 지역 MVP: 상위 3팀 주전 중 종합 능력 + 팀 순위 보너스
+    let best = null, bestV = -1, bestTeam = null;
+    ranked.slice(0, S.mvpRankBonus.length).forEach(function (t, i) {
+      const wt = findWorldTeam(t.id);
+      if (!wt) return;
+      const st = worldStarters(wt);
+      POSITION_IDS.forEach(function (pos) {
+        const p = st[pos] && worldPlayer(st[pos]);
+        if (!p) return;
+        const v = worldScore(p) + S.mvpRankBonus[i];
+        if (v > bestV) { bestV = v; best = p; bestTeam = wt; }
+      });
+    });
+    const entry = { y: state.year, r: r.id, team: champ.name, teamId: champ.id,
+      mvp: best ? best.name : null, mvpId: best ? best.id : null, mvpTeam: bestTeam ? bestTeam.name : null, mvpPos: best ? best.pos : null, mvpKr: !!(best && originOf(best) === HOME_ORIGIN.id) };
+    W.history.push(entry);
+    lines.push("🏆 " + r.name + ": " + champ.name + " 우승" + (best ? " · MVP " + best.name + "(" + findPosition(best.pos).name + ", " + bestTeam.name + ")" + (entry.mvpKr ? S.kr : "") : ""));
+  });
+  // 지역마다 최근 historyKeep년만
+  W.history = W.history.filter(function (e) { return e.y > state.year - S.historyKeep; });
+  if (!lines.length) return;
+  const head = S.headline.replace("{year}", state.year);
+  const r = state.weekReport;
+  if (r) {
+    r.headlines = r.headlines || [];
+    r.headlines.push({ key: "worldStory", headline: head, body: [S.intro].concat(lines).join("\n"), mine: false });
+    r.headlinesSeen = false;
+  }
+  addNews("해외 리그", head.replace(/^🌏 /, "") + " — " + lines.length + "개 지역 (왼쪽 메뉴 [해외 리그])");
+}
+
+// 지역 스타 선수: 지역 팀 주전 중 종합 능력 상위 n명
+function regionStars(regionId, n) {
+  const list = [];
+  state.world.teams.filter(function (t) { return t.region === regionId; }).forEach(function (t) {
+    const st = worldStarters(t);
+    POSITION_IDS.forEach(function (pos) { const p = st[pos] && worldPlayer(st[pos]); if (p) list.push({ p: p, team: t }); });
+  });
+  return list.sort(function (a, b) { return worldScore(b.p) - worldScore(a.p); }).slice(0, n);
+}
+
 // ----- 화면: [기록실] → 🌏 해외 리그 -----
 pages.world = function () {
   ensureWorld();
@@ -326,7 +382,19 @@ pages.world = function () {
       const rk = rankOf(t.id);
       return "<tr><td class=\"r\">" + (rk ? rk + "위" : "-") + "</td><td><b>" + escapeHTML(t.name) + "</b>" + (wt.indexOf(t.id) !== -1 ? ' <span class="chip meta">월드</span>' : "") + "</td><td class=\"r\">" + worldTeamStrength(t).toFixed(1) + '</td><td class="small">' + lineup + "</td></tr>";
     }).join("");
-    return '<div class="card"><h2>' + escapeHTML(r.name) + ' <span class="muted small">' + r.from + "년부터 참가 · " + teams.length + "팀</span></h2>" +
+    // 지역 이야기 (v1.1): 올해·역대 우승 · MVP · 스타 선수
+    const hist = (state.world.history || []).filter(function (e) { return e.r === r.id; }).slice().reverse();
+    const cur = hist[0] && hist[0].y === state.year ? hist[0] : null;
+    const stars = regionStars(r.id, WORLD_STORY.stars).map(function (x) {
+      const o = originOf(x.p);
+      return "<b>" + escapeHTML(x.p.name) + "</b>" + (o !== r.id ? ' <span class="chip meta">' + originShort(o) + "</span>" : "") + ' <span class="muted small">' + findPosition(x.p.pos).name + " · " + escapeHTML(x.team.name) + " · " + worldScore(x.p).toFixed(1) + "</span>";
+    }).join(" &nbsp; ");
+    const story =
+      (cur ? '<p class="small">🏆 <b>' + state.year + " 우승: " + escapeHTML(cur.team) + "</b>" + (cur.mvp ? " · 지역 MVP <b>" + escapeHTML(cur.mvp) + "</b> (" + findPosition(cur.mvpPos).name + ", " + escapeHTML(cur.mvpTeam) + ")" + (cur.mvpKr ? " 🇰🇷" : "") : "") + "</p>"
+           : '<p class="muted small">🏆 올해 지역 우승팀은 38주차(우리 리그 결승 주)에 정해져요.</p>') +
+      (stars ? '<p class="small">⭐ 스타 선수: ' + stars + "</p>" : "") +
+      (hist.filter(function (e) { return e !== cur; }).length ? '<p class="muted small">📜 역대 우승: ' + hist.filter(function (e) { return e !== cur; }).slice(0, 6).map(function (e) { return e.y + " " + escapeHTML(e.team) + (e.mvp ? " (MVP " + escapeHTML(e.mvp) + ")" : ""); }).join(" · ") + "</p>" : "");
+    return '<div class="card"><h2>' + escapeHTML(r.name) + ' <span class="muted small">' + r.from + "년부터 참가 · " + teams.length + "팀</span></h2>" + story +
       '<div class="table-wrap"><table class="roster"><tr><th class="r">순위</th><th>팀</th><th class="r">전력</th><th>주전 (탑 · 정글 · 미드 · 원딜 · 서포트)</th></tr>' + rows + "</table></div></div>";
   }).join("");
   const domestic = domesticBase();

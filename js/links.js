@@ -19,6 +19,11 @@ function nameIndex() {
     if (p.name && !map[p.name]) map[p.name] = { player: id };
   });
   if (state.player && state.player.name) map[state.player.name] = { player: USER_ID };
+  // 해외 선수도 (v1.1, 국내 선수와 이름이 같으면 국내 선수 우선)
+  if (state.world) Object.keys(state.world.players).forEach(function (id) {
+    const p = state.world.players[id];
+    if (p.name && !map[p.name]) map[p.name] = { player: id };
+  });
   const names = Object.keys(map).filter(function (n) { return n.length >= 2; })
     .sort(function (a, b) { return b.length - a.length; });
   if (!names.length) return null;

@@ -96,11 +96,14 @@ function playerDetailHTML(id) {
     return barHTML(s.name, p.stats[s.id], s.desc + (cap < 100 ? " (상한선 " + cap + ")" : ""), bonus.indexOf(s.id) !== -1, cap);
   }).join("");
   const team = p.teamId ? findTeam(p.teamId) : null;
+  const wtId = !team && typeof worldTeamIdOf === "function" ? worldTeamIdOf(id) : null; // 해외 선수 (v1.1)
+  const wt = wtId ? findWorldTeam(wtId) : null;
   const traits = traitsOf(id);
   return (
     '<div class="card detail">' +
       "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.pos).name + " · " + p.age + "세 · " +
-        (team ? escapeHTML(team.name) : "FA") + '</span> <span class="detail-score">스탯 점수 <b>' + playerScore(id).toFixed(1) + "</b></span></h2>" +
+        (team ? escapeHTML(team.name) : wt ? "🌏 " + escapeHTML(wt.name) + " (" + escapeHTML((findRegion(wt.region) || {}).name || "해외") + ")" : "FA") +
+        (typeof originOf === "function" ? " · 출신 " + escapeHTML(originName(originOf(p))) + " · 모국어 " + escapeHTML(langName(langOf(p))) : "") + '</span> <span class="detail-score">스탯 점수 <b>' + playerScore(id).toFixed(1) + "</b></span></h2>" +
       posScoresHTML(id, p) +
       '<div class="chips">' + styleChipHTML(id) + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
       strengthLineHTML(p) +
