@@ -53,3 +53,7 @@ python3 tools/measure_seasons.py --seasons 3 --answer random
 ## 리그 성장 뉴스·팬 배율 회귀 검사
 
 `node tools/test_league_growth.cjs` — 인기도/우승 팬 단일 배율, 감소량·1억 이후 완화, 옛 저장 팬 수, 투자 기사 무입금, 2014·2016 실제 새해 통합 기사를 검사한다. 2012년부터 각각 진행하므로 단위 검사보다 시간이 걸린다. Node VM 기반이며 화면 배치는 별도 확인.
+
+### 역사 뉴스 (5단계)
+
+node tools/test_historical_news.cjs: 2012~2026 기사 편성·중복·저장·게임 수치 무변경 검사. 출처는 data/historical_news.js의 source 필드. 새 게임은 SNS 신문 보관함, 다음 해부터 기존 신년 기사에 합쳐진다. 실제 53주 진행과 병합은 node tools/test_news.cjs에서도 검사한다. Node VM 검사로 화면 배치까지 검증하지는 않는다.

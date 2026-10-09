@@ -70,6 +70,11 @@ for(const year of [2012,2017,2022]){
      if(arts.some(a=>/\\{(?:firstStandNote|winner|mvp)\\}/.test(a.body)))throw Error('Unfilled article');
    }
    const save=JSON.parse(JSON.stringify(makeSaveData()));state=stateFromSave(save);renderAll();
+   for(const event of HISTORICAL_NEWS.filter(e=>e.year===${year}||e.year===state.year&&e.week===1)){
+     const matches=state.newsState.articles.filter(a=>a.body.includes(event.title));
+     if(matches.length!==1)throw Error('Historical article missing/duplicated: '+event.id);
+     if(event.year===state.year&&matches[0].key!=='newyear')throw Error('New year article not merged');
+   }
    return {year:state.year,week:state.week,articles:state.newsState.articles.length,bytes:JSON.stringify(save).length};
  })()`,ctx,{timeout:120000});
  console.log('Season',year,r);

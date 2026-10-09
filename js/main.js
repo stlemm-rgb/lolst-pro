@@ -809,6 +809,7 @@ function nextWeek(restWeek) {
       addNews(tag ? NEWS_TAGS[tag] : "승강", tag ? text.slice(tag.length).trim() : text);
     });
     Array.prototype.push.apply(article, leagueGrowthNews()); // 규모 확대·인기·투자 소식도 한 기사로
+    Array.prototype.push.apply(article, historicalNewsLines()); // 해당 연도 시대 소개도 신년 기사에 합침
     if (article.length) newYearArticle(article);
   }
 
@@ -816,6 +817,7 @@ function nextWeek(restWeek) {
   prepareWeek(state.week);
   prepareWeek(state.week + 1);
   worldsNewsForWeek(); // 41주 진입 특집·42주 개막 단신
+  historicalNewsForWeek();
   eraIntroArticle(); // 2012년 시작: 2주차에 리그 규모 소개 기사 (js/era.js)
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
@@ -953,6 +955,7 @@ function addNews(title, message) {
 
 function renderAll() {
   migrateCurrentNews();
+  historicalNewsForWeek(true); // 새 게임·옛 저장도 현재 발행 주차만 안내 (과거 기사 소급 없음)
   worldsNewsForWeek(true); // 구버전 41·42주 저장도 안내 (재호출은 무해)
   const creating = !state.player; // 캐릭터가 없으면 캐릭터 생성 화면
   const ended = !creating && !!state.retired; // 은퇴했으면 엔딩 화면
