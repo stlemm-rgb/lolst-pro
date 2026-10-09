@@ -662,8 +662,7 @@ function setupWorlds() {
       pairs.forEach(function (p) { schedule(42 + Math.floor(r / 3), "worlds_group", label, p[0], p[1], LEAGUE.bestOf.worlds_group); });
     });
   });
-  const mine = myTeam();
-  if (mine && domestic.indexOf(mine.id) !== -1) addNews("월드 진출", mine.name + "이(가) 월드 챔피언십에 진출했다!");
+  // 참가 안내는 42주 진입의 월즈 개막 단신에 통합 (js/worlds_news.js).
 }
 
 // 한 주 진행: 그 주의 행사(조 편성·토너먼트) → 잡힌 경기 진행

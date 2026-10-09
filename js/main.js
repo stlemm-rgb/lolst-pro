@@ -814,6 +814,7 @@ function nextWeek(restWeek) {
   // 이번 주·다음 주 리그 일정(대진) 미리 만들기 → 대시보드 '이번 주'·'다음 경기'에 바로 보임 (js/matchsim.js)
   prepareWeek(state.week);
   prepareWeek(state.week + 1);
+  worldsNewsForWeek(); // 41주 진입 특집·42주 개막 단신
   eraIntroArticle(); // 2012년 시작: 2주차에 리그 규모 소개 기사 (js/era.js)
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
@@ -913,7 +914,7 @@ function saveSeasonHistory() {
   if (!state.league.history) state.league.history = [];
   const names = {};
   Object.keys(season.champions).forEach(function (k) { names[k] = teamName(season.champions[k]); });
-  state.league.history.push({ year: season.year, champions: names, myTeam: myTeam().name });
+  state.league.history.push({ year: season.year, champions: names, myTeam: myTeam().name, worldsRecap: buildWorldsRecap(season) });
   state.league.lastChamps = { year: season.year, ids: Object.assign({}, season.champions) }; // 새 시즌 왕조 연봉 압박·해외 러브콜 (js/dynasty.js)
 }
 
@@ -951,6 +952,7 @@ function addNews(title, message) {
 
 function renderAll() {
   migrateCurrentNews();
+  worldsNewsForWeek(true); // 구버전 41·42주 저장도 안내 (재호출은 무해)
   const creating = !state.player; // 캐릭터가 없으면 캐릭터 생성 화면
   const ended = !creating && !!state.retired; // 은퇴했으면 엔딩 화면
   document.getElementById("layout").hidden = creating || ended;

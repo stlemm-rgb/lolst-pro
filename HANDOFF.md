@@ -1,6 +1,6 @@
-# 다음 세션 이어가기 — 2026-10-09 작성, PROGRESS 161까지 (ver 1.1 작업 중, 아직 push 전)
+# 다음 세션 이어가기 — 2026-10-09 작성, PROGRESS 162까지 (ver 1.1 작업 중, 아직 push 전)
 
-새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → PROGRESS.md 134~161 항목 → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태를 확인한다.
+새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → PROGRESS.md 134~162 항목 → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태를 확인한다.
 
 ## 0. 지금 상태 한눈에
 
@@ -11,7 +11,7 @@
 | 지금 작업 | **ver 1.1** = 친구 피드백 수정 + 해외 리그 ①~③단계. PROGRESS 134~161. 사용자가 커밋은 하고 있지만 **push는 ver 1.1이 다 끝나면 한 번에** (사용자 결정) |
 | 화면 버전 표시 | index.html 로고 아래 `ver 1.1` (버전을 올리면 같이 바꿈) |
 | 다음 버전 ver 1.2 | **④ 내 선수 해외 진출 + 내 언어 실력** (사용자 결정으로 미룸) |
-| 마지막 요청 | 149 평판 등급 하락 유예 · 150 월드 우승 스킨 고르기 · 151 대시보드 훈련 줄 삭제 · 152 리핏 기사 · 153 종합 능력 칸 이번 주 변화 · 154 솔로 랭크 칸 이번 주 결과 · 155 트로피 말풍선 · 156 안 열리는 일정 반투명 · 157 퀘스트 보상 실제 값 표시 · 158 팬 수 리뉴얼 · 159 팬 돌파 기사 교체(다른 AI 글) · 160 후보 구성 규칙 — 끝남. 161 뉴스 공통 처리 2단계 완료. 3단계 월즈 특집은 사용자 요청 후 진행 |
+| 마지막 요청 | 149 평판 등급 하락 유예 · 150 월드 우승 스킨 고르기 · 151 대시보드 훈련 줄 삭제 · 152 리핏 기사 · 153 종합 능력 칸 이번 주 변화 · 154 솔로 랭크 칸 이번 주 결과 · 155 트로피 말풍선 · 156 안 열리는 일정 반투명 · 157 퀘스트 보상 실제 값 표시 · 158 팬 수 리뉴얼 · 159 팬 돌파 기사 교체(다른 AI 글) · 160 후보 구성 규칙 — 끝남. 161 뉴스 공통 처리 2단계 완료. 162 월즈 특집 3단계 완료, 최신 인계는 11장 |
 
 ## 1. 사용자와 작업 방식
 
@@ -98,7 +98,7 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 - 화면 안 버튼은 renderPage의 `querySelectorAll("[data-…]")` 묶음에 추가.
 - 특성: traitSumOf / traitKeyOf / traitsOf / matchTraitsOf. 내 선수 ID는 USER_ID.
 - 주간 흐름 js/main.js nextWeek: 훈련 → 경기 → 급여·활동·인기도·업적 → 주 넘김(새해면 saveSeasonHistory → newSeasonLeague → contractsNewSeason → addBigRookies → initContracts → refillRivalAces) → 대진 미리 만들기 → eraIntroArticle → 새 챔피언·패치 → 시장 → 받은 연락 → 퀘스트.
-- 신문 기사 팝업은 `state.weekReport.headlines`에 push (그 주를 진행할 때 만들어진 report). 기사 데이터는 data/news_articles.js, `queueHeadline(key, who, vars)`.
+- 신문 기사 등록은 js/news.js `publishHeadline`을 사용한다(배열 직접 push 금지). 템플릿은 data/news_articles.js와 `queueHeadline(key, who, vars)`. 보관·중복 방지·구버전 호환은 10장 참고.
 
 ### 경기 일정
 - 리그 대진(LCK 컵 2주·정규 13주·후반기 30주)은 js/matchsim.js PRE_WEEK_EVENTS + prepareWeek. 토너먼트는 WEEK_EVENTS + koPreview/intlPreview. 38주 WEEK_EVENTS에 리그 결승 + worldSeasonStory(해외 리그 결산).
@@ -171,17 +171,92 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 
 ## 9. 다음 세션 시작 시
 
-1. `git pull`(다른 PC 작업이 있을 수 있음, 단 ver 1.1은 아직 push 전이라 이 PC가 최신) → `git status --short`, `git log --oneline -15`. 커밋 안 된 변경이 있으면 무엇인지 먼저 확인.
+1. `git status --short`, `git log --oneline -15`, `git diff`로 현재 변경부터 확인. 현재 미커밋 변경을 보존하고, 다른 PC 동기화가 필요하면 작업 상태를 확인한 뒤 진행한다.
 2. 새 사용자 요청 우선. 지금은 **ver 1.1 마무리 단계** — 친구 피드백·사용자 플레이 피드백을 하나씩 받아 고치는 중. 사용자가 "작업완료"라고 하면 1장의 체크리스트(태그 포함)를 알려 준다.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 162**, `[ver 1.1]` 표시)하고 이 HANDOFF.md도 갱신. Claude 프로젝트에도 같은 내용(claude/HANDOFF.md, claude/PROGRESS.md)을 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 163**, `[ver 1.1]` 표시)하고 이 HANDOFF.md도 갱신. Claude 프로젝트에도 같은 내용(claude/HANDOFF.md, claude/PROGRESS.md)을 올린다.
 
-## 10. 뉴스 개편 2단계 (161, 2026-10-09)
+## 10. 뉴스 개편 인계 — 1·2단계 완료 시점의 기록 (최신 상태는 11장)
 
-- 사용자 요청 범위: 2단계 공통 뉴스 처리까지. 3단계 월즈 특집, 팬 배율, 연도별 역사 뉴스는 아직 구현하지 않음.
-- js/news.js: publishHeadline / publishNotice / migrateCurrentNews / newsArchiveHTML. 신문 등록은 이 경로로만. 게임 효과는 fireEvent·경기·정산 처리에 유지.
-- 저장: state.newsState = {articles, notices}; 신문 최근 160건, 단신 중복 ID 최근 400개. 새 저장 필드는 save.js 양쪽 등록. 예전 현재 신문은 원래 when으로 이관, 이미 사라진 과거 기사 복구는 하지 않음.
-- publishHeadline 기본 ID = 연도·주차·key·variant. 같은 주 같은 종류에 여러 사건이 있으면 variant나 명시 id 필요(팬 돌파는 문턱값). queueHeadline은 상황과 vars로 구분.
-- 기사별 날짜 표시, SNS 소식에 접을 수 있는 신문 보관함. 읽음 처리 자동저장. trimMessages는 미응답 연락을 일반 보관 한도와 별도로 보존.
-- titleStreak는 js/records.js로 이동, 경기 결과에서 확정 후 queueFinalNews에 전달. repeatNews는 마지막 배열 원소 대신 기사 객체를 직접 받음.
-- 검증: node tools/test_news.cjs (DOM 대체 객체) 14개 회귀 및 2012/2017/2022 시작 각 53주. JS 문법·diff 검사 통과. Edge 자동실행 실패로 실제 화면 배치 미확인.
-- 커밋·push 안 함. claude/ 폴더는 현재 없으므로 별도 복사본 생성하지 않음.
+### 10-1. 사용자 의도와 범위
+
+- 현재 육성·계약·승강전·52주 일정의 큰 방향은 유지한다. 뉴스와 간단한 엔진·수치 변화로 시대와 월즈의 분위기를 살리는 것이 목적이다.
+- 사용자 구상: 매년 연초 실제 역사 기반 뉴스, 해당 시기의 작은 패치 변화, 리그 규모 확대 시 인기·투자 뉴스와 팬 유입 증가, 41주 월즈 준비 특집.
+- **이번까지 승인·완료한 것은 1단계 조사와 2단계 공통 처리다.** 3단계 이후는 청사진이며 자동으로 착수하지 않는다. 최신 요청은 1·2단계 HANDOFF 정리다.
+- 실존 우승팀·선수의 결과를 강제하지 않는다. 기사 속 우승·MVP·이적은 현재 게임 기록을 따른다. 피어리스·승강전 폐지·대회 포맷 변경은 이번 범위에서 제외한다.
+
+### 10-2. 1단계 — 조사 완료, 게임 코드 변경 없음
+
+- 23개 코드 파일에서 뉴스 등록·호출 위치 86곳을 조사했다. 이 숫자는 기사 수나 시즌 발생 건수가 아니라 코드 위치 수다.
+- 경로: addNews 단신 → 로그·SNS 소식·주간 결과 / queueHeadline 및 직접 등록 → 신문 / postMessage 직접 소식 / postSocial 선수·팬 반응.
+- 효과가 있는 news 이벤트 21개를 확인했다. fireEvent는 소식 생성 때 효과를 적용한다. 기사 읽기·재열기로 효과를 적용하는 구조가 아니다. **중복 문구를 줄이더라도 이벤트 효과·쿨다운·후속 상태를 없애지 않는다.**
+- 유지 대상: 실제 결과·개인 진로·효과 이벤트·선수와 팬 반응. 통합 후보: 결승 묶음, 패치 묶음, 대격변 상세/요약, 올스타 상세/요약, 신년·리그 성장 안내. 사건 자체를 통째로 삭제하는 확정 대상은 없다.
+- 발견 사항: 컵 기사에 First Stand 개최 전 출전권 오안내, 주간 보고서 날짜와 새해/패치 발생 날짜 혼재, 신문 원문이 다음 주 교체되는 문제, 뉴스 증가 시 미응답 연락이 120개 보관 한도에서 잘릴 위험.
+- 재사용 자료: 신년 종합 기사 이미 있음. 해외 MVP는 38주 world.history, 국내 MVP는 league.awards의 해당 연도 key=mvp. 해외 MVP를 월즈 특집 때 다시 선정하지 않는다.
+- 조사 보고서: C:/Users/dhlth/Documents/Codex/2026-10-07/c-project-game-game-hand-off-2/outputs/뉴스_1단계_조사보고서.md
+- 원본 위치 목록: 같은 outputs 폴더의 뉴스_발생위치_목록.csv. 두 파일은 이 PC의 조사 산출물이며 저장소에 포함되지 않는다. 다른 PC에서 파일이 없어도 본 절과 실제 코드로 이어갈 수 있다.
+
+### 10-3. 2단계 — 구현 완료 (PROGRESS 161)
+
+| 변경 | 구현 위치·주의사항 |
+|---|---|
+| 공통 신문 등록 | js/news.js publishHeadline. 기존 직접 push/unshift 경로를 전부 이 함수로 연결 |
+| 공통 단신 | main.js addNews → publishNotice. 같은 연도·주차·제목·본문의 반복 등록 방지. 다른 주의 같은 소식은 허용 |
+| 신문 중복 방지 | 기본 ID는 연도·주차·key·variant. 같은 주 같은 종류에 여러 사건이 있으면 variant 또는 명시 id 필요. 팬 돌파는 문턱값으로 구분 |
+| 템플릿 기사 | queueHeadline은 key·상황·vars로 ID를 만들고 중복이면 문구 재추첨 전에 종료 |
+| 표시·우선순위 | 기사별 발생 연도·주차 표시. publishHeadline에서 priority 지정 가능, 기본은 내 관련 기사 우선. 미래의 세부 중요도 규칙을 추가할 수 있는 상태 |
+| 신문 보관함 | SNS → 소식 상단의 접는 보관함. 최근 160개 원문을 보관. 신문 등록 시 SNS에 같은 장문을 추가 발송하지 않음 |
+| 세이브 | state.newsState={articles, notices}. articles 160개, 단신 중복 ID notices 400개. createNewState·SAVED_FIELDS·stateFromSave 등록 |
+| 구버전 호환 | renderAll → migrateCurrentNews. 현재 보고서에 남은 예전 기사는 원래 when을 보존해 이관. 이미 사라진 과거 원문을 복원하지 않음 |
+| 미응답 연락 보호 | trimMessages: 답장 대기 연락은 일반 메시지 120개 한도와 별도로 보존. postMessage와 불러오기 양쪽 적용 |
+| 읽음 상태 | 신문 닫기·SNS 소식 펼치기/모두 읽음에서 자동저장 설정이 켜졌을 때 저장 |
+| 결승 기록 분리 | titleStreak를 js/records.js로 이동. matchsim.js에서 기록 확정 후 queueFinalNews(champKey, title, f, st)에 전달. 같은 연도 재처리 시 연속 우승 수 유지 |
+| 결승 기사 보호 | f.newsPublished로 중복 처리 방지. repeatNews는 마지막 배열 원소가 아니라 생성한 기사 객체를 직접 받음 |
+| 문구 수정 | data/news_articles.js 컵 우승 기사에 firstStandNote 사용. 2025년 이전에는 출전 확정 문구를 넣지 않음 |
+
+- 게임 효과는 기존 fireEvent·경기 결과·팬 계산·정산 함수에 남겼다. 공통 뉴스 함수는 표시·보관만 담당한다.
+- 기존 선수·팬 SNS와 효과 이벤트의 발생 규칙은 유지했다. **같은 사건의 결승 기사·MVP·팬 반응을 의미상 모두 하나로 합치는 작업까지 끝난 것은 아니다.** 공통 등록 기반과 동일 등록 중복 방지가 완료된 상태다.
+- 월즈 개최지·주제곡·MV 데이터, 리그 성장 팬 배율, 역사 뉴스 데이터는 아직 없다.
+
+### 10-4. 검증과 한계
+
+- 재실행: 프로젝트 폴더에서 node tools/test_news.cjs.
+- Node 내장 VM으로 실제 게임 스크립트를 로드하며 DOM만 대체 객체를 사용한다. 외부 패키지가 필요 없다.
+- 회귀 검사 14개 통과: 소개 기사, 발생 날짜, 다른 제목의 동일 사건 중복, 단신 중복, 효과 유지, 재열기 무효과, First Stand 연도 조건 전후, 결승 재처리, 저장 왕복, 다음 주 원문 보관, 예전 저장 이관, 미응답 연락 보호, 보관함 HTML 생성.
+- 2012·2017·2022 시작 각각 53주 진행 및 이후 저장·불러오기 통과. JS 문법과 git diff --check 통과.
+- **실제 브라우저 화면 배치는 미확인.** Playwright로 Edge 실행을 시도했으나 브라우저가 시작 직후 종료됐다. VM 검사를 브라우저 UI 검사로 설명하지 않는다.
+- 다음 UI 확인 항목: SNS 소식 보관함 펼치기, 긴 기사 줄바꿈, 신문 날짜, 닫기 후 재로드 읽음 상태, 구버전 세이브 화면.
+
+### 10-5. Git 상태 — 이번 인계 작성 때 확인
+
+- HEAD: a4fbb0e (ver 1.1: 후보 구성 규칙). 2단계 변경은 아직 커밋되지 않았다. 자동 커밋·push하지 않았다.
+- 수정 파일: HANDOFF.md, PROGRESS.md, data/events.js, data/news_articles.js, index.html, js/dashboard.js, js/era.js, js/events.js, js/fame.js, js/main.js, js/matchsim.js, js/news_popup.js, js/records.js, js/save.js, js/shakeup.js, js/sns_page.js, tools/README.md.
+- 신규 파일: js/news.js, tools/test_news.cjs. 다음 작업자가 이 변경을 기존 사용자 작업으로 보존해야 한다.
+- 현재 claude/ 폴더는 없어 복사본을 만들지 않았다. PROGRESS는 161까지이며 이번 인계 문서 정리만으로 새 기능 번호를 추가하지 않는다. 다음 실제 기능 번호는 162.
+- 이후 상태는 바뀔 수 있으므로 시작할 때 git status·git log·git diff를 다시 확인한다.
+
+### 10-6. 다음 단계 청사진 — 아직 미착수
+
+1. **3단계 월즈 특집:** 매년 41주에 다음 주 개막 안내. 2012년 미국 고정, 이후 활성 리그가 있는 국가의 수도 중 무작위. 2012년 미국 내 도시와 유럽·동남아 등 광역 리그의 국가 후보는 별도 결정 필요.
+2. 같은 특집에 주제곡·뮤직비디오 공개 소식, 선수 리스펙·영상미·시즌 최고 장면 설명, 지역별 MVP를 묶는다. 실제 음원·영상 제작은 범위에 없음. 2013년부터 전년도 게임상 월즈 우승팀과 주요 장면을 반영한다.
+3. **41주 시점 주의:** 현재 setupWorlds는 41주를 진행할 때 실행되므로 다음 화면은 42주다. 41주 진입 안내와 실제 편성을 구분해야 한다. 조 편성을 중복 실행하지 않는다. 38주 국내 대표는 41주 해외 참가팀 부족 시 늘어날 수 있다.
+4. **기록 주의:** 전년도 우승팀은 league.history.champions.worlds 등을 사용. 역대 전체 경기 장면은 그대로 보관되지 않으므로 저장된 사실만 묘사하거나 별도 요약 저장을 설계한다. 2017/2022 새 시작처럼 전년도 기록이 없으면 없는 장면을 만들어내지 않는다. MVP와 실제 월즈 출전 여부도 구분한다.
+5. **4단계 리그 성장:** 기존 규모 확대 기사에 인기 상승·기업/방송사/중동 투자자 관심을 연결. 팬 증가 배율은 규모 단계별 교체 방식 검토. eraPop·popularityMultiplier·addPopularity와 직접 팬 추가 titleFans의 중복 적용을 먼저 확인. 투자 관심과 실제 계약 체결·입금은 구분한다.
+6. **5단계 역사 뉴스:** 연초 시대 소개, 중간 패치, 연말 다음 시즌 예고를 구분. 실제 제도와 게임 규칙이 다르면 운영 공지처럼 쓰지 않는다.
+7. **6단계 작은 효과:** 2016 오브젝트·2022 한타·2024 새 오브젝트 등이 후보. 확정 수치가 아니며 아직 적용하지 않았다. **7단계**는 전체 노출·저장·시대 조건·밸런스 검증.
+
+현재 사용자가 승인한 1·2단계는 완료했다. 다음 요청이 3단계라면 이 절을 바탕으로 이어간다.
+
+## 11. 뉴스 개편 3단계 완료 — PROGRESS 162
+
+- 사용자 승인으로 3단계 월즈 특집까지 구현. 4단계 팬 성장·투자 기사와 5단계 역사 뉴스는 아직 시작하지 않음.
+- 시작 시 HEAD edee383 (2단계 커밋 완료), 기존 HANDOFF 수정만 미커밋이었다. 이 문서 수정은 보존했다. 3단계는 아직 커밋·push하지 않음. 10장의 Git·미착수 상태는 당시 기록이며 현재는 이 절을 우선한다.
+- **41주 진입:** worldsNewsForWeek가 공통 publishHeadline으로 특집 등록. 개최지, 창작 곡 제목과 MV 연출, 현재 시즌 주요 경기, 지역 MVP 소개. MVP는 실제 기록 사용, 월즈 최종 출전 명단과 별개임을 명시.
+- **42주 진입:** 기존 setupWorlds의 조 편성 이후 개막 단신과 내 팀 참가 안내. setupWorlds 실행 시점을 앞당기거나 두 번 실행하지 않음.
+- 개최지: 2012 미국 로스앤젤레스 고정. 이후 WORLDS_NEWS.hosts에서 kr+activeRegions의 국가 수도 후보를 동일 확률 추첨. 광역 리그는 대표 국가 후보 목록으로 단순화(실제 역사 개최 일정 재현 아님).
+- 곡·영상은 설명형 창작 콘텐츠이며 실제 음원·영상 재생 없음. 직전 시즌 곡 연속 재사용은 막음. 기사 데이터는 data/worlds_news.js, 처리 js/worlds_news.js.
+- 저장: league.season.worldsFeature에 host/song/headline/body/mine/previewSent/openingSent. league가 통째로 저장되어 최상위 필드 추가 없음. 구버전 41/42주 로드시 renderAll에서 누락 안내를 생성하고 자동저장 설정이 켜져 있으면 저장.
+- 시즌 종료 saveSeasonHistory에서 buildWorldsRecap 호출: league.history[].worldsRecap={year,song,scenes}. 월즈 토너먼트 최신 경기부터 최대 3개, 실제 스코어와 저장된 큰 활약 장면의 선수 이름을 문자열로 보존. 2013 이후 전년도 우승팀과 이 요약을 영상 묘사에 사용. 기록이 없으면 가공의 우승자/장면을 넣지 않음.
+- 현재 시즌 영상 장면은 41주 전 결승 최대 2개에서 실제 기록을 선택. 국내 MVP=league.awards key mvp, 해외 MVP=world.history 해당 연도/지역. 기록이 없으면 수상 기록 없음 표시.
+- 중복 방지: season의 발행 플래그와 연도별 기사 ID. 기사 재열기·로드로 개최지/곡 재추첨 없음. 팬·능력·상금·경기 규칙 변경 없음.
+- 테스트: node tools/test_worlds_news.cjs — 월즈 19개 검사(2012→2013 41주 진행 포함), 2017/2022 옛 저장 대체 문구. node tools/test_news.cjs — 기존 14개와 3개 시작 연도 53주. Node VM의 DOM 대체 객체 검사이며 실제 화면 배치는 미확인.
+- 다음 실제 기능 번호 163. 다음 작업은 사용자 요청 시 4단계 리그 성장 뉴스·팬 증가율.

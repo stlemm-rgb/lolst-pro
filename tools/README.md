@@ -45,3 +45,7 @@ python3 tools/measure_seasons.py --seasons 3 --answer random
 ## 뉴스 공통 처리 회귀 검사
 
 `node tools/test_news.cjs` — 뉴스 중복·날짜·구버전 저장·효과 보존·미응답 연락·결승 재처리와 2012/2017/2022 시작 53주 진행 검사. Node 내장 모듈만 사용. DOM 대체 객체를 사용하므로 실제 브라우저 배치 검사는 별도다.
+
+## 월즈 특집 회귀 검사
+
+`node tools/test_worlds_news.cjs` — 41주 예고/42주 개막, 개최 후보, 실제 MVP·전년도 우승/장면, 저장 후 고정, 중복 방지, 과거 기록 없는 세이브를 검사한다. Node VM 기반이며 브라우저 화면 검사는 별도다.
