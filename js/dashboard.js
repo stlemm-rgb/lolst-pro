@@ -182,11 +182,7 @@ function weekReportHTML() {
     html += '<div class="rep-row"><span class="rep-tag ' + (l.up ? "win" : "lose") + '">투자</span>' + escapeHTML(l.text) + "</div>";
   });
   // 스폰서 계약 수입(r.activityIncome)은 지난주 결과에 보이지 않음 (131, 돈은 그대로 들어옴)
-  if (r.ladder && r.ladder.games) {
-    const d = r.ladder.delta;
-    html += '<div class="rep-row"><span class="rep-tag rank">랭크</span>솔로 랭크 ' + r.ladder.wins + "승 " + r.ladder.losses + "패 · " +
-      '<span class="' + (d >= 0 ? "up" : "down") + '">' + (d >= 0 ? "+" : "") + d + "점</span></div>";
-  }
+  // 솔로 랭크 결과는 맨 위 솔로 랭크 칸 (dashStripHTML weekLadderHTML)
 
   // 연락·소식 (이번에 새로 온 받은 연락)
   const msgs = state.inbox.filter(function (m) { return m.id > r.msgFrom && m.tab === "inbox"; });
@@ -257,6 +253,39 @@ function miniBarHTML(label, value, max, cls) {
     '<span class="mini-value">' + value + (max && max !== 100 ? '<span class="muted">/' + max + "</span>" : "") + "</span></div>";
 }
 
+// 종합 능력 칸: 이번 주 능력·특성 변화만 (진행 전 스탯 = weekReport.growthBase, 그 뒤 연락 답으로 바뀐 것도 포함)
+function weekGrowthHTML() {
+  const r = state.weekReport;
+  const b = r && r.growthBase;
+  if (!b) return "";
+  const parts = [];
+  const ds = playerScore(USER_ID) - b.score;
+  STATS.forEach(function (s) {
+    const d = (state.stats[s.id] || 0) - (b.stats[s.id] || 0);
+    if (d) parts.push('<span class="' + (d > 0 ? "up" : "down") + '">' + statName(s.id) + " " + (d > 0 ? "+" : "") + d + "</span>");
+  });
+  const cur = state.player.traits;
+  cur.filter(function (id) { return b.traits.indexOf(id) === -1; }).forEach(function (id) {
+    const t = findTrait(id);
+    if (t) parts.push(t.type === "bad" ? '<span class="down">⚠️ ' + escapeHTML(t.name) + " 생김</span>" : '<span class="up">✨ ' + escapeHTML(t.name) + " 획득</span>");
+  });
+  b.traits.filter(function (id) { return cur.indexOf(id) === -1; }).forEach(function (id) {
+    const t = findTrait(id);
+    if (t) parts.push('<span class="' + (t.type === "bad" ? "up" : "down") + '">' + (t.type === "bad" ? "🧹 " : "💨 ") + escapeHTML(t.name) + (t.type === "bad" ? " 극복" : " 사라짐") + "</span>");
+  });
+  const head = '<span class="muted">이번 주</span> ' + (Math.abs(ds) >= 0.05 ? '<b class="' + (ds > 0 ? "up" : "down") + '">' + (ds > 0 ? "+" : "") + ds.toFixed(1) + "</b> " : "");
+  return '<div class="sum-sub week-growth">' + head + (parts.length ? parts.join(" · ") : '<span class="muted">능력·특성 변화 없음</span>') + "</div>";
+}
+
+// 솔로 랭크 칸: 지난주 진행에서 한 랭크 게임 결과 (랭크 오른쪽)
+function weekLadderHTML() {
+  const l = state.weekReport && state.weekReport.ladder;
+  if (!l || !l.games) return "";
+  const d = l.delta;
+  return '<div class="sum-week"><div class="muted small">이번 주</div><div>' + l.wins + "승 " + l.losses + "패</div>" +
+    '<div class="' + (d >= 0 ? "up" : "down") + '"><b>' + (d >= 0 ? "+" : "") + d + "점</b></div></div>";
+}
+
 // ----- 맨 위 요약 4칸: 소속 · 종합 능력 · 솔로 랭크 · 상태 -----
 function dashStripHTML() {
   const team = myTeam();
@@ -282,10 +311,11 @@ function dashStripHTML() {
       '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="스탯 12개 평균 (포지션 가산점 스탯은 1.5배). 경기력의 바탕이 돼요.">종합 능력</div>' +
         '<div class="sum-main big">' + score.toFixed(1) + "</div>" +
         '<div class="sum-sub">리그 ' + findPosition(state.player.position).name + " " + pr.total + "명 중 <b>" + pr.rank + "위</b></div>" +
+        weekGrowthHTML() +
       "</div>" +
       '<div class="card sum"><div class="sum-label tip" tabindex="0" data-tip="훈련할 때마다 랭크 게임을 하고, 승패에 따라 점수가 오르내려요. 솔로 랭크 훈련이 가장 많이 해요. 패치마다 초기화.">솔로 랭크</div>' +
         '<div class="sum-tier">' + tierEmblemSVG(sr.points, 48) +
-          '<div><div class="sum-main" style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + '</div><div class="sum-points">' + sr.points.toLocaleString() + "점</div></div></div>" +
+          '<div><div class="sum-main" style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + '</div><div class="sum-points">' + sr.points.toLocaleString() + "점</div></div>" + weekLadderHTML() + "</div>" +
         (hasTrait(LADDER.kingTrait) ? '<div class="sum-sub king">👑 지난 랭크 시즌 1위 · 경기력 +3%</div>' : "") +
         '<div class="sum-sub">리그 ' + board.length + "명 중 <b>" + myLadderRank + "위</b> · 통산 " + sr.wins + "승 " + sr.losses + "패</div>" +
         '<div class="sum-sub muted">전 시즌 최종 순위: ' + (sr.lastSeason ? '<b>' + sr.lastSeason.rank + '위</b> / ' + sr.lastSeason.total + '명' : '기록 없음') + '</div>' +

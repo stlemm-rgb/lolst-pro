@@ -181,6 +181,9 @@
 149. [ver 1.1] 평판 등급 하락 유예 (사용자 요청): 평판 등급이 오르면 그 주 + 4주(1개월) 동안은 평판이 떨어져도 등급이 내려가지 않음 (감독 신뢰·팀 내 입지도 오른 등급 그대로). 유예가 끝났을 때 평판이 기준 아래면 그때 내려감. 상태 칸 평판 옆 '🛡️n주', 마우스 오버에 남은 주와 실제 평판 수준, 등급 상승 소식에 안내, 게임 방법 문장. 값 data/fame.js REPUTATION.holdWeeks 4, 코드 js/fame.js repTier(유예 반영)·rawRepTier·repHoldLeft, 저장 state.fame.repHold {idx, until}. 시험: 보통→모범 선수 뒤 평판 5로 떨어뜨려도 4주 유지, 5주째 '보통'
 150. [ver 1.1] 월드 우승 스킨 고르기 (사용자 요청): 월드 결승의 모든 세트 픽을 기록(m.finalSets, js/matchsim.js). 우승 팀 다른 선수는 결승에서 쓴 챔피언 중 무작위, 내 선수는 [수집] → 컬렉션 맨 위 '챔피언 고르기' 카드에서 결승에서 쓴 챔피언 중 직접 고름 (1개뿐이면 자동). 고르기 전에는 스킨 효과 없음·역대 표에 '고르는 중…', 💡 이번 주 추천에 [컬렉션 열기]. 고르면 주요 순간·디자인 회의 연락(skinMade)·소식. js/collection.js recordWorldsSkins·pendingSkins·chooseSkin·skinChosen, js/main.js data-skin-champ, css .skin-choice. 시험: 2012 한 시즌 진행(다른 팀 우승 스킨 정상) + 내 팀 우승 가짜 결승 3세트 → 후보 2개 표시·고르기·저장 정상, 오류 없음
 151. [ver 1.1] 대시보드 '이번 주' 카드에서 '훈련 (이름) [훈련 바꾸기]' 줄 삭제 (사용자 요청: 바로 아래 퀘스트와 겹침). 훈련을 안 골랐을 때는 💡 추천 줄에 '이번 주 훈련을 아직 안 골랐어요 [훈련 고르기]'가 나옴 (js/dashboard.js, js/guide.js adviceRowsHTML). 상단 훈련 배지는 그대로
+152. [ver 1.1] 연속 우승 기사 (사용자 요청): 같은 대회를 해마다 연속 우승하면 결승 기사 제목이 '리핏·쓰리핏·포핏·파이브핏…(10 넘으면 n연패)'으로 바뀌고 본문에 'n년 연속 우승' 문장, 연속 우승하던 팀이 결승에서 지면 '도전이 멈췄다' 문장. 소식 '연속 우승' + 우리 팀이면 주요 순간. 대회마다 따로(LCK 컵·리그·First Stand·MSI·월드). 기록 state.league.titleStreaks {대회: {id, n, year}}, 예전 세이브는 역대 우승(이름)으로 처음 한 번 셈. 글은 data/news_articles.js REPEAT_NEWS, 코드 js/news_popup.js titleStreak·peatName·repeatNews. 시험: 4년 연속 우승 → 리핏·쓰리핏·포핏 기사, 5년째 지면 '4년 연속 우승 도전은 결승에서 멈췄다'
+153. [ver 1.1] 대시보드 종합 능력 칸에 '이번 주' 능력·특성 변화만 모음: 종합 능력 변화 + 스탯 변화(훈련·퀘스트·연락 답 모두) + 특성 획득/생김/극복/사라짐. 다른 정보(돈·체력·숙련도 등)는 안 넣음. 진행 전 스탯·특성을 weekReport.growthBase에 저장하고 지금 값과 비교 (js/main.js nextWeek, js/dashboard.js weekGrowthHTML)
+154. [ver 1.1] 지난주 결과의 솔로 랭크 줄(n승 n패 · ±점)을 대시보드 솔로 랭크 칸의 랭크 오른쪽으로 옮김 (js/dashboard.js weekLadderHTML, css .sum-week)
 
 ## 파일 구성
 

@@ -32,11 +32,61 @@ function queueFinalNews(champKey, eventName, f) {
   else if (INTL_FINALS.indexOf(champKey) !== -1) who = findTeam(f.winner) ? "domestic" : "overseas";
   else who = "other";
   const EVENT_NAMES = { cup: "LCK 컵", playoffs: "리그 플레이오프", worlds: "월드 챔피언십", firststand: "First Stand", msi: "MSI" };
-  queueHeadline(champKey + "_final", who, {
+  const st = titleStreak(champKey, f);
+  const vars = {
     event: EVENT_NAMES[champKey] || eventName, winner: teamName(f.winner), loser: teamName(f.loser),
     score: Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]),
     mvp: f.pogName || teamName(f.winner) + "의 에이스", // 해외 팀은 선수 이름이 없어서
-  });
+    streak: st.n, peat: peatName(st.n), brokenStreak: st.broken,
+  };
+  queueHeadline(champKey + "_final", who, vars);
+  repeatNews(who, vars, st);
+}
+
+// ----- 연속 우승 (리핏·쓰리핏…) -----
+// state.league.titleStreaks = { champKey: { id 우승 팀, n 연속 우승, year } }. 예전 세이브는 역대 우승 기록(이름)으로 처음 한 번 셈
+function titleStreak(champKey, f) {
+  const L = state.league;
+  if (!L.titleStreaks) L.titleStreaks = {};
+  let prev = L.titleStreaks[champKey];
+  if (!prev) {
+    const hist = L.history || [];
+    let n = 0, name = null;
+    for (let i = hist.length - 1; i >= 0; i--) {
+      const h = hist[i], c = h.champions && h.champions[champKey];
+      if (h.year !== state.year - 1 - n || !c || (name && c !== name)) break;
+      name = c; n++;
+    }
+    const id = name === teamName(f.winner) ? f.winner : name === teamName(f.loser) ? f.loser : null;
+    prev = n && id ? { id: id, n: n, year: state.year - 1 } : null;
+  }
+  const last = prev && prev.year === state.year - 1;
+  const n = last && prev.id === f.winner ? prev.n + 1 : 1;
+  const broken = last && prev.id === f.loser && prev.n >= 2 ? prev.n : 0;
+  L.titleStreaks[champKey] = { id: f.winner, n: n, year: state.year };
+  return { n: n, broken: broken };
+}
+function peatName(n) {
+  if (n < 2) return "";
+  return (typeof REPEAT_NEWS !== "undefined" && REPEAT_NEWS.names[n]) || n + "연패";
+}
+// 방금 넣은 결승 기사에 연속 우승 제목·문장 더하기 + 우리 팀이면 소식·주요 순간
+function repeatNews(who, vars, st) {
+  if (typeof REPEAT_NEWS === "undefined") return;
+  const r = state.weekReport;
+  const art = r && r.headlines && r.headlines[r.headlines.length - 1];
+  const team = myTeam();
+  const v = Object.assign({ year: state.year, me: state.player.name, myTeam: team ? team.name : "" }, vars);
+  const mineWin = who === "myTeam";
+  if (art && st.n >= 2) {
+    art.headline = fillNews(pick(REPEAT_NEWS.headline[mineWin ? "myTeam" : "any"]), v);
+    art.body += " " + fillNews(REPEAT_NEWS.body[mineWin ? "myTeam" : "any"], v);
+  }
+  if (art && st.broken) art.body += " " + fillNews(REPEAT_NEWS.broken[mineWin ? "myTeam" : "any"], v);
+  if (st.n >= 2) {
+    addNews("연속 우승", (mineWin ? "🏆 " : "") + v.winner + ", " + v.event + " " + st.n + "년 연속 우승 — " + v.peat + "!");
+    if (mineWin) addMoment("🏆", v.winner + " " + v.event + " " + v.peat + " (" + st.n + "년 연속 우승)");
+  }
 }
 
 // ----- 화면 -----

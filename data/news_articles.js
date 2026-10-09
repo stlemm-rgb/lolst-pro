@@ -152,3 +152,23 @@ const NEWS_ARTICLES = {
     { who: "overseas", headline: "{winner}, 세계 정상 정복", body: "{event}의 마지막 경기는 {winner}의 승리로 끝났다. {winner}이(가) {loser}을(를) {score}로 꺾었고 결승 MVP는 {mvp}(이)었다. 월드 우승컵은 해외 팀의 손에 들어갔다." },
   ],
 };
+
+// ----- 연속 우승 (리핏·쓰리핏…) — js/news_popup.js queueFinalNews -----
+// 같은 대회를 해마다 연속으로 우승하면 결승 기사 제목을 바꾸고 본문에 한 문장을 더해요.
+// 연속 우승 기록이 있던 팀이 결승에서 지면 '도전이 멈췄다' 문장을 더해요.
+// 글자 바꾸기: 결승 기사 값 + {peat} 리핏·쓰리핏…, {streak} 연속 우승 횟수, {brokenStreak} 진 팀의 연속 우승 횟수
+const REPEAT_NEWS = {
+  names: { 2: "리핏", 3: "쓰리핏", 4: "포핏", 5: "파이브핏", 6: "식스핏", 7: "세븐핏", 8: "에잇핏", 9: "나인핏", 10: "텐핏" }, // 그 위는 'n연패'
+  headline: {
+    myTeam: ["{myTeam}, {event} {peat} 달성!", "{peat}! {myTeam}, {event} {streak}년 연속 정상", "{myTeam} 왕조, {event} {peat}"],
+    any: ["{winner}, {event} {peat} 달성", "{peat}! {winner}, {event} {streak}년 연속 정상", "{winner} 왕조, {event} {peat}"],
+  },
+  body: {
+    myTeam: "이번 우승으로 {myTeam}은(는) {event} {streak}년 연속 우승, '{peat}'을(를) 완성했다. {me}의 이름도 왕조의 역사에 새겨졌다.",
+    any: "이번 우승으로 {winner}은(는) {event} {streak}년 연속 우승, '{peat}'을(를) 달성했다.",
+  },
+  broken: {
+    myTeam: "{myTeam}이(가) {loser}의 {event} {brokenStreak}년 연속 우승 도전을 막아 세웠다.",
+    any: "{loser}의 {event} {brokenStreak}년 연속 우승 도전은 결승에서 멈췄다.",
+  },
+};

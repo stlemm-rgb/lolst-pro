@@ -653,6 +653,8 @@ function nextWeek(restWeek) {
   }
 
   resetWeekCtx(); // 이번 주에 일어난 일 기록 시작 (이벤트 조건용)
+  // 대시보드 종합 능력 칸 '이번 주 변화': 진행 전 스탯·특성 (js/dashboard.js weekGrowthHTML)
+  const growthBase = { stats: Object.assign({}, state.stats), traits: state.player.traits.slice(), score: playerScore(USER_ID) };
 
   // 훈련 효과 적용 (이벤트로 "쉰다"를 골랐으면 이번 주는 휴식)
   const training = (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
@@ -737,6 +739,7 @@ function nextWeek(restWeek) {
   recordStatSnapshot(); // [선수 정보] 능력 변화: 4주 전·시즌 시작 비교 (js/player_page.js)
   // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
   startWeekReport(training, message, changes, playLadder(training));
+  state.weekReport.growthBase = growthBase;
   playNpcLadder(); // 다른 선수들도 솔로 랭크 (리그 솔로 랭크 순위)
   npcPractice(); // 다른 선수들도 매주 챔피언 연습 (js/npc_mastery.js)
   progressQuests(training, changes); // 퀘스트 진행 (js/quests.js)
