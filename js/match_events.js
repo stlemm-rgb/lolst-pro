@@ -109,6 +109,8 @@ function evActorWeight(ev, p, side, teamId, series) {
   }
   if (ev.kind === "good") w *= moodMult(series, p, side, teamId, true);
   if (ev.kind === "bad") w *= moodMult(series, p, side, teamId, false);
+  // 챔피언 손맛 (v1.1, data/match.js CHAMP_EV): 숙련도·메타 배율(cf)이 높을수록 좋은 장면 ↑ 실수 ↓
+  if (CHAMP_EV.pow && p.cf && (ev.kind === "good" || ev.kind === "bad")) w *= Math.pow(p.cf, ev.kind === "good" ? CHAMP_EV.pow : -CHAMP_EV.pow);
   return w;
 }
 

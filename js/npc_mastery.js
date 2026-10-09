@@ -144,7 +144,9 @@ function applyNpcChampPower(list, picks) {
   list.forEach(function (entry, i) {
     const p = npcMasteryPlayer(entry);
     if (!p || p.mastery[picks[i]] === undefined) return;
-    entry.power = entry.power * npcChampMult(p, picks[i]) - npcMetaPenalty(p);
+    const mult = npcChampMult(p, picks[i]), pen = npcMetaPenalty(p);
+    entry.cf = mult - pen / Math.max(1, playerScore(p.id)); // 챔피언 배율 → 경기 흐름 사건 (js/match_events.js)
+    entry.power = entry.power * mult - pen;
   });
 }
 

@@ -91,7 +91,7 @@ function userMatchContext(match, target, used) {
   mult *= 1 + activityMatchBoost(match); // 라이벌 선언한 팀과 경기 (js/events.js)
   mult *= 1 + chemistryBonus(); // 주전 동료와의 관계 (js/stories.js)
   // 특성(큰 무대·클러치·역전 등)은 다른 선수와 똑같이 traitPowerMult에서 계산
-  return { power: m.power * mult, pick: m.pick, banned: m.banned, joker: m.joker };
+  return { power: m.power * mult, pick: m.pick, banned: m.banned, joker: m.joker, cf: m.score ? m.power / m.score : 1 }; // cf: 챔피언 배율 (숙련도·메타·조커·시그니처 − 메타 페널티)
 }
 
 // 특성에 따른 이번 세트 경기력 배율 (나와 다른 선수 모두)
@@ -193,7 +193,7 @@ function lineup(teamId, userCtx, setCtx) {
       if (!wt && findTeam(teamId).tier === 2) power *= 1 + HOUSING.npcDormPower; // 2부는 합숙: 컨디션 상한 (data/shop.js)
     }
     power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx) * scout;
-    return { pos: pos, id: id, power: power };
+    return { pos: pos, id: id, power: power, cf: id === USER_ID && userCtx.cf ? userCtx.cf : 1 }; // cf: 챔피언 배율 → 경기 흐름 사건 (다른 선수는 applyNpcChampPower에서)
   });
 }
 

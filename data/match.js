@@ -25,7 +25,7 @@ const MATCH = {
   focusBan: { from: 80, base: 0.25, per: 0.015 },
   // 메타 등급: 포지션마다 메타 5명 중 1명은 S급, 나머지는 A급
   metaPickBonus: { S: 25, A: 15 },      // 밴픽 때 "숙련도 + 이 값"으로 가치를 매김
-  metaPowerBonus: { S: 0.08, A: 0.03 }, // 고른 챔피언이 메타면 경기력 +8% / +3%
+  metaPowerBonus: { S: 0.15, A: 0.08 }, // 고른 챔피언이 메타면 경기력 +15% / +8% (v1.1: 8/3 → 15/8)
   metaSWeight: 2,                        // 메타 페널티 계산 때 S급 숙련도는 2배로 셈
   // 조커픽: 메타가 아닌 챔피언
   //   - 상대가 예상 못 해서 밴에서 빠지기 쉬움 (밴할 때 메타가 아닌 챔피언은 숙련도 −jokerBanDiscount로 봄)
@@ -36,7 +36,7 @@ const MATCH = {
   jokerMinMastery: 70,
   jokerPickBonus: 15,
   jokerBanDiscount: 30,
-  jokerPowerBonus: 0.05,
+  jokerPowerBonus: 0.03, // v1.1: 0.05 → 0.03 (비메타 장인이 메타보다 유리하던 문제)
   // 조커픽은 선수마다 최대 jokerSlots명만 (메타가 아닌 챔피언 중 숙련도가 가장 높은 순, 시그니처 픽은 따로) — 2026-10-08
   //   예전엔 숙련도 60 이상 비메타 챔피언 전부가 조커라서, 시간이 지나면 조커가 너무 많아졌음
   jokerSlots: 2,
@@ -50,7 +50,7 @@ const MATCH = {
   //   1~60: 1점에 약 0.5% · 60~80: 1점에 0.25% · 80~100: 1점에 0.125%  → 80이면 충분히 잘 다루는 수준
   masteryCurve: [[1, 0.75], [60, 1.05], [80, 1.10], [100, 1.125]],
   metaPenaltyBase: 60,
-  metaPenaltyDiv: 4,
+  metaPenaltyDiv: 2, // v1.1: 4 → 2 (메타 페널티 2배)
   adaptWeeks: 4,
   adaptFrom: 40,
   adaptRange: 40,
@@ -126,5 +126,8 @@ const PHASES = {
 //   userPerS: 내 좋은 장면이 뽑힐 확률 −n (최소 userMin배), matePerS: 같은 팀 동료 좋은 장면 +n
 // 컨디션 난조(화면에 안 보임): 정규 시즌 경기에서 우리 팀 최근 recent경기 승률이 winRate 이상이면
 //   chance 확률로 그 경기 내 좋은 장면 확률 ×goodMult (토너먼트·국제대회는 제외)
+// 챔피언 손맛 (v1.1): 챔피언 배율 cf(숙련도 배율 × 메타 보너스 × 조커·시그니처 − 메타 페널티 비율)를 경기 흐름 사건 주인공 확률에
+//   좋은 장면 × cf^pow, 실수 × cf^(−pow)  (pow 0 = 끔). 예: pow 3 → 숙련도 100(1.125) 좋은 장면 ×1.42 · 실수 ×0.70, 숙련도 20(0.85) ×0.61 · ×1.63
+const CHAMP_EV = { pow: 3 }; // v1.1 사용자 선택 D
 const FOCUS_RULES = { userPerS: 0.15, userMin: 0.35, matePerS: 0.06 };
 const SLUMP_RULES = { recent: 10, minGames: 6, winRate: 0.8, chance: 0.5, goodMult: 0.2 };
