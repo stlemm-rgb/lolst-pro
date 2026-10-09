@@ -109,8 +109,7 @@ function tryLoan(t, pos, margin, moved) {
   p.teamId = t.id;
   t.roster.push(best);
   while (t.roster.length > LEAGUE.rosterSize) {
-    const w = t.roster.filter(function (x) { return x !== USER_ID && x !== best && !findPlayer(x).loan; })
-      .sort(function (a, b) { return playerScore(a) - playerScore(b); })[0];
+    const w = surplusPlayer(t.id, best); // 후보 구성 규칙 (js/contracts.js)
     if (!w) break;
     releaseToFA(w);
   }

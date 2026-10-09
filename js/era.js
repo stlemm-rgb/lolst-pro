@@ -77,8 +77,13 @@ function foundClub() {
     p.teamId = team.id;
     team.roster.push(p.id);
   });
+  // 후보 2명: 주전이 가장 약한 포지션 1명 + 가장 강한 포지션을 뺀 나머지 중 1명 (js/contracts.js 후보 구성 규칙)
+  const sorted = POSITION_IDS.slice().sort(function (a, b) {
+    return playerScore(team.roster[POSITION_IDS.indexOf(a)]) - playerScore(team.roster[POSITION_IDS.indexOf(b)]);
+  });
+  const benchPos = [sorted[0]].concat(shuffled(sorted.slice(1, 4)));
   for (let k = 0; k < LEAGUE.rosterSize - 5; k++) {
-    const p = makeNpc(pick(POSITION_IDS), { avg: avg - 6, spread: 6 }, LEAGUE.npc.ageRange);
+    const p = makeNpc(benchPos[k % benchPos.length], { avg: avg - 6, spread: 6 }, LEAGUE.npc.ageRange);
     p.teamId = team.id;
     team.roster.push(p.id);
   }

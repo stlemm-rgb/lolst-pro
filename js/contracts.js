@@ -415,6 +415,65 @@ function weakestPlayer(teamId) {
   return list[0];
 }
 
+// ----- 후보(벤치) 구성 규칙 (160) -----
+// - 주전이 가장 강한 포지션에는 후보를 두지 않음 (그 선수 후보는 필요 없음)
+// - 한 포지션에 후보 2명 X (포지션마다 후보 최대 1명)
+// - 주전이 가장 약한 포지션부터 후보를 둠
+// 주전 점수 순 포지션 (약한 쪽 먼저) + 가장 강한 포지션
+function benchPlan(teamId) {
+  const s = starters(teamId);
+  const order = POSITION_IDS.slice().sort(function (a, b) { return (s[a] ? playerScore(s[a]) : -1) - (s[b] ? playerScore(s[b]) : -1); });
+  return { starters: s, order: order, best: order[order.length - 1] };
+}
+// 후보 목록 (주전·내 선수·임대 온 선수 제외)
+function benchOf(teamId, plan) {
+  const ids = POSITION_IDS.map(function (pos) { return plan.starters[pos]; });
+  return findTeam(teamId).roster.filter(function (id) { return id !== USER_ID && ids.indexOf(id) === -1 && !findPlayer(id).loan; });
+}
+// 후보를 더 둘 포지션 (약한 포지션부터, 가장 강한 포지션·이미 후보가 있는 포지션 제외)
+function benchWanted(teamId) {
+  const plan = benchPlan(teamId);
+  const have = benchOf(teamId, plan).map(playerPos);
+  return plan.order.filter(function (pos) { return pos !== plan.best && have.indexOf(pos) === -1 && plan.starters[pos] !== undefined; });
+}
+// 선수단이 넘칠 때 내보낼 선수: ① 가장 강한 포지션 후보 ② 같은 포지션 두 번째 후보 ③ 그 밖의 후보 중 가장 약한 선수 (keepId는 빼고)
+function surplusPlayer(teamId, keepId) {
+  const plan = benchPlan(teamId);
+  const bench = benchOf(teamId, plan).filter(function (id) { return id !== keepId; });
+  if (!bench.length) return weakestPlayer(teamId);
+  const bestOfPos = {};
+  benchOf(teamId, plan).forEach(function (id) {
+    const pos = playerPos(id);
+    if (!bestOfPos[pos] || playerScore(id) > playerScore(bestOfPos[pos])) bestOfPos[pos] = id;
+  });
+  const rank = function (id) {
+    const pos = playerPos(id);
+    if (pos === plan.best) return 0;
+    if (bestOfPos[pos] !== id) return 1;
+    return pos === plan.order[0] ? 3 : 2; // 가장 약한 포지션 후보는 마지막까지 지킴
+  };
+  return bench.sort(function (a, b) { return (rank(a) - rank(b)) || (playerScore(a) - playerScore(b)); })[0];
+}
+// 후보 구성 정리 (fillRosters): 가장 강한 포지션 후보·같은 포지션 두 번째 후보를 내보내고 필요한 포지션 FA로 채움 (팀마다 1번에 1명)
+function fixBench(t) {
+  const plan = benchPlan(t.id);
+  const bench = benchOf(t.id, plan);
+  const seen = {};
+  const bad = bench.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); }).find(function (id) {
+    const pos = playerPos(id);
+    if (pos === plan.best) return true;
+    if (seen[pos]) return true;
+    seen[pos] = true;
+    return false;
+  });
+  if (bad && benchWanted(t.id).length) { releaseToFA(bad); return; }
+  // 주전이 가장 약한 포지션에 후보가 없으면, 다른 후보 1명을 내보내고 그 자리를 채움 (fillRosters가 약한 포지션부터 채움)
+  const weakest = plan.order[0];
+  if (bench.length && t.roster.length >= LEAGUE.rosterSize && !bench.some(function (id) { return playerPos(id) === weakest; }) && plan.starters[weakest] !== USER_ID) {
+    releaseToFA(surplusPlayer(t.id));
+  }
+}
+
 // 포지션이 비면 FA 중 가장 잘하는 선수, 없으면 신인으로 채움
 function fillPosition(teamId, pos) {
   const fa = state.league.freeAgents.filter(function (id) { return findPlayer(id).pos === pos && foreignOk(id, teamId); }) // 외국인 수 제한
@@ -433,7 +492,7 @@ function moveUserTo(teamId) {
   }
   const team = findTeam(teamId);
   if (team.roster.indexOf(USER_ID) === -1) team.roster.unshift(USER_ID);
-  while (team.roster.length > LEAGUE.rosterSize) releaseToFA(weakestPlayer(team.id));
+  while (team.roster.length > LEAGUE.rosterSize) releaseToFA(surplusPlayer(team.id));
   state.team = team.name;
 }
 
@@ -445,13 +504,31 @@ function fillRosters() {
       const has = t.roster.some(function (id) { return playerPos(id) === pos; });
       if (!has) fillPosition(t.id, pos);
     });
-    while (t.roster.length < LEAGUE.rosterSize && state.league.freeAgents.length) {
-      const best = state.league.freeAgents.filter(function (id) { return foreignOk(id, t.id); }).sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
+    for (let round = 0; round < 4; round++) { // 정리·채우기 (새 선수가 주전이 되면 순서가 바뀌어 몇 번 더)
+    fixBench(t); // 후보 구성 규칙 (가장 강한 포지션 후보·같은 포지션 후보 2명 정리)
+    let guard = 10;
+    while (t.roster.length < LEAGUE.rosterSize && guard-- > 0) {
+      // 후보가 필요한 포지션(약한 포지션부터)의 가장 잘하는 FA, 없으면 아무 포지션
+      const ok = state.league.freeAgents.filter(function (id) { return foreignOk(id, t.id); });
+      const wanted = benchWanted(t.id);
+      let best = null;
+      const weakest = benchPlan(t.id).order[0];
+      if (wanted[0] === weakest) { // 주전이 가장 약한 포지션 후보는 꼭: FA가 없으면 그 포지션 신인
+        best = ok.filter(function (id) { return findPlayer(id).pos === weakest; }).sort(function (a, b) { return playerScore(b) - playerScore(a); })[0] || null;
+        if (!best) { fillPosition(t.id, weakest); continue; }
+      }
+      if (!best) wanted.some(function (pos) {
+        best = ok.filter(function (id) { return findPlayer(id).pos === pos; }).sort(function (a, b) { return playerScore(b) - playerScore(a); })[0] || null;
+        return !!best;
+      });
+      if (!best && wanted.length) { fillPosition(t.id, wanted[0]); continue; } // FA가 없으면 그 포지션 신인
+      if (!best) best = ok.sort(function (a, b) { return playerScore(b) - playerScore(a); })[0];
       if (!best) break;
       signFA(best, t.id);
     }
+    }
     while (t.roster.length > LEAGUE.rosterSize) {
-      const w = weakestPlayer(t.id);
+      const w = surplusPlayer(t.id);
       if (!w) break;
       releaseToFA(w);
     }

@@ -208,7 +208,7 @@ function sellable(id, buyer) {
 function payrollDelta(buyer, id, salary) {
   let delta = salary;
   if (buyer.roster.length + 1 > LEAGUE.rosterSize) {
-    const w = weakestPlayer(buyer.id);
+    const w = surplusPlayer(buyer.id, id);
     if (w && playerScore(w) < playerScore(id)) delta -= findPlayer(w).salary || 0;
   }
   return delta;
@@ -235,11 +235,8 @@ function npcTransfer(id, buyer, fee, salary, kind) {
   p.contractEnd = state.year - 1 + randInt(CONTRACT.years[0], CONTRACT.years[1]);
   buyer.roster.push(id);
   while (buyer.roster.length > LEAGUE.rosterSize) {
-    const s = kind === "depth" ? starters(buyer.id) : {};
-    const keep = POSITION_IDS.map(function (pos) { return s[pos]; });
-    const w = buyer.roster.filter(function (x) { return x !== USER_ID && x !== id && !findPlayer(x).loan && keep.indexOf(x) === -1; })
-      .sort(function (a, b) { return playerScore(a) - playerScore(b); })[0];
-    if (!w) break;
+    const w = surplusPlayer(buyer.id, id); // 후보 구성 규칙 (js/contracts.js)
+    if (!w || w === id) break;
     releaseToFA(w);
   }
 }
@@ -334,6 +331,7 @@ function starTransfers(moved, news) {
 }
 
 // 경쟁 후보 영입: 주전과 후보 차이가 큰 포지션에 '주전보다 조금 약한' 선수 (내 포지션이면 나와 비슷한 선수)
+//   (160) 주전이 가장 강한 포지션은 제외, 주전이 약한 포지션부터
 function depthSignings(order, moved, news) {
   const D = CLUB_MARKET.depth;
   order.forEach(function (t) {
@@ -341,12 +339,13 @@ function depthSignings(order, moved, news) {
     const s = starters(t.id);
     const starterIds = POSITION_IDS.map(function (pos) { return s[pos]; });
     // 포지션별 차이 (주전 − 같은 포지션 가장 좋은 후보)
-    const gaps = POSITION_IDS.filter(function (pos) { return s[pos]; }).map(function (pos) {
+    const bestPos = benchPlan(t.id).best;
+    const gaps = POSITION_IDS.filter(function (pos) { return s[pos] && pos !== bestPos; }).map(function (pos) {
       const base = playerScore(s[pos]);
       const bench = t.roster.filter(function (id) { return id !== USER_ID && starterIds.indexOf(id) === -1 && playerPos(id) === pos; })
         .map(playerScore).sort(function (a, b) { return b - a; })[0];
       return { pos: pos, base: base, gap: bench === undefined ? 99 : base - bench };
-    }).filter(function (g) { return g.gap >= D.gapFrom; }).sort(function (a, b) { return b.gap - a.gap; });
+    }).filter(function (g) { return g.gap >= D.gapFrom; }).sort(function (a, b) { return a.base - b.base; });
     let done = false;
     gaps.forEach(function (g) {
       if (done) return;

@@ -266,9 +266,13 @@ function makeLeague(defs, chosenIndex) {
       p.teamId = team.id;
       team.roster.push(p.id);
     });
-    // 후보 2명 (포지션 무작위)
+    // 후보 2명: 주전이 가장 약한 포지션 1명 + 나머지(가장 강한 포지션 제외) 중 1명, 같은 포지션 X (160)
+    const sorted = POSITION_IDS.slice().sort(function (a, b) {
+      return playerScore(team.roster[POSITION_IDS.indexOf(a)]) - playerScore(team.roster[POSITION_IDS.indexOf(b)]);
+    });
+    const benchPos = [sorted[0]].concat(shuffled(sorted.slice(1, 4)));
     for (let k = 0; k < LEAGUE.rosterSize - 5; k++) {
-      const p = makeNpc(pick(POSITION_IDS), shiftLevel(tier === 1 ? npc.tier1Sub : npc.tier2Sub, n.shift), npc.ageRange);
+      const p = makeNpc(benchPos[k % benchPos.length], shiftLevel(tier === 1 ? npc.tier1Sub : npc.tier2Sub, n.shift), npc.ageRange);
       p.teamId = team.id;
       team.roster.push(p.id);
     }
@@ -277,6 +281,7 @@ function makeLeague(defs, chosenIndex) {
   placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
   placeNamedPlayers(); // 네임드 선수 (data/named_players.js)
   addVeterans(); // 나이 많은 선수 몇 명 (세대교체, js/retirement.js)
+  fillRosters(); // 내 선수·네임드 배치 뒤 후보 구성 정리 (js/contracts.js 후보 구성 규칙)
   startSeason();
   initContracts(); // 선수들 연봉·계약 기간, 내 첫 계약 (2년)
 }
@@ -543,20 +548,15 @@ function addBigRookies() {
     }
     p.bigRookie = state.year;
     npcMasteryInit(p); // 바뀐 스탯(챔피언 폭)에 맞게 숙련도 다시
-    // 입단: 같은 포지션 선수가 2명 이상이 되므로, 선수가 2명 이상인 포지션에서 가장 약한 선수를 내보냄
+    // 입단: 선수단이 넘치므로 후보 구성 규칙대로 1명 내보냄 (가장 강한 포지션 후보 → 같은 포지션 두 번째 후보 → 약한 후보)
     p.teamId = team.id;
     team.roster.push(p.id);
     p.salary = salaryFor(statScoreFor(p.stats, pos), team.tier, 0);
     p.contractEnd = state.year - 1 + randInt(R.contractYears[0], R.contractYears[1]);
-    const posCount = {};
-    team.roster.forEach(function (id) { const q = playerPos(id); posCount[q] = (posCount[q] || 0) + 1; });
-    const out = team.roster.filter(function (id) {
-      const q = findPlayer(id);
-      return id !== p.id && id !== USER_ID && q && !q.loan && !q.named && posCount[q.pos] >= 2;
-    }).sort(function (a, b) { return playerScore(a) - playerScore(b); })[0];
-    if (out) releaseToFA(out);
+    const out2 = surplusPlayer(team.id, p.id); // 후보 구성 규칙 (js/contracts.js)
+    if (out2) releaseToFA(out2);
     news.push("🌟 대형 신인 " + p.name + "(" + findPosition(pos).name + ", " + p.age + "세, 종합 능력 " + Math.round(playerScore(p.id)) + ") " + team.name + (team.tier === 1 ? " 입단 — 1부 직행!" : " 입단") +
-      (out ? " · " + playerName(out) + " 자유 계약" : ""));
+      (out2 ? " · " + playerName(out2) + " 자유 계약" : ""));
   }
   return news;
 }

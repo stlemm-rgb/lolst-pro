@@ -796,6 +796,7 @@ function nextWeek(restWeek) {
     expireStartTrait(); // 유망주 전용 특성: 3년차부터 사라짐 (js/creation.js)
     const leagueNews = newSeasonLeague().concat(contractsNewSeason()).concat(addBigRookies()); // 대형 신인 (js/league.js)
     initContracts(); // 새로 들어온 신인들 계약
+    fillRosters(); // 은퇴·신인·이적이 다 끝난 뒤 후보 구성 다시 정리 (js/contracts.js 후보 구성 규칙)
     refillRivalAces(); // 은퇴한 🔥 리그의 에이스 자리 채우기 (js/straits.js)
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
     const NEWS_TAGS = { "🔁": "이적 시장", "🌟": "대형 신인", "📈": "리그 확장", "🆕": "신생 구단", "🌏": "해외 리그" };
