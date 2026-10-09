@@ -291,12 +291,12 @@ function placeNamedPlayers() {
   const pool = tierTeams(1).filter(function (t) { return !mine || t.id !== mine.id; })
     .sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); }).slice(0, NAMED_RULES.teamPool);
   const teams = shuffled(pool);
-  // 이미 네임드 선수가 있는 팀은 뒤로 (서로 다른 팀에 가도록)
-  const hasNamed = function (t) { return t.roster.some(function (id) { const p = findPlayer(id); return p && p.named; }); };
-  teams.sort(function (a, b) { return hasNamed(a) - hasNamed(b); });
-  todo.forEach(function (n, i) {
+  // 네임드 선수가 적은 팀부터, 같은 포지션 네임드가 이미 있는 팀은 빼고 (v1.1: 7명이라 강팀 수보다 많을 수 있음)
+  const namedIn = function (t) { return t.roster.filter(function (id) { const p = findPlayer(id); return p && p.named; }); };
+  todo.forEach(function (n) {
     L.namedDone.push(n.name);
-    const team = teams[i % teams.length];
+    const team = teams.filter(function (t) { return !namedIn(t).some(function (id) { return findPlayer(id).pos === n.pos; }); })
+      .sort(function (a, b) { return namedIn(a).length - namedIn(b).length; })[0];
     if (!team) return;
     const id = starterAt(team.id, n.pos);
     const p = id && id !== USER_ID ? findPlayer(id) : null;

@@ -1,5 +1,5 @@
 // ===== 네임드 선수: 새 게임마다 항상 등장하는 선수 (js/league.js placeNamedPlayers) =====
-// - 1부 강팀의 주전으로 들어가요 (내 팀 제외, 서로 다른 팀)
+// - 1부 강팀의 주전으로 들어가요 (내 팀 제외, 되도록 서로 다른 팀. 팀이 모자라면 같은 포지션 네임드가 없는 팀에)
 // - 나이: 내 선수 나이 ± ageGap 사이 (17~27세 안으로)
 // - 실력(종합 능력): 나이에 따라 score 범위에서 정해요. 어릴수록 낮게 시작해서 성장해요
 // - 좋은 특성 traits개 (다른 선수가 가질 수 있는 특성 중 무작위). 나쁜 특성은 없음
@@ -11,6 +11,8 @@ const NAMED_PLAYERS = [
   { name: "Sking",   pos: "mid" },
   { name: "Hwansam", pos: "adc" },
   { name: "Runa",    pos: "support" },
+  { name: "Jimul",   pos: "adc" },      // v1.1 추가
+  { name: "Kibai",   pos: "top" },      // v1.1 추가
 ];
 
 const NAMED_RULES = {
