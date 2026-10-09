@@ -1,7 +1,7 @@
 // ===== 선수 검색 · 구단 탐색 · 이적 시장 화면 =====
 
 // 화면에서만 쓰는 값 (저장 안 함)
-const searchFilter = { q: "", pos: "", team: "", sort: "score" };
+const searchFilter = { q: "", pos: "", team: "", sort: "score", origin: "" }; // origin: 출신 리그 (v1.1)
 let selectedPlayer = null;
 let openClubId = null;
 
@@ -19,12 +19,26 @@ function allPlayerIds() {
   return [USER_ID].concat(Object.keys(state.league.players));
 }
 
+// 선수의 출신 칸 (v1.1): 한국 출신은 KR, 해외 출신은 지역 약자 (마우스를 올리면 지역 이름·모국어)
+function originCellHTML(p) {
+  if (typeof originOf !== "function" || !p) return "-";
+  const o = p.id === USER_ID ? HOME_ORIGIN.id : originOf(p);
+  if (!o) return "-";
+  const home = o === HOME_ORIGIN.id;
+  return '<span class="' + (home ? "muted" : "chip meta") + ' tip" tabindex="0" data-tip="' + escapeHTML(originName(o) + " 출신 · 모국어 " + langName(home ? HOME_ORIGIN.lang : REGION_LANG[o] || "en")) + '">' + originShort(o) + "</span>";
+}
+
 // ----- 선수 검색 -----
 pages.search = function () {
   const q = searchFilter.q.trim().toLowerCase();
-  let ids = allPlayerIds().filter(function (id) {
+  // '🌏 해외 리그'를 고르거나 해외 출신으로 거르면 해외 리그 선수도 목록에 (v1.1)
+  const withWorld = state.world && (searchFilter.team === "WORLD" || (searchFilter.origin && searchFilter.origin !== HOME_ORIGIN.id));
+  const pool = searchFilter.team === "WORLD" ? [] : allPlayerIds();
+  let ids = pool.concat(withWorld ? Object.keys(state.world.players) : []).filter(function (id) {
     const p = playerInfo(id);
+    if (!p) return false;
     if (q && p.name.toLowerCase().indexOf(q) === -1) return false;
+    if (searchFilter.origin && (id === USER_ID ? HOME_ORIGIN.id : originOf(p)) !== searchFilter.origin) return false;
     if (searchFilter.pos && p.pos !== searchFilter.pos) return false;
     if (searchFilter.team === "FA" && p.teamId) return false;
     if (searchFilter.team === "T1ER" && !(p.teamId && findTeam(p.teamId).tier === 1)) return false;
@@ -45,10 +59,13 @@ pages.search = function () {
   const posOpts = '<option value="">전체 포지션</option>' + POSITIONS.map(function (p) {
     return '<option value="' + p.id + '"' + (searchFilter.pos === p.id ? " selected" : "") + ">" + p.name + "</option>";
   }).join("");
-  const teamOpts = [["", "전체 선수"], ["T1ER", "1부 리그"], ["T2ER", "2부 리그"], ["FA", "FA (소속 없음)"]].map(function (o) {
+  const teamOpts = [["", "전체 선수 (국내)"], ["T1ER", "1부 리그"], ["T2ER", "2부 리그"], ["FA", "FA (소속 없음)"], ["WORLD", "🌏 해외 리그"]].map(function (o) {
     return '<option value="' + o[0] + '"' + (searchFilter.team === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
   }).join("") + state.league.teams.map(function (t) {
     return '<option value="' + t.id + '"' + (searchFilter.team === t.id ? " selected" : "") + ">" + escapeHTML(t.name) + "</option>";
+  }).join("");
+  const originOpts = '<option value="">전체 출신</option>' + (typeof HOME_ORIGIN !== "undefined" ? [[HOME_ORIGIN.id, HOME_ORIGIN.name + " (KR)"]].concat(activeRegions().map(function (r) { return [r.id, r.name + " (" + originShort(r.id) + ")"]; })) : []).map(function (o) {
+    return '<option value="' + o[0] + '"' + (searchFilter.origin === o[0] ? " selected" : "") + ">" + escapeHTML(o[1]) + "</option>";
   }).join("");
   const sortOpts = [["score", "스탯 점수 높은 순"], ["age", "나이 어린 순"], ["salary", "연봉 높은 순"], ["name", "이름순"]].map(function (o) {
     return '<option value="' + o[0] + '"' + (searchFilter.sort === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
@@ -57,12 +74,14 @@ pages.search = function () {
   const rows = ids.map(function (id) {
     const p = playerInfo(id);
     const team = p.teamId ? findTeam(p.teamId) : null;
+    const wt = !team && id !== USER_ID && typeof worldTeamIdOf === "function" && state.world && state.world.players[id] ? findWorldTeam(worldTeamIdOf(id)) : null; // 해외 리그 선수
     return (
       '<tr class="click' + (id === USER_ID ? " me" : "") + (selectedPlayer === id ? " sel" : "") + '" data-player="' + id + '">' +
         "<td>" + escapeHTML(p.name) + (id !== USER_ID && findPlayer(id) && findPlayer(id).named ? ' <span title="네임드 선수">⭐</span>' : "") +
           (id !== USER_ID && findPlayer(id) && findPlayer(id).bigRookie ? ' <span title="' + findPlayer(id).bigRookie + '년 대형 신인">🌟</span>' : "") + "</td>" +
         "<td>" + findPosition(p.pos).name + "</td>" +
-        "<td>" + (team ? escapeHTML(team.name) + ' <span class="muted small">' + tierName(team.tier) + "</span>" : '<span class="muted">FA</span>') + "</td>" +
+        "<td>" + originCellHTML(p) + "</td>" +
+        "<td>" + (team ? escapeHTML(team.name) + ' <span class="muted small">' + tierName(team.tier) + "</span>" : wt ? "🌏 " + escapeHTML(wt.name) + ' <span class="muted small">' + escapeHTML((findRegion(wt.region) || {}).name || "") + "</span>" : '<span class="muted">FA</span>') + "</td>" +
         '<td class="small">' + topChampList(id, 2).map(function (c) { return escapeHTML(c.name) + ' <span class="muted">' + c.v + "</span>"; }).join(" · ") + "</td>" +
         '<td class="r">' + p.age + "</td>" +
         '<td class="r"><b>' + playerScore(id).toFixed(1) + "</b></td>" +
@@ -79,11 +98,12 @@ pages.search = function () {
         '<input type="text" id="s-q" placeholder="이름 검색 (Enter)" value="' + escapeHTML(searchFilter.q) + '">' +
         '<select id="s-pos">' + posOpts + "</select>" +
         '<select id="s-team">' + teamOpts + "</select>" +
+        '<select id="s-origin">' + originOpts + "</select>" +
         '<select id="s-sort">' + sortOpts + "</select>" +
       "</div>" +
       '<p class="muted small">' + total + "명" + (total > 80 ? " 중 80명 표시" : "") + " · 줄을 누르면 상세 스탯이 나와요.</p>" +
       (selectedPlayer && (selectedPlayer === USER_ID || findPlayer(selectedPlayer)) ? playerDetailHTML(selectedPlayer) : "") +
-      '<table class="roster"><tr><th>이름</th><th>포지션</th><th>소속</th><th>주력 챔피언</th><th class="r">나이</th><th class="r">스탯 점수</th><th class="r">연봉</th><th class="r">계약 만료</th></tr>' + rows + "</table>" +
+      '<table class="roster"><tr><th>이름</th><th>포지션</th><th>출신</th><th>소속</th><th>주력 챔피언</th><th class="r">나이</th><th class="r">스탯 점수</th><th class="r">연봉</th><th class="r">계약 만료</th></tr>' + rows + "</table>" +
     "</div>"
   );
 };
@@ -208,7 +228,7 @@ function transferLogCardHTML() {
     const mineRow = e.team === mine.id || e.from === mine.id;
     return "<tr" + (mineRow ? ' class="me"' : "") + "><td>" + when(e) + "</td><td>" + TLOG_KIND[e.kind] + "</td><td><b>" + escapeHTML(e.name) + '</b> <span class="muted small">' + findPosition(e.pos).name + " · " + e.age + "세</span>" +
       (e.tag && TLOG_TAG[e.tag] ? ' <span class="joker-tag tip" data-tip="' + escapeHTML(TLOG_TAG[e.tag].tip) + '">' + TLOG_TAG[e.tag].name + "</span>" : "") + "</td>" +
-      '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(teamName(e.from)) + " → <b>" + (e.kind === "retire" ? "은퇴" : e.kind === "leave" ? "FA" : e.kind === "abroad" ? escapeHTML(e.to || "해외") : escapeHTML(teamName(e.team))) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
+      "<td>" + originCellHTML({ id: e.id, origin: e.origin || (findPlayer(e.id) && originOf(findPlayer(e.id))) || HOME_ORIGIN.id }) + "</td>" + '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(teamName(e.from)) + " → <b>" + (e.kind === "retire" ? "은퇴" : e.kind === "leave" ? "FA" : e.kind === "abroad" ? escapeHTML(e.to || "해외") : escapeHTML(teamName(e.team))) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
   }).join("");
   const count = {};
   list.forEach(function (e) { count[e.kind] = (count[e.kind] || 0) + 1; });
@@ -217,7 +237,7 @@ function transferLogCardHTML() {
   return '<div class="card"><h2>📋 이적 목록 <span class="muted small">' + year + "년 · " + list.length + "건" + (summary ? " (" + summary + ")" : "") + "</span></h2>" +
     '<div class="radar-ctrl">' + btn("tlog-year", 0, tlogYear, "올해") + " " + btn("tlog-year", 1, tlogYear, "작년") + " &nbsp; " +
       btn("tlog-filter", "all", tlogFilter, "전체") + " " + btn("tlog-filter", "t1", tlogFilter, "1부 관련") + " " + btn("tlog-filter", "mine", tlogFilter, "우리 팀") + "</div>" +
-    (rows ? '<div class="table-wrap"><table class="roster tlog"><tr><th>시기</th><th>종류</th><th>선수</th><th class="r">스탯 점수</th><th>이동</th><th class="r">이적료</th></tr>' + rows + "</table></div>"
+    (rows ? '<div class="table-wrap"><table class="roster tlog"><tr><th>시기</th><th>종류</th><th>선수</th><th>출신</th><th class="r">스탯 점수</th><th>이동</th><th class="r">이적료</th></tr>' + rows + "</table></div>"
       : '<p class="muted">' + year + "년 이적 기록이 없어요. 이적은 비시즌(새 시즌 시작)과 여름(" + SUMMER_MARKET.applyWeek + "주)에 일어나요.</p>") +
     '<p class="muted small">💥 주전 이적: 돈 많은 1부 팀이 다른 1부 팀 주전을 비싸게 데려감 · 🧩 경쟁 후보: 주전과 실력이 비슷한 후보를 데려와 주전 경쟁 · 🎓 은퇴: 은퇴한 자리는 신인이 채움 · 스탯 점수는 이적할 때 기준</p>' +
     "</div>";
@@ -313,7 +333,7 @@ function bindMarket(page) {
   if (q) {
     q.onkeydown = function (e) { if (e.key === "Enter") { searchFilter.q = q.value; renderPage(); } };
     q.onchange = function () { searchFilter.q = q.value; renderPage(); };
-    ["pos", "team", "sort"].forEach(function (k) {
+    ["pos", "team", "sort", "origin"].forEach(function (k) {
       document.getElementById("s-" + k).onchange = function () { searchFilter[k] = this.value; renderPage(); };
     });
   }
