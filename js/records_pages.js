@@ -145,7 +145,9 @@ pages.awards = function () {
 // ----- 대회 일정: 대회 안내와 역대 우승 -----
 function competitionGuideHTML() {
   const rows = COMPETITION_GUIDE.map(function (c) {
-    return "<tr><td><b>" + c.name + '</b></td><td class="muted">' + c.weeks + "</td><td>" + c.who + '</td><td class="muted small">' + c.how + "</td></tr>";
+    const id = { "First Stand": "first_stand", "Road to MSI": "road_to_msi", "MSI": "msi", "플레이인": "playin" }[c.name];
+    const off = id && typeof scheduleOffReason === "function" ? scheduleOffReason(id) : ""; // 올해 안 열리면 반투명 (js/main.js)
+    return "<tr" + (off ? ' class="off"' : "") + "><td><b>" + c.name + "</b>" + (off ? offTagHTML(off) : "") + '</td><td class="muted">' + c.weeks + "</td><td>" + c.who + '</td><td class="muted small">' + c.how + "</td></tr>";
   }).join("");
   return '<div class="card"><h2>대회 안내</h2><table class="roster"><tr><th>대회</th><th>주차</th><th>참가</th><th>방식·진출 조건</th></tr>' + rows + "</table></div>";
 }

@@ -184,6 +184,8 @@
 152. [ver 1.1] 연속 우승 기사 (사용자 요청): 같은 대회를 해마다 연속 우승하면 결승 기사 제목이 '리핏·쓰리핏·포핏·파이브핏…(10 넘으면 n연패)'으로 바뀌고 본문에 'n년 연속 우승' 문장, 연속 우승하던 팀이 결승에서 지면 '도전이 멈췄다' 문장. 소식 '연속 우승' + 우리 팀이면 주요 순간. 대회마다 따로(LCK 컵·리그·First Stand·MSI·월드). 기록 state.league.titleStreaks {대회: {id, n, year}}, 예전 세이브는 역대 우승(이름)으로 처음 한 번 셈. 글은 data/news_articles.js REPEAT_NEWS, 코드 js/news_popup.js titleStreak·peatName·repeatNews. 시험: 4년 연속 우승 → 리핏·쓰리핏·포핏 기사, 5년째 지면 '4년 연속 우승 도전은 결승에서 멈췄다'
 153. [ver 1.1] 대시보드 종합 능력 칸에 '이번 주' 능력·특성 변화만 모음: 종합 능력 변화 + 스탯 변화(훈련·퀘스트·연락 답 모두) + 특성 획득/생김/극복/사라짐. 다른 정보(돈·체력·숙련도 등)는 안 넣음. 진행 전 스탯·특성을 weekReport.growthBase에 저장하고 지금 값과 비교 (js/main.js nextWeek, js/dashboard.js weekGrowthHTML)
 154. [ver 1.1] 지난주 결과의 솔로 랭크 줄(n승 n패 · ±점)을 대시보드 솔로 랭크 칸의 랭크 오른쪽으로 옮김 (js/dashboard.js weekLadderHTML, css .sum-week)
+155. [ver 1.1] 대시보드 제목 옆 우승 트로피 말풍선이 상단바(z-index 40)에 가려지던 문제 → 트로피 말풍선은 아래쪽으로 뜨게 (css .trophy.tip::after top)
+156. [ver 1.1] 올해 열리지 않는 일정·대회는 반투명 + '올해 없음 · 2015년부터' 표시, 연도(또는 1부 팀 수)가 맞아 열리면 원래대로: First Stand(2025~), Road to MSI·MSI(2015~), 플레이인(1부 10팀일 때만). [시즌 일정] 표, [대회 일정] 올해 우승 표·First Stand/Road to MSI/MSI 대진표 카드·대회 안내 표. js/main.js scheduleOffReason·offTagHTML, js/league_pages.js offBracketHTML, js/records_pages.js, css .off·.off-tag
 
 ## 파일 구성
 

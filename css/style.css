@@ -196,6 +196,8 @@ button.primary:hover:not(:disabled) { background: linear-gradient(180deg, #63a0f
 .trophy-shelf { display: inline-flex; align-items: flex-end; gap: 10px; font-size: 13px; font-weight: normal; }
 .trophy { position: relative; display: inline-flex; align-items: flex-end; cursor: default; filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); }
 .trophy:hover { transform: translateY(-2px); }
+/* 우승컵 설명은 아래로 (위쪽은 상단바에 가려짐) */
+.trophy.tip:hover::after, .trophy.tip:focus::after { bottom: auto; top: calc(100% + 8px); z-index: 30; }
 .trophy-n { margin-left: 2px; color: var(--gold); font-weight: bold; font-size: 13px; line-height: 1; }
 
 /* 주간 기록 */
@@ -400,6 +402,11 @@ table.schedule td { padding: 9px 8px; border-bottom: 1px solid var(--border); ve
 table.schedule td:first-child { white-space: nowrap; color: var(--muted); width: 90px; }
 table.schedule tr.past { opacity: 0.45; }
 table.schedule tr.now { background: rgba(59, 130, 246, 0.15); }
+/* 올해 열리지 않는 일정·대회 (연도가 맞으면 원래대로) */
+table.schedule tr.off, table.mini tr.off, table.roster tr.off, .card.off, .off-wrap > .card { opacity: 0.35; }
+.off-wrap { position: relative; }
+.off-note { position: absolute; top: 14px; right: 18px; z-index: 1; }
+.off-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 9px; font-size: 11px; font-weight: normal; color: var(--muted); border: 1px dashed var(--muted); white-space: nowrap; }
 .now-tag { font-size: 11px; color: #fff; background: var(--accent); border-radius: 4px; padding: 1px 5px; }
 
 /* 리그 표 */

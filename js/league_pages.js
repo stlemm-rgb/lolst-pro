@@ -152,7 +152,8 @@ pages.tournament = function () {
   const season = seasonOf();
   const champ = season.champions;
   const champHTML = [["cup", "LCK 컵"], ["firststand", "First Stand 🌏"], ["msi", "MSI 🌏"], ["playoffs", "리그 (플레이오프)"], ["worlds", "월드 챔피언십 🌏"]].map(function (c) {
-    return "<tr><td>" + c[1] + "</td><td>" + (champ[c[0]] ? "🏆 " + teamLabel(champ[c[0]]) : '<span class="muted">미정</span>') + "</td></tr>";
+    const off = scheduleOffReason(c[0]); // 올해 안 열리는 대회는 반투명 (js/main.js)
+    return '<tr' + (off ? ' class="off"' : "") + "><td>" + c[1] + offTagHTML(off) + "</td><td>" + (champ[c[0]] ? "🏆 " + teamLabel(champ[c[0]]) : '<span class="muted">' + (off ? "-" : "미정") + "</span>") + "</td></tr>";
   }).join("");
 
   // 토너먼트 대회는 대진표, 승강전은 경기 목록
@@ -163,7 +164,8 @@ pages.tournament = function () {
 
   // Road to MSI: 계단식이라 경기 목록으로 (js/intl.js)
   const rtm = season.matches.filter(function (m) { return m.comp === "rtmsi"; });
-  const rtmHTML = '<div class="card"><h2>Road to MSI <span class="muted small">1·2라운드 상위 6팀 · 5판 3선승 · MSI 대표 2팀 결정</span></h2>' +
+  const rtmOff = scheduleOffReason("rtmsi");
+  const rtmHTML = '<div class="card' + (rtmOff ? " off" : "") + '"><h2>Road to MSI' + offTagHTML(rtmOff) + ' <span class="muted small">1·2라운드 상위 6팀 · 5판 3선승 · MSI 대표 2팀 결정</span></h2>' +
     (rtm.length ? '<table class="matches">' + rtm.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>" +
       (season.msiTeams ? '<p class="small">MSI 대표: 1번 시드 ' + teamLabel(season.msiTeams[0]) + " · 2번 시드 " + teamLabel(season.msiTeams[1]) + "</p>" : "")
       : '<p class="muted small">아직 대진이 정해지지 않았어요. (23·24주차)</p>') + "</div>";
@@ -175,12 +177,19 @@ pages.tournament = function () {
     "<h1>대회 일정</h1>" +
     '<div class="card"><h2>' + state.year + '년 우승</h2><table class="mini">' + champHTML + "</table>" +
       (bonus.length ? '<p class="small up">' + bonus.join(" · ") + "</p>" : "") + "</div>" +
-    TOURNAMENT_BRACKETS.slice(0, 2).map(bracketHTML).join("") + rtmHTML +
-    TOURNAMENT_BRACKETS.slice(2).map(bracketHTML).join("") +
+    TOURNAMENT_BRACKETS.slice(0, 2).map(offBracketHTML).join("") + rtmHTML +
+    TOURNAMENT_BRACKETS.slice(2).map(offBracketHTML).join("") +
     promoHTML + competitionGuideHTML() +
     '<p class="muted small">역대 우승 기록은 [역사관]에서 볼 수 있어요.</p>'
   );
 };
+
+// 올해 안 열리는 대회(First Stand·MSI)의 대진표는 반투명 + '올해 없음'
+function offBracketHTML(def) {
+  const off = scheduleOffReason(def.champKey);
+  const html = bracketHTML(def);
+  return off ? '<div class="off-wrap"><div class="off-note">' + offTagHTML(off) + "</div>" + html + "</div>" : html;
+}
 
 // ----- 토너먼트 대진표 -----
 // 대회마다 라운드(열) 목록. 아직 열리지 않은 경기는 "미정" 칸으로 보여 줌

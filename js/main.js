@@ -209,17 +209,27 @@ function masteryRowHTML(name, pos) {
   );
 }
 
+// 올해 열리지 않는 일정 (연도·1부 팀 수에 따라): 이유 글자, 열리면 "" — 일정·대회 일정 화면에서 반투명
+function scheduleOffReason(id) {
+  if (id === "first_stand" || id === "firststand") return firstStandOn(state.year) ? "" : ERA.firstStandFrom + "년부터";
+  if (id === "road_to_msi" || id === "msi" || id === "rtmsi") return msiOn(state.year) ? "" : ERA.msiFrom + "년부터";
+  if (id === "playin") return playinOn() ? "" : "1부 10팀일 때만";
+  return "";
+}
+function offTagHTML(reason) { return reason ? ' <span class="off-tag">올해 없음 · ' + reason + "</span>" : ""; }
+
 // ===== 시즌 일정 (52주 달력) =====
 pages.schedule = function () {
   const rows = SCHEDULE.map(function (s) {
+    const off = scheduleOffReason(s.id);
     const now = state.week >= s.from && state.week <= s.to;
     const weeks = s.from === s.to ? s.from + "주" : s.from + " ~ " + s.to + "주";
     const tag = s.international ? ' <span class="meta-tag">국제</span>' : s.empty ? ' <span class="muted small">(비어 있음)</span>' : "";
     const patch = MASTERY.patchWeeks.filter(function (w) { return w >= s.from && w <= s.to; }).length ? ' <span class="chip meta">패치</span>' : "";
     return (
-      '<tr class="' + (now ? "now" : "") + (state.week > s.to ? " past" : "") + '">' +
+      '<tr class="' + (now ? "now" : "") + (state.week > s.to ? " past" : "") + (off ? " off" : "") + '">' +
         "<td>" + weeks + "</td>" +
-        "<td><b>" + s.name + "</b>" + tag + patch + (now ? ' <span class="now-tag">지금</span>' : "") + "</td>" +
+        "<td><b>" + s.name + "</b>" + tag + patch + (now ? ' <span class="now-tag">지금</span>' : "") + offTagHTML(off) + "</td>" +
         '<td class="muted">' + s.desc + "</td>" +
       "</tr>"
     );
