@@ -1,7 +1,7 @@
 // ===== 은퇴·세대교체 (122) — 값: data/league.js LEAGUE.veterans · RETIRE_RULES, 글: data/retire_stories.js =====
 // 1) 새 게임에 나이 많은 선수 섞기 (addVeterans, js/league.js makeLeague)
 // 2) 은퇴도 이적 목록에 (logRetire, js/league.js retirePlayer) — 메타 적응 은퇴는 '메타 적응 불가' 표시
-// 3) 비시즌 이적 시장 중간(50주): 1부 선수 1명 '메타 적응이 힘들다' 은퇴 기사 (1년 1번)
+// 3) 비시즌 이적 시장 중간(50주): 1부 선수 1명 '메타 적응이 힘들다' 은퇴 기사 (1년 1번, 1부 주전 평균보다 잘하는 선수만, 이름 옆에 종합 능력)
 // 4) 은퇴 전주(51주): 관계 25 이상 선수가 있으면 20% 확률로 은퇴 상담 연락 → 효과 counsel: retire / stay / coach
 // 5) 은퇴한 친구가 우리 팀 코치 → 2년 뒤 감독 (state.friends.coach)
 
@@ -51,11 +51,12 @@ function retirementWeekly() {
 function metaRetire() {
   const P = state.league.players;
   const list = [];
+  const avg = domesticBase(); // 1부 주전 평균 — 이보다 잘하는 선수만 기사로 (v1.1: 하위 선수 은퇴는 뉴스로 안 냄)
   state.league.teams.forEach(function (t) {
     if (t.tier !== 1) return;
     t.roster.forEach(function (id) {
       const p = P[id];
-      if (id === USER_ID || !p || p.retireNow) return;
+      if (id === USER_ID || !p || p.retireNow || playerScore(id) <= avg) return;
       list.push({ id: id, w: (100 - (p.stats.adapt || 50)) + Math.max(0, p.age - 20) * 4 }); // 적응력 낮고 나이 많을수록
     });
   });
@@ -63,12 +64,13 @@ function metaRetire() {
   list.sort(function (a, b) { return b.w - a.w; });
   const p = P[pick(list.slice(0, 6)).id];
   const team = findTeam(p.teamId);
-  const ctx = { player: p.name, pteam: team ? team.name : "FA", pos: findPosition(p.pos).name, age: p.age };
+  const score = playerScore(p.id).toFixed(1); // 은퇴 처리(선수 삭제) 전에 기록
+  const ctx = { player: p.name + "(" + score + ")", pteam: team ? team.name : "FA", pos: findPosition(p.pos).name, age: p.age }; // 이름(종합 능력) 예: Jar(77.2)
   const ints = typeof META_RETIRE_INTERVIEWS !== "undefined" ? META_RETIRE_INTERVIEWS : [];
   ctx.interview = ints.length ? fillText(pick(ints), ctx) : "요즘 메타를 따라가기가 너무 힘들어요. 여기까지인 것 같습니다.";
   p.retireTag = "meta";
   retirePlayer(p); // 자리는 신인이 채움 (js/league.js)
-  addNews("은퇴", ctx.pteam + "의 " + ctx.pos + " " + ctx.player + "(" + ctx.age + "세)이(가) 개인 방송에서 은퇴를 발표했다. \"" + ctx.interview + "\"");
+  addNews("은퇴", ctx.pteam + "의 " + ctx.pos + " " + p.name + "(" + score + ", " + ctx.age + "세)이(가) 개인 방송에서 은퇴를 발표했다. \"" + ctx.interview + "\"");
   if (typeof NEWS_ARTICLES !== "undefined" && NEWS_ARTICLES.meta_retire) queueHeadline("meta_retire", "any", ctx);
 }
 
