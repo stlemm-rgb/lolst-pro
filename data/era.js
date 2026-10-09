@@ -53,7 +53,7 @@ const WORLD_STORY = {
 //   returnHome: 해외에 간 지 minYears년 넘은 한국 출신 선수가 chance 확률로 국내 FA로 돌아옴 (국내 구단들이 이어서 영입). 한 해 최대 perYear명
 const WORLD_MOVES = {
   foreignMax: 1,
-  import: { chance: 0.2, margin: 3, maxAge: 28, feeMult: 1.2, perYear: 3 },
+  import: { chance: 0.2, margin: 3, maxAge: 28, feeMult: 1.2, perYear: 3, protectTop: 5 }, // protectTop: 지역마다 종합 능력 상위 n명(간판 스타)은 데려갈 수 없음
   faAbroad: { chance: 0.5, below: 2, maxAge: 29, perYear: 4 },
   returnHome: { minYears: 2, chance: 0.3, perYear: 2 },
 };

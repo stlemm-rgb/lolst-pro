@@ -152,11 +152,26 @@ function foreignReturnMoves(news) {
   });
 }
 
+// 지역마다 종합 능력 상위 n명 (간판 스타) → { 선수 id: true }
+function regionFranchiseStars(n) {
+  const out = {};
+  if (!state.world || !n) return out;
+  activeRegions().forEach(function (r) {
+    const list = [];
+    state.world.teams.filter(function (t) { return t.region === r.id; }).forEach(function (t) {
+      t.roster.forEach(function (id) { const p = worldPlayer(id); if (p) list.push(p); });
+    });
+    list.sort(function (a, b) { return worldScore(b) - worldScore(a); }).slice(0, n).forEach(function (p) { out[p.id] = true; });
+  });
+  return out;
+}
+
 // 2) 국내 구단의 해외 선수 영입 — 국내 보강 라운드 전에 (외국인이 없는 팀만)
 function importMoves(moved, news) {
   const R = WORLD_MOVES.import;
   if (!state.world) return;
   let n = 0;
+  const stars = regionFranchiseStars(R.protectTop); // 지역 간판 스타는 안 옴
   shuffled(state.league.teams.slice()).forEach(function (t) {
     if (n >= R.perYear || !foreignRoom(t.id) || Math.random() >= R.chance) return;
     const pos = weakPositions(t)[0];
@@ -165,7 +180,7 @@ function importMoves(moved, news) {
     const base = starter ? playerScore(starter) : 0;
     const salaryOf = function (w) { return Math.max(minSalaryNow(contractYear()), Math.round(salaryFor(worldScore(w), t.tier, 0) / 1000000) * 1000000); };
     const best = Object.keys(state.world.players).map(function (wid) { return state.world.players[wid]; }).filter(function (w) {
-      return w.pos === pos && originOf(w) !== HOME_ORIGIN.id && w.age <= R.maxAge && worldScore(w) >= base + R.margin;
+      return w.pos === pos && originOf(w) !== HOME_ORIGIN.id && w.age <= R.maxAge && worldScore(w) >= base + R.margin && !stars[w.id];
     }).map(function (w) {
       return { w: w, fee: Math.round(salaryFor(worldScore(w), 1, 0) * R.feeMult / 1000000) * 1000000, salary: salaryOf(w) };
     }).filter(function (c) {
