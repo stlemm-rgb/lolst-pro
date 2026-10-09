@@ -115,6 +115,8 @@ function weekAdvice() {
     list.push({ text: "이번 주가 끝나면 솔로 랭크가 초기화돼요. 지금 리그 " + r + "위" + (r <= 3 ? " — 1위면 👑 칭호(경기력 +3%)!" : "."),
       label: state.plan === "solo_rank" ? "솔로 랭크 선택됨" : "솔로 랭크로 선택", act: { plan: "solo_rank" } });
   }
+  // 2-2) 월드 우승 스킨 챔피언 고르기 (js/collection.js)
+  if (typeof pendingSkins === "function" && pendingSkins().length) list.push({ text: "🎨 월드 우승 스킨으로 만들 챔피언을 골라 주세요.", label: "컬렉션 열기", act: { go: "collection" } });
   // 3) 답하지 않은 연락
   const waiting = state.inbox.filter(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; }).length;
   if (waiting) list.push({ text: "답하지 않은 연락이 " + waiting + "개 있어요. 4주가 지나면 그냥 지나가요.", label: "SNS 열기", act: { sns: true } });

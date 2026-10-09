@@ -13,11 +13,24 @@ function fameTier(pop) {
 }
 function fameTierIndex(pop) { return FAME.tiers.indexOf(fameTier(pop)); }
 
-function repTier(rep) {
+function rawRepTier(rep) {
   const r = rep === undefined ? state.reputation : rep;
   let t = REP_TIERS[0];
   REP_TIERS.forEach(function (x) { if (r >= x.min) t = x; });
   return t;
+}
+// 지금 평판 등급. 등급이 오르면 REPUTATION.holdWeeks주 동안은 평판이 떨어져도 등급 유지 (하락 유예, state.fame.repHold)
+function repTier(rep) {
+  if (rep !== undefined) return rawRepTier(rep);
+  const raw = rawRepTier();
+  const h = repHoldLeft() > 0 ? REP_TIERS[state.fame.repHold.idx] : null;
+  return h && REP_TIERS.indexOf(h) > REP_TIERS.indexOf(raw) ? h : raw;
+}
+// 하락 유예 남은 주 (0이면 없음)
+function repHoldLeft() {
+  const h = state.fame && state.fame.repHold;
+  if (!h) return 0;
+  return Math.max(0, h.until - absWeek(state.year, state.week) + 1);
 }
 
 // 감독 신뢰: 2군행 판정에서 경쟁 선수와 점수 차이에 더하는 값
@@ -39,9 +52,12 @@ function fameLineHTML() {
   const nextF = FAME.tiers[FAME.tiers.indexOf(f) + 1];
   const tipF = "스타 등급 (인기도로 정해짐). " + (nextF ? "인기도 " + nextF.min + "이면 " + nextF.icon + " " + nextF.name + "." : "최고 등급!") +
     " 등급이 오르면 광고·개인 스폰서 제의가 와요. 경기에 안 나오는 주에는 인기도가 조금씩 줄어요.";
-  const tipR = "평판 등급. 감독 신뢰 " + (r.trust > 0 ? "+" : "") + r.trust + " (주전 경쟁에서 이만큼 유리/불리). 등급에 따라 오는 연락이 달라요. 평판은 시간이 지나면 천천히 0 쪽으로 돌아와요.";
+  const held = REP_TIERS.indexOf(r) > REP_TIERS.indexOf(rawRepTier());
+  const tipR = "평판 등급. 감독 신뢰 " + (r.trust > 0 ? "+" : "") + r.trust + " (주전 경쟁에서 이만큼 유리/불리). 등급에 따라 오는 연락이 달라요. 평판은 시간이 지나면 천천히 0 쪽으로 돌아와요." +
+    " 등급이 오르면 " + REPUTATION.holdWeeks + "주(1개월) 동안은 평판이 떨어져도 등급이 내려가지 않아요." +
+    (repHoldLeft() > 0 ? " 🛡️ 지금 하락 유예 " + repHoldLeft() + "주 남음" + (held ? " (평판으로는 '" + rawRepTier().name + "' 수준)" : "") + "." : "");
   return '<div class="sum-sub fame-line"><span class="tip" tabindex="0" data-tip="' + escapeHTML(tipF) + '">' + f.icon + " " + f.name + " · 팬 " + peopleText(fansCount()) + "</span> · " +
-    '<span class="tip" tabindex="0" data-tip="' + escapeHTML(tipR) + '">' + r.icon + " " + r.name + "</span></div>";
+    '<span class="tip" tabindex="0" data-tip="' + escapeHTML(tipR) + '">' + r.icon + " " + r.name + (held ? " 🛡️" + repHoldLeft() + "주" : "") + "</span></div>";
 }
 
 // 매주 (main.js nextWeek, 활동 효과 다음)
@@ -79,9 +95,14 @@ function checkFameTiers() {
   }
   if (ri !== F.repTier) {
     const r = REP_TIERS[ri];
-    addNews("평판", r.icon + " 평판 등급이 '" + r.name + "'(으)로 " + (ri > F.repTier ? "올랐다" : "떨어졌다") + ". 감독 신뢰 " + (r.trust > 0 ? "+" : "") + r.trust + ".");
+    const up = ri > F.repTier;
+    // 등급이 오르면 하락 유예: 이번 주 + 앞으로 holdWeeks주 동안 등급 유지
+    if (up) F.repHold = { idx: ri, until: absWeek(state.year, state.week) + REPUTATION.holdWeeks };
+    addNews("평판", r.icon + " 평판 등급이 '" + r.name + "'(으)로 " + (up ? "올랐다" : "떨어졌다") + ". 감독 신뢰 " + (r.trust > 0 ? "+" : "") + r.trust + "." +
+      (up ? " 🛡️ " + REPUTATION.holdWeeks + "주 동안은 평판이 조금 떨어져도 등급 유지." : ""));
     F.repTier = ri;
   }
+  if (F.repHold && repHoldLeft() <= 0) delete F.repHold;
 }
 
 // 커리어 평균 평판 → 엔딩 '인성 점수' (js/retire.js careerSummary)

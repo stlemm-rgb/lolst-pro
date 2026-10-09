@@ -30,6 +30,8 @@ const REP_TIERS = [
 const REPUTATION = {
   // 평판 제자리 찾기: 매주 평판 × driftPerWeek 만큼 0 쪽으로 (50이면 주 −0.3, 1년 약 −13)
   driftPerWeek: 0.006,
+  // 등급이 오르면 이만큼(주) 동안 평판이 떨어져도 등급이 안 내려감 (하락 유예, 1개월)
+  holdWeeks: 4,
   // 엔딩 커리어 점수: 커리어 평균 평판 ÷ endingDiv (최대 ±endingMax) — '인성 점수'
   endingDiv: 4,
   endingMax: 25,

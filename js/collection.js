@@ -1,23 +1,32 @@
 // ===== 수집·강화 (값: data/collection.js) =====
-// 1) 🏆 월드 우승 스킨: 월드 결승 우승 세트에서 우승 팀이 쓴 챔피언 → state.league.worldsSkins (모든 해 기록)
-//    내 선수가 뛰었으면 내 스킨 → 그 챔피언 경기력 +2% (js/champions.js champPower)
+// 1) 🏆 월드 우승 스킨: 월드 결승(모든 세트)에서 우승 팀 선수가 쓴 챔피언 중 하나 → state.league.worldsSkins (모든 해 기록)
+//    다른 선수는 결승에서 쓴 챔피언 중 무작위, 내 선수는 [컬렉션]에서 직접 고름 (고르기 전 champ null, choices 후보)
+//    내 스킨 → 그 챔피언 경기력 +2% (js/champions.js champPower)
 // 2) ✒️ 시그니처 픽 성장: 시그니처로 뛴 세트마다 경험치 → ★1~★5 (state.sigGrowth = { xp, sets, wins })
 // 3) 🏅 업적 도감: 매주 확인해서 이룬 업적 기록 (보상 없음, state.achievements = { id: { y, w } })
 // 화면: [수집] 업적 도감 (pages.achievements) · 컬렉션 (pages.collection)
 
 // ----- 1) 월드 우승 스킨 -----
-// 월드 결승이 끝나면 (js/matchsim.js koFinal) — f.finalPicks는 playMatch가 세트마다 덮어쓴 마지막(우승) 세트 픽
+// 월드 결승이 끝나면 (js/matchsim.js koFinal) — f.finalSets: playMatch가 남긴 세트별 픽 (예전 세이브 진행 중이면 f.finalPicks 1세트)
 function recordWorldsSkins(f) {
-  const fp = f.finalPicks;
-  delete f.finalPicks;
-  if (!fp) return;
+  const sets = f.finalSets || (f.finalPicks ? [f.finalPicks] : []);
+  delete f.finalSets; delete f.finalPicks;
+  if (!sets.length) return;
   const side = f.winner === f.a ? "a" : "b";
-  const picks = fp[side], ids = fp[side === "a" ? "la" : "lb"];
+  const idKey = side === "a" ? "la" : "lb";
+  const last = sets[sets.length - 1];
   const entry = {
     year: state.year, teamId: f.winner, team: teamName(f.winner),
     players: POSITION_IDS.map(function (pos, i) {
-      const id = ids[i] || null;
-      return { pos: pos, id: id, name: id ? playerName(id) : null, champ: picks[i] };
+      const id = last[idKey][i] || null;
+      // 이 선수가 결승에서 쓴 챔피언 (같은 자리에서 뛴 세트만, 없으면 그 자리 전부)
+      let champs = [];
+      sets.forEach(function (st) { if (st[idKey][i] === id && st[side][i] && champs.indexOf(st[side][i]) === -1) champs.push(st[side][i]); });
+      if (!champs.length) sets.forEach(function (st) { if (st[side][i] && champs.indexOf(st[side][i]) === -1) champs.push(st[side][i]); });
+      const row = { pos: pos, id: id, name: id ? playerName(id) : null, champ: null };
+      if (id === USER_ID && champs.length > 1) row.choices = champs; // 내 선수: 직접 고르기
+      else row.champ = champs.length ? champs[Math.floor(Math.random() * champs.length)] : null;
+      return row;
     }),
   };
   if (!state.league.worldsSkins) state.league.worldsSkins = [];
@@ -25,13 +34,38 @@ function recordWorldsSkins(f) {
   const me = entry.players.find(function (p) { return p.id === USER_ID; });
   if (me) {
     state.popularity = clamp(state.popularity + WORLDS_SKIN.popularity);
-    addMoment("🎨", state.year + " 월드 우승 스킨 '" + skinName(entry, me.champ) + "'");
-    queueTrigger("skinMade", { champ: me.champ }); // 스킨 디자인 연락 (js/stories.js)
-    postMessage("news", "🎨 월드 우승 스킨 제작 확정", state.year + " 월드 챔피언십 우승을 기념해 " + entry.team + " 선수들의 우승 스킨이 만들어진다.\n" +
-      state.player.name + "의 스킨은 결승 마지막 세트에서 쓴 " + me.champ + ".", {
-      notes: ["🎨 " + me.champ + "을(를) 고르면 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "% (스킨 효과)", "인기도 +" + WORLDS_SKIN.popularity, "[수집] → 컬렉션에서 볼 수 있어요."],
+    if (me.champ) skinChosen(entry, me, true);
+    else postMessage("news", "🎨 월드 우승 스킨 — 챔피언을 골라 주세요", state.year + " 월드 챔피언십 우승을 기념해 " + entry.team + " 선수들의 우승 스킨이 만들어진다.\n" +
+      state.player.name + "의 스킨은 결승에서 쓴 챔피언 중에서 직접 고를 수 있다: " + me.choices.join(", ") + ".", {
+      notes: ["[수집] → 컬렉션에서 고르기", "인기도 +" + WORLDS_SKIN.popularity, "고른 챔피언은 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "% (스킨 효과)"],
     });
   }
+}
+
+// 고르기 전인 내 우승 스킨 (컬렉션·이번 주 추천)
+function pendingSkins() {
+  return ((state.league && state.league.worldsSkins) || []).filter(function (e) {
+    return e.players.some(function (p) { return p.id === USER_ID && !p.champ && p.choices; });
+  });
+}
+// 컬렉션 화면에서 고름
+function chooseSkin(year, champ) {
+  const e = ((state.league && state.league.worldsSkins) || []).find(function (x) { return x.year === year; });
+  const me = e && e.players.find(function (p) { return p.id === USER_ID; });
+  if (!me || me.champ || !me.choices || me.choices.indexOf(champ) === -1) return;
+  me.champ = champ;
+  delete me.choices;
+  skinChosen(e, me, false);
+  state.notice = "🎨 " + escapeHTML(skinName(e, champ)) + " 스킨으로 정했어요! " + escapeHTML(champ) + "을(를) 고르면 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "%.";
+}
+// 내 스킨이 정해졌을 때: 주요 순간 · 디자인 회의 연락 · 소식
+function skinChosen(entry, me, auto) {
+  addMoment("🎨", entry.year + " 월드 우승 스킨 '" + skinName(entry, me.champ) + "'");
+  queueTrigger("skinMade", { champ: me.champ }); // 스킨 디자인 연락 (js/stories.js)
+  postMessage("news", "🎨 월드 우승 스킨 제작 확정", entry.year + " 월드 챔피언십 우승을 기념해 " + entry.team + " 선수들의 우승 스킨이 만들어진다.\n" +
+    state.player.name + "의 스킨은 " + (auto ? "결승에서 쓴 " : "직접 고른 ") + me.champ + ".", {
+    notes: ["🎨 " + me.champ + "을(를) 고르면 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "% (스킨 효과)", "[수집] → 컬렉션에서 볼 수 있어요."],
+  });
 }
 
 function skinName(entry, champ) { return entry.year + " " + entry.team + " " + champ; }
@@ -40,7 +74,7 @@ function skinName(entry, champ) { return entry.year + " " + entry.team + " " + c
 function mySkins() {
   const list = [];
   ((state.league && state.league.worldsSkins) || []).forEach(function (e) {
-    e.players.forEach(function (p) { if (p.id === USER_ID) list.push({ year: e.year, team: e.team, champ: p.champ }); });
+    e.players.forEach(function (p) { if (p.id === USER_ID && p.champ) list.push({ year: e.year, team: e.team, champ: p.champ }); });
   });
   return list;
 }
@@ -198,23 +232,32 @@ pages.collection = function () {
       '<table class="mini"><tr><th>단계</th><th class="r">경험치</th><th class="r">고를 때 가치</th><th class="r">경기력</th><th class="r">상대 선밴</th></tr>' + rows + "</table>" +
       '<p class="muted small">별이 오를수록 강해지지만 상대도 더 자주 먼저 밴해요. 고른 세트에서는 좋은 장면 1번 보장 · 대격변 패치에도 그대로.</p></div>';
   }
+  // 고르기 전인 우승 스킨: 결승에서 쓴 챔피언 중 하나를 고름
+  const pickCard = pendingSkins().map(function (e) {
+    const me = e.players.find(function (p) { return p.id === USER_ID; });
+    return '<div class="card skin-pick"><h2>🎨 ' + e.year + " 월드 우승 스킨 — 챔피언 고르기</h2>" +
+      '<p class="muted small">' + escapeHTML(e.team) + " 우승! 결승에서 내가 쓴 챔피언 중 하나를 골라 우승 스킨으로 만들어요. 고른 챔피언은 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "%.</p>" +
+      '<div class="skin-list">' + me.choices.map(function (c) {
+        return '<button class="skin-card skin-choice" data-skin-year="' + e.year + '" data-skin-champ="' + escapeHTML(c) + '"><div class="skin-year">' + e.year + '</div><div class="skin-champ">' + escapeHTML(c) + '</div><div class="muted small">' + Math.round(state.mastery[c] || 0) + " 숙련도</div></button>";
+      }).join("") + "</div></div>";
+  }).join("");
   // 내 우승 스킨
   const mine = mySkins();
   const skinCard = '<div class="card"><h2>🎨 내 월드 우승 스킨 <span class="muted small">' + mine.length + "개</span></h2>" +
     (mine.length ? '<div class="skin-list">' + mine.map(function (s) {
       return '<div class="skin-card"><div class="skin-year">' + s.year + '</div><div class="skin-champ">' + escapeHTML(s.champ) + '</div><div class="muted small">' + escapeHTML(s.team) + "</div></div>";
     }).join("") + "</div>" + '<p class="muted small">스킨이 있는 챔피언을 고르면 경기력 +' + Math.round(WORLDS_SKIN.powerBonus * 100) + "%.</p>"
-      : '<p class="muted">월드 챔피언십 결승에서 우승하면, 우승 세트에서 쓴 챔피언으로 우승 스킨이 만들어져요.</p>') + "</div>";
+      : '<p class="muted">월드 챔피언십 결승에서 우승하면, 결승에서 쓴 챔피언 중 하나를 직접 골라 우승 스킨을 만들어요.</p>') + "</div>";
   // 역대 월드 우승 스킨
   const all = ((state.league && state.league.worldsSkins) || []).slice().reverse();
   const hist = all.map(function (e) {
     const me = e.players.some(function (p) { return p.id === USER_ID; });
     return "<tr" + (me ? ' class="me"' : "") + "><td>" + e.year + "</td><td><b>" + escapeHTML(e.team) + "</b></td>" + e.players.map(function (p) {
-      return "<td>" + escapeHTML(p.champ) + (p.name ? '<div class="muted small">' + escapeHTML(p.name) + "</div>" : "") + "</td>";
+      return "<td>" + (p.champ ? escapeHTML(p.champ) : '<span class="muted">고르는 중…</span>') + (p.name ? '<div class="muted small">' + escapeHTML(p.name) + "</div>" : "") + "</td>";
     }).join("") + "</tr>";
   }).join("");
   const histCard = '<div class="card"><h2>🌍 역대 월드 우승 스킨</h2>' +
     (hist ? '<div class="table-wrap"><table class="roster tlog"><tr><th>연도</th><th>팀</th>' + POSITION_IDS.map(function (pos) { return "<th>" + findPosition(pos).name + "</th>"; }).join("") + "</tr>" + hist + "</table></div>"
       : '<p class="muted">아직 기록이 없어요. 월드 챔피언십 결승이 끝나면 우승 팀의 스킨이 여기에 남아요.</p>') + "</div>";
-  return "<h1>컬렉션</h1>" + '<div class="grid">' + sigCard + skinCard + "</div>" + histCard;
+  return "<h1>컬렉션</h1>" + pickCard + '<div class="grid">' + sigCard + skinCard + "</div>" + histCard;
 };

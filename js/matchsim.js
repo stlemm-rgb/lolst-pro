@@ -319,8 +319,11 @@ function playMatch(m) {
     set.comps.a.picks.concat(set.comps.b.picks).forEach(function (n) { if (seriesUsed.indexOf(n) === -1) seriesUsed.push(n); });
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
-    // 월드 결승: 마지막(우승) 세트 픽을 남김 → 우승 스킨 (js/collection.js recordWorldsSkins)
-    if (m.label === "월드 결승") m.finalPicks = { a: set.comps.a.picks.slice(), b: set.comps.b.picks.slice(), la: set.la.map(function (p) { return p.id; }), lb: set.lb.map(function (p) { return p.id; }) };
+    // 월드 결승: 세트마다 픽을 남김 → 우승 스킨 후보 (js/collection.js recordWorldsSkins)
+    if (m.label === "월드 결승") {
+      if (!m.finalSets) m.finalSets = [];
+      m.finalSets.push({ a: set.comps.a.picks.slice(), b: set.comps.b.picks.slice(), la: set.la.map(function (p) { return p.id; }), lb: set.lb.map(function (p) { return p.id; }) });
+    }
     // 시그니처 픽 성장 (js/collection.js)
     if (userIn && state.signature && userCtx.pick === state.signature) sigGrowthOnSet(set.winner === mine.id);
     if (userIn) {

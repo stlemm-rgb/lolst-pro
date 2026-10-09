@@ -630,6 +630,13 @@ function renderPage() {
   page.querySelectorAll("[data-ctab]").forEach(function (btn) {
     btn.onclick = function () { championTab = btn.getAttribute("data-ctab"); renderPage(); };
   });
+  page.querySelectorAll("[data-skin-champ]").forEach(function (btn) {
+    btn.onclick = function () { // 월드 우승 스킨 챔피언 고르기 (js/collection.js)
+      chooseSkin(Number(btn.getAttribute("data-skin-year")), btn.getAttribute("data-skin-champ"));
+      if (state.settings.autoSave) saveGame();
+      renderPage();
+    };
+  });
 }
 
 // ===== 다음 주로 진행 =====
