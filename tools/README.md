@@ -49,3 +49,7 @@ python3 tools/measure_seasons.py --seasons 3 --answer random
 ## 월즈 특집 회귀 검사
 
 `node tools/test_worlds_news.cjs` — 41주 예고/42주 개막, 개최 후보, 실제 MVP·전년도 우승/장면, 저장 후 고정, 중복 방지, 과거 기록 없는 세이브를 검사한다. Node VM 기반이며 브라우저 화면 검사는 별도다.
+
+## 리그 성장 뉴스·팬 배율 회귀 검사
+
+`node tools/test_league_growth.cjs` — 인기도/우승 팬 단일 배율, 감소량·1억 이후 완화, 옛 저장 팬 수, 투자 기사 무입금, 2014·2016 실제 새해 통합 기사를 검사한다. 2012년부터 각각 진행하므로 단위 검사보다 시간이 걸린다. Node VM 기반이며 화면 배치는 별도 확인.

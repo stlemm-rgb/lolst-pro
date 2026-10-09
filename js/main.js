@@ -808,6 +808,7 @@ function nextWeek(restWeek) {
       if (!tag || ARTICLE_TAGS.indexOf(tag) !== -1) { article.push(tag ? text : "⬆️ " + text); return; } // 승강(태그 없음)도 기사로
       addNews(tag ? NEWS_TAGS[tag] : "승강", tag ? text.slice(tag.length).trim() : text);
     });
+    Array.prototype.push.apply(article, leagueGrowthNews()); // 규모 확대·인기·투자 소식도 한 기사로
     if (article.length) newYearArticle(article);
   }
 

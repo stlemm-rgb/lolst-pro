@@ -124,3 +124,14 @@ const WORLD_NICK_PARTS = {
   tail: ["fox", "wolf", "blade", "fang", "hawk", "byte", "king", "lord", "storm", "shot", "zero", "ace", "mind", "heart", "flame",
          "rider", "smith", "jin", "kai", "max", "rex", "boy", "x", "one", "z", "ray", "dash", "nix", "lee", "won"],
 };
+
+// 리그 확대에 따른 신규 팬 유입. 확장 단계마다 +10%p, 반복 곱셈하지 않는다.
+// ERA.popularity(인기도 획득 속도)와 별개로 계산 완료된 양수 팬 증가분에 한 번 적용.
+const LEAGUE_GROWTH = {
+  fansPerExpansion: 0.10,
+  popularity: "📈 더 커진 프로 무대 — 1부 {t1}팀·2부 {t2}팀으로 확대되면서 게임과 리그에 대한 관심이 높아지고 있다. 신규 팬 유입 배율은 {before}배에서 {after}배로 오른다. 경기 활약과 우승으로 늘어나는 팬에게 적용된다.",
+  investment: [
+    "💼 기업과 방송사가 커진 리그의 구단 후원에 관심을 보이고 있다. 중동의 자산가와 투자자들도 유망 구단과의 협력을 검토하며 스폰서 시장에 눈길을 돌리고 있다.",
+    "💼 넓어진 선수층과 팬 시장을 보고 기업의 구단 후원 문의와 방송사의 콘텐츠 협력 논의가 이어진다. 중동 투자자들까지 관심을 보이며 프로 무대를 둘러싼 투자 열기가 커지고 있다.",
+  ],
+};

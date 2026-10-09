@@ -58,7 +58,9 @@ function fansDamp() {
 }
 function addFans(n) {
   fansCount();
-  state.fame.fans = Math.max(baseFans(), state.fame.fans + n);
+  // 모든 신규 팬 증가 경로에 한 번만 적용. 감소량·기존 팬 수·1억 이후 완화는 유지.
+  const gain = n > 0 ? n * leagueFanMultiplier() : n;
+  state.fame.fans = Math.max(baseFans(), state.fame.fans + gain);
 }
 // 인기도 바꾸기 (모든 인기도 변화는 여기로): 100에서 막혀도 오른 만큼 팬은 늘어남
 function addPopularity(v) {
@@ -119,7 +121,8 @@ function fameLineHTML() {
   const nextF = FAME.tiers[FAME.tiers.indexOf(f) + 1];
   const tipF = "스타 등급 (인기도로 정해짐). " + (nextF ? "인기도 " + nextF.min + "이면 " + nextF.icon + " " + nextF.name + "." : "최고 등급!") +
     " 등급이 오르면 광고·개인 스폰서 제의가 와요. 경기에 안 나오는 주에는 인기도가 조금씩 줄어요." +
-    " 팬 수는 인기도가 오를 때마다 늘어요 (인기도 100이어도 계속). 팬이 많을수록 더 빨리 늘고, 우승하면 크게(월드 > MSI > 리그) 늘어요. 1억 명부터는 천천히.";
+    " 팬 수는 인기도가 오를 때마다 늘어요 (인기도 100이어도 계속). 팬이 많을수록 더 빨리 늘고, 우승하면 크게(월드 > MSI > 리그) 늘어요. 1억 명부터는 천천히." +
+    " 리그 규모에 따른 신규 팬 유입은 " + leagueFanMultiplier().toFixed(1) + "배예요 (우승 팬 포함, 기존 팬 수와 감소량에는 미적용).";
   const held = REP_TIERS.indexOf(r) > REP_TIERS.indexOf(rawRepTier());
   const tipR = "평판 등급. 감독 신뢰 " + (r.trust > 0 ? "+" : "") + r.trust + " (주전 경쟁에서 이만큼 유리/불리). 등급에 따라 오는 연락이 달라요. 평판은 시간이 지나면 천천히 0 쪽으로 돌아와요." +
     " 등급이 오르면 " + REPUTATION.holdWeeks + "주(1개월) 동안은 평판이 떨어져도 등급이 내려가지 않아요." +

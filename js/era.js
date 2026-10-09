@@ -406,3 +406,24 @@ pages.world = function () {
       (future.length ? '<p class="muted small">앞으로 참가할 지역: ' + future.map(function (r) { return r.name + "(" + r.from + ")"; }).join(", ") + "</p>" : "") +
       '<p class="muted small">MSI ' + ERA.msiFrom + "년부터 · First Stand " + ERA.firstStandFrom + "년부터</p></div>" + cards;
 };
+
+// 현재 연도에 도달한 국내 리그 확장 단계. 세이브에 배율을 누적하지 않는다.
+function leagueExpansionCount(year) {
+  const y = eraYear(year);
+  return ERA.teams.reduce(function (n, row, i) {
+    if (!i || row[0] > y) return n;
+    const prev = ERA.teams[i - 1];
+    return n + (row[1] + row[2] > prev[1] + prev[2] ? 1 : 0);
+  }, 0);
+}
+function leagueFanMultiplier(year) {
+  return 1 + leagueExpansionCount(year) * LEAGUE_GROWTH.fansPerExpansion;
+}
+// 새해 종합 기사에 합친다. 경제 정산이나 팬 수 변경은 이 함수가 하지 않는다.
+function leagueGrowthNews() {
+  const now = eraTeams(), prev = eraTeams(state.year - 1);
+  if (now[1] + now[2] <= prev[1] + prev[2]) return [];
+  const vars = { t1: now[1], t2: now[2], before: leagueFanMultiplier(state.year - 1).toFixed(1), after: leagueFanMultiplier().toFixed(1) };
+  const texts = LEAGUE_GROWTH.investment;
+  return [fillNews(LEAGUE_GROWTH.popularity, vars), texts[(leagueExpansionCount() - 1) % texts.length]];
+}
