@@ -100,3 +100,19 @@
 | `CAREER.aging*` | 27세부터 | 내 선수 노화 |
 | `MASTERY.metaKeep` / `metaKeepMine` | 0.25 / 0.5 | 패치 때 메타 챔피언이 남을 확률 / 내 숙련도 1위가 메타였으면 |
 | `MASTERY.*` | data/champions.js | 숙련도 성장 |
+
+## 8. 강팀 쏠림 막기 (134, ver 1.1) — data/dynasty.js
+
+| 경로 | 지금 값 | 뜻 |
+|---|---|---|
+| `DYNASTY.raise` | 월드 0.35 · MSI 0.15 · 리그 0.2 · FS 0.1 · 컵 0.05 | 우승 팀 주전 새 시즌 연봉 인상 (더함) |
+| `DYNASTY.perS` / `max` | 0.1 / 0.8 | S급 1개당 추가 / 최대 인상 |
+| `DYNASTY.leave` / `leavePerS` / `maxLeave` | 0.12 / 0.05 / 2 | FA 선언 확률 / 팀당 최대 (구단 여유 < 0이면 협상 결렬) |
+| `ABROAD.base` / `perS` / `champ` / `max` | 0.04 / 0.06 / 0.08 / 0.35 | 해외 진출 확률 |
+| `ABROAD.perYear` / `perTeam` / `maxAge` | 3 / 1 / 29 | 한 해·팀당 최대, 나이 |
+| `SCOUTED.power` | 0.03 | 지난 월드 우승 팀 다음 시즌 경기력 − |
+| `PRIZE_SHARE.share` | 0.5 | 상금 중 선수단 몫 |
+| `DECOY.perS` | 0.25 | 견제받는 선수의 미끼 장면(도주·생존·존야…) 배율 S급당 |
+| `FOCUS_RULES` (data/match.js) | userPerS 0.15 · userMin 0.35 · matePerS 0.06 | 집중 견제 — 이제 다른 선수도 받음 |
+
+측정 기준 (유망주 2부 2012 시작, 10시즌 × 씨앗 11·22·33): 한 선수 S급 최대 3~6, 같은 국내 팀 월드 최다 2회, 1위 구단 자금 16~20억, 10년 FA 선언 10~13명·해외 진출 6~13명.

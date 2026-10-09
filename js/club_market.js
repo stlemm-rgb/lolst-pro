@@ -52,8 +52,16 @@ function payPrize(champKey, final, semis) {
   list.forEach(function (x) {
     const t = findTeam(x[0]);
     if (!t) return; // 해외 팀
-    addClubIncome(t, "prize", x[1]);
-    if (myTeam() && t.id === myTeam().id) addNews("💰 구단 상금", t.name + " 구단이 상금 " + moneyText(x[1]) + "을(를) 받았다.");
+    // 💰 상금 선수 분배 (v1.1, data/dynasty.js PRIZE_SHARE): 상금 일부는 선수 몫 → 구단에는 나머지만
+    const players = Math.round(x[1] * PRIZE_SHARE.share);
+    const club = x[1] - players;
+    addClubIncome(t, "prize", club);
+    if (myTeam() && t.id === myTeam().id) {
+      const mineShare = Math.round(players / Math.max(1, t.roster.length) / 10000) * 10000;
+      state.money += mineShare;
+      if (state.weekCtx) state.weekCtx.prizeShare = (state.weekCtx.prizeShare || 0) + mineShare;
+      addNews("💰 상금", "상금 " + moneyText(x[1]) + " — 구단 " + moneyText(club) + ", 선수단 " + moneyText(players) + " (" + t.roster.length + "명이 나눔). 내 몫 " + moneyText(mineShare) + "이(가) 들어왔다.");
+    }
   });
 }
 
@@ -186,6 +194,7 @@ function rebuildRule(need) {
 function sellable(id, buyer) {
   if (id === USER_ID) return false;
   const p = findPlayer(id);
+  if (leftThisYear(p, buyer)) return false;   // 우승 뒤 연봉 문제로 떠난 선수는 그해 원래 팀이 다시 못 데려감 (js/dynasty.js)
   if (!p.teamId) return true;                 // FA
   if (p.teamId === buyer.id) return false;
   if (p.loan) return false;                    // 임대 중인 선수는 못 데려감

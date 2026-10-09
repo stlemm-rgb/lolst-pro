@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-09, PROGRESS 133까지
+# 다음 세션 이어가기 — 2026-10-09, PROGRESS 134까지 (ver 1.1 작업 중)
 
 새 세션(Claude Code·Codex 등 이 PC의 로컬 AI)은 **이 파일 → PROGRESS.md(맨 아래 121~133) → CLAUDE.md → 필요하면 GAME_PLAN.md** 순서로 읽고, 실제 git 상태부터 확인한다.
 
@@ -37,6 +37,10 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 
 ## 2. git 상태와 GitHub (작성 시점)
 
+- **버전**: GitHub에 올라간 133까지가 **ver 1.0** (git 태그 `v1.0`). 지금은 **ver 1.1** 작업 중 — 사용자 요청: **이번 버전 업데이트(친구 피드백 수정)가 모두 끝날 때까지 push하지 않음.** 화면 왼쪽 위 로고 아래에 'ver 1.1' 표시(index.html). 버전을 올리면 이 글자도 바꾼다.
+- 실제 저장소 폴더는 **`C:\Project\Game\Game`** (아래 '옮김' 기록과 달리 아직 한 단계 안쪽). 명령 안내도 이 경로로.
+- 134 (ver 1.1 첫 수정)는 아직 커밋 전.
+
 - 133(`07720a5 확인 창을 화면 안 상자로 교체`)까지 커밋 + GitHub push 완료. 이 HANDOFF.md·CLAUDE.md 수정은 커밋 필요.
 - GitHub 저장소: https://github.com/stlemm-rgb/lolst-pro (공개, 브랜치 `master`, remote `origin`).
 - 웹 주소 (GitHub Pages, 로그인 없이 친구가 플레이): **https://stlemm-rgb.github.io/lolst-pro/** — Settings → Pages에서 master /(root). `git push`하면 1분쯤 뒤 자동 반영. 무료(사이트 1GB·월 100GB 권장 한도, 게임은 약 1.5MB).
@@ -66,6 +70,7 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 | 130 | 퀘스트: 5회짜리가 있으면 다음 퀘스트 최대 3회, 체력 회복 퀘스트는 체력 40 이하일 때만, 상단바 훈련 배지가 퀘스트와 같으면 연한 노란 배경으로 진행 단계 표시 | data/quests.js, js/quests.js, js/main.js planBadgeHTML, css |
 | 131 | 지난주 결과에서 스폰서 계약 수입 줄 삭제 | js/dashboard.js |
 | 132 | 스크롤해도 상단바가 가려지지 않게 (z-index) | css/style.css |
+| 134 | **ver 1.1** 친구 피드백: 강팀 쏠림 — 라이벌 특성 1년짜리, 집중 견제 NPC에도(+미끼 장면 해설), 월드 우승팀 분석 −3%, 왕조 연봉 압박(FA), 해외 러브콜, 상금 선수 분배, 평판 음수 진행 멈춤 버그 | data/dynasty.js, js/dynasty.js, js/straits.js, js/match_events.js, js/match_detail.js |
 | 133 | 웹 공유용: confirm() 6곳 → 화면 안 확인 상자 askConfirm (웹/아티팩트에서 confirm이 막힘), startCareer(sure) | js/main.js, js/creation.js, js/market_pages.js, js/retire.js, css, tools/ |
 
 자세한 수치·측정은 PROGRESS.md 114~133 참고.
@@ -90,6 +95,13 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 - js/club_market.js, 값 data/contracts.js CLUB_MARKET. 비시즌: offseasonRebuild = fireSale → starTransfers(1부 주전 이적) → 보강 라운드 tryBuy → depthSignings(경쟁 후보, 내 포지션 포함) → fillRosters.
 - 여름(23~28주, 29주 적용)은 js/summer_market.js. 모든 NPC 이동은 npcTransfer/tryLoan에서 logTransfer → state.league.transferLog → [이적 시장] 📋 이적 목록.
 - 47주 순서: NPC 성장 → 구단 정산 → 내 계약 제안 (다음 시즌 리그는 nextTier/nextTierName, 계약 연도는 contractYear).
+
+### 강팀 쏠림 막기 (134, ver 1.1)
+- 값: data/dynasty.js (DYNASTY 연봉 압박 · ABROAD 해외 러브콜 · SCOUTED 분석 −3% · PRIZE_SHARE 상금 절반 선수 몫 · DECOY 미끼 장면·해설 외침). 코드: js/dynasty.js.
+- 새해: saveSeasonHistory가 `state.league.lastChamps {year, ids}` 저장 → contractsNewSeason '1.5)'에서 dynastyNewSeason(moves) (계약 만료 처리 전). 연봉이 오른 선수는 contractEnd를 올해 이상으로 (만료 처리에서 덮어쓰지 않게). FA로 나간 선수 p.leftFrom/leftYear → sellable에서 원래 팀 재영입 막음.
+- 해외 진출: 국내 선수를 state.world 해외 선수로 다시 만들고 league.players에서 삭제 (은퇴처럼). 이적 목록 kind 'leave'·'abroad'(e.to).
+- 집중 견제: js/match_events.js sCountOfId (내 선수 = userSCount, 다른 선수는 라이벌 전용도 셈, GOAT 제외), rollSetEvents에서 ctx.focus·out.focus → set.focus → 세트 상세 fo. 사건 rec.call(해설 외침 번호)·rec.fm(견제받는 동료 덕분). 화면 match_detail.js focusNoteHTML·decoyCallHTML.
+- 라이벌 1년짜리: straits.js clearRivalTitle (r_ace는 시즌 끝, r_dynasty는 리그 결승 MVP 때 교체), 예전 세이브 trimRivalTitles (ensureNpcTraits에서, state.league.rivalYearDone).
 
 ### 수집·강화 (118, 120)
 - 월드 우승 스킨: state.league.worldsSkins (playMatch가 '월드 결승' 세트 픽을 m.finalPicks에 남김 → koFinal에서 recordWorldsSkins). mySkins / skinPowerBonus.
@@ -146,6 +158,6 @@ git commit -m "이번 변경을 설명하는 한국어 메시지"
 ## 8. 다음 세션 시작 시
 
 1. `git pull`(다른 PC에서 올린 게 있을 수 있음) → `git status --short`, `git log --oneline -10`.
-2. 새 사용자 요청을 우선한다. 현재 요청된 작업은 모두 끝났고, 로드맵의 다음 기능은 미선택 상태다.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 134), 이 HANDOFF.md도 갱신한다.
+2. 새 사용자 요청을 우선한다. 지금은 **ver 1.1: 친구들이 발견한 문제 수정** 단계 — 사용자가 문제를 하나씩 알려 줌. 다 끝나면 커밋 → push(웹 반영). 참고: 해외 팀이 월드를 여러 번 가져가는 판이 있음(134 측정, 아직 손대지 않음).
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 붙여 기록하고(다음 번호 135), 이 HANDOFF.md도 갱신한다.
 4. 사용자가 "작업완료"라고 하면 위 '작업완료' 체크리스트(커밋 → push → 다른 PC는 pull)를 다시 알려 준다.

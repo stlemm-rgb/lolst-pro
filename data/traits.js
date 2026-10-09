@@ -141,8 +141,8 @@ const TRAITS = [
   { id: "s_champ_master", type: "s", name: "챔피언 마스터",          desc: "모든 챔피언 숙련도 성장 2배, 메타 페널티 없음",                effects: { masteryGrowth: 1, noMetaPenalty: true } },
   // ===== 라이벌 전용 S급 (124): 다른 선수만 얻음 (rival: true). 내 선수가 강해질수록 맞설 상대가 생기게 =====
   { id: "r_nemesis",  type: "s", rival: true, npc: true, name: "⚔️ 숙명의 라이벌", desc: "라이벌 전용. 내 팀과 경기할 때 경기력 +12%",                         effects: { vsUser: 0.12 } },
-  { id: "r_ace",      type: "s", rival: true, npc: true, name: "🔥 리그의 에이스", desc: "라이벌 전용. 모든 경기 경기력 +5%, 좋은 장면 ×1.5",                effects: { power: 0.05, evGood: { all: 0.5 } } },
-  { id: "r_dynasty",  type: "s", rival: true, npc: true, name: "🏰 왕조의 심장",   desc: "라이벌 전용. 큰 경기 경기력 +8%, 큰 경기 실수 −50%",               effects: { bigMatch: 0.08, evBadBig: -0.5 } },
+  { id: "r_ace",      type: "s", rival: true, npc: true, name: "🔥 리그의 에이스", desc: "라이벌 전용 (1년). 모든 경기 경기력 +5%, 좋은 장면 ×1.5",                effects: { power: 0.05, evGood: { all: 0.5 } } },
+  { id: "r_dynasty",  type: "s", rival: true, npc: true, name: "🏰 왕조의 심장",   desc: "라이벌 전용 (1년). 큰 경기 경기력 +8%, 큰 경기 실수 −50%",               effects: { bigMatch: 0.08, evBadBig: -0.5 } },
   { id: "r_veteran",  type: "s", rival: true, npc: true, name: "🛡️ 베테랑의 품격", desc: "라이벌 전용. 우리 팀 모두 실수 −20%, 한타 때 팀 전력 +2",          effects: { teamBad: -0.2, teamMood: 2 } },
   { id: "s_rank_god",  type: "s", name: "랭크의 신",                 desc: "솔로 랭크 승률 +10%, 챌린저인 주마다 인기도 +1",               effects: { ladderWin: 0.1, challengerPopularity: 1 } },
   { id: "s_weed",      type: "s", name: "잡초",                      desc: "나쁜 특성이 생기지 않음, 패배해도 컨디션이 떨어지지 않음",       effects: { badImmune: true, lossMental: -1 } },
@@ -165,8 +165,8 @@ const S_TRAIT_RULES = [
   { trait: "s_goat",         who: "all",  text: "S급 특성 4개 이상 얻기",                       sCount: 4 },
   // 라이벌 전용 (who: "npc") — 시즌이 끝날 때·상을 받을 때 확인 (js/straits.js)
   { trait: "r_nemesis", who: "npc", text: "내 선수가 1부 주전·스탯 점수 72 이상일 때, 🔥 리그의 에이스를 가진 다른 1부 팀 같은 포지션 최고 선수 (리그에 1명)", userScore: 72 },
-  { trait: "r_ace",     who: "npc", text: "1부 시즌 평균 평점 상위 3명 (해마다)",             top: 3 },
-  { trait: "r_dynasty", who: "npc", text: "국내 결승 MVP" },
+  { trait: "r_ace",     who: "npc", text: "1부 시즌 평균 평점 상위 3명 (1년짜리 — 다음 시즌 끝에 새 상위 3명에게)",             top: 3 },
+  { trait: "r_dynasty", who: "npc", text: "리그 결승 MVP (1년짜리 — 다음 해 리그 결승 MVP에게)" },
   { trait: "r_veteran", who: "npc", text: "27세 이상 · 1부 주전 4시즌",                     age: 27, seasons: 4 },
 ];
 

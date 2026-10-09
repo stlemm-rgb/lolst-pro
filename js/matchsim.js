@@ -167,9 +167,10 @@ function phaseTeamScore(list, phase) {
 function lineup(teamId, userCtx, setCtx) {
   setCtx = setCtx || {};
   const overseas = findOverseas(teamId);
+  const scout = scoutedMult(teamId); // 🔍 지난 시즌 월드 우승 팀: 상대가 연구해서 경기력 − (js/dynasty.js)
   if (overseas) {
     return POSITION_IDS.map(function (pos) {
-      return { pos: pos, id: null, power: overseas.power * randFloat(0.85, 1.15) };
+      return { pos: pos, id: null, power: overseas.power * randFloat(0.85, 1.15) * scout };
     });
   }
   const s = starters(teamId);
@@ -189,7 +190,7 @@ function lineup(teamId, userCtx, setCtx) {
       power = playerScore(id) * randFloat(1 - down * (1 - steady), MATCH.npcMultiplier[1] + v);
       if (findTeam(teamId).tier === 2) power *= 1 + HOUSING.npcDormPower; // 2부는 합숙: 컨디션 상한 (data/shop.js)
     }
-    power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx);
+    power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx) * scout;
     return { pos: pos, id: id, power: power };
   });
 }
@@ -266,7 +267,7 @@ function playSet(a, b, userCtx, setCtx) {
   afterSetEvents(ev, la, lb, a, b, aWins ? 0 : 1, flipped, series);
   return {
     winner: aWins ? a : b, userLane: userLane, la: la, lb: lb,
-    lanes: laneResults, comps: comps, events: ev.list, evRate: ev.rate, flipped: flipped,
+    lanes: laneResults, comps: comps, events: ev.list, evRate: ev.rate, flipped: flipped, focus: ev.focus, // 집중 견제 받은 선수 (v1.1)
     teamA: { avg: avgA, lane: bonusA, play: playA, macro: macroA, fight: fightA, comp: compA, ev: ev.a, luck: luckA, mood: moodA },
     teamB: { avg: avgB, lane: bonusB, play: playB, macro: macroB, fight: fightB, comp: compB, ev: ev.b, luck: luckB, mood: moodB },
   };
@@ -585,6 +586,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   payPrize(champKey, f, semis); // 구단 상금 (js/club_market.js)
   finalsMvp(champKey, f); // 결승 MVP (js/records.js)
   if (champKey === "worlds") recordWorldsSkins(f); // 월드 우승 스킨 (js/collection.js)
+  if (champKey === "worlds") markScouted(f.winner); // 🔍 다음 시즌 분석 대상 (js/dynasty.js)
   sTraitsOnTitle(f.winner, champKey); // 황제·잡초 (js/straits.js)
   const mine = myTeam();
   if (mine && f.winner === mine.id) {

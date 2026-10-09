@@ -212,6 +212,7 @@ function ensureNpcTraits() {
     if (!state.league.lockedDone && !p.traits.some(function (t) { return findTrait(t).npcLocked; })) { const lk = randomLockedTrait(); if (lk) p.traits.push(lk); }
   });
   state.league.lockedDone = true;
+  trimRivalTitles(); // 예전 세이브(v1.0): 쌓인 1년짜리 라이벌 특성 정리 (js/straits.js)
 }
 
 // ----- 구단 이름 정하기 -----
@@ -250,7 +251,7 @@ function shiftLevel(level, shift) {
 // ----- 리그 만들기 (새 게임) -----
 // defs: 구단 이름 목록 (없으면 새로 만듦), chosenIndex: 내가 고른 구단 번호 (-1이면 무작위)
 function makeLeague(defs, chosenIndex) {
-  state.league = { teams: [], players: {}, freeAgents: [], usedNames: [], season: null, lockedDone: true }; // lockedDone: 🔒 특성은 선수를 만들 때 이미 붙음
+  state.league = { teams: [], players: {}, freeAgents: [], usedNames: [], season: null, lockedDone: true, rivalYearDone: true }; // lockedDone: 🔒 특성은 선수를 만들 때 이미 붙음
   const names = defs || makeTeamDefs();
   names.forEach(function (n, i) {
     const tier = n.tier;

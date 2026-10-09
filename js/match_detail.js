@@ -56,6 +56,7 @@ function setDetail(set, setCtx, m, userPick) {
   return {
     w: set.winner === m.a ? 0 : 1,
     ev: ev, flip: !!set.flipped,
+    fo: set.focus && set.focus.length ? set.focus : undefined, // 🎯 집중 견제 받은 선수 (v1.1)
     deciding: !!setCtx.deciding,
     ta: team(set.teamA), tb: team(set.teamB),
     ca: comp(set.comps && set.comps.a), cb: comp(set.comps && set.comps.b), // 조합 (js/comps.js)
@@ -101,6 +102,38 @@ function teamScoreText(t) {
     " " + (t.luck >= 0 ? "+ " : "− ") + "운 " + Math.abs(t.luck).toFixed(1) + "</span>";
 }
 
+// 🎯 집중 견제 안내 (v1.1): S급 특성을 가진 선수 → 상대가 집중 견제, 대신 동료 활약 기회 ↑
+//   sets: 세트 상세 목록 (요약 화면은 전체, 세트 탭은 그 세트 하나)
+function focusNoteHTML(m, sets) {
+  const teams = [m.a, m.b];
+  const acc = {}, order = [];
+  sets.forEach(function (s) {
+    (s.fo || []).forEach(function (f) {
+      const k = f.s + ":" + (f.id || f.pos);
+      if (!acc[k]) { acc[k] = { f: f, sets: 0, mates: 0, decoy: 0 }; order.push(k); }
+      const a = acc[k];
+      a.sets++;
+      (s.ev || []).forEach(function (e) {
+        if (e.s !== f.s || e.k !== "good") return;
+        if (e.fm && e.p !== f.id) a.mates++;
+        if (e.p === f.id && e.call !== undefined) a.decoy++;
+      });
+    });
+  });
+  if (!order.length) return "";
+  const rows = order.map(function (k) {
+    const a = acc[k], f = a.f;
+    return "<li>🎯 <b>집중 견제</b> · " + escapeHTML(teamShort(teams[f.s])) + " " + detailName(f.id, teams[f.s], f.pos) + ' <span class="muted small">(S급 특성 ' + f.n + "개)</span> — 상대가 집중 견제해서 본인 활약 확률 ×" + focusSelfMult(f.n).toFixed(2) +
+      '. <span class="up">그 덕분에 동료들이 활약할 기회가 늘었어요</span>' + ' <span class="muted small">(동료 좋은 장면 ' + a.mates + "번" + (a.decoy ? " · 미끼 장면 " + a.decoy + "번" : "") + (sets.length > 1 ? " · " + a.sets + "세트" : "") + ")</span></li>";
+  }).join("");
+  return '<ul class="ev-key focus-note">' + rows + "</ul>";
+}
+
+// 미끼 장면 해설 외침 한 줄
+function decoyCallHTML(e) {
+  return e.call !== undefined && typeof DECOY !== "undefined" && DECOY.calls[e.call] ? '<div class="ev-call">' + escapeHTML(DECOY.calls[e.call]) + "</div>" : "";
+}
+
 // 경기 흐름 타임라인 (js/match_events.js)
 function timelineHTML(m, s) {
   if (!s.ev || !s.ev.length) return "";
@@ -115,11 +148,12 @@ function timelineHTML(m, s) {
     return '<tr class="ev-row ev-' + side + " ev-" + (info.cat || "") + (e.p === USER_ID ? " me" : "") + '">' +
       '<td class="r muted small">' + (e.t < 10 ? "0" : "") + e.t + "분</td>" +
       '<td class="c">' + info.icon + "</td>" +
-      '<td><span class="ev-team">' + escapeHTML(teamShort(teams[e.s])) + "</span> " + matchEventText(e, nameOf) + (e.tr ? miniChips([e.tr]) : "") + (e.sg ? ' <span class="joker-tag sig-tag">✒️ 시그니처</span>' : "") + "</td>" +
+      '<td><span class="ev-team">' + escapeHTML(teamShort(teams[e.s])) + "</span> " + matchEventText(e, nameOf) + (e.tr ? miniChips([e.tr]) : "") + (e.sg ? ' <span class="joker-tag sig-tag">✒️ 시그니처</span>' : "") + decoyCallHTML(e) + "</td>" +
       '<td class="r">' + num + "</td></tr>";
   }).join("");
   return '<h2 class="sub">경기 흐름 <span class="muted small">숫자 = 그 팀 점수 ±(실수는 −) · 심리 = 이후 실수·슈퍼플레이 확률이 바뀜' +
     (s.flip ? ' · <b>이 세트는 경기 흐름이 승패를 뒤집었어요</b>' : "") + "</span></h2>" +
+    focusNoteHTML(m, [s]) +
     '<table class="ev-table">' + rows + "</table>";
 }
 
@@ -253,7 +287,7 @@ function seriesSummaryHTML(m) {
       const info = matchEventInfo(e);
       if (!info || e.a) return;
       const big = Math.abs(e.x || 0) >= MATCH_EVENT_RULES.size.l[0] * MATCH_EVENT_RULES.scale;
-      if (big || (e.p === USER_ID && e.k !== "psych")) key.push({ set: i, e: e, info: info });
+      if (big || e.call !== undefined || (e.p === USER_ID && e.k !== "psych")) key.push({ set: i, e: e, info: info }); // 미끼 장면(해설 외침)도
     });
   });
   const keyHTML = key.length ? '<div class="card"><h2>주요 장면 <span class="muted small">큰 사건과 내 선수 장면 · 세트 탭에서 경기 흐름 전체</span></h2><ul class="ev-key">' +
@@ -261,9 +295,11 @@ function seriesSummaryHTML(m) {
       const teams = [m.a, m.b];
       const nameOf = function (id, side, pos) { return detailName(id, teams[side], pos); };
       return "<li>" + '<span class="muted small">' + (k.set + 1) + "세트 " + k.e.t + "분</span> " + k.info.icon + " " + matchEventText(k.e, nameOf) + (k.e.tr ? miniChips([k.e.tr]) : "") + (k.e.sg ? ' <span class="joker-tag sig-tag">✒️ 시그니처</span>' : "") +
-        (k.e.x ? ' <b class="' + (k.e.x > 0 ? "up" : "down") + '">' + (k.e.x > 0 ? "+" : "−") + Math.abs(k.e.x).toFixed(0) + "</b>" : "") + "</li>";
+        (k.e.x ? ' <b class="' + (k.e.x > 0 ? "up" : "down") + '">' + (k.e.x > 0 ? "+" : "−") + Math.abs(k.e.x).toFixed(0) + "</b>" : "") + decoyCallHTML(k.e) + "</li>";
     }).join("") + "</ul></div>" : "";
+  const focusHTML = focusNoteHTML(m, d.sets);
   return (
+    (focusHTML ? '<div class="card"><h2>집중 견제 <span class="muted small">S급 특성을 가진 선수는 상대가 집중해서 막아요 (나와 다른 선수 모두)</span></h2>' + focusHTML + "</div>" : "") +
     keyHTML +
     '<div class="card"><h2>' + teamLabel(m.a) + ' <span class="muted small">시리즈 합계 (CS/분·비중·점수·평점은 평균)</span></h2><div class="table-wrap"><table class="roster box">' + head + rows("a", m.a) + "</table></div></div>" +
     '<div class="card"><h2>' + teamLabel(m.b) + '</h2><div class="table-wrap"><table class="roster box">' + head + rows("b", m.b) + "</table></div></div>" +

@@ -109,7 +109,41 @@ function sTraitsOnAward(id, key) {
     if (both) grantSTrait(id, "s_demon");
   }
   if (key === "mvp" && playerAge(id) >= sRule("s_iron_will").age) grantSTrait(id, "s_iron_will");
-  if (key === "fmvp" && id !== USER_ID) grantSTrait(id, "r_dynasty"); // 라이벌 전용: 국내 결승 MVP
+  if (key === "fmvp") { // 라이벌 전용: 국내(리그) 결승 MVP — 1년짜리, 다음 해 결승 MVP에게 넘어감 (v1.1)
+    clearRivalTitle("r_dynasty", id);
+    if (id !== USER_ID) grantSTrait(id, "r_dynasty");
+  }
+}
+
+// 1년짜리 라이벌 특성 (v1.1): 지금 가진 선수에게서 떼어 냄 (keep: 남길 선수 id 또는 id 목록)
+//   🔥 리그의 에이스(해마다 시즌 끝) · 🏰 왕조의 심장(해마다 리그 결승) — 한 번 받으면 영원히 쌓이던 문제
+function clearRivalTitle(traitId, keep) {
+  const P = state.league.players;
+  const keepIds = Array.isArray(keep) ? keep : [keep];
+  Object.keys(P).forEach(function (pid) {
+    const list = P[pid].traits;
+    if (keepIds.indexOf(pid) !== -1 || !list) return;
+    const i = list.indexOf(traitId);
+    if (i !== -1) list.splice(i, 1);
+  });
+}
+
+// 예전 세이브 (v1.0): 쌓여 있던 1년짜리 라이벌 특성을 가장 최근에 받은 선수들만 남기고 정리 (한 번만)
+function trimRivalTitles() {
+  const L = state.league;
+  if (!L || L.rivalYearDone) return;
+  const log = L.sTraitLog || [];
+  ["r_ace", "r_dynasty"].forEach(function (traitId) {
+    const mine = log.filter(function (e) { return e.trait === traitId; });
+    const lastYear = mine.reduce(function (m, e) { return Math.max(m, e.year); }, 0);
+    const keep = mine.filter(function (e) { return e.year === lastYear && lastYear >= state.year - 1; }).map(function (e) { return e.id; });
+    Object.keys(L.players).forEach(function (pid) {
+      const list = L.players[pid].traits;
+      const i = list ? list.indexOf(traitId) : -1;
+      if (i !== -1 && keep.indexOf(pid) === -1) list.splice(i, 1);
+    });
+  });
+  L.rivalYearDone = true;
 }
 
 // 시즌이 끝날 때 (새해 직전, 이번 시즌 기록이 남아 있을 때)
@@ -151,7 +185,9 @@ function rivalSTraitsOnSeasonEnd(stats) {
   const ids = [];
   t1.forEach(function (t) { t.roster.forEach(function (id) { if (id !== USER_ID && P[id] && stats[id] && stats[id].g >= 20) ids.push(id); }); });
   ids.sort(function (a, b) { return stats[b].r / stats[b].g - stats[a].r / stats[a].g; });
-  ids.slice(0, ace.top).forEach(function (id) { grantSTrait(id, "r_ace"); });
+  const aces = ids.slice(0, ace.top);
+  clearRivalTitle("r_ace", aces); // 1년짜리: 작년 에이스는 내려놓음 (v1.1)
+  aces.forEach(function (id) { grantSTrait(id, "r_ace"); });
   // 숙명의 라이벌: 리그에 1명. 지금 주인이 없거나 1부를 떠났으면, 내 선수가 강할 때 새로
   const mine = myTeam();
   const holder = Object.keys(P).find(function (id) { return (P[id].traits || []).indexOf("r_nemesis") !== -1; });

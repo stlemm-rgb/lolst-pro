@@ -186,7 +186,7 @@ function clubRosterHTML(teamId) {
 // ----- 이적 목록 (js/club_market.js logTransfer) -----
 let tlogYear = 0;      // 0 = 올해, 1 = 작년
 let tlogFilter = "all"; // all · t1 · mine
-const TLOG_KIND = { buy: "🔁 보강", star: "💥 주전 이적", depth: "🧩 경쟁 후보", loan: "🤝 임대", retire: "🎓 은퇴" };
+const TLOG_KIND = { buy: "🔁 보강", star: "💥 주전 이적", depth: "🧩 경쟁 후보", loan: "🤝 임대", leave: "💸 연봉 문제로 FA", abroad: "✈️ 해외 진출", retire: "🎓 은퇴" };
 // 은퇴 사유 표시 (js/retirement.js logRetire tag)
 const TLOG_TAG = { meta: { name: "메타 적응 불가", tip: "바뀐 메타를 따라가지 못해 이적 시장 도중 은퇴했다" } };
 function transferLogCardHTML() {
@@ -205,7 +205,7 @@ function transferLogCardHTML() {
     const mineRow = e.team === mine.id || e.from === mine.id;
     return "<tr" + (mineRow ? ' class="me"' : "") + "><td>" + when(e) + "</td><td>" + TLOG_KIND[e.kind] + "</td><td><b>" + escapeHTML(e.name) + '</b> <span class="muted small">' + findPosition(e.pos).name + " · " + e.age + "세</span>" +
       (e.tag && TLOG_TAG[e.tag] ? ' <span class="joker-tag tip" data-tip="' + escapeHTML(TLOG_TAG[e.tag].tip) + '">' + TLOG_TAG[e.tag].name + "</span>" : "") + "</td>" +
-      '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(teamName(e.from)) + " → <b>" + (e.kind === "retire" ? "은퇴" : escapeHTML(teamName(e.team))) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
+      '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(teamName(e.from)) + " → <b>" + (e.kind === "retire" ? "은퇴" : e.kind === "leave" ? "FA" : e.kind === "abroad" ? escapeHTML(e.to || "해외") : escapeHTML(teamName(e.team))) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
   }).join("");
   const count = {};
   list.forEach(function (e) { count[e.kind] = (count[e.kind] || 0) + 1; });

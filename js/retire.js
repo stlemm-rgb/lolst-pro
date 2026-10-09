@@ -181,7 +181,7 @@ function careerSummary(includeCurrent) {
   const repPoints = typeof reputationPoints === "function" ? reputationPoints() : 0;
   const allstars = c.allstars || 0;
   points += repPoints + allstars * (P.allstar || 0);
-  const grade = CAREER.grades.find(function (g) { return points >= g.min; });
+  const grade = CAREER.grades.find(function (g) { return points >= g.min; }) || CAREER.grades[CAREER.grades.length - 1]; // 평판이 나빠 점수가 0 아래여도 '평범' (v1.1 버그 수정: 매주 멈추던 문제)
 
   return {
     name: state.player.name, position: state.player.position, archetype: state.player.archetype,

@@ -504,6 +504,10 @@ function contractsNewSeason() {
   state.transferListed = false;
   state.career.seasonGames = 0;
 
+  // 1.5) 강팀 쏠림 막기 (v1.1, js/dynasty.js): 우승 팀 연봉 압박 · 해외 러브콜 → 소식은 이적 소식과 같이
+  const moves = [];
+  dynastyNewSeason(moves);
+
   // 2) NPC 계약 만료: 재계약(성적 프리미엄 포함) 또는 FA
   //    2부 선수가 1부 주전 평균보다 확실히 잘하면 1부에 가려고 재계약을 거절
   const tier1Avg = average(tierTeams(1).map(function (t) { return teamStrength(t.id); }));
@@ -520,7 +524,6 @@ function contractsNewSeason() {
   });
 
   // 3) 리빌딩: 지난 시즌 하위 팀부터 FA·2부 스타·다른 팀 후보를 영입 (이적료·빚 50%까지, js/club_market.js)
-  const moves = [];
   offseasonRebuild(moves);
   // 4) 빈 포지션 채우기, 선수단 인원 맞추기
   fillRosters();

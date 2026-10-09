@@ -144,13 +144,30 @@ function addRate(rate, id, v) {
 function userSCount() {
   return state.player.traits.filter(function (x) { const t = findTrait(x); return t && t.type === "s" && !t.rival && x !== "s_goat"; }).length;
 }
-function focusUserMult() { return Math.max(FOCUS_RULES.userMin, 1 - FOCUS_RULES.userPerS * userSCount()); }
-function focusMateMult() { return 1 + FOCUS_RULES.matePerS * userSCount(); }
-// 좋은 장면 주인공 배율: 집중 견제(나 −, 동료 +) · 컨디션 난조(나만, 숨김)
+// 선수 누구든 S급 특성 수 (v1.1: 집중 견제를 다른 선수도 받음). 해외 가상 선수(id 없음)는 0
+function sCountOfId(id) {
+  if (!id) return 0;
+  if (id === USER_ID) return userSCount();
+  const p = findPlayer(id);
+  // 다른 선수는 라이벌 전용(🔥 리그의 에이스 등)도 셈 — 리그 최고 선수일수록 집중 견제 대상 (GOAT만 제외, 내 선수 규칙과 같음)
+  return p ? (p.traits || []).filter(function (x) { const t = findTrait(x); return t && t.type === "s" && x !== "s_goat"; }).length : 0;
+}
+function focusSelfMult(n) { return n ? Math.max(FOCUS_RULES.userMin, 1 - FOCUS_RULES.userPerS * n) : 1; }
+function focusUserMult() { return focusSelfMult(userSCount()); }
+function focusMateMult(n) { return 1 + FOCUS_RULES.matePerS * (n === undefined ? userSCount() : n); }
+function isDecoyEvent(ev) { return typeof DECOY !== "undefined" && DECOY.events.indexOf(ev.id) !== -1; }
+// 좋은 장면 주인공 배율: 집중 견제(본인 −, 동료 +) · 미끼 장면(견제받는 본인 +) · 컨디션 난조(나만, 숨김)
+//   v1.1: 나만이 아니라 S급을 가진 모든 선수에게 (모든 대회). focus = 이 세트 선수별 S급 수 { id: n }
 function userFocusMult(ev, p, side, teamId, ctx) {
-  if (ev.kind !== "good" || !side.some(function (q) { return q.id === USER_ID; })) return 1;
-  if (p.id !== USER_ID) return focusMateMult();
-  return focusUserMult() * (ctx.slump ? SLUMP_RULES.goodMult : 1);
+  if (ev.kind !== "good") return 1;
+  const F = ctx.focus || {};
+  const own = p.id ? F[p.id] || 0 : 0;
+  let m = 1;
+  if (own) m *= isDecoyEvent(ev) ? 1 + DECOY.perS * own : focusSelfMult(own); // 견제를 받으면 도주·생존 같은 '미끼' 장면은 오히려 늘어남
+  const mate = side.reduce(function (mx, q) { return q !== p && q.id ? Math.max(mx, F[q.id] || 0) : mx; }, 0);
+  if (mate) m *= focusMateMult(mate);
+  if (p.id === USER_ID && ctx.slump) m *= SLUMP_RULES.goodMult;
+  return m;
 }
 // 이번 경기를 컨디션 난조로 할지 (js/matchsim.js playMatch): 정규 시즌 + 최근 승률이 너무 높을 때만
 function rollSlump(m) {
@@ -171,6 +188,15 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
   ctx = ctx || {};
   const out = { list: [], a: 0, b: 0, rate: {} };
   const sides = [la, lb], teams = [teamA, teamB];
+  // 집중 견제 (v1.1): 이 세트 S급 선수 → { id: S급 수 }, 화면용 목록 out.focus [{ s, id, pos, n }]
+  ctx.focus = {};
+  out.focus = [];
+  [0, 1].forEach(function (s) {
+    sides[s].forEach(function (p) {
+      const n = sCountOfId(p.id);
+      if (n) { ctx.focus[p.id] = n; out.focus.push({ s: s, id: p.id, pos: p.pos, n: n }); }
+    });
+  });
   // 원클럽맨 등: 경기(시리즈) 시작 때 팀 분위기 +
   [0, 1].forEach(function (s) {
     if (series.init[teams[s]]) return;
@@ -230,6 +256,8 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
     }
     const rec = { t: t, e: ev.id, s: s, p: p.id, pp: p.pos, v: victim ? victim.id : null, vp: victim ? victim.pos : null, x: x, k: ev.kind };
     if (who.tr) rec.tr = who.tr; // 이 사건에 작용한 특성
+    if (ev.kind === "good" && p.id && ctx.focus[p.id] && isDecoyEvent(ev)) rec.call = randInt(0, DECOY.calls.length - 1); // 미끼 장면: 해설 외침
+    else if (ev.kind === "good" && sides[s].some(function (q) { return q !== p && q.id && ctx.focus[q.id]; })) rec.fm = 1; // 견제받는 동료 덕분에 생긴 기회
     out.list.push(rec);
   });
   if (ctx.sigUser) sigGuaranteedPlay(out, sides, R); // 시그니처 픽: 좋은 장면 1번 보장 (js/signature.js)

@@ -53,6 +53,7 @@ body {
   color: #fff;
   word-break: keep-all; /* 메뉴가 좁을 때 단어 중간에서 줄이 바뀌지 않게 */
 }
+.logo .ver { display: block; font-size: 11px; font-weight: normal; color: var(--muted); margin-top: 2px; }
 
 #menu { list-style: none; margin: 0; padding: 0 0 8px; flex: 1; display: flex; flex-direction: column; }
 /* 메뉴 묶음 제목 (누를 수 없음) */
@@ -565,6 +566,8 @@ table.ev-table td:last-child { width: 72px; white-space: nowrap; }
 .ev-row.me td { background: rgba(59, 130, 246, 0.10); }
 .ev-team { display: inline-block; min-width: 34px; font-size: 11px; color: var(--muted); }
 ul.ev-key { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
+ul.focus-note { list-style: none; padding-left: 0; margin: 4px 0 8px; }
+.ev-call { font-size: 12px; font-style: italic; color: var(--gold); margin-top: 2px; }
 .md-ratings { margin-top: 8px; }
 .md-ratings h3 { margin: 0 0 4px; }
 

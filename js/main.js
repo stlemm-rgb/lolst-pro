@@ -890,6 +890,7 @@ function saveSeasonHistory() {
   const names = {};
   Object.keys(season.champions).forEach(function (k) { names[k] = teamName(season.champions[k]); });
   state.league.history.push({ year: season.year, champions: names, myTeam: myTeam().name });
+  state.league.lastChamps = { year: season.year, ids: Object.assign({}, season.champions) }; // 새 시즌 왕조 연봉 압박·해외 러브콜 (js/dynasty.js)
 }
 
 // 신년 신문 기사: 리그 확장·신생 구단·해외 리그·대형 신인을 한 기사로 (js/news_popup.js 팝업)
