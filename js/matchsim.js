@@ -407,7 +407,7 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
 
   const pop = roundRandom((randInt(rule.popularity[0], rule.popularity[1]) + (won ? traitEffectSum("winPopularity") : 0)) * popularityMultiplier());
   before = state.popularity;
-  state.popularity = clamp(state.popularity + pop);
+  addPopularity(pop);
   changes.popularity = state.popularity - before;
 
   // 라인전 요약
@@ -439,7 +439,7 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
     addNews(fill(art.title), fill(art.text));
     const heroPop = roundRandom(LOSS_HERO.popularity * popularityMultiplier());
     before = state.popularity;
-    state.popularity = clamp(state.popularity + heroPop);
+    addPopularity(heroPop);
     changes.popularity = (changes.popularity || 0) + state.popularity - before;
   }
 
@@ -598,6 +598,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
     state.career.finalsWon = (state.career.finalsWon || 0) + 1;
+    if (!state.benched) titleFans(champKey); // 우승 팬 보너스 (js/fame.js, 출전했을 때)
     addMoment("🏆", mine.name + " " + { cup: "LCK 컵 우승", playoffs: "리그 우승", worlds: "월드 챔피언십 우승", firststand: "First Stand 우승", msi: "MSI 우승" }[champKey]);
     if (state.weekCtx) state.weekCtx.champion = title;
   }

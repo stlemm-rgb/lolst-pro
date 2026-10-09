@@ -84,7 +84,7 @@ function giveAward(key, id, value, extraTitle) {
     if (!state.career.awards) state.career.awards = [];
     state.career.awards.push({ year: state.year, title: title, key: key });
     addMoment("🏅", title + " 수상");
-    state.popularity = clamp(state.popularity + RECORDS.awardBonus.popularity);
+    addPopularity(RECORDS.awardBonus.popularity);
     state.reputation = Math.min(100, state.reputation + RECORDS.awardBonus.reputation);
     postMessage("news", "🏆 수상: " + title, state.player.name + "이(가) " + state.year + " " + title + "을(를) 받았다!", {
       notes: ["인기도 +" + RECORDS.awardBonus.popularity + ", 평판 +" + RECORDS.awardBonus.reputation],

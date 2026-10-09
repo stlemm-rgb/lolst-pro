@@ -135,7 +135,7 @@ function applyEffects(eff, ctx) {
       add(key, state.condition - before);
     } else if (key === "popularity") {
       before = state.popularity;
-      state.popularity = clamp(state.popularity + (v > 0 ? roundRandom(v * popularityMultiplier()) : v));
+      addPopularity(v > 0 ? roundRandom(v * popularityMultiplier()) : v);
       add(key, state.popularity - before);
     } else if (key === "reputation") {
       before = state.reputation;

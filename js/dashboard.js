@@ -115,7 +115,7 @@ function playLadder(training) {
   r.peak = Math.max(r.peak, r.points);
   // 랭크의 신: 챌린저인 주마다 인기도
   const cp = traitEffectSum("challengerPopularity");
-  if (cp && r.points >= 3200) state.popularity = clamp(state.popularity + cp);
+  if (cp && r.points >= 3200) addPopularity(cp);
   return { games: games, wins: wins, losses: games - wins, delta: r.points - before };
 }
 

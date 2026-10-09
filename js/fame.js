@@ -36,14 +36,83 @@ function repHoldLeft() {
 // 감독 신뢰: 2군행 판정에서 경쟁 선수와 점수 차이에 더하는 값
 function managerTrust() { return repTier().trust + (typeof coachTrust === "function" ? coachTrust() : 0); } // + 친구 감독 (js/retirement.js)
 
-function fansCount(pop) {
+// 인기도 기준 팬 수 (예전 공식, 팬 수의 바닥값). pop을 주면 그 인기도 기준
+function baseFans(pop) {
   const p = pop === undefined ? state.popularity : pop;
   return Math.round(p * p * FAME.fansSquare + p * FAME.fansLinear);
 }
-// "62만 명", "290만 명", "3,500명"
+// 지금 팬 수 (state.fame.fans, 없으면 인기도 기준으로 시작). pop을 주면 그 인기도 기준 값
+function fansCount(pop) {
+  if (pop !== undefined) return baseFans(pop);
+  if (!state.fame) state.fame = {};
+  if (!(state.fame.fans >= 0)) state.fame.fans = baseFans();
+  return Math.round(state.fame.fans);
+}
+// 인기도 1점어치 팬 (팬이 많을수록 큼), 1억 넘으면 완만하게
+function fansPerPoint(pop) {
+  return Math.max(pop * FAME.fansSquare * 2 + FAME.fansLinear, fansCount() * FAME.perPointPct);
+}
+function fansDamp() {
+  const f = fansCount();
+  return f > FAME.softCap ? Math.pow(FAME.softCap / f, 2) : 1;
+}
+function addFans(n) {
+  fansCount();
+  state.fame.fans = Math.max(baseFans(), state.fame.fans + n);
+}
+// 인기도 바꾸기 (모든 인기도 변화는 여기로): 100에서 막혀도 오른 만큼 팬은 늘어남
+function addPopularity(v) {
+  const before = state.popularity;
+  state.popularity = clamp(before + v);
+  if (v > 0) addFans(v * fansPerPoint(before) * fansDamp());
+  else if (v < 0) addFans(-(before - state.popularity) * fansPerPoint(state.popularity) * FAME.lossShare);
+  return state.popularity - before;
+}
+// 우승 팬 보너스 (js/matchsim.js koFinal, 우리 팀 우승)
+function titleFans(champKey) {
+  const r = FAME.titleFans[champKey];
+  if (!r) return 0;
+  const before = fansCount();
+  addFans(Math.max(before * r.pct, r.pts * fansPerPoint(state.popularity)) * fansDamp());
+  const gain = fansCount() - before;
+  if (gain > 0) addNews("팬", "🏆 우승 효과! 팬이 " + peopleText(gain) + " 늘어 " + peopleText(fansCount()) + "이(가) 됐다.");
+  return gain;
+}
+// "62만 명", "290만 명", "3,500명", "1억 2,345만 명"
 function peopleText(n) {
+  n = Math.round(n);
+  if (n >= 100000000) {
+    const man = Math.round((n % 100000000) / 10000);
+    return Math.floor(n / 100000000) + "억" + (man ? " " + man.toLocaleString() + "만" : "") + " 명";
+  }
   if (n >= 10000) return Math.round(n / 10000).toLocaleString() + "만 명";
   return n.toLocaleString() + "명";
+}
+// 팬 1,000만·5,000만·1억 돌파 → 공중파 뉴스 기사 (data/fame.js FAN_MILESTONES), 한 번씩
+function checkFanMilestones() {
+  if (typeof FAN_MILESTONES === "undefined") return;
+  const F = state.fame;
+  F.fanMiles = F.fanMiles || [];
+  const fans = fansCount();
+  FAN_MILESTONES.forEach(function (m) {
+    if (fans < m.at || F.fanMiles.indexOf(m.at) !== -1) return;
+    F.fanMiles.push(m.at);
+    const s = careerSummary(true);
+    const t = s.titles || {};
+    const titleBits = [["worlds", "월드"], ["msi", "MSI"], ["firststand", "First Stand"], ["playoffs", "리그"], ["cup", "LCK 컵"]]
+      .filter(function (x) { return t[x[0]] > 0; }).map(function (x) { return x[1] + " " + t[x[0]] + "회"; });
+    const vars = { me: state.player.name, myTeam: myTeam() ? myTeam().name : "", fans: peopleText(fans), year: state.year,
+      pos: findPosition(state.player.position).name, titles: titleBits.length ? "우승 기록: " + titleBits.join(" · ") + "." : "" };
+    const art = pick(m.articles);
+    const r = state.weekReport;
+    if (r && art) {
+      r.headlines = r.headlines || [];
+      r.headlines.push({ key: "fans", headline: fillNews(art.headline, vars), body: fillNews(art.body, vars), mine: true });
+      r.headlinesSeen = false;
+    }
+    addNews("팬", m.icon + " 팬 " + m.label + " 명 돌파! 공중파 뉴스에 나왔다.");
+    addMoment(m.icon, "팬 " + m.label + " 명 돌파 — 공중파 뉴스 보도");
+  });
 }
 
 // 상태 칸 아래 한 줄: ⭐ 인기 선수 · 팬 62만 명 · 😇 모범 선수 (감독 신뢰 +1.5)
@@ -51,7 +120,8 @@ function fameLineHTML() {
   const f = fameTier(), r = repTier();
   const nextF = FAME.tiers[FAME.tiers.indexOf(f) + 1];
   const tipF = "스타 등급 (인기도로 정해짐). " + (nextF ? "인기도 " + nextF.min + "이면 " + nextF.icon + " " + nextF.name + "." : "최고 등급!") +
-    " 등급이 오르면 광고·개인 스폰서 제의가 와요. 경기에 안 나오는 주에는 인기도가 조금씩 줄어요.";
+    " 등급이 오르면 광고·개인 스폰서 제의가 와요. 경기에 안 나오는 주에는 인기도가 조금씩 줄어요." +
+    " 팬 수는 인기도가 오를 때마다 늘어요 (인기도 100이어도 계속). 팬이 많을수록 더 빨리 늘고, 우승하면 크게(월드 > MSI > 리그) 늘어요. 1억 명부터는 천천히.";
   const held = REP_TIERS.indexOf(r) > REP_TIERS.indexOf(rawRepTier());
   const tipR = "평판 등급. 감독 신뢰 " + (r.trust > 0 ? "+" : "") + r.trust + " (주전 경쟁에서 이만큼 유리/불리). 등급에 따라 오는 연락이 달라요. 평판은 시간이 지나면 천천히 0 쪽으로 돌아와요." +
     " 등급이 오르면 " + REPUTATION.holdWeeks + "주(1개월) 동안은 평판이 떨어져도 등급이 내려가지 않아요." +
@@ -67,7 +137,7 @@ function weeklyFame() {
   // 1) 인기도 자연 감소: 이번 주 경기에 안 나왔고 개인 방송도 안 하면
   if (!played && !(typeof hasActivity === "function" && hasActivity("stream"))) {
     const d = (state.popularity - FAME.decay.floor) * FAME.decay.perWeek;
-    if (d > 0) state.popularity = clamp(state.popularity - roundRandom(d));
+    if (d > 0) addPopularity(-roundRandom(d));
   }
   // 2) 평판 제자리 찾기 (0 쪽으로 아주 천천히)
   const drift = state.reputation * REPUTATION.driftPerWeek;
@@ -77,6 +147,7 @@ function weeklyFame() {
   c.repSum = (c.repSum || 0) + state.reputation;
   c.repWeeks = (c.repWeeks || 0) + 1;
   checkFameTiers();
+  checkFanMilestones();
 }
 
 // 등급이 바뀌었으면 소식 (처음엔 기록만)
@@ -160,7 +231,7 @@ function runAllStar() {
   if (me) {
     state.career.allstars = (state.career.allstars || 0) + 1;
     const S = ALL_STAR.selected;
-    state.popularity = clamp(state.popularity + S.popularity);
+    addPopularity(S.popularity);
     state.reputation = Math.min(100, state.reputation + S.reputation);
     const m = eventMoney(S.money);
     state.money += m;
@@ -168,7 +239,7 @@ function runAllStar() {
     addMoment("⭐", state.year + " 올스타 선정 (" + me.votes.toLocaleString() + "표)");
     if (mvp.id === USER_ID) {
       const mm = eventMoney(ALL_STAR.mvp.money);
-      state.popularity = clamp(state.popularity + ALL_STAR.mvp.popularity);
+      addPopularity(ALL_STAR.mvp.popularity);
       state.money += mm;
       notes.push("🏅 올스타전 MVP! 인기도 +" + ALL_STAR.mvp.popularity + " · 상금 " + moneyText(mm));
       addMoment("🏅", state.year + " 올스타전 MVP");

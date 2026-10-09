@@ -33,7 +33,7 @@ function recordWorldsSkins(f) {
   state.league.worldsSkins.push(entry);
   const me = entry.players.find(function (p) { return p.id === USER_ID; });
   if (me) {
-    state.popularity = clamp(state.popularity + WORLDS_SKIN.popularity);
+    addPopularity(WORLDS_SKIN.popularity);
     if (me.champ) skinChosen(entry, me, true);
     else postMessage("news", "🎨 월드 우승 스킨 — 챔피언을 골라 주세요", state.year + " 월드 챔피언십 우승을 기념해 " + entry.team + " 선수들의 우승 스킨이 만들어진다.\n" +
       state.player.name + "의 스킨은 결승에서 쓴 챔피언 중에서 직접 고를 수 있다: " + me.choices.join(", ") + ".", {

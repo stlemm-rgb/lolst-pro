@@ -185,7 +185,7 @@ function checkBench() {
     }
   } else {
     state.benchWeeks += CONTRACT.benchCheckEvery;
-    state.popularity = clamp(state.popularity - CONTRACT.benchPopularityLoss);
+    addPopularity(-CONTRACT.benchPopularityLoss);
     if (!rival || me + managerTrust() > playerScore(rival)) {
       state.benched = false;
       state.benchWeeks = 0;

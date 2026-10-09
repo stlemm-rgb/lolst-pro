@@ -691,7 +691,7 @@ function nextWeek(restWeek) {
     } else if (id === "popularity") {
       if (amount > 0) amount = roundRandom(amount * popularityMultiplier());
       before = state.popularity;
-      state.popularity = clamp(state.popularity + amount);
+      addPopularity(amount);
       changes[id] = state.popularity - before;
     } else if (id === "reputation") {
       before = state.reputation;
