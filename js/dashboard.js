@@ -492,10 +492,8 @@ function crownLadderKing() {
     // 신문 기사 + 축하 연락 (data/events_story.js ladder_king)
     const r = state.weekReport;
     if (r) {
-      r.headlines = r.headlines || [];
-      r.headlines.push({ key: "ladderKing", headline: "👑 " + state.player.name + ", 솔로 랭크 시즌 1위 등극", mine: true,
+      publishHeadline({ key: "ladderKing", headline: "👑 " + state.player.name + ", 솔로 랭크 시즌 1위 등극", mine: true,
         body: state.player.name + "이(가) " + top.points.toLocaleString() + "점으로 이번 랭크 시즌 리그 1위에 올랐다. 프로 선수들이 모인 최상위 구간에서 끝까지 자리를 지켰다. 다음 랭크 시즌까지 '" + findTrait(id).name + "' 칭호(경기력 +3%)를 단다." });
-      r.headlinesSeen = false;
     }
     queueTrigger("ladderKing", { points: top.points.toLocaleString() });
   }

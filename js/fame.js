@@ -106,9 +106,7 @@ function checkFanMilestones() {
     const art = pick(m.articles);
     const r = state.weekReport;
     if (r && art) {
-      r.headlines = r.headlines || [];
-      r.headlines.push({ key: "fans", headline: fillNews(art.headline, vars), body: fillNews(art.body, vars), mine: true });
-      r.headlinesSeen = false;
+      publishHeadline({ key: "fans", headline: fillNews(art.headline, vars), body: fillNews(art.body, vars), mine: true }, { variant: m.at });
     }
     addNews("팬", m.icon + " 팬 " + m.label + " 명 돌파! 공중파 뉴스에 나왔다.");
     addMoment(m.icon, "팬 " + m.label + " 명 돌파 — 공중파 뉴스 보도");

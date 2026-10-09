@@ -610,7 +610,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   }
   addNews(title + " 우승", teamName(f.winner) + "이(가) " + teamName(f.loser) + "을(를) " +
     Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]) + "로 꺾고 " + title + " 우승!");
-  queueFinalNews(champKey, title, f); // 화면 뉴스 (js/news_popup.js)
+  queueFinalNews(champKey, title, f, titleStreak(champKey, f)); // 화면 뉴스 (js/news_popup.js)
   if (champKey === "playoffs") {
     const wt = seasonOf().worldsTeams;
     queueHeadline("worlds_qualify", mine && wt.indexOf(mine.id) !== -1 ? "myTeam" : "other", { teams: wt.map(teamName).join(", "), count: wt.length });

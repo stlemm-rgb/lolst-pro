@@ -99,7 +99,7 @@ function postMessage(tab, title, text, extra) {
   };
   Object.keys(extra || {}).forEach(function (k) { msg[k] = extra[k]; });
   state.inbox.unshift(msg);
-  state.inbox = state.inbox.slice(0, EVENT_RULES.keepMessages);
+  state.inbox = trimMessages(state.inbox);
   return msg;
 }
 

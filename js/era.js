@@ -300,9 +300,7 @@ function eraIntroArticle() {
   if (ERA.msiFrom === n) next.push("  · 🏆 새 국제대회 MSI 시작");
   else if (ERA.msiFrom > n) next.push("  · 🏆 새 국제대회 MSI는 " + ERA.msiFrom + "년 시작 예정");
   const body = I.lines.map(fill).concat(next.length ? next : [I.noChange]);
-  r.headlines = r.headlines || [];
-  r.headlines.push({ key: "eraIntro", headline: fill(I.headline), body: body.join("\n"), mine: false });
-  r.headlinesSeen = false;
+  publishHeadline({ key: "eraIntro", headline: fill(I.headline), body: body.join("\n"), mine: false });
   addNews("리그 소개", "📰 " + fill(I.headline) + " (대시보드 [📰 NEWS])");
 }
 
@@ -345,9 +343,7 @@ function worldSeasonStory() {
   const head = S.headline.replace("{year}", state.year);
   const r = state.weekReport;
   if (r) {
-    r.headlines = r.headlines || [];
-    r.headlines.push({ key: "worldStory", headline: head, body: [S.intro].concat(lines).join("\n"), mine: false });
-    r.headlinesSeen = false;
+    publishHeadline({ key: "worldStory", headline: head, body: [S.intro].concat(lines).join("\n"), mine: false });
   }
   addNews("해외 리그", head.replace(/^🌏 /, "") + " — " + lines.length + "개 지역 (왼쪽 메뉴 [해외 리그])");
 }

@@ -195,3 +195,28 @@ function saveCareerSeason() {
   state.career.seasons.push(currentSeasonRecord());
   state.career.seasonWins = 0;
 }
+
+// ----- 연속 우승 (리핏·쓰리핏…) -----
+// state.league.titleStreaks = { champKey: { id 우승 팀, n 연속 우승, year } }. 예전 세이브는 역대 우승 기록(이름)으로 처음 한 번 셈
+function titleStreak(champKey, f) {
+  const L = state.league;
+  if (!L.titleStreaks) L.titleStreaks = {};
+  let prev = L.titleStreaks[champKey];
+  if (prev && prev.year === state.year && prev.id === f.winner) return { n: prev.n, broken: prev.broken || 0 };
+  if (!prev) {
+    const hist = L.history || [];
+    let n = 0, name = null;
+    for (let i = hist.length - 1; i >= 0; i--) {
+      const h = hist[i], c = h.champions && h.champions[champKey];
+      if (h.year !== state.year - 1 - n || !c || (name && c !== name)) break;
+      name = c; n++;
+    }
+    const id = name === teamName(f.winner) ? f.winner : name === teamName(f.loser) ? f.loser : null;
+    prev = n && id ? { id: id, n: n, year: state.year - 1 } : null;
+  }
+  const last = prev && prev.year === state.year - 1;
+  const n = last && prev.id === f.winner ? prev.n + 1 : 1;
+  const broken = last && prev.id === f.loser && prev.n >= 2 ? prev.n : 0;
+  L.titleStreaks[champKey] = { id: f.winner, n: n, year: state.year, broken: broken };
+  return { n: n, broken: broken };
+}

@@ -25,17 +25,17 @@
 //   promotion: myUp 우리(2부) 승격 / myFail 우리(2부) 승격 실패 / myStay 우리(1부) 잔류 / myDown 우리(1부) 강등 / up 다른 2부 팀 승격 / stay 다른 1부 팀 잔류
 const NEWS_ARTICLES = {
   cup_final: [
-    { who: "myTeam", headline: "{myTeam}, {event} 정상 등극", body: "{myTeam}이(가) {event} 결승에서 {loser}을(를) {score}로 꺾고 우승을 차지했다. 결승 MVP는 {mvp}이(가) 선정됐다. 시즌 첫 트로피와 함께 First Stand 출전권까지 손에 넣었다." },
-    { who: "myTeam", headline: "{myTeam}, 우승과 세계행 확정", body: "{myTeam}이(가) {loser}을(를) {score}로 제압하며 {event}의 주인이 됐다. {mvp}이(가) 결승 MVP에 올랐다. {me}은(는) 우승의 기쁨을 안고 First Stand 무대로 향하게 됐다." },
-    { who: "myTeam", headline: "{myTeam}, 첫 관문을 넘었다", body: "{year} 시즌 첫 우승컵은 {myTeam}의 차지가 됐다. {event} 결승에서 {loser}을(를) {score}로 꺾었고, {mvp}이(가) MVP를 차지했다. 이제 {myTeam}의 시선은 First Stand로 향한다." },
+    { who: "myTeam", headline: "{myTeam}, {event} 정상 등극", body: "{myTeam}이(가) {event} 결승에서 {loser}을(를) {score}로 꺾고 우승을 차지했다. 결승 MVP는 {mvp}이(가) 선정됐다. {firstStandNote}" },
+    { who: "myTeam", headline: "{myTeam}, 컵 우승 확정", body: "{myTeam}이(가) {loser}을(를) {score}로 제압하며 {event}의 주인이 됐다. {mvp}이(가) 결승 MVP에 올랐다. {firstStandNote}" },
+    { who: "myTeam", headline: "{myTeam}, 첫 관문을 넘었다", body: "{year} 시즌 첫 우승컵은 {myTeam}의 차지가 됐다. {event} 결승에서 {loser}을(를) {score}로 꺾었고, {mvp}이(가) MVP를 차지했다. {firstStandNote}" },
 
     { who: "myRunnerUp", headline: "{myTeam}, 우승 문턱서 멈췄다", body: "{myTeam}이(가) {event} 결승에서 {winner}에게 {score}로 패하며 준우승에 머물렀다. 결승 MVP는 {mvp}이(가) 차지했다. {me}에게는 아쉬움을 씻을 다음 무대가 남아 있다." },
     { who: "myRunnerUp", headline: "{myTeam}, 아쉬운 결승 패배", body: "{event} 우승컵을 눈앞에 뒀던 {myTeam}이(가) {winner}에게 {score}로 패했다. {mvp}이(가) 결승 MVP에 선정됐다. {myTeam}은(는) 첫 우승 기회를 놓치며 다음 대회를 기약했다." },
     { who: "myRunnerUp", headline: "{myTeam}, 준우승으로 대회 마감", body: "{myTeam}이(가) {year} {event} 결승에서 {winner}의 벽을 넘지 못했다. 최종 스코어는 {score}, 결승 MVP는 {mvp}(이)었다. 정상까지 한 걸음이 부족했던 결과였다." },
 
-    { who: "other", headline: "{winner}, {event} 우승", body: "{winner}이(가) {event} 결승에서 {loser}을(를) {score}로 꺾고 정상에 올랐다. 결승 MVP는 {mvp}이(가) 선정됐다. {winner}은(는) 우승팀 자격으로 First Stand에 출전한다." },
-    { who: "other", headline: "{winner}, LCK 컵 정상과 세계행", body: "{year} {event}의 우승팀은 {winner}(으)로 결정됐다. {winner}이(가) 결승에서 {loser}을(를) {score}로 제압했고, {mvp}이(가) MVP를 차지했다. 다음 무대는 국제대회 First Stand다." },
-    { who: "other", headline: "{event} 챔피언은 {winner}", body: "{winner}이(가) {loser}을(를) 상대로 {score} 승리를 거두며 {event} 우승컵을 들어 올렸다. 결승 MVP는 {mvp}(이)었다. 이로써 First Stand에 나설 팀도 {winner}(으)로 확정됐다." },
+    { who: "other", headline: "{winner}, {event} 우승", body: "{winner}이(가) {event} 결승에서 {loser}을(를) {score}로 꺾고 정상에 올랐다. 결승 MVP는 {mvp}이(가) 선정됐다. {firstStandNote}" },
+    { who: "other", headline: "{winner}, LCK 컵 정상 등극", body: "{year} {event}의 우승팀은 {winner}(으)로 결정됐다. {winner}이(가) 결승에서 {loser}을(를) {score}로 제압했고, {mvp}이(가) MVP를 차지했다. {firstStandNote}" },
+    { who: "other", headline: "{event} 챔피언은 {winner}", body: "{winner}이(가) {loser}을(를) 상대로 {score} 승리를 거두며 {event} 우승컵을 들어 올렸다. 결승 MVP는 {mvp}(이)었다. {firstStandNote}" },
   ],
 
   firststand_final: [

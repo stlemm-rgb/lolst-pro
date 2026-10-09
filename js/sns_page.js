@@ -38,6 +38,8 @@ pages.sns = function () {
     body = list.map(messageHTML).join("");
   }
 
+  if (snsTab === "news") body = newsArchiveHTML() + body;
+
   const readAll = snsTab === "news" && unreadCount("news")
     ? '<button data-readall="news">모두 읽음</button>' : "";
 
@@ -120,6 +122,7 @@ function bindSns(page) {
       const m = state.inbox.find(function (x) { return x.id === id; });
       openMsgId = openMsgId === id ? null : id;
       if (m) m.read = true; // 펼치면 읽음
+      if (state.settings.autoSave) saveGame();
       renderMenu();
       renderPage();
     };
@@ -135,6 +138,7 @@ function bindSns(page) {
   const readAll = page.querySelector("[data-readall]");
   if (readAll) readAll.onclick = function () {
     state.inbox.forEach(function (m) { if (m.tab === "news") m.read = true; });
+    if (state.settings.autoSave) saveGame();
     renderMenu();
     renderPage();
   };

@@ -10,6 +10,8 @@ function fillNews(text, vars) {
 
 // key: NEWS_ARTICLES의 키, who: 상황, vars: 글자 바꾸기 값
 function queueHeadline(key, who, vars) {
+  const id = newsIdentity("article", key, [who, vars || {}]);
+  if (findNewsArticle(id)) return null;
   const r = state.weekReport;
   const list = (typeof NEWS_ARTICLES !== "undefined" && NEWS_ARTICLES[key]) || [];
   const pool = list.filter(function (a) { return a.who === who; });
@@ -17,14 +19,13 @@ function queueHeadline(key, who, vars) {
   if (!r || !art) return;
   const team = myTeam();
   const v = Object.assign({ year: state.year, me: state.player.name, myTeam: team ? team.name : "" }, vars);
-  r.headlines = r.headlines || [];
-  r.headlines.push({ key: key, headline: fillNews(art.headline, v), body: fillNews(art.body, v), mine: who.indexOf("my") === 0 });
-  r.headlinesSeen = false;
+  return publishHeadline({ key: key, headline: fillNews(art.headline, v), body: fillNews(art.body, v), mine: who.indexOf("my") === 0 }, { id: id });
 }
 
 // 결승이 끝났을 때 (js/matchsim.js koFinal)
 const INTL_FINALS = ["firststand", "msi", "worlds"];
-function queueFinalNews(champKey, eventName, f) {
+function queueFinalNews(champKey, eventName, f, st) {
+  if (f.newsPublished) return;
   const mine = myTeam();
   let who;
   if (mine && f.winner === mine.id) who = "myTeam";
@@ -32,49 +33,27 @@ function queueFinalNews(champKey, eventName, f) {
   else if (INTL_FINALS.indexOf(champKey) !== -1) who = findTeam(f.winner) ? "domestic" : "overseas";
   else who = "other";
   const EVENT_NAMES = { cup: "LCK 컵", playoffs: "리그 플레이오프", worlds: "월드 챔피언십", firststand: "First Stand", msi: "MSI" };
-  const st = titleStreak(champKey, f);
+  // 연속 우승 기록은 경기 결과 처리에서 확정한 값을 받는다.
   const vars = {
     event: EVENT_NAMES[champKey] || eventName, winner: teamName(f.winner), loser: teamName(f.loser),
     score: Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]),
     mvp: f.pogName || teamName(f.winner) + "의 에이스", // 해외 팀은 선수 이름이 없어서
     streak: st.n, peat: peatName(st.n), brokenStreak: st.broken,
+    firstStandNote: firstStandOn() ? "우승팀은 First Stand에 출전한다." : "시즌 첫 트로피를 품고 다음 무대를 준비한다.",
   };
-  queueHeadline(champKey + "_final", who, vars);
-  repeatNews(who, vars, st);
+  const article = queueHeadline(champKey + "_final", who, vars);
+  repeatNews(who, vars, st, article);
+  if (article) f.newsPublished = true;
 }
 
-// ----- 연속 우승 (리핏·쓰리핏…) -----
-// state.league.titleStreaks = { champKey: { id 우승 팀, n 연속 우승, year } }. 예전 세이브는 역대 우승 기록(이름)으로 처음 한 번 셈
-function titleStreak(champKey, f) {
-  const L = state.league;
-  if (!L.titleStreaks) L.titleStreaks = {};
-  let prev = L.titleStreaks[champKey];
-  if (!prev) {
-    const hist = L.history || [];
-    let n = 0, name = null;
-    for (let i = hist.length - 1; i >= 0; i--) {
-      const h = hist[i], c = h.champions && h.champions[champKey];
-      if (h.year !== state.year - 1 - n || !c || (name && c !== name)) break;
-      name = c; n++;
-    }
-    const id = name === teamName(f.winner) ? f.winner : name === teamName(f.loser) ? f.loser : null;
-    prev = n && id ? { id: id, n: n, year: state.year - 1 } : null;
-  }
-  const last = prev && prev.year === state.year - 1;
-  const n = last && prev.id === f.winner ? prev.n + 1 : 1;
-  const broken = last && prev.id === f.loser && prev.n >= 2 ? prev.n : 0;
-  L.titleStreaks[champKey] = { id: f.winner, n: n, year: state.year };
-  return { n: n, broken: broken };
-}
 function peatName(n) {
   if (n < 2) return "";
   return (typeof REPEAT_NEWS !== "undefined" && REPEAT_NEWS.names[n]) || n + "연패";
 }
 // 방금 넣은 결승 기사에 연속 우승 제목·문장 더하기 + 우리 팀이면 소식·주요 순간
-function repeatNews(who, vars, st) {
+function repeatNews(who, vars, st, art) {
   if (typeof REPEAT_NEWS === "undefined") return;
-  const r = state.weekReport;
-  const art = r && r.headlines && r.headlines[r.headlines.length - 1];
+  if (!art) return;
   const team = myTeam();
   const v = Object.assign({ year: state.year, me: state.player.name, myTeam: team ? team.name : "" }, vars);
   const mineWin = who === "myTeam";
@@ -92,12 +71,12 @@ function repeatNews(who, vars, st) {
 // ----- 화면 -----
 function newsOverlayHTML(items) {
   const r = state.weekReport;
-  const arts = items.slice().sort(function (a, b) { return b.mine - a.mine; }).map(function (a, i) {
+  const arts = items.slice().sort(function (a, b) { return newsPriority(b) - newsPriority(a); }).map(function (a, i) {
     return '<article class="np-article' + (i === 0 ? " lead" : "") + (a.mine ? " mine" : "") + '">' +
-      "<h2>" + escapeHTML(a.headline) + "</h2><p>" + escapeHTML(a.body) + "</p></article>";
+      "<h2>" + escapeHTML(a.headline) + "</h2><div class=\"muted small\">" + escapeHTML(newsDate(a)) + "</div><p>" + escapeHTML(a.body) + "</p></article>";
   }).join("");
   return '<div class="np-paper">' +
-    '<div class="np-mast"><span class="np-title">📰 e스포츠 데일리</span><span class="np-date">' + escapeHTML(r ? r.when : "") + "</span></div>" +
+    '<div class="np-mast"><span class="np-title">📰 e스포츠 데일리</span><span class="np-date">' + "주간 주요 소식" + "</span></div>" +
     arts + '<div class="np-hint">아무 곳이나 누르면 닫혀요 · 다시 보기: 대시보드 지난주 결과 [📰 NEWS]</div></div>';
 }
 
@@ -120,6 +99,7 @@ function hideNewsPopup(e) {
   const el = document.getElementById("news-popup");
   if (el) el.hidden = true;
   if (state.weekReport) state.weekReport.headlinesSeen = true;
+  if (state.settings.autoSave) saveGame();
 }
 
 // 화면을 그린 뒤 (main.js renderPage): 아직 안 본 뉴스가 있으면 대시보드에서 띄움

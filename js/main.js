@@ -37,6 +37,7 @@ function createNewState() {
     transferListed: false,        // 이적 희망 (비시즌 제안 늘어남)
     transferRequestsLeft: 0,      // 이번 비시즌 이적 요청 남은 횟수
     soloRank: { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints }, // 솔로 랭크 (가상 래더)
+    newsState: { articles: [], notices: [] }, // 공통 뉴스 기록
     weekReport: null,             // 대시보드 "지난주 결과" (js/dashboard.js)
     quests: [],                   // 진행 중인 퀘스트 (js/quests.js)
     questSeq: 0,
@@ -920,9 +921,7 @@ function saveSeasonHistory() {
 function newYearArticle(lines) {
   const r = state.weekReport;
   if (!r) { lines.forEach(function (t) { addNews("새 시즌", t); }); return; }
-  r.headlines = r.headlines || [];
-  r.headlines.push({ key: "newyear", headline: state.year + "년 새 시즌, 이렇게 달라진다", body: lines.join("\n"), mine: false });
-  r.headlinesSeen = false;
+  publishHeadline({ key: "newyear", headline: state.year + "년 새 시즌, 이렇게 달라진다", body: lines.join("\n"), mine: false });
   addNews("새 시즌 기사", "📰 " + state.year + "년 새 시즌 기사: 승강·리그·해외·대형 신인 소식 " + lines.length + "건 (대시보드 [📰 NEWS])");
 }
 
@@ -947,17 +946,11 @@ function askConfirm(message, onYes, yesLabel) {
 
 // 소식 기록 (새 시즌, 새 챔피언, 패치 등)
 function addNews(title, message) {
-  state.log.unshift({
-    when: state.year + "년 " + state.week + "주차",
-    training: title,
-    message: message,
-    changes: {},
-  });
-  if (state.inbox) postMessage("news", "[" + title + "] " + message, message); // SNS 소식 탭에도
-  if (state.weekReport) state.weekReport.news.push({ title: title, text: message }); // 대시보드 지난주 결과에도 (제목과 함께)
+  return publishNotice(title, message);
 }
 
 function renderAll() {
+  migrateCurrentNews();
   const creating = !state.player; // 캐릭터가 없으면 캐릭터 생성 화면
   const ended = !creating && !!state.retired; // 은퇴했으면 엔딩 화면
   document.getElementById("layout").hidden = creating || ended;

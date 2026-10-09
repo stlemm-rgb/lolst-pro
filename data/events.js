@@ -20,7 +20,7 @@
 // - chance: 조건이 맞을 때 실제로 올 확률 (0.3 = 30%). 없으면 100%
 // - need: 추가 조건 { minPopularity, maxPopularity, minReputation, maxReputation, minAge, minWeek(이 주차 이후), trait(이 특성이 있어야), noTrait(이 특성이 없어야) }
 // - cooldown: 같은 이벤트가 다시 오기까지 쉬는 주 (없으면 EVENT_RULES.cooldown)
-// - effects: (소식) 읽으면 바로 적용되는 효과
+// - effects: (소식) 생성될 때 바로 적용되는 효과 (읽기·재열기와 무관)
 // - choices: (받은 연락) 선택지 [{ label, effects, risk, cure, note, followUp }]
 // - who: 다른 선수가 나오는 연락 (2026-10-06). 맞는 선수가 없으면 이 연락은 안 와요
 //     "rival"       다른 팀의 같은 포지션 선수 중 가장 잘하는 선수 (같은 리그)

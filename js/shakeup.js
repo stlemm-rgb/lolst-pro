@@ -130,7 +130,5 @@ function shakeupNews() {
   const art = pick(SHAKEUP_ARTICLES);
   const short = pend.reworks.length > 6 ? pend.reworks.slice(0, 6).join(", ") + " 등 " + pend.reworks.length + "명" : pend.reworks.join(", ");
   const v = { year: state.year, item: item.name, itemDesc: item.desc, reworks: short, moves: movesText, metaCount: SHAKEUP.metaWide.perPosition, mine: mine };
-  r.headlines = r.headlines || [];
-  r.headlines.unshift({ key: "shakeup", headline: fillNews(art.headline, v), body: fillNews(art.body, v), mine: true });
-  r.headlinesSeen = false;
+  publishHeadline({ key: "shakeup", headline: fillNews(art.headline, v), body: fillNews(art.body, v), mine: true }, { first: true });
 }

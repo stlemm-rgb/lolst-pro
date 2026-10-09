@@ -41,3 +41,7 @@ python3 tools/measure_seasons.py --seasons 3 --answer random
 - 명령 하나가 10분을 넘으면 끊김 → 길면 `nohup python3 tools/measure_seasons.py ... --out /tmp/x.json > /tmp/x.log 2>&1 &` 후 `sleep`으로 기다렸다 읽기
 - 동시 실행은 3개까지가 적당 (`--jobs 3`)
 - `pkill -f`는 쓰지 말 것 (셸까지 끊김)
+
+## 뉴스 공통 처리 회귀 검사
+
+`node tools/test_news.cjs` — 뉴스 중복·날짜·구버전 저장·효과 보존·미응답 연락·결승 재처리와 2012/2017/2022 시작 53주 진행 검사. Node 내장 모듈만 사용. DOM 대체 객체를 사용하므로 실제 브라우저 배치 검사는 별도다.
