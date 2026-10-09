@@ -956,6 +956,7 @@ function renderAll() {
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
   ensureWorld(); // 해외 리그 (새 게임·예전 세이브, js/era.js)
+  ensureWorldV11(); // 예전 세이브: 해외 선수 숙련도·지역 3단계 수준 (js/era.js)
   if (state.league && state.league.season) { prepareWeek(state.week); prepareWeek(state.week + 1); } // 새 게임 1주차: 2주차 LCK 컵 대진도 미리
   ensureNpcStyles(); // 예전 세이브: 다른 선수 플레이 스타일 (js/league.js)
   ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)

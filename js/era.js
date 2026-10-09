@@ -123,6 +123,7 @@ function makeWorldPlayer(pos, avg, ageRange) {
   const p = { id: "X" + W.seq, name: worldNick(), pos: pos, age: randInt(ageRange[0], ageRange[1]), stats: stats, traits: randomNpcTraits(), style: pickStyle(pos) };
   applyStyle(p);
   shapeNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (js/league.js)
+  npcMasteryInit(p); // 챔피언 숙련도 (국제대회에서 국내 선수와 같은 밴픽·숙련도 규칙, v1.1)
   W.players[p.id] = p;
   return p;
 }
@@ -171,7 +172,7 @@ function addWorldRegion(region) {
 // 해외 리그 준비: 없으면 만들고, 올해 새로 참가하는 지역 추가 (새 게임·불러오기·새 시즌)
 function ensureWorld() {
   if (!state.league) return [];
-  if (!state.world) state.world = { teams: [], players: {}, seq: 0, tseq: 0, names: [] };
+  if (!state.world) state.world = { teams: [], players: {}, seq: 0, tseq: 0, names: [], tierDone: true };
   const have = {};
   state.world.teams.forEach(function (t) { have[t.region] = true; });
   const news = [];
@@ -203,6 +204,41 @@ function worldNewSeason() {
       return id;
     });
   });
+  normalizeWorldTiers(WORLD_RULES.tierPull); // 지역 수준 3단계 유지 (v1.1)
+}
+
+// 해외 선수가 속한 팀 id (없으면 null)
+function worldTeamIdOf(id) {
+  if (!state.world) return null;
+  const t = state.world.teams.find(function (x) { return x.roster.indexOf(id) !== -1; });
+  return t ? t.id : null;
+}
+
+// 지역 수준 맞추기 (v1.1): 지역 주전 평균을 '1부 평균 × strength' 쪽으로 pull만큼 (스탯을 한꺼번에 올리거나 내림)
+function normalizeWorldTiers(pull) {
+  if (!state.world) return;
+  const base = domesticBase();
+  activeRegions().forEach(function (r) {
+    const teams = state.world.teams.filter(function (t) { return t.region === r.id; });
+    if (!teams.length) return;
+    const avg = average(teams.map(worldTeamStrength));
+    const shift = Math.round((base * r.strength - avg) * pull);
+    if (!shift) return;
+    teams.forEach(function (t) {
+      t.roster.forEach(function (id) {
+        const p = worldPlayer(id);
+        if (p) STATS.forEach(function (s) { p.stats[s.id] = Math.max(1, Math.min(100, p.stats[s.id] + shift)); });
+      });
+    });
+  });
+}
+
+// 예전 세이브: 해외 선수 숙련도 · 지역 3단계 수준 한 번 맞추기
+function ensureWorldV11() {
+  const W = state.world;
+  if (!W) return;
+  Object.keys(W.players).forEach(function (id) { if (!W.players[id].mastery) npcMasteryInit(W.players[id]); });
+  if (!W.tierDone) { normalizeWorldTiers(1); W.tierDone = true; }
 }
 
 // 해외 선수 1년 성장·노화 (js/league.js npcYearGrowth에서 같은 규칙으로)
@@ -276,6 +312,7 @@ pages.world = function () {
   return "<h1>해외 리그</h1>" +
     '<div class="card"><p class="muted small">국제대회(월드' + (msiOn() ? " · MSI" : "") + (firstStandOn() ? " · First Stand" : "") + ")에 나오는 해외 지역과 팀이에요. 전력 = 주전 5명 종합 능력 평균 (우리 리그 1부 평균 " + domestic.toFixed(1) +
       "). 선수들도 해마다 성장·노화·은퇴해요. 순위는 이번 시즌 지역 순위예요 (전력 + 운).</p>" +
+      '<p class="muted small">지역 수준은 3단계: 우리 리그가 가장 강하고, 중국·북미·유럽이 그다음(약 94%), 나머지 지역이 가장 아래(약 86%)예요. 국제대회에서는 해외 팀도 실제 선수 5명이 뛰어서 경기 결과에 이름·평점·POG가 나와요.</p>' +
       (future.length ? '<p class="muted small">앞으로 참가할 지역: ' + future.map(function (r) { return r.name + "(" + r.from + ")"; }).join(", ") + "</p>" : "") +
       '<p class="muted small">MSI ' + ERA.msiFrom + "년부터 · First Stand " + ERA.firstStandFrom + "년부터</p></div>" + cards;
 };

@@ -13,7 +13,8 @@ function findTeam(id) {
 }
 
 function findPlayer(id) {
-  return state.league.players[id];
+  // v1.1: 해외 선수(id "X…")도 찾음 → 국제대회 경기·평점·POG·특성에 그대로 쓰임 (js/era.js)
+  return state.league.players[id] || (typeof id === "string" && id[0] === "X" && state.world ? state.world.players[id] : undefined);
 }
 
 function myTeam() {

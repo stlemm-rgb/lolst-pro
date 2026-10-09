@@ -35,7 +35,7 @@ function grantSTrait(id, traitId) {
   if (rule.who === "npc" && id === USER_ID) return; // 라이벌 전용 (124)
   list.push(traitId);
   const t = findTrait(traitId);
-  const teamId = id === USER_ID ? myTeam().id : findPlayer(id).teamId;
+  const teamId = id === USER_ID ? myTeam().id : findPlayer(id).teamId || worldTeamIdOf(id); // 해외 선수면 해외 팀 (v1.1)
   const team = teamId ? teamName(teamId) : "FA";
   if (!state.league.sTraitLog) state.league.sTraitLog = [];
   state.league.sTraitLog.push({ year: state.year, week: state.week, id: id, name: playerName(id), team: team, trait: traitId });

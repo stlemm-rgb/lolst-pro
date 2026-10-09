@@ -168,14 +168,16 @@ function lineup(teamId, userCtx, setCtx) {
   setCtx = setCtx || {};
   const overseas = findOverseas(teamId);
   const scout = scoutedMult(teamId); // 🔍 지난 시즌 월드 우승 팀: 상대가 연구해서 경기력 − (js/dynasty.js)
-  if (overseas) {
+  const wt = overseas && typeof findWorldTeam === "function" ? findWorldTeam(teamId) : null; // v1.1: 해외 리그 팀은 실제 선수 5명으로
+  if (overseas && !wt) {
     return POSITION_IDS.map(function (pos) {
       return { pos: pos, id: null, power: overseas.power * randFloat(0.85, 1.15) * scout };
     });
   }
-  const s = starters(teamId);
+  const s = wt ? worldStarters(wt) : starters(teamId);
   return POSITION_IDS.map(function (pos) {
     const id = s[pos];
+    if (!id) return { pos: pos, id: null, power: wt ? worldTeamStrength(wt) * randFloat(0.85, 1.15) * scout : 0 }; // 해외 팀에 그 포지션 선수가 없을 때
     const tr = matchTraitsOf(id);
     const st = statsOfId(id);
     const v = traitSumOf(tr, "variance"); // 기복: 더 흔들림
@@ -188,7 +190,7 @@ function lineup(teamId, userCtx, setCtx) {
     } else {
       const down = 1 - (MATCH.npcMultiplier[0] - v);
       power = playerScore(id) * randFloat(1 - down * (1 - steady), MATCH.npcMultiplier[1] + v);
-      if (findTeam(teamId).tier === 2) power *= 1 + HOUSING.npcDormPower; // 2부는 합숙: 컨디션 상한 (data/shop.js)
+      if (!wt && findTeam(teamId).tier === 2) power *= 1 + HOUSING.npcDormPower; // 2부는 합숙: 컨디션 상한 (data/shop.js)
     }
     power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx) * scout;
     return { pos: pos, id: id, power: power };

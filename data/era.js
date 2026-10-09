@@ -30,20 +30,21 @@ const ERA_INTRO = {
 
 // 월드 챔피언십 지역 (우리 리그 = 한국은 여기 없음). from: 처음 참가하는 해
 // strength: 우리 리그 1부 평균 대비 전력 (1.0 = 같음), teams: 그 지역 팀 수 (선수 명단을 가진 가상 팀)
+//   v1.1 (사용자 결정): 3단계 — 우리 리그(LCK) 1.0 > 중국·북미·유럽 0.94 > 나머지 0.86. 해마다 새해에 이 수준 쪽으로 반쯤 맞춤 (WORLD_RULES.tierPull)
 // 월드 자리: 강한 지역 1위부터 자리를 받고(전력 순 자리 openSlots개는 남겨 둠 → 약한 지역은 못 나갈 수도), 나머지는 전력 순
 const WORLD_REGIONS = [
-  { id: "na",  name: "북미",       from: 2012, strength: 0.88, teams: 8 },
-  { id: "eu",  name: "유럽",       from: 2012, strength: 0.93, teams: 8 },
-  { id: "cn",  name: "중국",       from: 2013, strength: 1.0,  teams: 8 },
-  { id: "tw",  name: "대만·홍콩",  from: 2013, strength: 0.84, teams: 6 },
-  { id: "sea", name: "동남아시아", from: 2014, strength: 0.76, teams: 4 },
-  { id: "br",  name: "브라질",     from: 2015, strength: 0.75, teams: 4 },
-  { id: "tr",  name: "터키",       from: 2015, strength: 0.74, teams: 4 },
-  { id: "cis", name: "CIS",        from: 2016, strength: 0.74, teams: 4 },
-  { id: "jp",  name: "일본",       from: 2016, strength: 0.72, teams: 4 },
-  { id: "lat", name: "중남미",     from: 2016, strength: 0.73, teams: 4 },
-  { id: "vn",  name: "베트남",     from: 2017, strength: 0.82, teams: 4 },
-  { id: "oce", name: "오세아니아", from: 2017, strength: 0.70, teams: 4 },
+  { id: "na",  name: "북미",       from: 2012, strength: 0.94, teams: 8 },
+  { id: "eu",  name: "유럽",       from: 2012, strength: 0.94, teams: 8 },
+  { id: "cn",  name: "중국",       from: 2013, strength: 0.94,  teams: 8 },
+  { id: "tw",  name: "대만·홍콩",  from: 2013, strength: 0.86, teams: 6 },
+  { id: "sea", name: "동남아시아", from: 2014, strength: 0.86, teams: 4 },
+  { id: "br",  name: "브라질",     from: 2015, strength: 0.86, teams: 4 },
+  { id: "tr",  name: "터키",       from: 2015, strength: 0.86, teams: 4 },
+  { id: "cis", name: "CIS",        from: 2016, strength: 0.86, teams: 4 },
+  { id: "jp",  name: "일본",       from: 2016, strength: 0.86, teams: 4 },
+  { id: "lat", name: "중남미",     from: 2016, strength: 0.86, teams: 4 },
+  { id: "vn",  name: "베트남",     from: 2017, strength: 0.86, teams: 4 },
+  { id: "oce", name: "오세아니아", from: 2017, strength: 0.86, teams: 4 },
 ];
 
 // 해외 선수 (가벼운 버전: 이름·포지션·나이·스탯만, 경기 화면에는 아직 안 나옴 — 나중에 확장)
@@ -54,6 +55,7 @@ const WORLD_RULES = {
   rookieBelow: 8,         // 은퇴한 자리를 채우는 신인: 그 팀 평균보다 이만큼 낮게
   rankNoise: 2,           // 시즌마다 지역 순위를 정할 때 전력 흔들림 ±
   openSlots: 4,           // 월드에서 지역 1위가 아니라 전력 순으로 주는 자리 수
+  tierPull: 0.5,          // 새해마다 지역 주전 평균을 '1부 평균 × strength' 쪽으로 차이의 이만큼 옮김 (스타 유입·성장으로 수준이 흐트러지지 않게)
 };
 
 // 해외 팀 이름 (지역마다 앞에서부터 사용, 모자라면 공용 목록) — 모두 가상의 이름

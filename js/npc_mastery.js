@@ -23,8 +23,7 @@ function npcMasteryInit(p) {
 function ensureNpcMastery() {
   if (!state.league || !state.year) return;
   const released = releasedChampions(state.year, state.week);
-  Object.keys(state.league.players).forEach(function (id) {
-    const p = state.league.players[id];
+  Object.keys(state.league.players).map(function (id) { return state.league.players[id]; }).concat(typeof worldPlayersList === "function" ? worldPlayersList() : []).forEach(function (p) { // 해외 선수도 (v1.1)
     if (!p.mastery) { npcMasteryInit(p); return; }
     released.forEach(function (c) {
       if (c.positions.indexOf(p.pos) !== -1 && p.mastery[c.name] === undefined) p.mastery[c.name] = MASTERY.min;
@@ -35,8 +34,7 @@ function ensureNpcMastery() {
 // 매주 챔피언 연습: 적응력이 높을수록 메타 챔피언(숙련도 낮은 순)을 더 자주 연습
 function npcPractice() {
   const R = NPC_MASTERY;
-  Object.keys(state.league.players).forEach(function (id) {
-    const p = state.league.players[id];
+  Object.keys(state.league.players).map(function (id) { return state.league.players[id]; }).concat(typeof worldPlayersList === "function" ? worldPlayersList() : []).forEach(function (p) { // 해외 선수도 매주 연습 (v1.1)
     if (!p.mastery) npcMasteryInit(p);
     const names = Object.keys(p.mastery);
     if (!names.length) return;

@@ -72,7 +72,7 @@ function finishSeriesRecord(m, perf) {
 // ----- 시상 -----
 function giveAward(key, id, value, extraTitle) {
   const title = AWARD_NAMES[key] + (extraTitle ? " (" + extraTitle + ")" : "");
-  const teamId = id === USER_ID ? myTeam().id : (findPlayer(id) ? findPlayer(id).teamId : null);
+  const teamId = id === USER_ID ? myTeam().id : (findPlayer(id) ? findPlayer(id).teamId || worldTeamIdOf(id) : null); // 해외 선수면 해외 팀 (v1.1)
   const entry = {
     year: state.year, key: key, title: title, id: id, name: playerName(id),
     team: teamId ? teamName(teamId) : "FA", pos: playerPos(id), value: value,
