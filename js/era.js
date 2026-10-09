@@ -210,6 +210,43 @@ function worldPlayersList() {
   return state.world ? Object.keys(state.world.players).map(function (id) { return state.world.players[id]; }) : [];
 }
 
+// ----- 2012년 시작: 2주차 리그 규모 소개 기사 (v1.1, data/era.js ERA_INTRO) -----
+// main.js nextWeek에서 주를 넘긴 뒤 부름. 2012년 2주차에 한 번 (state.league.eraIntroDone)
+function eraIntroArticle() {
+  const L = state.league, r = state.weekReport;
+  if (!L || L.eraIntroDone || state.year !== 2012 || state.week !== 2 || !r) return;
+  L.eraIntroDone = true;
+  const y = state.year, n = y + 1, I = ERA_INTRO;
+  const now = eraTeams(y), nx = eraTeams(n);
+  const regs = activeRegions(y);
+  const fullYear = ERA.money[ERA.money.length - 1][0];
+  const v = {
+    year: y, next: n, t1: now[1], t2: now[2], players: Object.keys(L.players).length,
+    b1: moneyText(teamBudgetOf(1, y)), b2: moneyText(teamBudgetOf(2, y)), pct: Math.round(eraMoney(y) * 100),
+    regions: regs.map(function (x) { return x.name; }).join("·"), rcount: regs.length,
+    wteams: regs.reduce(function (sum, x) { return sum + x.teams; }, 0), fullYear: fullYear,
+  };
+  const fill = function (t) { return t.replace(/\{(\w+)\}/g, function (all, k) { return v[k] !== undefined ? v[k] : all; }); };
+  // 내년에 달라지는 것
+  const next = [];
+  if (eraMoney(n) > eraMoney(y)) next.push("  · 💰 돈 규모 " + v.pct + "% → " + Math.round(eraMoney(n) * 100) + "%: 1부 구단 예산 " + v.b1 + " → " + moneyText(teamBudgetOf(1, n)) + ", 연봉·상금도 함께 오른다");
+  if (eraPop(n) > eraPop(y)) next.push("  · ⭐ 관심이 늘어 인기도가 오르는 속도 " + Math.round(eraPop(y) * 100) + "% → " + Math.round(eraPop(n) * 100) + "%");
+  if (nx[1] !== now[1] || nx[2] !== now[2]) next.push("  · 🏟️ 리그 확장: 1부 " + now[1] + " → " + nx[1] + "팀, 2부 " + now[2] + " → " + nx[2] + "팀");
+  else {
+    const grow = ERA.teams.find(function (row) { return row[0] > y; });
+    if (grow) next.push("  · 🏟️ 리그 확장은 " + grow[0] + "년 예정 (1부 " + grow[1] + "팀 · 2부 " + grow[2] + "팀)");
+  }
+  const joins = WORLD_REGIONS.filter(function (x) { return x.from === n; });
+  if (joins.length) next.push("  · 🌏 " + joins.map(function (x) { return x.name; }).join("·") + " 지역이 월드 챔피언십에 새로 참가 (" + joins.reduce(function (s2, x) { return s2 + x.teams; }, 0) + "팀)");
+  if (ERA.msiFrom === n) next.push("  · 🏆 새 국제대회 MSI 시작");
+  else if (ERA.msiFrom > n) next.push("  · 🏆 새 국제대회 MSI는 " + ERA.msiFrom + "년 시작 예정");
+  const body = I.lines.map(fill).concat(next.length ? next : [I.noChange]);
+  r.headlines = r.headlines || [];
+  r.headlines.push({ key: "eraIntro", headline: fill(I.headline), body: body.join("\n"), mine: false });
+  r.headlinesSeen = false;
+  addNews("리그 소개", "📰 " + fill(I.headline) + " (대시보드 [📰 NEWS])");
+}
+
 // ----- 화면: [기록실] → 🌏 해외 리그 -----
 pages.world = function () {
   ensureWorld();

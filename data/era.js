@@ -14,6 +14,20 @@ const ERA = {
   firstStandFrom: 2025, // First Stand
 };
 
+// 2012년 시작 게임: 2주차에 들어가면 리그 규모 소개 신문 기사 (js/era.js eraIntroArticle)
+//   빈칸: {year} {next} {t1} {t2} {players} {b1} {b2} {pct} {regions} {rcount} {wteams} {fullYear} {nextLines}
+const ERA_INTRO = {
+  headline: "{year}년, 걸음마를 뗀 프로 리그 — 해마다 커진다",
+  lines: [
+    "🏟️ 리그 규모: 1부 {t1}팀 · 2부 {t2}팀, 선수 약 {players}명이 뛰고 있다.",
+    "💰 구단 예산: 1부 구단 한 해 {b1} · 2부 {b2} 정도. 연봉·상금·스폰서도 아직 완성된 시장의 {pct}% 수준이다.",
+    "🌏 해외 리그: {regions} — {rcount}개 지역 {wteams}팀이 월드 챔피언십에 도전한다. 국제대회는 아직 월드 챔피언십 하나뿐.",
+    "📈 e스포츠 인기가 빠르게 오르면서 리그는 해마다 커지는 추세다. {fullYear}년쯤이면 지금의 완성된 리그 규모가 될 전망이다.",
+    "🔜 내년({next}년)에는:",
+  ],
+  noChange: "  · 큰 변화 없이 올해 규모가 이어진다",
+};
+
 // 월드 챔피언십 지역 (우리 리그 = 한국은 여기 없음). from: 처음 참가하는 해
 // strength: 우리 리그 1부 평균 대비 전력 (1.0 = 같음), teams: 그 지역 팀 수 (선수 명단을 가진 가상 팀)
 // 월드 자리: 강한 지역 1위부터 자리를 받고(전력 순 자리 openSlots개는 남겨 둠 → 약한 지역은 못 나갈 수도), 나머지는 전력 순

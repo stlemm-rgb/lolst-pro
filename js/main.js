@@ -791,6 +791,7 @@ function nextWeek(restWeek) {
   // 이번 주·다음 주 리그 일정(대진) 미리 만들기 → 대시보드 '이번 주'·'다음 경기'에 바로 보임 (js/matchsim.js)
   prepareWeek(state.week);
   prepareWeek(state.week + 1);
+  eraIntroArticle(); // 2012년 시작: 2주차에 리그 규모 소개 기사 (js/era.js)
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
   newlyReleased(state.year, state.week).forEach(function (c) {
