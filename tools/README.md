@@ -57,3 +57,7 @@ python3 tools/measure_seasons.py --seasons 3 --answer random
 ### 역사 뉴스 (5단계)
 
 node tools/test_historical_news.cjs: 2012~2026 기사 편성·중복·저장·게임 수치 무변경 검사. 출처는 data/historical_news.js의 source 필드. 새 게임은 SNS 신문 보관함, 다음 해부터 기존 신년 기사에 합쳐진다. 실제 53주 진행과 병합은 node tools/test_news.cjs에서도 검사한다. Node VM 검사로 화면 배치까지 검증하지는 않는다.
+
+### 작은 시대 효과 (6단계)
+
+node tools/test_era_match.cjs: 날짜 경계·저장·양 팀 대칭·뉴스 무보상, 시대별500세트 동일 난수 전후 비교. 실제 playSet을 사용하며 로스터 생성에 따라 측정값은 달라집니다. 전체 장기 밸런스나 실제 화면 검사는 아닙니다. 조절 값은 data/era_match.js.

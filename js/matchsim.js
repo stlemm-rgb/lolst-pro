@@ -160,7 +160,7 @@ function phaseTeamScore(list, phase) {
     sum += phaseDev(p.id, phase) * w;
     weight += w;
   });
-  return weight ? sum / weight * P.devWeight : 0;
+  return weight ? sum / weight * P.devWeight * eraPhaseMultiplier(phase) : 0;
 }
 
 // 한 팀의 이번 세트 라인업과 경기력

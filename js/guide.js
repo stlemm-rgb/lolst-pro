@@ -244,6 +244,7 @@ pages.howto = function () {
   }).join("");
   const t = tutorialState();
   return "<h1>게임 방법</h1>" +
+    '<div class="card"><h2>현재 경기 환경</h2><p>' + escapeHTML(eraMatchRule().label) + '</p><p class="muted small">' + escapeHTML(ERA_MATCH_HELP) + '</p></div>' +
     '<div class="card"><p>처음이라면 대시보드의 📘 처음이라면 안내를 따라가 보세요. ' +
       (t.on ? '<span class="up small">(지금 켜져 있어요)</span>' : '<button class="small-btn" data-tutorial="on">처음 안내 다시 켜기</button>') + "</p></div>" +
     '<div class="grid">' + cards + "</div>" +
