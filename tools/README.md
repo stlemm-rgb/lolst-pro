@@ -61,3 +61,7 @@ node tools/test_historical_news.cjs: 2012~2026 기사 편성·중복·저장·�
 ### 작은 시대 효과 (6단계)
 
 node tools/test_era_match.cjs: 날짜 경계·저장·양 팀 대칭·뉴스 무보상, 시대별500세트 동일 난수 전후 비교. 실제 playSet을 사용하며 로스터 생성에 따라 측정값은 달라집니다. 전체 장기 밸런스나 실제 화면 검사는 아닙니다. 조절 값은 data/era_match.js.
+
+### 뉴스 개편 통합 검증 (7단계)
+
+결과와 미완료 화면 항목: NEWS_VALIDATION.md. node tools/test_news_integration.cjs(832주), node tools/test_news_edges.cjs(8항목), node tools/test_era_positions.cjs(포지션별 경기 비교). 통합/포지션 검사는 수 분 걸릴 수 있습니다. 실제 저장소의 localStorage에는 쓰지 않고 VM 내부 상태만 사용합니다.
