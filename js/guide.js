@@ -97,7 +97,7 @@ function currentGoal() {
 
 // ----- 💡 이번 주 추천: [{ text, label, act }] 중요한 것부터 최대 3개 -----
 let adviceActions = [];
-function weekAdvice() {
+function weekAdvice(noQuest) {
   const list = [];
   const wk = userWeekMatches(state.week);
   const hasMatch = wk.matches.length + wk.preview.length > 0 && !state.benched;
@@ -122,7 +122,7 @@ function weekAdvice() {
   if (waiting) list.push({ text: "답하지 않은 연락이 " + waiting + "개 있어요. 4주가 지나면 그냥 지나가요.", label: "SNS 열기", act: { sns: true } });
   // 4) 지금 훈련이 채우지 않는 퀘스트
   const q = (state.quests || []).find(function (x) { return questPlan(x) && !questPlanActive(x); });
-  if (q) list.push({ text: "퀘스트 '" + findQuest(q.id).title + "' (" + Math.max(0, q.deadline - absWeek()) + "주 남음)", label: questPlanLabel(q) + "(으)로 선택", act: { quest: q.uid } });
+  if (q && !noQuest) list.push({ text: "퀘스트 '" + findQuest(q.id).title + "' (" + Math.max(0, q.deadline - absWeek()) + "주 남음)", label: questPlanLabel(q) + "(으)로 선택", act: { quest: q.uid } });
   // 5) 메타 챔피언 숙련도가 낮음
   const meta = state.meta.champs[state.player.position];
   const avg = meta.reduce(function (a, n) { return a + (state.mastery[n] || 0); }, 0) / meta.length;
@@ -154,8 +154,8 @@ function goalLineHTML() {
 }
 
 // 💡 이번 주 추천 줄들 ('이번 주' 카드 맨 위, js/dashboard.js). 훈련 미선택도 여기서 알려 줌 (훈련 줄은 없앰)
-function adviceRowsHTML() {
-  const advice = weekAdvice();
+function adviceRowsHTML(noQuest) {
+  const advice = weekAdvice(noQuest);
   adviceActions = advice.map(function (a) { return a.act; });
   return advice.map(function (a, i) {
     return '<div class="rep-row advice"><span class="rep-tag tip-tag">💡</span><span>' + escapeHTML(a.text) + '</span><button class="small-btn" data-advice="' + i + '">' + escapeHTML(a.label) + "</button></div>";

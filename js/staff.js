@@ -169,14 +169,31 @@ function compEdge(mine, opp) {
   if (!a || !b) return 0;
   return a.beats.indexOf(opp) !== -1 ? 1 : b.beats.indexOf(mine) !== -1 ? -1 : 0;
 }
-function scoutAdvice(shown) {
+function scoutOptions(shown) {
   const meta = metaComp();
   const cs = countersOf(meta);
   const opts = [
     { id: "meta", v: compEdge(meta, shown) },
     { id: "counter", v: cs.reduce(function (s, c) { return s + compEdge(c, shown); }, 0) / cs.length },
   ];
-  opts.sort(function (a, b) { return b.v - a.v; });
+  return opts.sort(function (a, b) { return b.v - a.v; });
+}
+// 이번 주 리포트들을 합쳐 더 나은 전략 (대시보드 조합 전략 '📊 추천' 표시, js/comps.js). 차이 없으면 null
+function scoutBestPlan() {
+  const mine = myTeam();
+  if (!mine || !state.league.season) return null;
+  const sum = { meta: 0, counter: 0 };
+  let n = 0;
+  userWeekMatches(state.week).matches.forEach(function (m) {
+    if (!m.scout || m.scout.y !== state.year) return;
+    scoutOptions(m.scout.shown).forEach(function (o) { sum[o.id] += o.v; });
+    n++;
+  });
+  if (!n || sum.meta === sum.counter) return null;
+  return sum.meta > sum.counter ? "meta" : "counter";
+}
+function scoutAdvice(shown) {
+  const opts = scoutOptions(shown);
   if (opts[0].v === opts[1].v) return "두 전략 차이 없음";
   const p = COMP_PLANS.find(function (x) { return x.id === opts[0].id; });
   return "추천: <b>" + p.name + "</b>" + (opts[0].v > 0 ? " (상성 우위 기대)" : " (상성 열세를 피함)");

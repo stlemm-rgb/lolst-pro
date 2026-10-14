@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 5 — 대시보드</title>
+<style>
+:root { --bg:#07070d; --panel:#11111c; --panel-2:#181828; --border:#26263d; --text:#f1f1f7; --muted:#8a8aa6; --accent:#00e0ff; --accent2:#b44dff; --gold:#ffd23f; --good:#2bff9e; --bad:#ff3d71;
+  --r:14px; --r-s:10px; --r-xs:6px; --grad: linear-gradient(90deg,#b44dff,#00e0ff); --grad-btn: linear-gradient(90deg,#8a3dff,#0096c7); --grad-hero: linear-gradient(120deg,#1a0f2e 0%,#0d1a2b 60%,#0b0b14 100%); }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+.wrap { max-width: 1320px; margin: 0 auto; padding: 24px 16px 60px; }
+h1 { font-size: 24px; margin: 0 0 6px; }
+.lead, .note { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+h2.sec { font-size: 18px; margin: 40px 0 6px; padding-top: 16px; border-top: 1px solid var(--border); }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px; }
+.tabs button, .btabs button { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--panel-2); color: var(--text); cursor: pointer; }
+.tabs button.on, .btabs button.on { background: var(--grad-btn); border-color: transparent; color: #fff; font-weight: bold; }
+.muted { color: var(--muted); } .sm { font-size: 12px; } .up { color: var(--good); } .down { color: var(--bad); } .acc { color: var(--accent); } .r { margin-left: auto; }
+button { font: inherit; color: var(--text); }
+button.primary { background: var(--grad-btn); border: 0; color: #fff; font-weight: bold; padding: 9px 16px; border-radius: var(--r-s); }
+.sm-btn { font-size: 12px; padding: 5px 10px; border-radius: var(--r-s); border: 1px solid rgba(0,224,255,.35); background: linear-gradient(180deg,#22223a,#1a1a2d); cursor: pointer; white-space: nowrap; }
+.bar { height: 8px; border-radius: 99px; background: var(--panel-2); overflow: hidden; flex: 1; min-width: 50px; }
+.bar i { display: block; height: 100%; border-radius: 99px; background: var(--grad); }
+.bar.y i { background: var(--gold); }
+.px { image-rendering: pixelated; image-rendering: crisp-edges; } .pf { display: block; }
+.pf-frame { display: inline-flex; align-items: flex-end; justify-content: center; padding: 4px 4px 0; border-radius: var(--r-s); background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); overflow: hidden; flex: none; }
+.pf-face { display: inline-block; vertical-align: middle; border-radius: var(--r-xs); background: radial-gradient(circle at 50% 70%, #34305e, #1c1b30); }
+.pf-jump { display: inline-block; } .pf-jump.jumping { animation: pfJump 420ms steps(1, end); }
+@keyframes pfJump { 0%{transform:translateY(0)} 25%{transform:translateY(calc(var(--jh,3px) * -.5))} 50%{transform:translateY(calc(var(--jh,3px) * -1))} 75%{transform:translateY(calc(var(--jh,3px) * -.5))} 100%{transform:translateY(0)} }
+.uni-sw { display: inline-flex; gap: 2px; vertical-align: middle; margin-right: 6px; } .uni-sw i { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(255,255,255,.25); display: inline-block; }
+
+/* 앱 틀 */
+.app { display: grid; grid-template-columns: 170px 1fr; border: 1px solid var(--border); border-radius: 18px; overflow: hidden; background: var(--bg); }
+.side { background: #0b0b14; padding: 16px 8px; }
+.logo { font-weight: bold; font-size: 17px; padding: 4px 10px 12px; line-height: 1.3; } .logo .ver { display: block; font-size: 11px; color: var(--muted); font-weight: normal; }
+.mg { font-size: 11px; color: #5d6679; font-weight: bold; padding: 12px 10px 4px; }
+.mi { padding: 8px 12px; border-radius: var(--r-s); color: #9a9ab4; margin: 1px 0; } .mi.on { background: var(--grad-btn); color: #fff; font-weight: bold; }
+.badge-n { background: var(--bad); color: #fff; font-size: 11px; border-radius: 99px; padding: 0 6px; margin-left: 4px; }
+.main { padding: 0 20px 20px; min-width: 0; }
+.topbar { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; position: sticky; top: 0; background: rgba(7,7,13,.92); backdrop-filter: blur(6px); z-index: 5; }
+.topbar .ham { display: none; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-s); padding: 6px 10px; font-size: 16px; }
+.tb-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.pill { padding: 7px 11px; border-radius: var(--r-s); border: 1px solid var(--border); background: var(--panel-2); font-size: 13px; white-space: nowrap; }
+
+/* 히어로 */
+.hero { background: var(--grad-hero); border: 1px solid var(--border); border-radius: 18px; padding: 16px 18px; display: grid; grid-template-columns: auto minmax(0, 1.6fr) auto minmax(220px, 1fr); gap: 20px; align-items: center; margin-bottom: 16px; position: relative; overflow: hidden; }
+.hero::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 92% -20%, rgba(0,224,255,.12), transparent 40%); pointer-events: none; }
+.hero-name { font-size: 22px; font-weight: bold; } .hero-name .muted { font-size: 13px; font-weight: normal; }
+.hero-team { margin-top: 4px; font-size: 13px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.chip { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid rgba(43,255,158,.45); color: var(--good); }
+.chip.gold { background: var(--gold); color: #1d1b16; border-color: var(--gold); font-weight: bold; }
+.goal { margin-top: 8px; font-size: 13px; }
+.hero-ovr { text-align: center; padding: 0 8px; } .hero-ovr .lbl { font-size: 12px; color: var(--muted); }
+.hero-ovr .big { font-size: 44px; font-weight: bold; line-height: 1.05; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero-status .hg { display: grid; grid-template-columns: 46px 1fr 30px; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); padding: 2px 0; } .hero-status .hg b { color: var(--text); text-align: right; font-size: 13px; }
+.hs-row { display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px; }
+
+/* 본문 */
+.body { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr); gap: 16px; align-items: start; }
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 18px; margin-bottom: 16px; }
+.card h2 { font-size: 16px; margin: 0 0 12px; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.week { border-color: rgba(0,224,255,.45); box-shadow: 0 0 0 1px rgba(0,224,255,.08), 0 10px 30px rgba(0,224,255,.06); }
+.todo { display: grid; gap: 6px; margin-bottom: 12px; }
+.todo .t { display: flex; gap: 10px; align-items: center; justify-content: space-between; background: var(--panel-2); border-radius: var(--r-s); padding: 8px 12px; font-size: 13px; }
+.todo .t.warn { box-shadow: inset 3px 0 0 var(--gold); }
+/* 경기 카드 */
+.match { border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; margin-bottom: 10px; background: linear-gradient(180deg, #151526, #11111c); }
+.match.big { border-color: rgba(255,138,61,.6); }
+.m-top { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); margin-bottom: 8px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: var(--r-xs); background: rgba(43,255,158,.16); color: var(--good); }
+.tag.hot { background: rgba(255,138,61,.18); color: #ff8a3d; }
+.vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
+.side-t { display: flex; gap: 10px; align-items: center; } .side-t.right { flex-direction: row-reverse; text-align: right; }
+.side-t b { font-size: 15px; display: block; } .side-t .muted { font-size: 12px; }
+.vs-mid { text-align: center; font-weight: bold; font-size: 13px; color: var(--muted); }
+.pw { display: flex; height: 6px; border-radius: 99px; overflow: hidden; margin: 10px 0 8px; background: var(--panel-2); }
+.pw i { display: block; height: 100%; } .pw .a { background: var(--grad); } .pw .b { background: #ff3d71; }
+.m-lines { display: grid; gap: 4px; font-size: 12px; }
+.m-lines .rep { background: rgba(0,224,255,.07); border-radius: var(--r-xs); padding: 6px 8px; }
+.dots .w { color: var(--good); } .dots .l { color: var(--bad); }
+.g { display: inline-block; min-width: 16px; text-align: center; font-size: 11px; font-weight: bold; border-radius: 5px; padding: 0 4px; background: rgba(255,210,63,.2); color: var(--gold); }
+/* 조합 전략 */
+.plan { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 4px; }
+.plan-h { margin-bottom: 8px; } .cc { font-size: 11px; border: 1px solid var(--border); border-radius: 99px; padding: 1px 7px; margin-left: 2px; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--panel-2); border-radius: var(--r-s); padding: 4px; margin-bottom: 6px; }
+.seg button { border: 0; background: transparent; padding: 9px 6px; border-radius: 8px; cursor: pointer; font-size: 13px; position: relative; }
+.seg button.on { background: var(--grad-btn); color: #fff; font-weight: bold; }
+.seg button.rec { box-shadow: inset 0 0 0 1px var(--gold); }
+.rec-tag { display: block; font-size: 10px; color: var(--gold); }
+.quests { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 12px; }
+.q .bar { background: #0b0b14; }
+.q-p { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+.q-btn { margin-top: 2px; font-size: 12px; padding: 7px 8px; border-radius: var(--r-s); border: 1px solid rgba(0,224,255,.35); background: linear-gradient(180deg,#22223a,#1a1a2d); cursor: pointer; text-align: center; }
+.q-btn.on { border-color: rgba(43,255,158,.5); color: var(--good); background: rgba(43,255,158,.08); cursor: default; }
+.q { background: var(--panel-2); border-radius: var(--r-s); padding: 10px 12px; display: grid; gap: 6px; } .q-h { display: flex; gap: 6px; align-items: baseline; }
+/* 지난주 */
+.news-btn { margin-left: auto; font-size: 12px; background: #f3efe4; color: #1d1b16; border-radius: var(--r-xs); padding: 2px 8px; font-weight: bold; }
+.res { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; padding: 8px 0; border-top: 1px solid var(--border); }
+.res:first-of-type { border-top: 0; }
+.wl { font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: var(--r-xs); background: rgba(255,61,113,.18); color: var(--bad); } .wl.tr { background: rgba(0,224,255,.14); color: var(--accent); }
+.chg { display: flex; gap: 10px; font-size: 12px; margin-top: 3px; }
+/* 오른쪽 */
+.meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; } .mc { font-size: 12px; border: 1px solid rgba(255,210,63,.6); color: var(--gold); border-radius: 99px; padding: 2px 9px; } .mc.s { border-color: #ff8a3d; color: #ff8a3d; }
+.ms { display: grid; grid-template-columns: 100px 1fr 28px; gap: 8px; align-items: center; font-size: 13px; padding: 3px 0; } .ms b { text-align: right; }
+.lr { display: grid; grid-template-columns: 34px 1fr 50px 52px; gap: 6px; align-items: center; font-size: 13px; padding: 5px 4px; border-top: 1px solid var(--border); } .lr b { text-align: right; }
+.lr.me { background: rgba(0,224,255,.08); border-radius: var(--r-xs); } .lr.gap { display: block; text-align: center; color: var(--muted); padding: 2px; }
+.lr .nm { display: flex; align-items: center; gap: 6px; } .lr i { font-style: normal; font-size: 11px; }
+.recent { display: flex; gap: 6px; margin-bottom: 8px; } .recent span { width: 34px; text-align: center; font-size: 12px; font-weight: bold; border-radius: var(--r-xs); padding: 5px 0; }
+.recent .w { background: rgba(43,255,158,.16); color: var(--good); } .recent .l { background: rgba(255,61,113,.16); color: var(--bad); }
+.sgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 24px; }
+.sgrid .st { display: grid; grid-template-columns: 90px 1fr 28px; gap: 8px; align-items: center; font-size: 13px; } .sgrid .st b { text-align: right; } .sgrid .st.bonus span { color: var(--gold); }
+
+/* B안 */
+.btabs { display: none; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.btabs .dot-n { font-size: 11px; background: rgba(255,61,113,.25); color: #ffb3c4; border-radius: 99px; padding: 0 6px; margin-left: 4px; }
+.app.lb .btabs { display: flex; }
+.app.lb .body { grid-template-columns: 1fr; }
+.app.lb [data-sec] { display: none; }
+.app.lb [data-sec].show { display: block; }
+.app.lb .col-side { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; } .app.lb .col-side .card { margin-bottom: 0; }
+
+/* 휴대폰 */
+.phone { width: 412px; max-width: 100%; height: 780px; border: 10px solid #22222e; border-radius: 34px; overflow: hidden; margin: 6px auto; background: #000; }
+.phone iframe { width: 100%; height: 100%; border: 0; }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; border: 0; border-radius: 0; }
+  .side { display: none; }
+  .main { padding: 0 12px 16px; }
+  .topbar { flex-wrap: wrap; gap: 8px; } .topbar .ham { display: block; } .tb-right { width: 100%; margin: 0; } .tb-right .pill:nth-child(3) { display: none; } .tb-right .primary { margin-left: auto; }
+  .hero { grid-template-columns: auto 1fr; gap: 12px; padding: 14px; } .hero-ovr { text-align: left; padding: 0; } .hero-ovr .big { font-size: 34px; }
+  .hero-info { grid-column: 1 / -1; order: 3; } .hero-status { grid-column: 1 / -1; order: 4; }
+  .body { grid-template-columns: 1fr; } .quests { grid-template-columns: 1fr 1fr; gap: 6px; } .q { padding: 8px; } .q-h { flex-wrap: wrap; } .sgrid { grid-template-columns: 1fr 1fr; }
+  .vs { grid-template-columns: 1fr; } .side-t.right { flex-direction: row; text-align: left; } .vs-mid { text-align: left; }
+  .seg button { font-size: 12px; } .app.lb .col-side { grid-template-columns: 1fr; }
+  .todo .t { flex-direction: column; align-items: flex-start; }
+  .wrap { padding: 0; } .wrap > h1, .wrap > .lead, .wrap > .tabs, .wrap > .sec, .wrap > .note, .wrap > .phone { padding: 0 12px; }
+}
+body.phone-mode .wrap > :not(.app) { display: none !important; }
+body.phone-mode .wrap { padding: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>디자인 시안 5-2 — 대시보드 A안 + 퀘스트 1줄 2칸</h1>
+  <p class="lead">예시 값이에요. 위 버튼으로 <b>A안·B안</b>을 바꿔 보고, 맨 아래에서 <b>휴대폰 화면</b>을 확인해 주세요. 모든 정보는 지금 대시보드에 있는 것 그대로이고, 배치·크기·묶음만 바꿨어요.</p>
+  <div class="tabs" id="layoutTabs">
+    <button data-l="a" class="on">A안 · 한 화면에 쭉 (지금처럼 스크롤)</button>
+    <button data-l="b">B안 · 탭으로 나눔 (스크롤 적음)</button>
+  </div>
+
+  <div class="app" id="app">
+    <aside class="side">
+      <div class="logo">프로게이머<br>커리어<span class="ver">ver 1.2</span></div>
+      <div class="mg">내 선수</div><div class="mi on">대시보드</div><div class="mi">훈련</div><div class="mi">SNS <span class="badge-n">2</span></div><div class="mi">친구</div><div class="mi">선수 정보</div><div class="mi">상점</div>
+      <div class="mg">경기</div><div class="mi">소속팀</div><div class="mi">경기 결과</div><div class="mi">일정</div><div class="mi">리그 순위</div>
+      <div class="mg">이적·기록</div><div class="mi">이적 시장</div><div class="mi">기록실</div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <button class="ham">☰</button>
+        <div class="when"><b>2017년 31주차</b> <span class="muted">정규 시즌 3·4라운드</span></div>
+        <div class="tb-right"><span class="pill">🏋 휴식</span><span class="pill">💪 58/80</span><span class="pill">💰 565만</span><button class="primary">다음 주 ▶</button></div>
+      </div>
+
+      <!-- 히어로: 내 선수 카드 -->
+      <section class="hero">
+        <div class="hero-pf pf-frame" id="heroPf"></div>
+        <div class="hero-info">
+          <div class="hero-name">테스트 <span class="muted">미드 · 17세 · 유망주</span></div>
+          <div class="hero-team"><span class="uni-sw"><i style="background:#f5c400"></i><i style="background:#1f2a44"></i></span><b>BNK KINETIC</b> <span class="muted">1부 · 주전 · 팀 9위 · 연봉 1,500만 · 2017년 종료</span></div>
+          <div class="chips"><span class="chip">스타성</span><span class="chip">늦게 피는 꽃</span><span class="chip">하이라이트 메이커</span><span class="chip gold">🌱 유망주</span></div>
+          <div class="goal">🎯 <b>리그 우승</b> <span class="muted">✓주전 → ✓1부 승격 →</span> <b class="acc">리그 우승</b> <span class="muted">→ 월드 우승 → 전설</span></div>
+        </div>
+        <div class="hero-ovr"><div class="lbl">종합 능력</div><div class="big">48.1</div><div class="muted sm">리그 미드 23명 중 19위</div><div class="sm up">이번 주 변화 없음</div></div>
+        <div class="hero-status">
+          <div class="hg"><span>체력</span><div class="bar"><i style="width:72%"></i></div><b>58</b></div>
+          <div class="hg"><span>컨디션</span><div class="bar"><i style="width:76%"></i></div><b>61</b></div>
+          <div class="hg"><span>인기도</span><div class="bar y"><i style="width:29%"></i></div><b>29</b></div>
+          <div class="hg"><span>평판</span><div class="bar"><i style="width:53%"></i></div><b class="up">+6</b></div>
+          <div class="hs-row"><span>🪙 실버 1,365</span><span class="muted">솔랭 121위</span></div>
+          <div class="hs-row"><span>😟 입지 25</span><span class="muted">팬 31만</span></div>
+        </div>
+      </section>
+
+      <!-- B안 탭 -->
+      <div class="btabs only-b"><button class="on" data-bt="week">▶ 이번 주</button><button data-bt="last">📅 지난주 결과 <span class="dot-n">패 1</span></button><button data-bt="me">📊 스탯·챔피언</button><button data-bt="rank">🏆 랭킹·최근 경기</button></div>
+
+      <div class="body">
+        <div class="col-main">
+          <!-- 이번 주 -->
+          <section class="card week" data-sec="week">
+            <h2>▶ 이번 주 <span class="muted sm">31주차 · 정규 시즌 3·4라운드 · 경기 2개</span></h2>
+            <div class="todo">
+              <div class="t warn"><span>⚔️ 메타 숙련도 평균 46 → 경기력이 깎여요</span><button class="sm-btn">챔피언 연습 고르기</button></div>
+            </div>
+            <div class="quests">
+              <div class="q"><div class="q-h"><span class="muted sm">🧑‍🏫 코치</span> <b>리플레이 숙제</b><span class="muted sm r">4주 남음</span></div>
+                <div class="q-p"><div class="bar"><i style="width:0%"></i></div><span class="sm">0/4</span></div>
+                <div class="muted sm">보상 시야 +2 · 집중력 +1</div>
+                <button class="q-btn">▶ 리플레이 분석 고르기</button></div>
+              <div class="q"><div class="q-h"><span class="muted sm">🧑‍🏫 코치</span> <b>주력 챔피언 만들기</b><span class="muted sm r">6주 남음</span></div>
+                <div class="q-p"><div class="bar"><i style="width:33%"></i></div><span class="sm">1/3</span></div>
+                <div class="muted sm">보상 입력 정확도 +1 · 거리 조절 +1</div>
+                <button class="q-btn on">✓ 이번 주 훈련 (집중 연습)</button></div>
+            </div>
+            <div class="match" id="m1"></div>
+            <div class="match" id="m2"></div>
+            <div class="plan">
+              <div class="plan-h"><b>조합 전략</b> <span class="muted sm">메타 <span class="cc">⚔ 난전</span> · 이기는 성향 <span class="cc">🏹 포킹</span> <span class="cc">🛡 받아치기</span></span></div>
+              <div class="seg"><button>메타 따라가기</button><button class="rec">메타 카운터 <span class="rec-tag">📊 추천</span></button><button class="on">감독에게 맡기기</button></div>
+              <div class="muted sm">📊 이번 주 상대 2팀 모두 '메타 카운터'가 상성 우위예요 (분석관 Vale S · 정확도 90%).</div>
+            </div>
+          </section>
+
+          <!-- 지난주 결과 -->
+          <section class="card last" data-sec="last">
+            <h2>📅 지난주 결과 <span class="muted sm">30주차</span> <span class="news-btn">📰 NEWS 1</span></h2>
+            <div class="res lose"><span class="wl">패</span><div><b>후반기 하위 그룹 1라운드 · vs NS RAMPAGE 0:2</b><div class="muted sm">라이즈 / 피즈 픽 · 라인전 0/2 · 솔로킬 2회 허용 (상대 Lava) · 💀 딜러 초반 폭사 · 📊 분석 적중 · 평점 2.2</div><div class="chg"><span class="down">체력 −8</span><span class="down">컨디션 −6</span></div></div><button class="sm-btn">경기 결과</button></div>
+            <div class="res"><span class="wl tr">훈련</span><div><b>휴식</b><div class="muted sm">모니터를 끄고 하루 종일 푹 쉬었다.</div><div class="chg"><span class="up">체력 +33</span><span class="up">컨디션 +5</span></div></div></div>
+          </section>
+        </div>
+
+        <div class="col-side">
+          <section class="card" data-sec="me">
+            <h2>⚔️ 챔피언 <span class="muted sm">2017년 2차 패치 · 미드 메타</span></h2>
+            <div class="meta"><span class="mc s">S 브랜드 45</span><span class="mc">A 블라디미르 46</span><span class="mc">A 아우렐리온 솔 46</span><span class="mc">A 스웨인 45</span><span class="mc">A 라이즈 46</span></div>
+            <div class="ms"><span>라이즈</span><div class="bar y"><i style="width:46%"></i></div><b>46</b></div>
+            <div class="ms"><span>블라디미르</span><div class="bar y"><i style="width:46%"></i></div><b>46</b></div>
+            <div class="ms"><span>아우렐리온 솔</span><div class="bar y"><i style="width:46%"></i></div><b>46</b></div>
+            <div class="ms"><span>루시안</span><div class="bar"><i style="width:46%"></i></div><b>46</b></div>
+            <div class="ms"><span>브랜드</span><div class="bar y"><i style="width:45%"></i></div><b>45</b></div>
+          </section>
+          <section class="card" data-sec="rank">
+            <h2>🏆 리그 솔로 랭크 <span class="muted sm">126명</span></h2>
+            <div class="lr"><span>1</span><span class="nm" data-face="Xena">Xena <i class="muted">원딜</i></span><span class="muted">JW</span><b>2,345</b></div>
+            <div class="lr"><span>2</span><span class="nm" data-face="Glow">Glow <i class="muted">정글</i></span><span class="muted">KT</span><b>2,331</b></div>
+            <div class="lr"><span>3</span><span class="nm" data-face="Sage">Sage <i class="muted">정글</i></span><span class="muted">CV</span><b>2,225</b></div>
+            <div class="lr gap">…</div>
+            <div class="lr me"><span>121</span><span class="nm" data-face="ME">테스트 <i class="muted">미드</i></span><span class="muted">BNK</span><b>1,365</b></div>
+          </section>
+          <section class="card" data-sec="rank">
+            <h2>🗂️ 최근 경기</h2>
+            <div class="recent"><span class="l">패</span><span class="l">패</span><span class="w">승</span><span class="w">승</span><span class="l">패</span></div>
+            <div class="muted sm">최근 5경기 2승 3패 · 30주 vs NS RAMPAGE 0:2</div>
+          </section>
+        </div>
+      </div>
+
+      <section class="card stats" data-sec="me">
+        <h2>📊 내 스탯 <span class="muted sm">★ 포지션 가산점 · 최대 100</span></h2>
+        <div class="sgrid" id="sgrid"></div>
+      </section>
+    </main>
+  </div>
+
+  <h2 class="sec">휴대폰 화면 (390px) — 지금은 가로로 넘쳐서 옆으로 밀려요</h2>
+  <p class="note">메뉴를 ☰ 버튼 안으로 넣고, 카드를 한 줄로 쌓아요. 아래는 같은 화면을 휴대폰 폭으로 줄인 모습이에요.</p>
+  <div class="phone"><iframe id="phone" title="휴대폰 미리보기"></iframe></div>
+</div>
+<script>
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 코드는 js/portrait.js =====
+// 32×32 도트. 내 선수는 캐릭터 만들 때 고른 얼굴(state.player.look), 다른 선수는 선수 id로 정해지는 얼굴 (저장 안 함)
+// 크기: 최대 3배(96px) (사용자 결정), 표에는 얼굴만 잘라서
+const PORTRAIT = {
+  skins: [
+    { name: "아주 밝게", c: "#f6d7c3" }, { name: "밝게", c: "#eec1a0" }, { name: "보통", c: "#d9a27f" },
+    { name: "조금 어둡게", c: "#b97a57" }, { name: "어둡게", c: "#8d5a3b" },
+  ],
+  hairStyles: ["짧은 앞머리", "덮은 머리", "옆으로 넘김", "긴 머리", "뾰족 머리", "대머리", "아프로"],
+  hairColors: [
+    { name: "검정", c: "#1d1a1f" }, { name: "갈색", c: "#6b4226" }, { name: "금발", c: "#c7923e" }, { name: "은발", c: "#e7e1d4" },
+    { name: "파랑", c: "#2f4a8a" }, { name: "빨강", c: "#c8322b" }, { name: "주황", c: "#e8792a" },
+  ],
+  eyes: ["점 눈", "반짝 눈"],
+  faces: ["보통", "갸름", "넓적"],   // 얼굴 너비 12 · 11 · 13 도트
+  headsetChance: 0.55,
+  glassesChance: 0.18,
+  // 움직임: 크게 보이는 그림(.pf-jump)만 가끔 1~5px 점프
+  jump: { minGap: 3000, maxGap: 7000, minPx: 1, maxPx: 5 },
+  tiredStamina: 30, // 내 선수 체력이 이 아래면 지친 표정
+};
+
+// 구단 유니폼 [바탕, 포인트(깃·줄)] — 1부 기업 10곳 고정 (사용자 확인 시안 3)
+const TEAM_UNIFORMS = {
+  "T1": ["#e2012d", "#141414"], "KT": ["#f2f2f2", "#e1251b"], "GEN.G": ["#a98b46", "#1b1b1b"], "Hanwha": ["#ff6a13", "#2a2a2a"],
+  "Dplus": ["#1b1b1b", "#4fd1c5"], "BNK": ["#f5c400", "#1f2a44"], "BRION": ["#1fae5c", "#f2f2f2"], "NS": ["#8e1c2b", "#e8dcc2"],
+  "KW": ["#1e3a8a", "#7cc4ff"], "DN": ["#6b2fbf", "#f2f2f2"],
+};
+// 2부·신생 구단: 기업명으로 정해지는 색 (이 중 하나)
+const UNIFORM_POOL = [
+  ["#3b82f6", "#f2f2f2"], ["#14b8a6", "#111827"], ["#a3e635", "#1f2937"], ["#f472b6", "#1f2937"], ["#64748b", "#f8fafc"], ["#f59e0b", "#7c2d12"],
+  ["#0ea5e9", "#0f172a"], ["#ef4444", "#fde68a"], ["#8b5cf6", "#fde68a"], ["#10b981", "#064e3b"], ["#e11d48", "#f1f5f9"], ["#facc15", "#111111"],
+];
+// 해외 팀: 지역마다 2~3가지 중 팀 id로
+const REGION_UNIFORMS = {
+  na: [["#1d4ed8", "#f8fafc"], ["#0f766e", "#f8fafc"], ["#111827", "#60a5fa"]],
+  eu: [["#f8fafc", "#1e3a8a"], ["#7c3aed", "#f8fafc"], ["#111827", "#f59e0b"]],
+  cn: [["#dc2626", "#facc15"], ["#111827", "#ef4444"], ["#f8fafc", "#dc2626"]],
+};
+const FREE_AGENT_UNIFORM = ["#4b5563", "#9ca3af"]; // 소속 없음
+
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/portrait.js =====
+// portraitImg(id, opts) → <img> HTML (canvas로 그린 그림을 data URL로, 같은 그림은 캐시)
+//   opts: scale 1~3, mood "normal"|"win"|"lose"|"tired", face true = 얼굴만 18×18 잘라서(표용), jump true = 가끔 점프, size(face일 때 px: 18 또는 36)
+// 내 선수 얼굴: state.player.look { skin, hs, hairC, eyes, face, headset, glasses } (캐릭터 만들 때 고름, 예전 세이브는 이름으로 자동)
+
+function pfSeed(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function pfRng(s) {
+  let a = pfSeed(s);
+  return function () { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function randomLook(seed) {
+  const r = seed === undefined ? Math.random : pfRng(seed);
+  const n = function (k) { return Math.floor(r() * k); };
+  const P = PORTRAIT;
+  return { skin: n(P.skins.length), hairC: n(P.hairColors.length), hs: n(P.hairStyles.length), eyes: n(P.eyes.length), face: n(P.faces.length),
+    headset: r() < P.headsetChance, glasses: r() < P.glassesChance };
+}
+function lookOf(id) {
+  if (id === USER_ID && state.player) {
+    if (!state.player.look) state.player.look = randomLook("me:" + state.player.name); // 예전 세이브
+    return state.player.look;
+  }
+  return randomLook(id);
+}
+
+// ----- 유니폼 -----
+function uniformByShort(short) {
+  return TEAM_UNIFORMS[short] || UNIFORM_POOL[pfSeed(short) % UNIFORM_POOL.length];
+}
+function uniformOfTeam(teamId) {
+  if (!teamId) return FREE_AGENT_UNIFORM;
+  const t = findTeam(teamId);
+  if (t) return uniformByShort(t.short);
+  const w = typeof findWorldTeam === "function" ? findWorldTeam(teamId) : null;
+  const reg = w ? w.region : null;
+  const list = REGION_UNIFORMS[reg] || UNIFORM_POOL;
+  return list[pfSeed(teamId) % list.length];
+}
+function teamIdOfPlayer(id) {
+  if (id === USER_ID) { const t = myTeam(); return t ? t.id : null; }
+  const p = state.league && state.league.players[id];
+  if (p) return p.teamId || null;
+  if (state.world && String(id).charAt(0) === "X") {
+    const wt = state.world.teams.find(function (t) { return t.roster.indexOf(id) !== -1; });
+    return wt ? wt.id : null;
+  }
+  return null;
+}
+// 내 선수 표정: 체력이 낮으면 지침, 아니면 지난주 경기 결과 (이긴 경기가 더 많으면 웃음)
+function myMood() {
+  if (state.stamina < PORTRAIT.tiredStamina) return "tired";
+  const L = state.weekReport && state.weekReport.userLines;
+  if (!L || !L.length) return "normal";
+  const w = L.filter(function (l) { return l.won; }).length;
+  return w * 2 > L.length ? "win" : w * 2 < L.length ? "lose" : "normal";
+}
+
+// ----- 그리기 (32×32, 시안 4 그대로) -----
+function drawPortrait32(g, L, c, mood) {
+  const P = PORTRAIT;
+  const R = function (x, y, w, h, col) { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const sk = P.skins[L.skin].c, H = P.hairColors[L.hairC].c, dark = "#231f2b", M = "#7a3b3b";
+  // 몸·유니폼
+  R(6, 26, 20, 6, c[0]); R(8, 25, 16, 1, c[0]); R(14, 25, 4, 3, c[1]); R(6, 30, 20, 1, c[1]); R(14, 22, 4, 4, sk);
+  // 얼굴
+  const fw = [12, 11, 13][L.face], fx = Math.floor(16 - fw / 2);
+  const face = function () { R(fx, 9, fw, 14, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk); };
+  face();
+  // 머리
+  if (L.hs === 6) { // 아프로: 얼굴 뒤를 감싸고 얼굴을 다시
+    R(fx - 4, 3, fw + 8, 10, H); R(fx - 3, 2, fw + 6, 1, H); R(fx - 5, 5, 1, 10, H); R(fx + fw + 4, 5, 1, 10, H); R(fx - 4, 13, 3, 5, H); R(fx + fw + 1, 13, 3, 5, H);
+    R(fx, 10, fw, 13, sk); R(fx + 1, 9, fw - 2, 1, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk);
+    R(fx - 2, 4, 2, 1, "rgba(255,255,255,.18)"); R(fx + 3, 3, 3, 1, "rgba(255,255,255,.18)");
+  } else [
+    function () { R(fx - 1, 6, fw + 2, 4, H); R(fx - 1, 10, 2, 4, H); R(fx + fw - 1, 10, 2, 4, H); },
+    function () { R(fx - 1, 5, fw + 2, 5, H); R(fx + 2, 10, 4, 2, H); R(fx - 1, 10, 1, 6, H); R(fx + fw, 10, 1, 6, H); },
+    function () { R(fx, 5, fw, 4, H); R(fx - 1, 8, fw + 2, 2, H); R(fx + fw - 4, 10, 4, 1, H); },
+    function () { R(fx - 2, 5, fw + 4, 5, H); R(fx - 2, 10, 2, 10, H); R(fx + fw, 10, 2, 10, H); },
+    function () { R(fx, 6, fw, 3, H); R(fx + 2, 4, 2, 2, H); R(fx + 6, 3, 2, 3, H); R(fx + fw - 3, 4, 2, 2, H); R(fx - 1, 8, fw + 2, 2, H); },
+    function () { R(fx + 1, 7, fw - 2, 2, sk); R(fx + 2, 6, fw - 4, 1, sk); R(fx + 2, 7, 2, 1, "rgba(255,255,255,.55)"); R(fx - 1, 12, 1, 2, H); R(fx + fw, 12, 1, 2, H); },
+  ][L.hs]();
+  // 눈썹·눈
+  const ey = 15, e1 = fx + 2, e2 = fx + fw - 4;
+  if (mood === "lose") { R(e1, 12, 1, 1, H); R(e1 + 1, 13, 1, 1, H); R(e2 + 1, 12, 1, 1, H); R(e2, 13, 1, 1, H); }
+  else { R(e1, 13, 2, 1, H); R(e2, 13, 2, 1, H); }
+  const eye = function (x) {
+    if (mood === "win") { R(x, ey, 1, 1, dark); R(x + 1, ey - 1, 1, 1, dark); }
+    else if (mood === "tired") R(x, ey, 2, 1, dark);
+    else if (L.eyes === 1) { R(x, ey - 1, 2, 2, dark); R(x + 1, ey - 1, 1, 1, "#fff"); }
+    else R(x, ey - 1, 2, 2, dark);
+  };
+  eye(e1); eye(e2);
+  if (L.glasses) { R(e1 - 1, ey - 2, 4, 1, dark); R(e2 - 1, ey - 2, 4, 1, dark); R(e1 + 3, ey - 1, e2 - e1 - 3, 1, dark); }
+  // 입
+  if (mood === "win") { R(14, 19, 4, 1, M); R(15, 20, 2, 1, M); R(fx + 1, 17, 2, 1, "#f29a9a"); R(fx + fw - 3, 17, 2, 1, "#f29a9a"); }
+  else if (mood === "lose") { R(15, 19, 2, 1, M); R(14, 20, 1, 1, M); R(17, 20, 1, 1, M); }
+  else if (mood === "tired") { R(15, 19, 2, 2, M); R(fx + fw + 1, 10, 1, 2, "#7fc8ff"); }
+  else R(15, 20, 2, 1, M);
+  // 헤드셋: 머리띠 + 귀 이어컵(밝은 테두리, 안쪽 팀색) + 마이크
+  if (L.headset) {
+    const k = "#2b2b38", kl = "#6c6c86", top = L.hs === 6 ? 2 : 4;
+    R(fx, top, fw, 1, k); R(fx - 1, top + 1, 1, 1, k); R(fx + fw, top + 1, 1, 1, k); R(fx - 2, top + 2, 1, 12 - top, k); R(fx + fw + 1, top + 2, 1, 12 - top, k);
+    R(fx - 4, 12, 4, 7, k); R(fx - 4, 12, 4, 1, kl); R(fx - 4, 12, 1, 7, kl); R(fx - 3, 14, 2, 3, c[0]);
+    R(fx + fw, 12, 4, 7, k); R(fx + fw, 12, 4, 1, kl); R(fx + fw + 3, 12, 1, 7, kl); R(fx + fw + 1, 14, 2, 3, c[0]);
+    R(fx - 1, 19, 1, 1, k); R(fx, 20, 3, 1, k); R(fx + 3, 20, 1, 1, "#ff3d71");
+  }
+}
+
+// 그림 → data URL (캐시)
+const PF_CACHE = {};
+function portraitURL(look, uni, mood, face) {
+  const key = JSON.stringify([look, uni, mood || "normal", !!face]);
+  if (PF_CACHE[key] !== undefined) return PF_CACHE[key];
+  let url = "";
+  try {
+    const cv = document.createElement("canvas");
+    cv.width = 32; cv.height = 32;
+    const g = cv.getContext && cv.getContext("2d");
+    if (g) {
+      drawPortrait32(g, look, uni, mood || "normal");
+      if (face) { // 얼굴만: 머리~턱 18×18 (표에서 2배 = 36px로 선명하게)
+        const c2 = document.createElement("canvas");
+        c2.width = 18; c2.height = 18;
+        c2.getContext("2d").drawImage(cv, 7, 5, 18, 18, 0, 0, 18, 18);
+        url = c2.toDataURL();
+      } else url = cv.toDataURL();
+    }
+  } catch (e) { url = ""; }
+  PF_CACHE[key] = url;
+  return url;
+}
+function portraitHTMLFrom(look, uni, opts) {
+  opts = opts || {};
+  const url = portraitURL(look, uni, opts.mood, opts.face);
+  if (!url) return "";
+  const size = opts.face ? (opts.size || 36) : 32 * Math.max(1, Math.min(3, opts.scale || 1));
+  const img = '<img class="pf px' + (opts.face ? " pf-face" : "") + '" src="' + url + '" width="' + size + '" height="' + size + '" alt="">';
+  return opts.jump ? '<span class="pf-jump">' + img + "</span>" : img;
+}
+function portraitImg(id, opts) {
+  opts = Object.assign({}, opts);
+  if (id === USER_ID && !opts.mood && !opts.face) opts.mood = myMood();
+  return portraitHTMLFrom(lookOf(id), uniformOfTeam(opts.teamId !== undefined ? opts.teamId : teamIdOfPlayer(id)), opts);
+}
+// 표에 넣는 얼굴 칸
+function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: true, size: 36 }) + "</td>"; }
+
+// ----- 가끔 점프 (크게 보이는 그림만) -----
+(function () {
+  if (typeof setInterval !== "function" || typeof document === "undefined" || !document.querySelectorAll) return;
+  const J = PORTRAIT.jump;
+  setInterval(function () {
+    let list;
+    try { list = document.querySelectorAll(".pf-jump"); } catch (e) { return; }
+    const now = Date.now();
+    Array.prototype.forEach.call(list, function (el) {
+      if (!el._nj) el._nj = now + 600 + Math.random() * (J.maxGap - J.minGap);
+      if (now < el._nj) return;
+      el.style.setProperty("--jh", (J.minPx + Math.floor(Math.random() * (J.maxPx - J.minPx + 1))) + "px");
+      el.classList.remove("jumping"); void el.offsetWidth; el.classList.add("jumping");
+      el._nj = now + J.minGap + Math.random() * (J.maxGap - J.minGap);
+    });
+  }, 250);
+})();
+
+const USER_ID = "ME";
+const LOOK_ME = { skin: 3, hairC: 0, hs: 0, eyes: 1, face: 1, headset: false, glasses: true };
+const BNK = TEAM_UNIFORMS["BNK"];
+function pfOf(id, uniShort, opts) { return portraitHTMLFrom(id === "ME" ? LOOK_ME : randomLook(id), uniformByShort(uniShort), opts); }
+document.getElementById("heroPf").innerHTML = pfOf("ME", "BNK", { scale: 3, jump: true });
+function matchHTML(o) {
+  const ua = uniformByShort("BNK"), ub = uniformByShort(o.short);
+  const pa = 58.0, pb = o.power, tot = pa + pb;
+  return '<div class="match' + (o.big ? " big" : "") + '"><div class="m-top"><span class="tag">경기</span>' + (o.big ? '<span class="tag hot">🔥 ' + o.big + "</span>" : "") +
+    "<span>" + o.label + " · 3판 2선승</span></div>" +
+    '<div class="vs"><div class="side-t"><span class="pf-frame">' + pfOf("ME", "BNK", { scale: 2 }) + '</span><div><b><span class="uni-sw"><i style="background:' + ua[0] + '"></i><i style="background:' + ua[1] + '"></i></span>BNK KINETIC</b><span class="muted">전력 58.0 · 나: 테스트</span></div></div>' +
+    '<div class="vs-mid">VS<div class="sm muted" style="font-weight:normal">' + o.rec + "</div></div>" +
+    '<div class="side-t right"><span class="pf-frame">' + pfOf(o.mate, o.short, { scale: 2 }) + '</span><div><b>' + o.team + ' <span class="uni-sw"><i style="background:' + ub[0] + '"></i><i style="background:' + ub[1] + '"></i></span></b><span class="muted">전력 ' + pb.toFixed(1) + " · 맞수: " + o.mate + "</span></div></div></div>" +
+    '<div class="pw"><i class="a" style="width:' + (pa / tot * 100) + '%"></i><i class="b" style="width:' + (pb / tot * 100) + '%"></i></div>' +
+    '<div class="m-lines"><div class="muted">📊 상대 전적 <b style="color:var(--text)">' + o.h2h + '</b> · 최근 <span class="dots">' + o.dots + "</span> · ⚔️ 맞수 " + o.mate + " 세트 " + o.mateRec + "</div>" +
+    '<div class="rep">📊 분석 리포트 <span class="muted">(Vale <span class="g">S</span> · 90%)</span>: ' + o.team + "은(는) <b>" + o.comp + "</b> 조합을 노릴 듯 → 추천 <b>메타 카운터</b></div></div></div>";
+}
+document.getElementById("m1").outerHTML = matchHTML({ label: "후반기 하위 그룹 3라운드", team: "DN GENESIS", short: "DN", power: 68.2, mate: "Next", h2h: "1승 2패", dots: '<span class="l">○</span><span class="l">○</span><span class="w">●</span>', mateRec: "2승 4패", comp: "🏹 포킹", rec: "상대가 강해요" });
+document.getElementById("m2").outerHTML = matchHTML({ label: "후반기 하위 그룹 4라운드", team: "Hanwha ASTRUM", short: "Hanwha", power: 60.5, mate: "Cash", h2h: "0승 2패 · 2연패", dots: '<span class="l">○</span><span class="l">○</span>', mateRec: "0승 4패", comp: "⚔ 난전", rec: "해볼 만해요", big: "" });
+document.querySelectorAll("[data-face]").forEach(function (el) { const id = el.getAttribute("data-face"); el.insertAdjacentHTML("afterbegin", pfOf(id, id === "ME" ? "BNK" : "KT", { face: true, size: 18 })); });
+const ST = [["입력 정확도", 44], ["라인전", 44], ["한타", 69], ["운영", 67], ["시야", 39], ["오더", 66], ["★ 챔피언 폭", 43, 1], ["멘탈", 40], ["★ 반응속도", 43, 1], ["거리 조절", 41], ["적응력", 41], ["집중력", 45]];
+document.getElementById("sgrid").innerHTML = ST.map(function (s) { return '<div class="st' + (s[2] ? " bonus" : "") + '"><span>' + s[0] + '</span><div class="bar' + (s[2] ? " y" : "") + '"><i style="width:' + s[1] + '%"></i></div><b>' + s[1] + "</b></div>"; }).join("");
+
+// A/B
+const app = document.getElementById("app");
+let bt = "week";
+function applyB() { app.querySelectorAll("[data-sec]").forEach(function (el) { el.classList.toggle("show", el.getAttribute("data-sec") === bt); }); app.querySelectorAll(".btabs button").forEach(function (b) { b.classList.toggle("on", b.dataset.bt === bt); }); }
+function setLayout(l) { app.classList.toggle("lb", l === "b"); applyB(); document.querySelectorAll("#layoutTabs button").forEach(function (b) { b.classList.toggle("on", b.dataset.l === l); });
+  const f = document.getElementById("phone"); if (f && !document.body.classList.contains("phone-mode")) f.src = location.href.split("#")[0] + "#phone-" + l; }
+document.getElementById("layoutTabs").addEventListener("click", function (e) { const b = e.target.closest("button"); if (b) setLayout(b.dataset.l); });
+app.querySelector(".btabs").addEventListener("click", function (e) { const b = e.target.closest("button"); if (!b) return; bt = b.dataset.bt; applyB(); });
+if (location.hash.indexOf("#phone") === 0) { document.body.classList.add("phone-mode"); setLayout(location.hash === "#phone-b" ? "b" : "a"); }
+else setLayout("a");
+</script>
+</body>
+</html>

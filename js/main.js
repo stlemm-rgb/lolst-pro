@@ -132,18 +132,17 @@ pages.dashboard = function () {
   // 조각들은 js/dashboard.js
   return (
     '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/trophies.js)
-    tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 프로필 카드, 💡 추천은 '이번 주' 카드 안
-    dashStripHTML() +
+    tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 내 선수 카드, 💡 추천은 '이번 주' 카드 안
+    heroCardHTML() + // 맨 위 내 선수 카드 (디자인 D2, js/dashboard.js)
     '<div class="dash">' +
       '<div class="dash-main">' +
-        weekReportHTML() +
         thisWeekHTML() +
-        recentMatchesHTML() +
+        weekReportHTML() +
       "</div>" +
       '<div class="dash-side">' +
-        profileCardHTML() +
         championCardHTML() +
         leagueLadderHTML() +
+        recentMatchesHTML() +
       "</div>" +
     "</div>" +
     statsCardHTML()
@@ -485,6 +484,8 @@ function selectMenu(id) {
   });
   state.currentMenu = id;
   state.notice = "";
+  const lay = document.getElementById("layout");
+  if (lay) lay.classList.remove("menu-open"); // 휴대폰: 메뉴를 고르면 닫기
   tutorialVisit(id); // 처음 안내: 들어가 본 메뉴 (js/guide.js)
   renderMenu();
   renderPage();
@@ -502,6 +503,7 @@ function subTabsHTML(parent) {
 // ===== 상단바 =====
 function renderTopbar() {
   document.getElementById("topbar").innerHTML =
+    '<button class="menu-toggle" id="menu-toggle" title="메뉴">☰</button>' + // 휴대폰: 메뉴 열기 (디자인 D2)
     '<span class="item"><b>' + state.year + "</b>년 <b>" + state.week + "</b>주차 · " + scheduleOfWeek(state.week).name + "</span>" +
     '<span class="item"><b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
     '<span class="item"><b>' + escapeHTML(myTeam().name) + "</b> (" + tierName(myTeam().tier) + ")</span>" +
@@ -514,6 +516,11 @@ function renderTopbar() {
       '<button class="primary" id="next-week">다음 주로 진행 ▶</button>' +
     "</span>";
   document.getElementById("next-week").onclick = function () { nextWeek(false); };
+  document.getElementById("menu-toggle").onclick = function () { document.getElementById("layout").classList.toggle("menu-open"); };
+  document.querySelector(".content").onclick = function (e) { // 휴대폰: 메뉴 밖을 누르면 닫기
+    const lay = document.getElementById("layout");
+    if (lay.classList.contains("menu-open") && !e.target.closest("#menu-toggle")) lay.classList.remove("menu-open");
+  };
   document.getElementById("plan-badge").onclick = function () { selectMenu("training"); };
   document.getElementById("rest-week").onclick = function () { nextWeek(true); };
 }

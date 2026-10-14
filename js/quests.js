@@ -311,3 +311,25 @@ function questsHTML(compact) {
   }).join("");
   return compact ? '<h2 class="sub">📋 퀘스트</h2>' + rows : '<div class="card"><h2>📋 퀘스트 <span class="muted small">완료 ' + (state.career.questsDone || 0) + "회</span></h2>" + rows + "</div>";
 }
+
+// 대시보드 '이번 주' 퀘스트 카드 (1줄 2칸, 디자인 D2): 이름·남은 주·진행도·보상·훈련 고르기 버튼
+function questCardsHTML() {
+  repairQuests();
+  const list = state.quests || [];
+  if (!list.length) return "";
+  const now = absWeek();
+  return '<div class="qcards">' + list.map(function (q) {
+    const tpl = findQuest(q.id);
+    let pct = Math.round(q.progress / q.need * 100), prog = q.progress + "/" + q.need;
+    if (tpl.kind === "ladderTop") {
+      const rank = myLadderRank(), from = q.startRank || leagueLadder().length;
+      pct = rank <= q.need ? 100 : Math.max(0, Math.round((from - rank) / Math.max(1, from - q.need) * 100));
+      prog = rank + "위→" + q.need + "위";
+    }
+    return '<div class="qcard"><div class="qcard-h"><span class="muted small">' + QUEST_GIVERS[tpl.giver] + "</span> <b>" + escapeHTML(tpl.title) + '</b><span class="muted small qcard-left">' +
+      (q.deadline > now ? (q.deadline - now) + "주 남음" : "이번 주까지") + "</span></div>" +
+      '<div class="qcard-p"><span class="bar"><span class="bar-fill gold" style="width:' + pct + '%"></span></span><span class="small">' + prog + "</span></div>" +
+      '<div class="muted small tip" tabindex="0" data-tip="' + escapeHTML(questText(q, tpl.desc)) + '">보상 ' + escapeHTML(rewardText(q)) + "</div>" +
+      questPlanButtonHTML(q) + "</div>";
+  }).join("") + "</div>";
+}

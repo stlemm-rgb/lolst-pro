@@ -415,10 +415,18 @@ function statsCardHTML() {
 // ----- 왼쪽: 최근 경기 5개 -----
 function recentMatchesHTML() {
   const done = userMatches().filter(function (m) { return m.winner; }).slice(-5).reverse();
-  const body = done.length
-    ? '<table class="matches">' + done.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
-    : '<p class="muted">아직 경기를 하지 않았어요.</p>';
-  return '<div class="card"><h2>🗂️ 최근 경기 <span class="muted small">' + escapeHTML(myTeam().name) + " · 전체 기록은 [경기 결과]</span></h2>" + body + "</div>";
+  const mine = myTeam();
+  if (!done.length) return '<div class="card"><h2>🗂️ 최근 경기</h2><p class="muted">아직 경기를 하지 않았어요.</p></div>';
+  const wins = done.filter(function (m) { return m.winner === mine.id; }).length;
+  const chips = done.slice().reverse().map(function (m) {
+    const w = m.winner === mine.id;
+    return '<span class="wl-chip ' + (w ? "w" : "l") + '" title="' + m.week + "주 vs " + escapeHTML(teamName(m.a === mine.id ? m.b : m.a)) + " " + m.score[0] + ":" + m.score[1] + '">' + (w ? "승" : "패") + "</span>";
+  }).join("");
+  const last = done[0];
+  return '<div class="card"><h2>🗂️ 최근 경기 <span class="muted small">전체 기록은 [경기 결과]</span></h2>' +
+    '<div class="wl-chips">' + chips + "</div>" +
+    '<div class="muted small">최근 ' + done.length + "경기 " + wins + "승 " + (done.length - wins) + "패 · " + last.week + "주 vs " + escapeHTML(teamName(last.a === mine.id ? last.b : last.a)) + " " + last.score[0] + ":" + last.score[1] + "</div>" +
+    '<details class="recent-more"><summary class="muted small">경기 목록 펼치기</summary><table class="matches">' + done.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table></details></div>";
 }
 
 // ----- 오른쪽: 리그 솔로 랭크 순위표 (TOP 10 + 내 순위, [전체 보기]) -----
@@ -443,7 +451,7 @@ function leagueLadderHTML() {
     const me = x.id === USER_ID;
     const team = me ? myTeam() : findTeam(findPlayer(x.id).teamId);
     rows += "<tr" + (me ? ' class="me"' : "") + ' title="' + ladderTier(x.points) + '"><td class="r">' + (i + 1) + "</td>" +
-      "<td>" + tierEmblemSVG(x.points, 18) + " " + (me ? "<b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) +
+      "<td>" + tierEmblemSVG(x.points, 18) + " " + portraitImg(x.id, { face: true, size: 18 }) + " " + (me ? "<b>" + escapeHTML(state.player.name) + "</b>" : escapeHTML(playerName(x.id))) +
         (traitsOf(x.id).indexOf(LADDER.kingTrait) !== -1 ? ' <span title="지난 랭크 시즌 1위">👑</span>' : "") +
         (!me && findPlayer(x.id) && findPlayer(x.id).named ? ' <span title="네임드 선수">⭐</span>' : "") +
         ' <span class="muted small">' + findPosition(playerPos(x.id)).name + "</span></td>" +
@@ -531,11 +539,7 @@ function thisWeekHTML() {
     matchHTML = matches.map(function (m) {
       const opp = m.a === mine.id ? m.b : m.a;
       const big = bigGameOf(mine.id, opp);
-      return '<div class="rep-row"><span class="rep-tag win">경기</span>' + (big ? bigGameTagHTML(big) : "") + escapeHTML(m.label) + " · vs <b>" + escapeHTML(teamName(opp)) + "</b>" +
-        ' <span class="muted small">(' + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승 · 전력 우리 " + teamStrength(mine.id).toFixed(1) + " / 상대 " + strengthOf(opp).toFixed(1) + ")</span>" +
-        (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : "") + "</div>" +
-        h2hPreviewHTML(opp) + // 상대 전적·내 맞수 (js/h2h.js)
-        scoutReportHTML(m); // 분석 리포트 (js/staff.js)
+      return matchCardHTML(m, mine, opp, big);
     }).join("") +
     (wk.sameWeekFinal ? '<div class="rep-row muted small">4강을 이기면 같은 주에 LCK 컵 결승 (' + LEAGUE.bestOf.cup_final + "판 " + Math.ceil(LEAGUE.bestOf.cup_final / 2) + "선승)도 치러요.</div>" : "");
   } else {
@@ -548,12 +552,89 @@ function thisWeekHTML() {
   // 훈련 줄은 없앰 (바로 아래 퀘스트·상단 훈련 배지와 겹침). 훈련을 안 골랐으면 💡 추천 줄에 [훈련 고르기]
 
   return (
-    '<div class="card upcoming"><h2>▶ 이번 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + "</span></h2>" +
-      adviceRowsHTML() + // 💡 이번 주 추천 (js/guide.js)
+    '<div class="card upcoming"><h2>▶ 이번 주 <span class="muted small">' + state.year + "년 " + week + "주차 · " + escapeHTML(scheduleOfWeek(week).name) + (matches.length ? " · 경기 " + matches.length + "개" : "") + "</span></h2>" +
+      adviceRowsHTML(true) + // 💡 이번 주 추천 (js/guide.js) — 퀘스트 추천은 아래 퀘스트 카드 버튼으로
+      questCardsHTML() + // 퀘스트 1줄 2칸 (js/quests.js)
       matchHTML +
       ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고
       compPlanHTML() + // 조합 전략 (js/comps.js)
-      questsHTML(true) +
     "</div>"
   );
+}
+
+// ===== 디자인 D2 (176): 맨 위 '내 선수 카드' (예전 요약 4칸 + 프로필 카드를 하나로) =====
+function heroCardHTML() {
+  const p = state.player;
+  const team = myTeam();
+  const rankList = team.tier === 1 ? tier1FinalOrder() : standings(["tier2", "tier2b"], tier2Ids()).map(function (x) { return x.id; });
+  const leagueRank = rankList.indexOf(team.id) + 1;
+  const c = state.contract;
+  const pr = positionRank();
+  const sr = state.soloRank || { points: LADDER.startPoints, wins: 0, losses: 0, peak: LADDER.startPoints };
+  const board = leagueLadder();
+  const myLadderRank = board.findIndex(function (x) { return x.id === USER_ID; }) + 1;
+  const staminaCls = state.stamina < 20 ? "neg" : state.stamina < 30 ? "warn" : "";
+  const v = state.reputation;
+  const uni = uniformOfTeam(team.id);
+  const traits = p.traits.map(traitChipHTML).join("") || '<span class="muted small">특성 없음</span>';
+  const ladderTip = "훈련할 때마다 랭크 게임을 하고, 승패에 따라 점수가 오르내려요. 솔로 랭크 훈련이 가장 많이 해요. 패치마다 초기화. 리그 " + board.length + "명 중 " + myLadderRank + "위 · 통산 " + sr.wins + "승 " + sr.losses + "패 · 전 시즌 최종 " +
+    (sr.lastSeason ? sr.lastSeason.rank + "위/" + sr.lastSeason.total + "명" : "기록 없음") + " · 이번 패치 최고 " + (sr.patchPeak || sr.points).toLocaleString() + " · 역대 최고 " + sr.peak.toLocaleString();
+  return (
+    '<div class="card hero">' +
+      '<span class="pf-frame hero-pf">' + portraitImg(USER_ID, { scale: 3, jump: true }) + "</span>" + // 도트 포트레잇 (js/portrait.js)
+      '<div class="hero-info">' +
+        '<div class="hero-name">' + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.position).name + " · " + p.age + "세 · " + findArchetype(p.archetype).name + "</span></div>" +
+        '<div class="hero-team small"><span class="uni-sw"><i style="background:' + uni[0] + '"></i><i style="background:' + uni[1] + '"></i></span>' + teamLinkHTML(team.id) + " " +
+          tierName(team.tier) + " · " + (state.benched ? '<span class="down">2군 (후보)</span>' : '<span class="up">1군 (주전)</span>') + " · 팀 순위 <b>" + leagueRank + "위</b>" +
+          '<span class="muted"> · ' + (c ? "연봉 " + moneyText(c.salary) + " · 계약 " + contractEndText(c) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : "계약 없음") + "</span></div>" +
+        '<div class="chips">' + traits + "</div>" +
+        goalLineHTML() + // 🎯 지금 목표 (js/guide.js)
+      "</div>" +
+      '<div class="hero-ovr"><div class="sum-label tip" tabindex="0" data-tip="스탯 12개 평균 (포지션 가산점 스탯은 1.5배). 경기력의 바탕이 돼요.">종합 능력</div>' +
+        '<div class="hero-big">' + playerScore(USER_ID).toFixed(1) + "</div>" +
+        '<div class="small">리그 ' + findPosition(p.position).name + " " + pr.total + "명 중 <b>" + pr.rank + "위</b></div>" +
+        weekGrowthHTML() +
+      "</div>" +
+      '<div class="hero-status">' +
+        miniBarHTML("체력", state.stamina, state.staminaMax, staminaCls) +
+        conditionBarHTML() +
+        miniBarHTML("인기도", state.popularity) +
+        '<div class="mini-bar"><span class="mini-label tip" tabindex="0" data-tip="-100 ~ +100. 좋은 이미지인지 나쁜 이미지인지. 구단 제안·이적에 영향">평판</span>' +
+          '<span class="bar rep-bar"><span class="rep-mid"></span><span class="bar-fill ' + (v < 0 ? "neg" : "pos") + '" style="margin-left:' + (v < 0 ? 50 + v / 2 : 50) + "%;width:" + Math.abs(v) / 2 + '%"></span></span>' +
+          '<span class="mini-value ' + (v < 0 ? "down" : v > 0 ? "up" : "") + '">' + (v > 0 ? "+" : "") + v + "</span></div>" +
+        '<div class="hero-ladder tip" tabindex="0" data-tip="' + escapeHTML(ladderTip) + '">' + tierEmblemSVG(sr.points, 26) +
+          '<span><b style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + "</b> " + sr.points.toLocaleString() + '점 <span class="muted">· 솔랭 ' + myLadderRank + "위</span></span>" + weekLadderHTML() + "</div>" +
+        (hasTrait(LADDER.kingTrait) ? '<div class="small king">👑 지난 랭크 시즌 1위 · 경기력 +3%</div>' : "") +
+        (isPrePatchWeek(state.week) ? '<div class="small warn-text">⚠️ 이번 주 끝에 솔로 랭크 초기화</div>' : "") +
+        fameLineHTML() + // 스타 등급·팬 수·평판 등급 (js/fame.js)
+        standingLineHTML() + // 팀 내 입지 (js/standing.js)
+        homeLineHTML() +
+      "</div>" +
+    "</div>"
+  );
+}
+
+// ===== 디자인 D2: 이번 주 경기 카드 (우리 팀 VS 상대, 맞수 얼굴, 전력 막대, 전적·분석 리포트) =====
+function matchCardHTML(m, mine, opp, big) {
+  const ua = uniformOfTeam(mine.id), ub = uniformOfTeam(opp);
+  const pa = teamStrength(mine.id), pb = strengthOf(opp);
+  const wt = typeof findWorldTeam === "function" ? findWorldTeam(opp) : null;
+  const os = wt ? worldStarters(wt) : findTeam(opp) ? starters(opp) : null;
+  const mate = os && os[state.player.position];
+  const sw = function (u) { return '<span class="uni-sw"><i style="background:' + u[0] + '"></i><i style="background:' + u[1] + '"></i></span>'; };
+  const gap = pa - pb;
+  const hint = gap >= 4 ? "우리가 강해요" : gap <= -4 ? "상대가 강해요" : "해볼 만해요";
+  return '<div class="mcard' + (big ? " big" : "") + '">' +
+    '<div class="mcard-top"><span class="rep-tag win">경기</span>' + (big ? bigGameTagHTML(big) : "") + "<span>" + escapeHTML(m.label) + " · " + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승</span>" +
+      (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : "") + "</div>" +
+    '<div class="mcard-vs">' +
+      '<div class="mside"><span class="pf-frame">' + portraitImg(USER_ID, { scale: 2 }) + "</span><div><b>" + sw(ua) + escapeHTML(mine.name) + '</b><div class="muted small">전력 ' + pa.toFixed(1) + " · 나: " + escapeHTML(state.player.name) + "</div></div></div>" +
+      '<div class="mvs">VS<div class="muted small">' + hint + "</div></div>" +
+      '<div class="mside right"><span class="pf-frame">' + (mate ? portraitImg(mate, { scale: 2 }) : portraitHTMLFrom(randomLook(opp), ub, { scale: 2 })) + "</span><div><b>" + teamLinkHTML(opp) + " " + sw(ub) + "</b>" +
+        '<div class="muted small">전력 ' + pb.toFixed(1) + (mate ? " · 맞수: " + escapeHTML(playerName(mate)) : "") + "</div></div></div>" +
+    "</div>" +
+    '<div class="mpower"><i class="a" style="width:' + (pa / Math.max(1, pa + pb) * 100).toFixed(1) + '%"></i><i class="b"></i></div>' +
+    h2hPreviewHTML(opp) + // 상대 전적·내 맞수 (js/h2h.js)
+    scoutReportHTML(m) + // 분석 리포트 (js/staff.js)
+  "</div>";
 }
