@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 4 — 파츠 수정 · 얼굴 고르기</title>
+<style>
+  :root { --bg:#07070d; --panel:#11111c; --panel2:#181828; --line:#26263d; --text:#f1f1f7; --muted:#8a8aa6; --accent:#00e0ff; --gold:#ffd23f; --good:#2bff9e;
+    --r:14px; --r-s:10px; --grad-btn: linear-gradient(90deg,#8a3dff,#0096c7); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: var(--bg); color: var(--text); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  h2 { font-size: 18px; margin: 36px 0 6px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .lead, .note { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+  .px { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; }
+  table.parts { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.parts td, table.parts th { padding: 10px 8px; border-top: 1px solid var(--line); vertical-align: middle; text-align: left; }
+  table.parts th { color: var(--muted); font-weight: normal; border-top: 0; }
+  .opts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .opt { text-align: center; font-size: 11px; color: var(--muted); }
+  .fr { background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); border-radius: var(--r-s); padding: 4px 4px 0; margin-bottom: 3px; display: inline-flex; }
+  .chg { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: rgba(180,77,255,.18); color: #d6a6ff; white-space: nowrap; }
+  .crowd { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
+  .maker { display: grid; grid-template-columns: 260px 1fr; gap: 18px; align-items: start; }
+  .preview { text-align: center; }
+  .preview .stage { background: radial-gradient(circle at 50% 75%, #34305e, #12121f); border-radius: var(--r); padding: 18px 10px 0; display: flex; justify-content: center; }
+  .preview .nm { margin-top: 8px; font-weight: bold; }
+  .pf-anim { display: inline-block; }
+  .jump { animation: jumpP 420ms steps(1, end); }
+  @keyframes jumpP { 0%{transform:translateY(0)} 25%{transform:translateY(calc(var(--jh) * -.5))} 50%{transform:translateY(calc(var(--jh) * -1))} 75%{transform:translateY(calc(var(--jh) * -.5))} 100%{transform:translateY(0)} }
+  .row { display: grid; grid-template-columns: 90px 36px 1fr 36px; gap: 8px; align-items: center; padding: 7px 0; border-top: 1px solid var(--line); font-size: 14px; }
+  .row:first-child { border-top: 0; }
+  .row .val { text-align: center; background: var(--panel2); border-radius: var(--r-s); padding: 7px 4px; font-size: 13px; }
+  button { font: inherit; padding: 7px 12px; border-radius: var(--r-s); border: 1px solid rgba(0,224,255,.35); background: linear-gradient(180deg,#22223a,#1a1a2d); color: #f1f5ff; cursor: pointer; }
+  button.primary { background: var(--grad-btn); border-color: transparent; font-weight: bold; }
+  .sws { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  .sw { width: 22px; height: 22px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; }
+  .sw.on { border-color: #fff; }
+  .moods { display: flex; gap: 6px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
+  .moods button { padding: 4px 9px; font-size: 12px; }
+  @media (max-width: 700px) { .maker { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>디자인 시안 4 — 파츠 수정 · 처음 시작할 때 얼굴 고르기</h1>
+  <p class="lead">요청대로 바꿨어요: 머리 모양 쉼표 머리 → <b>대머리·아프로</b> 추가 / 머리색 진갈색·와인 → <b>빨강·주황</b> / 헤드셋은 <b>귀에 이어컵</b>이 잘 보이게 / 추가 후보는 넣지 않음.</p>
+
+  <h2>① 바뀐 파츠</h2>
+  <div class="card"><table class="parts" id="parts"><tr><th style="width:150px">변수</th><th>종류</th></tr></table></div>
+
+  <h2>② 무작위 30명</h2>
+  <div class="crowd" id="crowd"></div>
+
+  <h2>③ 캐릭터 만들기 — 얼굴 고르기 시안</h2>
+  <p class="note">이름 다음 단계에 '얼굴' 칸을 넣는 모습이에요. ◀ ▶로 하나씩 바꾸고, 🎲는 전부 무작위. 미리보기 유니폼은 '7. 소속팀'에서 고른 팀 색(지금은 T1). 다른 선수 얼굴은 지금처럼 자동이에요.</p>
+  <div class="card maker">
+    <div class="preview">
+      <div class="stage" id="stage"></div>
+      <div class="nm">테스트 <span style="color:var(--muted);font-weight:normal;font-size:13px">미드</span></div>
+      <div class="moods" id="moods"><button data-m="normal">기본</button><button data-m="win">이김</button><button data-m="lose">짐</button><button data-m="tired">지침</button></div>
+    </div>
+    <div>
+      <div id="rows"></div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><button class="primary" id="rand">🎲 무작위</button><button id="team">유니폼 미리보기: T1 ▶</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function seedOf(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function rngOf(s){let a=seedOf(s);return function(){a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const SKIN=["#f6d7c3","#eec1a0","#d9a27f","#b97a57","#8d5a3b"], SKIN_N=["아주 밝게","밝게","보통","조금 어둡게","어둡게"];
+const HAIRC=["#1d1a1f","#6b4226","#c7923e","#e7e1d4","#2f4a8a","#c8322b","#e8792a"], HAIRC_N=["검정","갈색","금발","은발","파랑","빨강","주황"];
+const HAIR_N=["짧은 앞머리","덮은 머리","옆으로 넘김","긴 머리","뾰족 머리","대머리","아프로"];
+const EYES_N=["점 눈","반짝 눈"], FACE_N=["보통","갸름","넓적"];
+const UNI={"T1":["#e2012d","#141414"],"KT":["#f2f2f2","#e1251b"],"GEN.G":["#a98b46","#1b1b1b"],"Hanwha":["#ff6a13","#2a2a2a"],"Dplus":["#1b1b1b","#4fd1c5"],"BNK":["#f5c400","#1f2a44"],"BRION":["#1fae5c","#f2f2f2"],"NS":["#8e1c2b","#e8dcc2"],"KW":["#1e3a8a","#7cc4ff"],"DN":["#6b2fbf","#f2f2f2"]};
+const TEAMK=Object.keys(UNI);
+function look(id){const r=rngOf(id);const p=n=>Math.floor(r()*n);return{skin:p(5),hairC:p(7),hs:p(7),eyes:p(2),face:p(3),headset:r()<0.55,glasses:r()<0.18};}
+
+function draw32(g,L,c,mood){
+  const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  const sk=SKIN[L.skin],H=HAIRC[L.hairC],dark="#231f2b",M="#7a3b3b";
+  R(6,26,20,6,c[0]);R(8,25,16,1,c[0]);R(14,25,4,3,c[1]);R(6,30,20,1,c[1]);R(14,22,4,4,sk);
+  const fw=[12,11,13][L.face],fx=Math.floor(16-fw/2);
+  R(fx,9,fw,14,sk);R(fx+1,23,fw-2,1,sk);R(fx-1,14,1,4,sk);R(fx+fw,14,1,4,sk);
+  // 머리 (아프로는 얼굴 뒤를 감싸서 먼저 그리고 얼굴을 다시)
+  if(L.hs===6){R(fx-4,3,fw+8,10,H);R(fx-3,2,fw+6,1,H);R(fx-5,5,1,10,H);R(fx+fw+4,5,1,10,H);R(fx-4,13,3,5,H);R(fx+fw+1,13,3,5,H);
+    R(fx,10,fw,13,sk);R(fx+1,9,fw-2,1,sk);R(fx+1,23,fw-2,1,sk);R(fx-1,14,1,4,sk);R(fx+fw,14,1,4,sk);
+    R(fx-2,4,2,1,"rgba(255,255,255,.18)");R(fx+3,3,3,1,"rgba(255,255,255,.18)");}
+  const hs=[()=>{R(fx-1,6,fw+2,4,H);R(fx-1,10,2,4,H);R(fx+fw-1,10,2,4,H);},()=>{R(fx-1,5,fw+2,5,H);R(fx+2,10,4,2,H);R(fx-1,10,1,6,H);R(fx+fw,10,1,6,H);},
+   ()=>{R(fx,5,fw,4,H);R(fx-1,8,fw+2,2,H);R(fx+fw-4,10,4,1,H);},()=>{R(fx-2,5,fw+4,5,H);R(fx-2,10,2,10,H);R(fx+fw,10,2,10,H);},
+   ()=>{R(fx,6,fw,3,H);R(fx+2,4,2,2,H);R(fx+6,3,2,3,H);R(fx+fw-3,4,2,2,H);R(fx-1,8,fw+2,2,H);},
+   ()=>{R(fx+1,7,fw-2,2,sk);R(fx+2,6,fw-4,1,sk);R(fx+2,7,2,1,"rgba(255,255,255,.55)");R(fx-1,12,1,2,H);R(fx+fw,12,1,2,H);},
+   ()=>{}];
+  hs[L.hs]();
+  const ey=15,e1=fx+2,e2=fx+fw-4;
+  if(mood==="lose"){R(e1,12,1,1,H);R(e1+1,13,1,1,H);R(e2+1,12,1,1,H);R(e2,13,1,1,H);}else{R(e1,13,2,1,H);R(e2,13,2,1,H);}
+  const eye=x=>{if(mood==="win"){R(x,ey,1,1,dark);R(x+1,ey-1,1,1,dark);}else if(mood==="tired"){R(x,ey,2,1,dark);}else if(L.eyes===1){R(x,ey-1,2,2,dark);R(x+1,ey-1,1,1,"#fff");}else{R(x,ey-1,2,2,dark);}};
+  eye(e1);eye(e2);
+  if(L.glasses){R(e1-1,ey-2,4,1,dark);R(e2-1,ey-2,4,1,dark);R(e1+3,ey-1,e2-e1-3,1,dark);}
+  if(mood==="win"){R(14,19,4,1,M);R(15,20,2,1,M);R(fx+1,17,2,1,"#f29a9a");R(fx+fw-3,17,2,1,"#f29a9a");}
+  else if(mood==="lose"){R(15,19,2,1,M);R(14,20,1,1,M);R(17,20,1,1,M);}
+  else if(mood==="tired"){R(15,19,2,2,M);R(fx+fw+1,10,1,2,"#7fc8ff");}else R(15,20,2,1,M);
+  // 헤드셋: 머리띠 + 귀 이어컵(밝은 테두리 + 팀색 안쪽) + 마이크
+  if(L.headset){const k="#2b2b38",kl="#6c6c86",top=L.hs===6?2:4;
+    R(fx,top,fw,1,k);R(fx-1,top+1,1,1,k);R(fx+fw,top+1,1,1,k);R(fx-2,top+2,1,12-top,k);R(fx+fw+1,top+2,1,12-top,k);
+    R(fx-4,12,4,7,k);R(fx-4,12,4,1,kl);R(fx-4,12,1,7,kl);R(fx-3,14,2,3,c[0]);
+    R(fx+fw,12,4,7,k);R(fx+fw,12,4,1,kl);R(fx+fw+3,12,1,7,kl);R(fx+fw+1,14,2,3,c[0]);
+    R(fx-1,19,1,1,k);R(fx,20,3,1,k);R(fx+3,20,1,1,"#ff3d71");}
+}
+function pic(L,c,mood,scale){const cv=document.createElement("canvas");cv.width=32;cv.height=32;cv.className="px";cv.style.width=32*scale+"px";cv.style.height=32*scale+"px";draw32(cv.getContext("2d"),L,c,mood||"normal");return cv;}
+function optCell(L,c,label){const d=document.createElement("div");d.className="opt";const f=document.createElement("div");f.className="fr";f.appendChild(pic(L,c,"normal",2));d.appendChild(f);d.insertAdjacentHTML("beforeend","<div>"+label+"</div>");return d;}
+
+const BASE={skin:1,hairC:1,hs:0,eyes:0,face:0,headset:false,glasses:false};
+const ROWS=[["머리 모양","7가지 (쉼표 머리 빼고 대머리·아프로)",HAIR_N.map((n,i)=>[{hs:i},n])],
+  ["머리색","7가지 (진갈색·와인 빼고 빨강·주황)",HAIRC_N.map((n,i)=>[{hairC:i},n])],
+  ["헤드셋","귀 이어컵 + 팀색 안쪽 + 마이크",[[{headset:false},"없음"],[{headset:true},"있음"],[{headset:true,hs:6},"아프로+헤드셋"],[{headset:true,hs:5},"대머리+헤드셋"]]]];
+const tb=document.getElementById("parts");
+ROWS.forEach(function(r){const tr=document.createElement("tr");tr.innerHTML="<td><b>"+r[0]+"</b> <span class='chg'>바뀜</span><br><span style='color:var(--muted);font-size:12px'>"+r[1]+"</span></td><td></td>";
+  const box=document.createElement("div");box.className="opts";r[2].forEach(o=>box.appendChild(optCell(Object.assign({},BASE,o[0]),UNI.T1,o[1])));tr.children[1].appendChild(box);tb.appendChild(tr);});
+const tr2=document.createElement("tr");tr2.innerHTML="<td><b>그대로</b></td><td style='color:var(--muted)'>피부색 5 · 눈 2 · 얼굴 너비 3 · 안경 18% · 표정 4 · 유니폼 = 팀 색</td>";tb.appendChild(tr2);
+
+const NAMES="Ace Aero Aim Aika Apex Aqua Arc Ash Blaze Bolt Burn Cave Chill Cobra Dash Dawn Echo Ember Fang Flux Frost Gale Hawk Ice Ion Jade Jinx Kai Kyro Lark".split(" ");
+const cr=document.getElementById("crowd");NAMES.forEach((n,i)=>cr.appendChild(optCell(look(n),UNI[TEAMK[i%10]],n)));
+
+// ③ 얼굴 고르기
+const me={skin:1,hairC:0,hs:0,eyes:1,face:0,headset:true,glasses:false};let mood="normal",ti=0;
+const FIELDS=[["피부색","skin",SKIN_N],["머리 모양","hs",HAIR_N],["머리색","hairC",HAIRC_N],["눈","eyes",EYES_N],["얼굴","face",FACE_N],["헤드셋","headset",["없음","있음"]],["안경","glasses",["없음","있음"]]];
+function draw(){
+  const st=document.getElementById("stage");st.innerHTML="";const s=document.createElement("span");s.className="pf-anim";s.appendChild(pic(me,UNI[TEAMK[ti]],mood,3));st.appendChild(s);
+  const rows=document.getElementById("rows");rows.innerHTML="";
+  FIELDS.forEach(function(f){const v=typeof me[f[1]]==="boolean"?(me[f[1]]?1:0):me[f[1]];const d=document.createElement("div");d.className="row";
+    d.innerHTML="<span>"+f[0]+"</span><button data-k='"+f[1]+"' data-d='-1'>◀</button><div class='val'>"+f[2][v]+"</div><button data-k='"+f[1]+"' data-d='1'>▶</button>";rows.appendChild(d);});
+  document.getElementById("team").textContent="유니폼 미리보기: "+TEAMK[ti]+" ▶";
+  document.querySelectorAll("#moods button").forEach(b=>b.classList.toggle("primary",b.dataset.m===mood));
+}
+document.getElementById("rows").addEventListener("click",function(e){const b=e.target.closest("button");if(!b)return;const f=FIELDS.find(x=>x[1]===b.dataset.k);const n=f[2].length;
+  if(typeof me[f[1]]==="boolean")me[f[1]]=!me[f[1]];else me[f[1]]=(me[f[1]]+Number(b.dataset.d)+n)%n;draw();});
+document.getElementById("rand").onclick=function(){const L=look("r"+Math.random());Object.assign(me,L);draw();};
+document.getElementById("team").onclick=function(){ti=(ti+1)%TEAMK.length;draw();};
+document.getElementById("moods").addEventListener("click",function(e){const b=e.target.closest("button");if(!b)return;mood=b.dataset.m;draw();});
+setInterval(function(){document.querySelectorAll(".pf-anim").forEach(function(el){const now=Date.now();if(!el._nj)el._nj=now+800+Math.random()*3000;if(now>el._nj){el.style.setProperty("--jh",(1+Math.floor(Math.random()*5))+"px");el.classList.remove("jump");void el.offsetWidth;el.classList.add("jump");el._nj=now+3000+Math.random()*4000;}});},200);
+draw();
+</script>
+</body>
+</html>

@@ -141,7 +141,7 @@ function draw32(g,L,c,mood){
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
   const sk=L.skin[0],H=L.hair[0],dark="#231f2b";
   R(6,26,20,6,c[0]);R(8,25,16,1,c[0]);R(14,25,4,3,c[1]);R(6,30,20,1,c[1]);R(14,22,4,4,sk);
-  const fw=[12,11,13][L.face],fx=16-fw/2;
+  const fw=[12,11,13][L.face],fx=Math.floor(16-fw/2);
   R(fx,9,fw,14,sk);R(fx+1,23,fw-2,1,sk);R(fx-1,14,1,4,sk);R(fx+fw,14,1,4,sk);
   [()=>{R(fx-1,6,fw+2,4,H);R(fx-1,10,2,4,H);R(fx+fw-1,10,2,4,H);},()=>{R(fx-1,5,fw+2,5,H);R(fx+2,10,4,2,H);R(fx-1,10,1,6,H);R(fx+fw,10,1,6,H);},
    ()=>{R(fx,5,fw,4,H);R(fx-1,8,fw+2,2,H);R(fx+fw-4,10,4,1,H);},()=>{R(fx-2,5,fw+4,5,H);R(fx-2,10,2,10,H);R(fx+fw,10,2,10,H);},

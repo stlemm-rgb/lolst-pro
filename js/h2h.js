@@ -122,7 +122,7 @@ function h2hPreviewHTML(oppId) {
   const oppMate = os && os[state.player.position];
   if (oppMate && !state.benched) {
     const me = h2hMe(oppMate);
-    parts.push("⚔️ 맞수 " + escapeHTML(playerName(oppMate)) + (me ? " 세트 " + me.s[0] + "승 " + me.s[1] + "패 · 라인전 " + me.l[0] + ":" + me.l[1] : " (첫 맞대결)"));
+    parts.push("⚔️ 맞수 " + portraitImg(oppMate, { face: true, size: 18 }) + " " + escapeHTML(playerName(oppMate)) + (me ? " 세트 " + me.s[0] + "승 " + me.s[1] + "패 · 라인전 " + me.l[0] + ":" + me.l[1] : " (첫 맞대결)"));
   }
   return '<div class="rep-row muted small h2h-row">' + parts.join(" &nbsp;|&nbsp; ") + "</div>";
 }

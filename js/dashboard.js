@@ -364,8 +364,9 @@ function profileCardHTML() {
   const p = state.player;
   const traits = p.traits.map(traitChipHTML).join("") || '<span class="muted">없음</span>';
   return (
-    '<div class="card"><h2>👤 ' + escapeHTML(p.name) + ' <span class="muted small">' + p.age + "세 · " + findPosition(p.position).name + " · " + findArchetype(p.archetype).name + "</span></h2>" +
-      '<div class="chips">' + traits + "</div>" +
+    '<div class="card profile-card"><div class="profile-top"><span class="pf-frame">' + portraitImg(USER_ID, { scale: 3, jump: true }) + "</span><div>" + // 도트 포트레잇 (js/portrait.js)
+      "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + p.age + "세 · " + findPosition(p.position).name + " · " + findArchetype(p.archetype).name + "</span></h2>" +
+      '<div class="chips">' + traits + "</div></div></div>" +
       goalLineHTML() + // 🎯 지금 목표 (js/guide.js)
     "</div>"
   );

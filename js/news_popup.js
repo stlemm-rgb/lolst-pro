@@ -73,6 +73,7 @@ function newsOverlayHTML(items) {
   const r = state.weekReport;
   const arts = items.slice().sort(function (a, b) { return newsPriority(b) - newsPriority(a); }).map(function (a, i) {
     return '<article class="np-article' + (i === 0 ? " lead" : "") + (a.mine ? " mine" : "") + '">' +
+      (a.mine && i === 0 ? '<span class="np-pf">' + portraitImg(USER_ID, { scale: 2 }) + "</span>" : "") + // 내 기사 1면: 내 얼굴 (js/portrait.js)
       "<h2>" + escapeHTML(a.headline) + "</h2><div class=\"muted small\">" + escapeHTML(newsDate(a)) + "</div><p>" + escapeHTML(a.body) + "</p></article>";
   }).join("");
   return '<div class="np-paper">' +

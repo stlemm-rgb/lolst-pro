@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 3 — 포트레잇 파츠 도감 · 유니폼</title>
+<style>
+  :root { --bg:#07070d; --panel:#11111c; --panel2:#181828; --line:#26263d; --text:#f1f1f7; --muted:#8a8aa6; --accent:#00e0ff; --accent2:#b44dff; --gold:#ffd23f; --good:#2bff9e;
+    --r:14px; --r-s:10px; --r-xs:6px; --grad-btn: linear-gradient(90deg,#8a3dff,#0096c7); }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: var(--bg); color: var(--text); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  h2 { font-size: 18px; margin: 36px 0 6px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .lead, .note { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+  .px { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; }
+  table.parts { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  table.parts td, table.parts th { padding: 10px 8px; border-top: 1px solid var(--line); vertical-align: middle; text-align: left; }
+  table.parts th { color: var(--muted); font-weight: normal; border-top: 0; }
+  .opts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .opt { text-align: center; font-size: 11px; color: var(--muted); }
+  .opt .fr { background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); border-radius: var(--r-s); padding: 4px 4px 0; margin-bottom: 3px; display: inline-flex; }
+  .sw { display: inline-block; width: 20px; height: 20px; border-radius: 6px; border: 1px solid rgba(255,255,255,.15); vertical-align: middle; }
+  .badge { font-size: 11px; padding: 2px 7px; border-radius: 999px; background: rgba(43,255,158,.15); color: var(--good); white-space: nowrap; }
+  .badge.new { background: rgba(180,77,255,.18); color: #d6a6ff; }
+  .crowd { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
+  .crowd .opt .fr { padding: 6px 6px 0; }
+  .teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+  .team { background: var(--panel2); border: 1px solid var(--line); border-radius: var(--r); padding: 10px; display: flex; gap: 10px; align-items: center; cursor: pointer; }
+  .team.sel { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,224,255,.25); }
+  .team .pf { background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); border-radius: var(--r-s); padding: 4px 4px 0; display: inline-flex; }
+  .team b { display: block; font-size: 14px; }
+  .team .sm { font-size: 12px; color: var(--muted); }
+  .stars { color: var(--gold); font-size: 12px; }
+  .uni { display: inline-flex; gap: 3px; vertical-align: middle; margin-right: 4px; }
+  .uni i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(255,255,255,.2); display: inline-block; }
+  .sub { font-size: 15px; margin: 18px 0 8px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .tabs button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel2); color: var(--text); cursor: pointer; }
+  .tabs button.on { background: var(--grad-btn); color: #fff; border-color: transparent; }
+  @media (max-width: 700px) { table.parts td:first-child { width: 80px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>디자인 시안 3 — 포트레잇 파츠 도감 · 유니폼</h1>
+  <p class="lead">32×32 도트, 모두 2배(64px)로 보여요. <span class="badge">지금 있음</span> = 시안 2에 이미 있는 것, <span class="badge new">추가 후보</span> = 넣을지 골라 주세요.</p>
+
+  <h2>① 얼굴 파츠 — 한 칸씩만 바꿔 본 모습</h2>
+  <div class="card"><table class="parts" id="parts"><tr><th style="width:150px">변수</th><th>종류</th><th style="width:220px">정하는 방법</th></tr></table></div>
+
+  <h2>② 이 조합으로 나오는 선수들 (무작위 30명)</h2>
+  <p class="note">선수 id만으로 정해져서 같은 선수는 언제나 같은 얼굴이에요 (저장 공간 0). 유니폼은 지금 소속팀 색.</p>
+  <div class="tabs" id="crowdTabs"><button data-x="0" class="on">지금 있는 파츠만</button><button data-x="1">추가 후보까지 넣으면</button></div>
+  <div class="crowd" id="crowd"></div>
+
+  <h2>③ 구단 유니폼 색</h2>
+  <p class="note">유니폼 = 바탕색 + 포인트색(깃·줄). 1부 기업 10곳은 고정, 2부·신생 구단은 이름으로 정해지는 무작위 색, 해외 팀은 지역마다 2~3가지 중에서. 이적하면 다음 경기부터 새 팀 유니폼.</p>
+  <div class="card"><table class="parts" id="uniTable"><tr><th style="width:150px">구단</th><th>유니폼</th><th>색</th></tr></table></div>
+
+  <h2>④ 캐릭터 만들기 '7. 소속팀' 시안 — 유니폼 색이 같이 보임</h2>
+  <p class="note">팀 카드마다 내 캐릭터가 그 팀 유니폼을 입은 모습 + 색 두 칸. 누르면 고른 팀 표시.</p>
+  <div class="card">
+    <div class="sub">1부 리그</div><div class="teams" id="t1"></div>
+    <div class="sub">2부 리그</div><div class="teams" id="t2"></div>
+  </div>
+</div>
+
+<script>
+function seedOf(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function rngOf(s){let a=seedOf(s);return function(){a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const SKIN=["#f6d7c3","#eec1a0","#d9a27f","#b97a57","#8d5a3b"];
+const SKIN_N=["아주 밝게","밝게","보통","조금 어둡게","어둡게"];
+const HAIRC=["#1d1a1f","#3b2a20","#6b4226","#c7923e","#e7e1d4","#2f4a8a","#9b3d5a"];
+const HAIRC_N=["검정","진갈색","갈색","금발","은발","파랑","와인"];
+const HAIR_N=["짧은 앞머리","덮은 머리","옆으로 넘김","긴 머리","뾰족 머리","쉼표 머리"];
+const EYES_N=["점 눈","반짝 눈"];
+const FACE_N=["보통","갸름","넓적"];
+const UNI={ // 1부 기업 10곳 (고정)
+  "T1":["#e2012d","#141414"],"KT":["#f2f2f2","#e1251b"],"GEN.G":["#a98b46","#1b1b1b"],"Hanwha":["#ff6a13","#2a2a2a"],"Dplus":["#1b1b1b","#4fd1c5"],
+  "BNK":["#f5c400","#1f2a44"],"BRION":["#1fae5c","#f2f2f2"],"NS":["#8e1c2b","#e8dcc2"],"KW":["#1e3a8a","#7cc4ff"],"DN":["#6b2fbf","#f2f2f2"] };
+const UNI_POOL=[["#3b82f6","#f2f2f2"],["#14b8a6","#111827"],["#a3e635","#1f2937"],["#f472b6","#1f2937"],["#64748b","#f8fafc"],["#f59e0b","#7c2d12"],["#0ea5e9","#0f172a"],["#ef4444","#fde68a"],["#8b5cf6","#fde68a"],["#10b981","#064e3b"],["#e11d48","#f1f5f9"],["#facc15","#111111"]];
+const REGION_UNI={"북미":[["#1d4ed8","#f8fafc"],["#0f766e","#f8fafc"]],"유럽":[["#f8fafc","#1e3a8a"],["#7c3aed","#f8fafc"]],"중국":[["#dc2626","#facc15"],["#111827","#ef4444"]]};
+function teamUni(short){ return UNI[short] || UNI_POOL[seedOf(short)%UNI_POOL.length]; }
+
+function look(id, extra){const r=rngOf(id);const p=a=>Math.floor(r()*a);
+  const L={skin:p(5),hairC:p(7),hs:p(6),eyes:p(2),face:p(3),headset:r()<0.55,glasses:r()<0.18,beard:r()<0.15,band:r()<0.12,cap:r()<0.1,freckle:r()<0.15};
+  if(!extra){L.beard=L.band=L.cap=L.freckle=false;}
+  if(L.cap) L.band=false;
+  return L;}
+
+function draw32(g,L,c,mood){
+  const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  const sk=SKIN[L.skin],H=HAIRC[L.hairC],dark="#231f2b",M="#7a3b3b";
+  R(6,26,20,6,c[0]);R(8,25,16,1,c[0]);R(14,25,4,3,c[1]);R(6,30,20,1,c[1]);R(14,22,4,4,sk);
+  const fw=[12,11,13][L.face],fx=Math.floor(16-fw/2);
+  R(fx,9,fw,14,sk);R(fx+1,23,fw-2,1,sk);R(fx-1,14,1,4,sk);R(fx+fw,14,1,4,sk);
+  if(!L.cap)[()=>{R(fx-1,6,fw+2,4,H);R(fx-1,10,2,4,H);R(fx+fw-1,10,2,4,H);},()=>{R(fx-1,5,fw+2,5,H);R(fx+2,10,4,2,H);R(fx-1,10,1,6,H);R(fx+fw,10,1,6,H);},
+   ()=>{R(fx,5,fw,4,H);R(fx-1,8,fw+2,2,H);R(fx+fw-4,10,4,1,H);},()=>{R(fx-2,5,fw+4,5,H);R(fx-2,10,2,10,H);R(fx+fw,10,2,10,H);},
+   ()=>{R(fx,6,fw,3,H);R(fx+2,4,2,2,H);R(fx+6,3,2,3,H);R(fx+fw-3,4,2,2,H);R(fx-1,8,fw+2,2,H);},()=>{R(fx-1,6,fw+2,3,H);R(fx-1,9,fw-3,2,H);}][L.hs]();
+  else { R(fx-1,10,2,4,H);R(fx+fw-1,10,2,4,H);R(fx-1,5,fw+2,5,c[0]);R(fx-1,9,fw+5,1,c[1]);R(fx+fw-2,9,4,1,c[1]); }
+  if(L.band){R(fx-1,8,fw+2,1,c[1]);}
+  const ey=15,e1=fx+2,e2=fx+fw-4;
+  if(mood==="lose"){R(e1,12,1,1,H);R(e1+1,13,1,1,H);R(e2+1,12,1,1,H);R(e2,13,1,1,H);}else{R(e1,13,2,1,H);R(e2,13,2,1,H);}
+  const eye=x=>{if(mood==="win"){R(x,ey,1,1,dark);R(x+1,ey-1,1,1,dark);}else if(mood==="tired"){R(x,ey,2,1,dark);}else if(L.eyes===1){R(x,ey-1,2,2,dark);R(x+1,ey-1,1,1,"#fff");}else{R(x,ey-1,2,2,dark);}};
+  eye(e1);eye(e2);
+  if(L.glasses){R(e1-1,ey-2,4,1,dark);R(e2-1,ey-2,4,1,dark);R(e1+3,ey-1,e2-e1-3,1,dark);}
+  if(L.freckle){R(e1,ey+2,1,1,"#c47a5a");R(e1+2,ey+3,1,1,"#c47a5a");R(e2+1,ey+2,1,1,"#c47a5a");R(e2-1,ey+3,1,1,"#c47a5a");}
+  if(L.beard){R(fx+1,20,fw-2,3,H);R(fx+2,23,fw-4,1,H);R(15,20,2,1,sk);}
+  if(mood==="win"){R(14,19,4,1,M);R(15,20,2,1,M);R(fx+1,17,2,1,"#f29a9a");R(fx+fw-3,17,2,1,"#f29a9a");}
+  else if(mood==="lose"){R(15,19,2,1,M);R(14,20,1,1,M);R(17,20,1,1,M);}
+  else if(mood==="tired"){R(15,19,2,2,M);R(fx+fw+1,10,1,2,"#7fc8ff");}else R(15,20,2,1,M);
+  if(L.headset){const k="#2b2b33";R(fx-1,4,fw+2,1,k);R(fx-2,5,1,9,k);R(fx+fw+1,5,1,9,k);R(fx-3,13,2,4,k);R(fx+fw+1,13,2,4,k);R(fx-1,17,1,2,k);R(fx,19,3,1,k);R(fx+3,19,1,1,c[0]);}
+}
+function pic(L,c,mood,scale){const cv=document.createElement("canvas");cv.width=32;cv.height=32;cv.className="px";cv.style.width=32*scale+"px";cv.style.height=32*scale+"px";draw32(cv.getContext("2d"),L,c,mood||"normal");return cv;}
+function optCell(L,c,label,mood){const d=document.createElement("div");d.className="opt";const f=document.createElement("div");f.className="fr";f.appendChild(pic(L,c,mood,2));d.appendChild(f);d.insertAdjacentHTML("beforeend","<div>"+label+"</div>");return d;}
+
+// ① 파츠 표
+const BASE={skin:1,hairC:2,hs:0,eyes:0,face:0,headset:false,glasses:false,beard:false,band:false,cap:false,freckle:false};
+const T1=UNI["T1"];
+const ROWS=[
+  ["피부색","5가지",SKIN_N.map((n,i)=>[{skin:i},n]),"무작위 (5가지 같은 확률)",0],
+  ["머리 모양","6가지",HAIR_N.map((n,i)=>[{hs:i},n]),"무작위",0],
+  ["머리색","7가지",HAIRC_N.map((n,i)=>[{hairC:i},n]),"무작위",0],
+  ["눈","2가지",EYES_N.map((n,i)=>[{eyes:i},n]),"무작위",0],
+  ["얼굴 너비","3가지",FACE_N.map((n,i)=>[{face:i},n]),"무작위",0],
+  ["헤드셋","있음·없음",[[{headset:false},"없음"],[{headset:true},"있음"]],"55%가 씀",0],
+  ["안경","있음·없음",[[{glasses:false},"없음"],[{glasses:true},"있음"]],"18%가 씀",0],
+  ["표정","4가지",[[{},"기본","normal"],[{},"이김","win"],[{},"짐","lose"],[{},"지침","tired"]],"그 주 경기 결과·체력에 따라 (내 선수)",0],
+  ["수염","있음·없음",[[{beard:false},"없음"],[{beard:true},"있음"]],"예: 26세 이상 중 30% (나이 들면 생김)",1],
+  ["주근깨","있음·없음",[[{freckle:false},"없음"],[{freckle:true},"있음"]],"15%",1],
+  ["머리띠","있음·없음",[[{band:false},"없음"],[{band:true},"있음 (포인트색)"]],"12%",1],
+  ["팀 모자","있음·없음",[[{cap:false},"없음"],[{cap:true},"있음 (팀 색)"]],"10%",1],
+];
+const tb=document.getElementById("parts");
+ROWS.forEach(function(r){const tr=document.createElement("tr");
+  tr.innerHTML="<td><b>"+r[0]+"</b><br><span class='muted' style='font-size:12px'>"+r[1]+"</span> <span class='badge"+(r[4]?" new":"")+"'>"+(r[4]?"추가 후보":"지금 있음")+"</span></td><td></td><td class='muted' style='font-size:12px'>"+r[3]+"</td>";
+  const box=document.createElement("div");box.className="opts";
+  r[2].forEach(function(o){box.appendChild(optCell(Object.assign({},BASE,o[0]),T1,o[1],o[2]));});
+  tr.children[1].appendChild(box);tb.appendChild(tr);});
+const trU=document.createElement("tr");
+trU.innerHTML="<td><b>유니폼</b><br><span class='muted' style='font-size:12px'>바탕 + 포인트</span> <span class='badge'>지금 있음</span></td><td></td><td class='muted' style='font-size:12px'>지금 소속팀 색 (아래 ③)</td>";
+const ub=document.createElement("div");ub.className="opts";["T1","KT","GEN.G","Dplus","BNK"].forEach(s=>ub.appendChild(optCell(BASE,UNI[s],s)));trU.children[1].appendChild(ub);tb.appendChild(trU);
+
+// ② 무작위
+const NAMES="Ace Aero Aim Aika Apex Aqua Arc Ash Blaze Bolt Burn Cave Chill Cobra Dash Dawn Echo Ember Fang Flux Frost Gale Hawk Ice Ion Jade Jinx Kai Kyro Lark".split(" ");
+const SH=Object.keys(UNI);
+function crowd(extra){const c=document.getElementById("crowd");c.innerHTML="";NAMES.forEach(function(n,i){c.appendChild(optCell(look(n,extra),teamUni(SH[i%SH.length]),n));});}
+document.getElementById("crowdTabs").addEventListener("click",function(e){const b=e.target.closest("button");if(!b)return;this.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));crowd(b.dataset.x==="1");});
+crowd(false);
+
+// ③ 유니폼 표
+const ut=document.getElementById("uniTable");
+const me=look("테스트",false);
+function uniRow(name,c,note){const tr=document.createElement("tr");tr.innerHTML="<td><b>"+name+"</b>"+(note?"<br><span class='muted' style='font-size:12px'>"+note+"</span>":"")+"</td><td></td><td><span class='sw' style='background:"+c[0]+"'></span> <span class='sw' style='background:"+c[1]+"'></span> <span class='muted' style='font-size:12px'>"+c[0]+" · "+c[1]+"</span></td>";
+  const f=document.createElement("div");f.className="opt";const fr=document.createElement("div");fr.className="fr";fr.appendChild(pic(me,c,"normal",2));f.appendChild(fr);tr.children[1].appendChild(f);ut.appendChild(tr);}
+Object.keys(UNI).forEach(s=>uniRow(s,UNI[s],"1부 고정"));
+["QX","LM","ZR"].forEach(s=>uniRow(s+" (2부 예시)",teamUni(s),"이름으로 정해지는 색 (12가지 중)"));
+Object.keys(REGION_UNI).forEach(r=>uniRow("해외 · "+r+" 예시",REGION_UNI[r][0],"지역마다 2~3가지"));
+
+// ④ 팀 고르기 시안
+const TEAMS1=[["T1 VANGUARD","T1",5],["GEN.G HYDRA","GEN.G",5],["Hanwha AURA","Hanwha",4],["Dplus NOVA","Dplus",4],["KT VALOR","KT",3],["DN CHRONO","DN",3],["BRION APEX","BRION",3],["NS ALPHA","NS",2],["KW LEGION","KW",2],["BNK OVERLOAD","BNK",1]];
+const TEAMS2=[["QX STORM","QX",3],["LM PULSE","LM",2],["ZR MIRAGE","ZR",2]];
+let sel="T1 VANGUARD";
+function teamCards(){[["t1",TEAMS1],["t2",TEAMS2]].forEach(function(x){const box=document.getElementById(x[0]);box.innerHTML="";x[1].forEach(function(t){const c=teamUni(t[1]);
+  const d=document.createElement("div");d.className="team"+(sel===t[0]?" sel":"");const pf=document.createElement("div");pf.className="pf";pf.appendChild(pic(me,c,sel===t[0]?"win":"normal",2));d.appendChild(pf);
+  d.insertAdjacentHTML("beforeend","<div><b>"+t[0]+"</b><div class='sm'><span class='uni'><i style='background:"+c[0]+"'></i><i style='background:"+c[1]+"'></i></span><span class='stars'>"+"★".repeat(t[2])+"☆".repeat(5-t[2])+"</span></div><div class='sm'>예상 "+(t[2]>=4?"상위권":t[2]>=3?"중위권":"하위권")+"</div></div>");
+  d.onclick=function(){sel=t[0];teamCards();};box.appendChild(d);});});}
+teamCards();
+</script>
+</body>
+</html>

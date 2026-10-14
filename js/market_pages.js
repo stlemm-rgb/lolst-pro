@@ -76,7 +76,7 @@ pages.search = function () {
     const team = p.teamId ? findTeam(p.teamId) : null;
     const wt = !team && id !== USER_ID && typeof worldTeamIdOf === "function" && state.world && state.world.players[id] ? findWorldTeam(worldTeamIdOf(id)) : null; // 해외 리그 선수
     return (
-      '<tr class="click' + (id === USER_ID ? " me" : "") + (selectedPlayer === id ? " sel" : "") + '" data-player="' + id + '">' +
+      '<tr class="click' + (id === USER_ID ? " me" : "") + (selectedPlayer === id ? " sel" : "") + '" data-player="' + id + '">' + faceTd(id) + // 얼굴 (js/portrait.js)
         "<td>" + escapeHTML(p.name) + (id !== USER_ID && findPlayer(id) && findPlayer(id).named ? ' <span title="네임드 선수">⭐</span>' : "") +
           (id !== USER_ID && findPlayer(id) && findPlayer(id).bigRookie ? ' <span title="' + findPlayer(id).bigRookie + '년 대형 신인">🌟</span>' : "") + "</td>" +
         "<td>" + findPosition(p.pos).name + "</td>" +
@@ -103,7 +103,7 @@ pages.search = function () {
       "</div>" +
       '<p class="muted small">' + total + "명" + (total > 80 ? " 중 80명 표시" : "") + " · 줄을 누르면 상세 스탯이 나와요.</p>" +
       (selectedPlayer && (selectedPlayer === USER_ID || findPlayer(selectedPlayer)) ? playerDetailHTML(selectedPlayer) : "") +
-      '<table class="roster"><tr><th>이름</th><th>포지션</th><th>출신</th><th>소속</th><th>주력 챔피언</th><th class="r">나이</th><th class="r">스탯 점수</th><th class="r">연봉</th><th class="r">계약 만료</th></tr>' + rows + "</table>" +
+      '<table class="roster"><tr><th></th><th>이름</th><th>포지션</th><th>출신</th><th>소속</th><th>주력 챔피언</th><th class="r">나이</th><th class="r">스탯 점수</th><th class="r">연봉</th><th class="r">계약 만료</th></tr>' + rows + "</table>" +
     "</div>"
   );
 };
@@ -201,7 +201,7 @@ function clubRosterHTML(teamId) {
   }).map(function (id) {
     const p = playerInfo(id);
     const mainText = topChampList(id, 2).map(function (c) { return escapeHTML(c.name); }).join(" · ");
-    return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + (id === USER_ID ? "" : " " + styleIconHTML(id)) + traitChipsMini(id) +
+    return '<tr class="' + (id === USER_ID ? "me" : "") + '">' + faceTd(id) + "<td>" + findPosition(p.pos).name + "</td><td>" + escapeHTML(p.name) + (id === USER_ID ? "" : " " + styleIconHTML(id)) + traitChipsMini(id) +
       (mainText ? ' <span class="muted small">⚔️ ' + mainText + "</span>" : "") + "</td><td>" + p.age + '세</td><td class="r"><b>' +
       playerScore(id).toFixed(1) + '</b></td><td class="r">' + moneyText(p.salary || 0) + "</td><td>" + (starterIds.indexOf(id) !== -1 ? "주전" : '<span class="muted">후보</span>') + "</td></tr>";
   }).join("");

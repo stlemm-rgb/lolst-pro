@@ -30,6 +30,7 @@ function newDraft() {
     traits: [],                         // 직접 고른 좋은 특성 (유형별 개수까지)
     teams: makeTeamDefs(CREATION.startYears[0].year), // 이번 판 구단 이름 (구단 수는 시작 연도에 따라, data/era.js)
     teamChoice: -1,                     // 고른 구단 번호 (-1 = 무작위)
+    look: randomLook(),                 // 얼굴 (js/portrait.js, 175)
     error: "",
   };
 }
@@ -121,6 +122,7 @@ function randomizeDraft() {
     if (draftStat(sid) < 100) draft.alloc[sid] = (draft.alloc[sid] || 0) + 1;
   }
   draft.teamChoice = -1;
+  draft.look = randomLook();
   draft.error = "";
 }
 
@@ -148,9 +150,10 @@ function teamRankText(def) {
 function creationHTML() {
   // 1. 이름
   const nameCard =
-    '<div class="card"><h2>1. 이름</h2>' +
+    '<div class="card"><h2>1. 이름 · 얼굴</h2>' +
       '<div class="name-row"><input type="text" id="c-name" maxlength="20" placeholder="선수 이름 (닉네임)" value="' + escapeHTML(draft.name) + '">' +
       '<button data-cname="1" title="무작위 이름">🎲 이름</button></div>' +
+      lookPickerHTML() +
     "</div>";
 
   // 2. 시작 연도
@@ -278,9 +281,11 @@ function creationHTML() {
   const myScore = statScoreFor(stats, draft.position);
   const teamBtn = function (def, i) {
     const n = teamStarCount(def);
+    const uni = uniformByShort(def.short);
     return '<div class="choice team-choice' + (draft.teamChoice === i ? " selected" : "") + '" data-cteam="' + i + '">' +
-      "<b>" + escapeHTML(def.name) + "</b>" +
-      '<div class="small"><span class="team-stars s' + n + '">' + starsText(n) + '</span> <span class="muted">예상 ' + teamRankText(def) + "</span></div></div>";
+      '<span class="pf-frame">' + portraitHTMLFrom(draft.look, uni, { scale: 2, mood: draft.teamChoice === i ? "win" : "normal" }) + "</span>" +
+      '<div class="team-choice-text"><b>' + escapeHTML(def.name) + "</b>" +
+      '<div class="small">' + uniformSwatchHTML(uni) + '<span class="team-stars s' + n + '">' + starsText(n) + '</span></div><div class="small muted">예상 ' + teamRankText(def) + "</div></div></div>";
   };
   let t1 = "", t2 = "";
   draft.teams.forEach(function (def, i) { if (def.tier === 1) t1 += teamBtn(def, i); else t2 += teamBtn(def, i); });
@@ -328,8 +333,10 @@ function playerCardHTML(stats, myScore) {
   for (let i = picked.length; i < slots; i++) empty.push('<span class="chip muted">＋ 무작위</span>');
   const team = draft.teams[draft.teamChoice];
   const saved = loadGame();
+  const uni = team ? uniformByShort(team.short) : FREE_AGENT_UNIFORM;
   return (
     '<div class="card pcard">' +
+      '<div class="pc-portrait pf-frame">' + portraitHTMLFrom(draft.look, uni, { scale: 3, jump: true }) + "</div>" +
       '<div class="pc-name">' + (draft.name.trim() ? escapeHTML(draft.name.trim()) : '<span class="muted">이름을 입력해 주세요</span>') + "</div>" +
       '<div class="small">' + pos.name + " · " + arch.age + "세 · " + arch.name + " · " + draft.startYear + "년 데뷔</div>" +
       '<div class="pc-score"><span class="muted small">스탯 점수</span> <b>' + myScore.toFixed(1) + '</b> <span class="small">' + level + "</span></div>" +
@@ -425,6 +432,10 @@ function renderCreation() {
   box.querySelector("[data-crandom]").onclick = function () { randomizeDraft(); renderCreation(); };
   box.querySelector("[data-cname]").onclick = function () { draft.name = pick(PLAYER_NAMES); draft.error = ""; renderCreation(); };
 
+  box.querySelectorAll("[data-clook]").forEach(function (el) {
+    el.onclick = function () { changeLook(draft.look, el.getAttribute("data-clook"), Number(el.getAttribute("data-d"))); renderCreation(); };
+  });
+  box.querySelector("[data-clookrand]").onclick = function () { draft.look = randomLook(); renderCreation(); };
   box.querySelector("[data-start]").onclick = startCareer;
 
   const cont = box.querySelector("[data-continue]");
@@ -460,6 +471,7 @@ function startCareer(sure) {
     archetype: draft.archetype,
     age: arch.age,
     traits: finalTraits(),
+    look: draft.look || randomLook(), // 얼굴 (js/portrait.js)
   };
   // 시작 유형 전용 특성 (유망주: 🌱 유망주, startTraitSeasons 시즌 뒤 사라짐)
   if (arch.startTrait) {
@@ -541,4 +553,34 @@ function expireStartTrait() {
   if (!id || p.traits.indexOf(id) === -1) return;
   p.traits.splice(p.traits.indexOf(id), 1);
   addNews("특성", findTrait(id).name + " 기간이 끝났다. 데뷔 " + arch.startTraitSeasons + "시즌 동안 받던 훈련·숙련도 보너스가 사라지고, 이제 진짜 실력으로 승부할 때다.");
+}
+
+// ----- 얼굴 고르기 (175, 디자인 D1 — 그림은 js/portrait.js) -----
+const LOOK_FIELDS = [
+  { key: "skin", name: "피부색", list: function () { return PORTRAIT.skins.map(function (x) { return x.name; }); } },
+  { key: "hs", name: "머리 모양", list: function () { return PORTRAIT.hairStyles; } },
+  { key: "hairC", name: "머리색", list: function () { return PORTRAIT.hairColors.map(function (x) { return x.name; }); } },
+  { key: "eyes", name: "눈", list: function () { return PORTRAIT.eyes; } },
+  { key: "face", name: "얼굴", list: function () { return PORTRAIT.faces; } },
+  { key: "headset", name: "헤드셋", list: function () { return ["없음", "있음"]; } },
+  { key: "glasses", name: "안경", list: function () { return ["없음", "있음"]; } },
+];
+function changeLook(look, key, d) {
+  const f = LOOK_FIELDS.find(function (x) { return x.key === key; });
+  if (!f) return;
+  if (typeof look[key] === "boolean") look[key] = !look[key];
+  else { const n = f.list().length; look[key] = ((look[key] || 0) + d + n) % n; }
+}
+function lookPickerHTML() {
+  const L = draft.look;
+  const rows = LOOK_FIELDS.map(function (f) {
+    const v = typeof L[f.key] === "boolean" ? (L[f.key] ? 1 : 0) : L[f.key];
+    return '<div class="look-row"><span>' + f.name + '</span><button data-clook="' + f.key + '" data-d="-1">◀</button><div class="look-val">' + escapeHTML(f.list()[v]) +
+      '</div><button data-clook="' + f.key + '" data-d="1">▶</button></div>';
+  }).join("");
+  return '<div class="look-picker"><div class="look-rows">' + rows + '</div><div class="buttons"><button data-clookrand="1">🎲 얼굴 무작위</button>' +
+    '<span class="muted small">유니폼은 7. 소속팀에서 고른 팀 색이에요. 다른 선수 얼굴은 자동이에요.</span></div></div>';
+}
+function uniformSwatchHTML(uni) {
+  return '<span class="uni-sw"><i style="background:' + uni[0] + '"></i><i style="background:' + uni[1] + '"></i></span>';
 }

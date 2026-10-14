@@ -512,6 +512,31 @@ tr.sel { outline: 1px solid var(--accent); }
 .staff-g.gB { background: rgba(var(--accent-rgb), 0.18); color: var(--accent); }
 .staff-g.gC { background: rgba(148, 163, 184, 0.18); color: var(--muted, #94a3b8); }
 .staff-g.gD { background: rgba(var(--bad-rgb), 0.18); color: var(--bad); }
+.px { image-rendering: pixelated; image-rendering: crisp-edges; }
+/* ===== 도트 포트레잇 (175, js/portrait.js) ===== */
+.pf { display: block; }
+.pf-frame { display: inline-flex; align-items: flex-end; justify-content: center; flex: none; padding: 4px 4px 0; border-radius: var(--r-s);
+  background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); overflow: hidden; }
+.pf-jump { display: inline-block; }
+.pf-jump.jumping { animation: pfJump 420ms steps(1, end); }
+@keyframes pfJump { 0% { transform: translateY(0); } 25% { transform: translateY(calc(var(--jh, 3px) * -0.5)); } 50% { transform: translateY(calc(var(--jh, 3px) * -1)); } 75% { transform: translateY(calc(var(--jh, 3px) * -0.5)); } 100% { transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .pf-jump.jumping { animation: none; } }
+.pf-face { display: inline-block; vertical-align: middle; border-radius: var(--r-xs); background: radial-gradient(circle at 50% 70%, #34305e, #1c1b30); }
+td.pf-cell { width: 44px; padding-top: 3px; padding-bottom: 3px; padding-right: 0; }
+.profile-top, .phead-top { display: flex; gap: 14px; align-items: center; }
+.profile-top h2 { margin: 0 0 6px; }
+.np-pf { float: right; margin: 0 0 6px 12px; background: #e3dccb; border-radius: var(--r-s); padding: 4px 4px 0; }
+.pc-portrait { display: flex; margin: 0 auto 10px; width: max-content; }
+.team-choice { display: flex; gap: 10px; align-items: center; }
+.team-choice .pf-frame { padding: 2px 2px 0; }
+.uni-sw { display: inline-flex; gap: 2px; vertical-align: middle; margin-right: 5px; }
+.uni-sw i { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, 0.25); display: inline-block; }
+.look-picker { margin-top: 12px; }
+.look-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 4px 16px; }
+.look-row { display: grid; grid-template-columns: 70px 34px 1fr 34px; gap: 6px; align-items: center; font-size: 14px; }
+.look-row button { padding: 5px 0; }
+.look-val { text-align: center; background: var(--panel-2); border-radius: var(--r-s); padding: 6px 4px; font-size: 13px; }
+.look-picker .buttons { margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 .rep-tag.biggame { background: rgba(251, 146, 60, 0.18); color: #fb923c; min-width: 0; padding: 0 6px; margin-right: 4px; }
 .rep-tag.msg { color: var(--gold); }
 .small-btn { padding: 3px 11px; font-size: 13px; margin-left: 6px; }
