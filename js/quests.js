@@ -10,6 +10,8 @@ function questText(q, text) {
     .replace(/\{need\}/g, q.need)
     .replace(/\{champ\}/g, q.champ || "")
     .replace(/\{start\}/g, q.startRank || "")
+    .replace(/\{opp\}/g, q.opp ? teamName(q.opp) : "")
+    .replace(/\{derby\}/g, q.derby || "")
     .replace(/\{pos\}/g, findPosition(state.player.position).name);
 }
 
@@ -86,7 +88,11 @@ function progressQuests(training, changes) {
     if (q.progress >= q.need) done.push(q);
     else if (state.weekReport) state.weekReport.questLines.push("📋 " + tpl.title + " " + q.progress + "/" + q.need);
   });
-  done.forEach(function (q) {
+  done.forEach(completeQuest);
+}
+
+// 퀘스트 완료 처리 (훈련 퀘스트 + 빅게임 퀘스트 js/biggame.js)
+function completeQuest(q) {
     const tpl = findQuest(q.id);
     // 모범생: 보상 +50%
     const bonus = 1 + traitEffectSum("questBonus");
@@ -101,7 +107,6 @@ function progressQuests(training, changes) {
     if (state.weekReport) state.weekReport.questLines.push(line);
     state.log.unshift({ when: state.year + "년 " + state.week + "주차", training: "퀘스트 완료 · " + tpl.title, message: QUEST_GIVERS[tpl.giver] + "의 과제를 끝냈다!", changes: r.changes });
     postMessage("news", "✅ 퀘스트 완료: " + tpl.title, QUEST_GIVERS[tpl.giver] + ": \"잘했다. 약속한 대로다.\"", { changes: r.changes, notes: r.notes });
-  });
 }
 
 // 이미 충분히 익힌 챔피언이라 의미 없는 퀘스트인가? (숙련도 masteryDone 이상)
@@ -138,6 +143,7 @@ function updateQuests() {
   state.quests.slice().forEach(function (q) {
     if (now > q.deadline) {
       state.quests.splice(state.quests.indexOf(q), 1);
+      if (findQuest(q.id) && findQuest(q.id).special) return; // 빅게임 퀘스트: 경기가 안 열렸으면 조용히 정리
       standingQuest(false); // 팀 내 입지 (js/standing.js)
       const prog = findQuest(q.id).kind === "ladderTop" ? "최종 리그 " + (q.rank || "-") + "위 / 목표 " + q.need + "위" : q.progress + "/" + q.need;
       postMessage("news", "⌛ 퀘스트 기한 만료: " + findQuest(q.id).title, "기한 안에 끝내지 못했다. (" + prog + ")", {});
@@ -150,7 +156,7 @@ function updateQuests() {
   const active = state.quests.map(function (q) { return q.id; });
   const pool = QUESTS.filter(function (t) {
     if (t.maxStamina !== undefined && state.stamina > t.maxStamina) return false; // 컨디션 관리: 체력 40 이하일 때만
-    return !t.offseason && active.indexOf(t.id) === -1 && !questMastered(t);
+    return !t.offseason && !t.special && active.indexOf(t.id) === -1 && !questMastered(t);
   });
   if (!pool.length) return;
   const tpl = weightedPickBy(pool, questWeight); // 숙련도가 낮으면 챔피언 퀘스트 비중 ↑
@@ -296,7 +302,7 @@ function questsHTML(compact) {
     return (
       '<div class="quest">' +
         '<div class="quest-head"><span class="muted small">' + QUEST_GIVERS[tpl.giver] + "</span> <b>" + escapeHTML(tpl.title) + "</b>" +
-          '<span class="muted small quest-left">' + (q.deadline - now) + "주 남음</span></div>" +
+          '<span class="muted small quest-left">' + (q.deadline > now ? (q.deadline - now) + "주 남음" : "이번 주까지") + "</span></div>" +
         (compact ? "" : '<div class="small">' + escapeHTML(questText(q, tpl.desc)) + "</div>") +
         '<div class="stat"><div class="stat-label small">' + progLabel + '</div><div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div><div class="stat-value small">' + pct + "%</div></div>" +
         '<div class="quest-foot"><span class="muted small">보상: ' + escapeHTML(rewardText(q)) + "</span>" + questPlanButtonHTML(q) + "</div>" +

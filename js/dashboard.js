@@ -529,7 +529,8 @@ function thisWeekHTML() {
   if (matches.length) {
     matchHTML = matches.map(function (m) {
       const opp = m.a === mine.id ? m.b : m.a;
-      return '<div class="rep-row"><span class="rep-tag win">경기</span>' + escapeHTML(m.label) + " · vs <b>" + escapeHTML(teamName(opp)) + "</b>" +
+      const big = bigGameOf(mine.id, opp);
+      return '<div class="rep-row"><span class="rep-tag win">경기</span>' + (big ? bigGameTagHTML(big) : "") + escapeHTML(m.label) + " · vs <b>" + escapeHTML(teamName(opp)) + "</b>" +
         ' <span class="muted small">(' + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승 · 전력 우리 " + teamStrength(mine.id).toFixed(1) + " / 상대 " + strengthOf(opp).toFixed(1) + ")</span>" +
         (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : "") + "</div>" +
         h2hPreviewHTML(opp); // 상대 전적·내 맞수 (js/h2h.js)

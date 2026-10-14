@@ -132,6 +132,8 @@ function achContext() {
 const ACH_VALUES = {
   games: function (x) { return x.c.games || 0; },
   wins: function (x) { return x.c.wins || 0; },
+  bigWins: function (x) { return (x.c.bigGames && x.c.bigGames.w) || 0; }, // 빅게임 (js/biggame.js)
+  bigStreak: function (x) { return (x.c.bigGames && x.c.bigGames.best) || 0; },
   pog: function (x) { return x.s.pog; },
   solo: function (x) { return x.s.solo; },
   cup: function (x) { return x.s.titles.cup; },

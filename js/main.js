@@ -819,6 +819,7 @@ function nextWeek(restWeek) {
   worldsNewsForWeek(); // 41주 진입 특집·42주 개막 단신
   historicalNewsForWeek();
   eraIntroArticle(); // 2012년 시작: 2주차에 리그 규모 소개 기사 (js/era.js)
+  bigGameWeek(); // 이번 주 우리 팀 빅게임: 예고 기사 + 감독 퀘스트 (js/biggame.js)
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
   newlyReleased(state.year, state.week).forEach(function (c) {

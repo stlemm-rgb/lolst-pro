@@ -351,6 +351,7 @@ function playMatch(m) {
   h2hOnMatch(m); // 구단 맞대결 전적 (js/h2h.js)
   sTraitsOnMatch(m, perf, downTwo); // 0:2 역전승 기록 (역전의 명수, js/straits.js)
   if (userIn) afterUserMatch(m, { pick: userPicks.map(function (u) { return (u.joker ? "🃏" : "") + u.pick; }).join(" / "), joker: false, events: userEvents }, lanes, perf[USER_ID]);
+  bigGameOnMatch(m, userIn); // 빅게임 기사·인기도·퀘스트 (js/biggame.js)
   return m;
 }
 

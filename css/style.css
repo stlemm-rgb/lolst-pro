@@ -489,6 +489,7 @@ tr.sel { outline: 1px solid var(--accent); }
 .rep-tag.lose { background: rgba(248, 113, 113, 0.18); color: var(--bad); }
 .rep-tag.train { color: var(--accent); }
 .rep-tag.rank { color: var(--gold); }
+.rep-tag.biggame { background: rgba(251, 146, 60, 0.18); color: #fb923c; min-width: 0; padding: 0 6px; margin-right: 4px; }
 .rep-tag.msg { color: var(--gold); }
 .small-btn { padding: 3px 11px; font-size: 13px; margin-left: 6px; }
 

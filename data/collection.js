@@ -40,6 +40,9 @@ const ACHIEVEMENTS = [
   { id: "pog1",      cat: "career", icon: "🏅", name: "첫 POG",          desc: "POG 1번",                    key: "pog",    goal: 1,   grade: "b" },
   { id: "pog30",     cat: "career", icon: "🏅", name: "POG 단골",        desc: "POG 30번",                   key: "pog",    goal: 30,  grade: "s" },
   { id: "pog100",    cat: "career", icon: "🏅", name: "POG 수집가",      desc: "POG 100번",                  key: "pog",    goal: 100, grade: "g" },
+  { id: "big1",      cat: "career", icon: "🔥", name: "라이벌전 첫 승",  desc: "빅게임(통신사 더비·왕좌의 전쟁) 첫 승리", key: "bigWins",   goal: 1,  grade: "b" },
+  { id: "big10",     cat: "career", icon: "🔥", name: "더비의 주인",     desc: "빅게임 10승",                 key: "bigWins",   goal: 10, grade: "s" },
+  { id: "bigStreak5", cat: "career", icon: "🔥", name: "라이벌의 천적",  desc: "같은 빅게임 5연승",           key: "bigStreak", goal: 5,  grade: "g" },
   { id: "solo30",    cat: "career", icon: "🗡️", name: "라인전 학살자",   desc: "솔로킬 30번",                key: "solo",   goal: 30,  grade: "s" },
   // 우승
   { id: "cup1",      cat: "title",  icon: "🏆", name: "컵 우승",         desc: "LCK 컵 우승",                key: "cup",        goal: 1, grade: "s" },
