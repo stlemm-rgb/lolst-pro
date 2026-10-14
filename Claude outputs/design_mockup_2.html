@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 2 — 픽셀 포트레잇 실제 크기</title>
+<style>
+  /* B 색 + C 둥근 모서리 (게임 적용 후보 값) */
+  :root {
+    --bg:#07070d; --panel:#11111c; --panel2:#181828; --line:#26263d; --text:#f1f1f7; --muted:#8a8aa6;
+    --accent:#00e0ff; --accent2:#b44dff; --good:#2bff9e; --bad:#ff3d71; --gold:#ffd23f; --side:#0b0b14;
+    --radius:14px; --radius-s:10px; --grad: linear-gradient(90deg, var(--accent2), var(--accent));
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: var(--bg); color: var(--text); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 24px; margin: 0 0 6px; }
+  h2 { font-size: 18px; margin: 36px 0 6px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .lead, .note { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 14px; }
+  .tabs button { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel2); color: var(--text); cursor: pointer; }
+  .tabs button.on { background: var(--grad); border-color: transparent; color: #fff; font-weight: bold; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+  .muted { color: var(--muted); }
+  .px { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+  .pf-anim { display: inline-block; }
+  .jump { animation: jumpP 420ms steps(1, end); }
+  @keyframes jumpP { 0%{transform:translateY(0)} 25%{transform:translateY(calc(var(--jh) * -.5))} 50%{transform:translateY(calc(var(--jh) * -1))} 75%{transform:translateY(calc(var(--jh) * -.5))} 100%{transform:translateY(0)} }
+  @media (prefers-reduced-motion: reduce) { .jump { animation: none; } }
+
+  /* 크기 자 */
+  .ruler { display: flex; gap: 22px; align-items: flex-end; flex-wrap: wrap; }
+  .ruler .it { text-align: center; font-size: 12px; color: var(--muted); }
+  .ruler .frame { background: var(--panel2); border-radius: var(--radius-s); padding: 6px; display: inline-flex; align-items: flex-end; justify-content: center; margin-bottom: 6px; }
+  .ruler .it b { color: var(--text); font-size: 13px; display: block; }
+
+  /* 대시보드 히어로 */
+  .hero { background: linear-gradient(120deg,#1a0f2e 0%,#0d1a2b 60%,#07070d 100%); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; }
+  .hero .pf { background: radial-gradient(circle at 50% 75%, #2a2650, #12121f); border: 1px solid var(--line); border-radius: var(--radius-s); padding: 6px 6px 0; display: flex; align-items: flex-end; overflow: hidden; }
+  .hero .name { font-size: 22px; font-weight: bold; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .chip { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .chip.s { border-color: var(--gold); color: var(--gold); }
+  .ovr .n { font-size: 40px; font-weight: bold; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; line-height: 1; text-align: center; }
+  .ovr .l { font-size: 12px; color: var(--muted); text-align: center; margin-top: 4px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  table.roster { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.roster td, table.roster th { padding: 6px 8px; border-top: 1px solid var(--line); text-align: left; vertical-align: middle; }
+  table.roster th { color: var(--muted); font-weight: normal; border-top: 0; }
+  .face { border-radius: 8px; background: var(--panel2); overflow: hidden; display: inline-block; vertical-align: middle; }
+  .r { text-align: right; }
+  .vs { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: var(--radius-s); background: var(--panel2); font-size: 13px; }
+  .vs .side { display: flex; align-items: center; gap: 8px; }
+  .vs .mid { flex: 1; text-align: center; font-weight: bold; }
+  .news { background: #f3efe4; color: #1e1b16; border-radius: var(--radius); padding: 16px; display: grid; grid-template-columns: auto 1fr; gap: 14px; font-family: "Batang", serif; }
+  .news h4 { margin: 0 0 6px; font-size: 18px; }
+  .news .pf { background: #e3dccb; border-radius: 8px; padding: 4px 4px 0; display: flex; align-items: flex-end; }
+  .cands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .cand { background: var(--panel2); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .cand.gS { border-color: var(--gold); box-shadow: 0 0 18px rgba(255,210,63,.25); }
+  .cand .pf { display: flex; justify-content: center; margin-bottom: 8px; }
+  .g { display: inline-block; min-width: 18px; text-align: center; font-size: 11px; font-weight: bold; border-radius: 6px; padding: 0 5px; }
+  .gS { color: var(--gold); } .g.gS { background: rgba(255,210,63,.2); }
+  .g.gA { background: rgba(43,255,158,.18); color: var(--good); }
+  .g.gB { background: rgba(0,224,255,.18); color: var(--accent); }
+  .sum td, .sum th { padding: 7px 8px; border-top: 1px solid var(--line); font-size: 13px; text-align: left; }
+  .sum { border-collapse: collapse; width: 100%; }
+  @media (max-width: 760px) {
+    .hero { grid-template-columns: auto 1fr; } .ovr { grid-column: 1 / -1; }
+    .grid2 { grid-template-columns: 1fr; } .cands { grid-template-columns: 1fr; }
+    .news { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>디자인 시안 2 — 픽셀 포트레잇, 실제 화면 크기</h1>
+  <p class="lead">고르신 <b>B 색 + C 둥근 모서리</b>로 만들었어요. 그림은 이 화면에 보이는 크기 그대로예요(지금 모니터 기준). 위 버튼으로 해상도를 바꿔 같은 자리에서 비교해 보세요.</p>
+  <div class="tabs" id="resTabs">
+    <button data-r="32" class="on">32×32 (지금 시안)</button>
+    <button data-r="48">48×48 (더 자세하게: 윤곽선·명암)</button>
+  </div>
+
+  <h2>① 크기 자 — 몇 배로 키우느냐</h2>
+  <p class="note">도트 그림은 <b>정수 배</b>로만 키워야 선명해요 (1배·2배·3배·4배). 옆 글자 크기와 비교해 보세요. 이 문단 글자 = 약 14px.</p>
+  <div class="ruler" id="ruler"></div>
+
+  <h2>② 대시보드 맨 위 '내 선수 카드'</h2>
+  <div class="hero">
+    <div class="pf" id="heroPf"></div>
+    <div>
+      <div class="name">테스트 <span class="muted" style="font-size:14px;font-weight:normal">미드 · 19세</span></div>
+      <div class="muted" style="font-size:13px;margin-top:2px">T1 ZEPHYR · 1부 리그 · 주전 · 팀 순위 4위</div>
+      <div class="chips"><span class="chip s">🌟 라인전 지배자</span><span class="chip">강철 멘탈</span><span class="chip">💪 핵심 선수 64</span></div>
+    </div>
+    <div class="ovr"><div class="n">74.2</div><div class="l">종합 능력</div></div>
+  </div>
+
+  <h2>③ 목록·경기 줄 (작은 크기)</h2>
+  <div class="grid2">
+    <div class="card">
+      <div style="font-weight:bold;margin-bottom:6px">소속팀 선수단</div>
+      <table class="roster" id="roster"><tr><th></th><th>포지션</th><th>이름</th><th class="r">점수</th></tr></table>
+    </div>
+    <div class="card">
+      <div style="font-weight:bold;margin-bottom:8px">이번 주 경기 · ⚔️ 맞수</div>
+      <div class="vs" id="vs"></div>
+      <p class="note" style="margin-top:10px">작은 자리(표·경기 줄)는 1배 그대로 써요. 얼굴만 잘라 쓰는 방법도 있어요 (아래 표의 '얼굴만' 칸).</p>
+    </div>
+  </div>
+
+  <h2>④ 신문 기사 · 인사 후보 카드 (중간 크기)</h2>
+  <div class="grid2">
+    <div class="news" id="news"></div>
+    <div class="cands" id="cands"></div>
+  </div>
+
+  <h2>⑤ 정리</h2>
+  <table class="sum">
+    <tr><th>자리</th><th>32×32이면</th><th>48×48이면</th></tr>
+    <tr><td>대시보드 내 선수 카드</td><td>4배 = 128px</td><td>3배 = 144px</td></tr>
+    <tr><td>선수 정보 화면 (가장 큼)</td><td>5배 = 160px</td><td>4배 = 192px</td></tr>
+    <tr><td>신문·후보 카드</td><td>3배 = 96px</td><td>2배 = 96px</td></tr>
+    <tr><td>표·경기 줄</td><td>1배 = 32px</td><td>1배 = 48px (줄이 두꺼워짐) → 얼굴만 잘라 24~32px</td></tr>
+    <tr><td>그리기 수고 (파츠 추가)</td><td>쉬움</td><td>보통 (점이 2배 넘게 많음)</td></tr>
+  </table>
+</div>
+
+<script>
+function seedOf(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function rngOf(s){let a=seedOf(s);return function(){a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const SKIN=[["#f6d7c3","#e3b8a0"],["#eec1a0","#d5a07e"],["#d9a27f","#bd825f"],["#b97a57","#9a5f3f"],["#8d5a3b","#6f4329"]];
+const HAIRC=[["#1d1a1f","#3a3442"],["#3b2a20","#5a4231"],["#6b4226","#8c5a36"],["#c7923e","#e3b462"],["#e7e1d4","#ffffff"],["#2f4a8a","#4a6cc0"],["#9b3d5a","#c4587a"]];
+const TEAMS={T1:["#e2012d","#1a1a1a"],KT:["#ff1e1e","#111111"],"GEN.G":["#a98b46","#1b1b1b"],Hanwha:["#ff6a13","#2a2a2a"],DN:["#4ad3c5","#16283a"],BNK:["#f5c400","#20202a"]};
+function look(id){const r=rngOf(id);const p=a=>a[Math.floor(r()*a.length)];return{skin:p(SKIN),hair:p(HAIRC),hs:Math.floor(r()*6),eyes:Math.floor(r()*3),face:Math.floor(r()*3),headset:r()<0.55,glasses:r()<0.18};}
+const OUT="#16131c", MOUTH="#7a3b3b";
+
+// ----- 32×32 (시안 1과 같음) -----
+function draw32(g,L,c,mood){
+  const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  const sk=L.skin[0],H=L.hair[0],dark="#231f2b";
+  R(6,26,20,6,c[0]);R(8,25,16,1,c[0]);R(14,25,4,3,c[1]);R(6,30,20,1,c[1]);R(14,22,4,4,sk);
+  const fw=[12,11,13][L.face],fx=16-fw/2;
+  R(fx,9,fw,14,sk);R(fx+1,23,fw-2,1,sk);R(fx-1,14,1,4,sk);R(fx+fw,14,1,4,sk);
+  [()=>{R(fx-1,6,fw+2,4,H);R(fx-1,10,2,4,H);R(fx+fw-1,10,2,4,H);},()=>{R(fx-1,5,fw+2,5,H);R(fx+2,10,4,2,H);R(fx-1,10,1,6,H);R(fx+fw,10,1,6,H);},
+   ()=>{R(fx,5,fw,4,H);R(fx-1,8,fw+2,2,H);R(fx+fw-4,10,4,1,H);},()=>{R(fx-2,5,fw+4,5,H);R(fx-2,10,2,10,H);R(fx+fw,10,2,10,H);},
+   ()=>{R(fx,6,fw,3,H);R(fx+2,4,2,2,H);R(fx+6,3,2,3,H);R(fx+fw-3,4,2,2,H);R(fx-1,8,fw+2,2,H);},()=>{R(fx-1,6,fw+2,3,H);R(fx-1,9,fw-3,2,H);}][L.hs]();
+  const ey=15,e1=fx+2,e2=fx+fw-4;
+  if(mood==="lose"){R(e1,12,1,1,H);R(e1+1,13,1,1,H);R(e2+1,12,1,1,H);R(e2,13,1,1,H);}else{R(e1,13,2,1,H);R(e2,13,2,1,H);}
+  const eye=x=>{if(mood==="win"){R(x,ey,1,1,dark);R(x+1,ey-1,1,1,dark);}else if(mood==="tired"){R(x,ey,2,1,dark);}else if(L.eyes===1){R(x,ey-1,2,2,dark);R(x+1,ey-1,1,1,"#fff");}else{R(x,ey-1,2,2,dark);}};
+  eye(e1);eye(e2);
+  if(L.glasses){R(e1-1,ey-2,4,1,dark);R(e2-1,ey-2,4,1,dark);R(e1+3,ey-1,e2-e1-3,1,dark);}
+  if(mood==="win"){R(14,19,4,1,MOUTH);R(15,20,2,1,MOUTH);R(fx+1,17,2,1,"#f29a9a");R(fx+fw-3,17,2,1,"#f29a9a");}
+  else if(mood==="lose"){R(15,19,2,1,MOUTH);R(14,20,1,1,MOUTH);R(17,20,1,1,MOUTH);}
+  else if(mood==="tired"){R(15,19,2,2,MOUTH);R(fx+fw+1,10,1,2,"#7fc8ff");}else R(15,20,2,1,MOUTH);
+  if(L.headset){const k="#2b2b33";R(fx-1,4,fw+2,1,k);R(fx-2,5,1,9,k);R(fx+fw+1,5,1,9,k);R(fx-3,13,2,4,k);R(fx+fw+1,13,2,4,k);R(fx-1,17,1,2,k);R(fx,19,3,1,k);R(fx+3,19,1,1,c[0]);}
+}
+
+// ----- 48×48: 윤곽선 + 명암 + 하이라이트 -----
+function draw48(g,L,c,mood){
+  const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  const sk=L.skin[0],skd=L.skin[1],H=L.hair[0],Hl=L.hair[1];
+  const shade=(hex,f)=>{const n=parseInt(hex.slice(1),16);let r=n>>16,gg=(n>>8)&255,b=n&255;r=Math.round(r*f);gg=Math.round(gg*f);b=Math.round(b*f);return"rgb("+r+","+gg+","+b+")";};
+  // 몸 (어깨 곡선)
+  R(8,40,32,8,OUT);R(9,41,30,7,c[0]);R(11,39,26,2,OUT);R(12,40,24,1,c[0]);R(31,41,8,7,shade(c[0],0.78));
+  R(9,45,30,1,c[1]);R(9,46,30,2,shade(c[0],0.9));
+  // 목 + V자 깃
+  R(20,33,8,7,OUT);R(21,33,6,7,sk);R(25,33,2,6,skd);
+  R(19,39,10,1,c[1]);R(20,40,8,1,c[1]);R(21,40,6,1,sk);R(21,41,6,1,c[1]);R(22,41,4,1,sk);R(22,42,4,1,c[1]);R(23,42,2,1,sk);R(23,43,2,1,c[1]);
+  // 얼굴
+  const fw=[18,16,20][L.face],fx=24-fw/2,top=12,bot=35;
+  R(fx,top,fw,bot-top,OUT);R(fx+1,top+1,fw-2,bot-top-2,sk);
+  R(fx+fw-4,top+3,3,bot-top-6,skd); // 오른쪽 그림자
+  R(fx+2,bot-1,fw-4,1,OUT);R(fx+2,bot-2,fw-4,1,sk);
+  // 턱 둥글게
+  g.clearRect(fx,bot-2,2,2);g.clearRect(fx+fw-2,bot-2,2,2);R(fx+1,bot-2,1,1,OUT);R(fx+fw-2,bot-2,1,1,OUT);R(fx+2,bot-1,1,1,OUT);
+  // 귀
+  R(fx-2,21,3,6,OUT);R(fx-1,22,2,4,sk);R(fx+fw-1,21,3,6,OUT);R(fx+fw-1,22,2,4,skd);
+  // 머리
+  const hair=[
+    ()=>{R(fx-1,8,fw+2,6,OUT);R(fx,9,fw,5,H);R(fx-1,14,3,7,OUT);R(fx,14,2,6,H);R(fx+fw-2,14,3,7,OUT);R(fx+fw-2,14,2,6,H);R(fx+3,10,6,1,Hl);},
+    ()=>{R(fx-2,7,fw+4,8,OUT);R(fx-1,8,fw+2,7,H);R(fx+3,15,6,3,H);R(fx-2,15,2,9,H);R(fx+fw,15,2,9,H);R(fx+2,9,8,1,Hl);},
+    ()=>{R(fx,7,fw,6,OUT);R(fx+1,8,fw-2,5,H);R(fx-1,12,fw+2,3,H);R(fx+fw-7,15,6,2,H);R(fx+4,9,5,1,Hl);},
+    ()=>{R(fx-3,7,fw+6,8,OUT);R(fx-2,8,fw+4,7,H);R(fx-3,15,3,16,H);R(fx+fw,15,3,16,H);R(fx+2,9,8,1,Hl);},
+    ()=>{R(fx,9,fw,4,H);R(fx+2,5,3,4,H);R(fx+8,3,3,6,H);R(fx+fw-5,5,3,4,H);R(fx-1,12,fw+2,3,H);R(fx+9,4,1,3,Hl);},
+    ()=>{R(fx-1,8,fw+2,5,OUT);R(fx,9,fw,4,H);R(fx,13,fw-6,3,H);R(fx+3,10,5,1,Hl);},
+  ];hair[L.hs]();
+  // 눈썹·눈
+  const ey=23,e1=fx+3,e2=fx+fw-7;
+  if(mood==="lose"){R(e1,18,2,1,H);R(e1+2,19,2,1,H);R(e2+2,18,2,1,H);R(e2,19,2,1,H);}else{R(e1,19,4,1,H);R(e2,19,4,1,H);}
+  const eye=x=>{
+    if(mood==="win"){R(x,ey,1,1,OUT);R(x+1,ey-1,2,1,OUT);R(x+3,ey,1,1,OUT);}
+    else if(mood==="tired"){R(x,ey,4,1,OUT);}
+    else if(L.eyes===0){R(x+1,ey-2,2,3,OUT);R(x+1,ey-2,1,1,"#fff");}
+    else if(L.eyes===1){R(x,ey-2,4,4,"#fff");R(x+1,ey-2,3,4,OUT);R(x+2,ey-2,1,1,"#fff");}
+    else {R(x,ey-1,4,2,OUT);R(x+1,ey-1,1,1,"#fff");}
+  };eye(e1);eye(e2);
+  if(L.glasses){R(e1-1,ey-3,6,1,OUT);R(e1-1,ey+2,6,1,OUT);R(e1-1,ey-3,1,6,OUT);R(e1+4,ey-3,1,6,OUT);R(e2-1,ey-3,6,1,OUT);R(e2-1,ey+2,6,1,OUT);R(e2-1,ey-3,1,6,OUT);R(e2+4,ey-3,1,6,OUT);R(e1+5,ey-1,e2-e1-6,1,OUT);}
+  // 코
+  R(23,26,2,1,skd);
+  // 입
+  if(mood==="win"){R(21,29,6,1,OUT);R(21,30,6,2,MOUTH);R(22,30,4,1,"#fff");R(22,32,4,1,OUT);R(fx+2,27,3,1,"#f29a9a");R(fx+fw-5,27,3,1,"#f29a9a");}
+  else if(mood==="lose"){R(22,30,4,1,OUT);R(21,31,1,1,OUT);R(26,31,1,1,OUT);}
+  else if(mood==="tired"){R(22,29,3,3,OUT);R(23,30,1,1,MOUTH);R(fx+fw+1,14,2,3,"#7fc8ff");R(fx+fw+1,17,1,1,"#bfe4ff");}
+  else {R(22,30,4,1,MOUTH);R(21,29,1,1,MOUTH);R(26,29,1,1,MOUTH);}
+  // 헤드셋
+  if(L.headset){const k="#2b2b33",kl="#45454f";R(fx-2,6,fw+4,2,k);R(fx-3,8,2,12,k);R(fx+fw+1,8,2,12,k);R(fx-5,19,4,8,k);R(fx-4,20,2,6,kl);R(fx+fw+1,19,4,8,k);R(fx+fw+2,20,2,6,kl);
+    R(fx-2,27,1,3,k);R(fx-1,30,1,1,k);R(fx,31,3,1,k);R(fx+3,31,2,1,c[0]);}
+}
+
+function portrait(id, team, mood, res, scale){
+  const cv=document.createElement("canvas");cv.width=res;cv.height=res;cv.className="px";
+  cv.style.width=res*scale+"px";cv.style.height=res*scale+"px";
+  const g=cv.getContext("2d");(res===48?draw48:draw32)(g,look(id),TEAMS[team],mood||"normal");
+  return cv;
+}
+function face(id, team, res, size){ // 얼굴만 잘라서 (표용)
+  const full=portrait(id,team,"normal",res,1);
+  const cv=document.createElement("canvas");const crop=res===48?28:18;const sx=res===48?10:7,sy=res===48?4:3;
+  cv.width=crop;cv.height=crop;cv.className="px";cv.style.width=size+"px";cv.style.height=size+"px";
+  cv.getContext("2d").drawImage(full,sx,sy,crop,crop,0,0,crop,crop);return cv;
+}
+function wrapAnim(el){const s=document.createElement("span");s.className="pf-anim";s.appendChild(el);return s;}
+
+let RES=32;
+const ROSTER=[["탑","Kibai","T1",71.2],["정글","Jeep","T1",66.7],["미드","Faker2","T1",74.2],["원딜","Hwansam","T1",67.0],["서포트","Era","T1",65.1]];
+function render(){
+  const ruler=document.getElementById("ruler");ruler.innerHTML="";
+  const scales=RES===32?[1,2,3,4,5]:[1,2,3,4];
+  scales.forEach(function(s){
+    const it=document.createElement("div");it.className="it";
+    const f=document.createElement("div");f.className="frame";f.appendChild(wrapAnim(portrait("Faker2","T1","normal",RES,s)));
+    it.appendChild(f);it.insertAdjacentHTML("beforeend","<b>"+s+"배 · "+(RES*s)+"px</b>"+({1:"표·경기 줄",2:"목록 카드",3:"신문·후보 카드",4:"대시보드",5:"선수 정보"}[RES===48&&s>=2?s+1:s]||""));
+    ruler.appendChild(it);
+  });
+  const hs=RES===32?4:3;
+  document.getElementById("heroPf").innerHTML="";document.getElementById("heroPf").appendChild(wrapAnim(portrait("Faker2","T1","normal",RES,hs)));
+  const tb=document.getElementById("roster");tb.querySelectorAll("tr:not(:first-child)").forEach(r=>r.remove());
+  ROSTER.forEach(function(p){const tr=document.createElement("tr");const td=document.createElement("td");const fc=document.createElement("span");fc.className="face";fc.appendChild(face(p[1],p[2],RES,RES===32?28:28));td.appendChild(fc);tr.appendChild(td);
+    tr.insertAdjacentHTML("beforeend","<td>"+p[0]+"</td><td>"+p[1]+(p[1]==="Faker2"?' <span class="g gB">나</span>':"")+'</td><td class="r"><b>'+p[3]+"</b></td>");tb.appendChild(tr);});
+  const vs=document.getElementById("vs");vs.innerHTML="";
+  const a=document.createElement("div");a.className="side";a.appendChild(wrapAnim(portrait("Faker2","T1","normal",RES,1)));a.insertAdjacentHTML("beforeend","<div><b>Faker2</b><div class='muted'>T1</div></div>");
+  const b=document.createElement("div");b.className="side";b.insertAdjacentHTML("beforeend","<div style='text-align:right'><b>Burn</b><div class='muted'>KT</div></div>");b.appendChild(wrapAnim(portrait("Burn","KT","normal",RES,1)));
+  vs.appendChild(a);vs.insertAdjacentHTML("beforeend","<div class='mid'>🔥 통신사 더비<div class='muted' style='font-weight:normal'>세트 6승 2패</div></div>");vs.appendChild(b);
+  const nw=document.getElementById("news");nw.innerHTML="";const np=document.createElement("div");np.className="pf";np.appendChild(portrait("Faker2","T1","win",RES,RES===32?3:2));nw.appendChild(np);
+  nw.insertAdjacentHTML("beforeend","<div><div style='font-size:12px;color:#7a6f5a'>e스포츠 데일리 · 2022년 15주차</div><h4>📡 통신사 더비의 승자는 T1</h4><div style='font-size:14px;line-height:1.6'>T1 ZEPHYR이(가) 전반기 6라운드에서 KT VALOR을(를) 2:0으로 꺾었다. 상대 전적은 4승 1패.</div></div>");
+  const cd=document.getElementById("cands");cd.innerHTML="";
+  [["Sand","S","DN"],["Tech","A","GEN.G"],["Ice","B","BNK"]].forEach(function(c){const d=document.createElement("div");d.className="cand g"+c[1];const pf=document.createElement("div");pf.className="pf";pf.appendChild(wrapAnim(portrait(c[0],c[2],"normal",RES,RES===32?3:2)));d.appendChild(pf);
+    d.insertAdjacentHTML("beforeend","<b>"+c[0]+"</b> <span class='g g"+c[1]+"'>"+c[1]+"</span><div class='muted' style='font-size:12px;margin-top:4px'>코치 후보</div>");cd.appendChild(d);});
+}
+document.getElementById("resTabs").addEventListener("click",function(e){const b=e.target.closest("button");if(!b)return;this.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));RES=+b.dataset.r;render();});
+setInterval(function(){document.querySelectorAll(".pf-anim").forEach(function(el){const now=Date.now();if(!el._nj)el._nj=now+800+Math.random()*5000;if(now>el._nj){el.style.setProperty("--jh",(1+Math.floor(Math.random()*5))+"px");el.classList.remove("jump");void el.offsetWidth;el.classList.add("jump");el._nj=now+3000+Math.random()*4000;}});},200);
+render();
+</script>
+</body>
+</html>

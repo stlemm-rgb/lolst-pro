@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 1 — 색감 · 포트레잇</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: #101114; color: #e8e8ec; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2.sec { font-size: 19px; margin: 40px 0 6px; padding-top: 18px; border-top: 1px solid #2a2c33; }
+  p.lead { color: #a0a3ad; margin: 0 0 16px; font-size: 14px; line-height: 1.6; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px; }
+  .tabs button { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 8px; border: 1px solid #3a3d47; background: #1b1d23; color: #e8e8ec; cursor: pointer; }
+  .tabs button.on { background: #e8e8ec; color: #111; border-color: #e8e8ec; font-weight: bold; }
+  .note { font-size: 13px; color: #a0a3ad; line-height: 1.6; }
+
+  /* ===== 테마 (게임에 적용할 때 :root 변수로 옮김) ===== */
+  .theme-a { --bg:#0f131b; --panel:#171d29; --panel2:#1f2636; --line:#2b3448; --text:#e9ecf2; --muted:#8e97ab; --accent:#4f8cff; --accent2:#7c5cff; --good:#3ecf8e; --bad:#ff6b6b; --gold:#f7c948; --side:#0b0e15; --radius:10px; --shadow:none; --heroBg: linear-gradient(135deg,#1c2436,#171d29); }
+  .theme-b { --bg:#07070d; --panel:#11111c; --panel2:#181828; --line:#26263d; --text:#f1f1f7; --muted:#8a8aa6; --accent:#00e0ff; --accent2:#b44dff; --good:#2bff9e; --bad:#ff3d71; --gold:#ffd23f; --side:#0b0b14; --radius:4px; --shadow:0 0 0 1px rgba(0,224,255,.08), 0 8px 24px rgba(0,0,0,.4); --heroBg: linear-gradient(120deg,#1a0f2e 0%,#0d1a2b 60%,#07070d 100%); }
+  .theme-c { --bg:#f4f1ea; --panel:#ffffff; --panel2:#f8f5ee; --line:#e6dfd2; --text:#2c2a33; --muted:#857f8f; --accent:#ff7a59; --accent2:#5b8def; --good:#2fae7a; --bad:#e5534b; --gold:#e8a317; --side:#2c2a33; --radius:16px; --shadow:0 2px 10px rgba(60,40,20,.08); --heroBg: linear-gradient(135deg,#fff3e6,#fffaf3); }
+
+  .demo { background: var(--bg); color: var(--text); border-radius: 14px; overflow: hidden; display: grid; grid-template-columns: 150px 1fr; min-height: 560px; border: 1px solid #2a2c33; }
+  .demo .side { background: var(--side); padding: 18px 12px; }
+  .demo .logo { font-weight: bold; font-size: 15px; color: #fff; line-height: 1.3; }
+  .theme-c .demo .logo, .demo.theme-c .logo { color: #fff; }
+  .demo .ver { font-size: 11px; color: #8a8a99; margin-bottom: 18px; }
+  .demo .mi { font-size: 14px; padding: 8px 10px; border-radius: 6px; color: #a7acba; margin-bottom: 2px; }
+  .demo .mi.on { background: var(--accent); color: #fff; font-weight: bold; }
+  .theme-b .demo .mi.on, .demo.theme-b .mi.on { background: linear-gradient(90deg, var(--accent2), var(--accent)); color: #fff; }
+  .demo .main { padding: 18px; min-width: 0; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+  .topbar b { color: var(--text); }
+  .btn { font: inherit; font-size: 13px; padding: 8px 14px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--panel2); color: var(--text); }
+  .btn.pri { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: bold; }
+  .theme-b .btn.pri { background: linear-gradient(90deg, var(--accent2), var(--accent)); border: 0; color: #fff; }
+
+  .hero { background: var(--heroBg); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; grid-template-columns: 120px 1fr auto; gap: 16px; align-items: center; margin-bottom: 14px; }
+  .hero .pf { width: 120px; height: 120px; border-radius: var(--radius); background: var(--panel2); border: 1px solid var(--line); display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+  .hero .name { font-size: 22px; font-weight: bold; }
+  .hero .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .chip { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+  .chip.s { border-color: var(--gold); color: var(--gold); }
+  .ovr { text-align: center; }
+  .ovr .n { font-size: 40px; font-weight: bold; color: var(--accent); line-height: 1; }
+  .theme-b .ovr .n { background: linear-gradient(90deg, var(--accent2), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .ovr .l { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .grid2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
+  .card h3 { margin: 0 0 10px; font-size: 15px; }
+  .row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px; flex-wrap: wrap; }
+  .row:first-of-type { border-top: 0; }
+  .tag { font-size: 11px; font-weight: bold; padding: 2px 7px; border-radius: 4px; background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
+  .tag.hot { background: color-mix(in srgb, #ff8a3d 20%, transparent); color: #ff8a3d; }
+  .muted { color: var(--muted); }
+  .bar { height: 8px; border-radius: 99px; background: var(--panel2); overflow: hidden; flex: 1; min-width: 80px; }
+  .bar i { display: block; height: 100%; border-radius: 99px; background: var(--accent); }
+  .bar.g i { background: var(--good); } .bar.y i { background: var(--gold); }
+  .stat { display: grid; grid-template-columns: 52px 1fr 34px; gap: 8px; align-items: center; font-size: 13px; padding: 4px 0; }
+  .stat b { text-align: right; }
+  .g { display: inline-block; min-width: 18px; text-align: center; font-size: 11px; font-weight: bold; border-radius: 4px; padding: 0 4px; }
+  .gS { background: color-mix(in srgb, var(--gold) 25%, transparent); color: var(--gold); }
+  .gA { background: color-mix(in srgb, var(--good) 22%, transparent); color: var(--good); }
+  .gB { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); }
+  .report { font-size: 13px; padding: 8px 10px; border-radius: 8px; background: var(--panel2); margin-top: 6px; }
+  @media (max-width: 760px) {
+    .demo { grid-template-columns: 1fr; } .demo .side { display: none; }
+    .hero { grid-template-columns: 84px 1fr; } .hero .pf { width: 84px; height: 84px; } .ovr { grid-column: 1 / -1; text-align: left; display: flex; gap: 8px; align-items: baseline; }
+    .grid2 { grid-template-columns: 1fr; }
+  }
+
+  /* ===== 포트레잇 ===== */
+  .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .pcard { background: #1b1d23; border: 1px solid #2d3039; border-radius: 12px; padding: 12px; text-align: center; }
+  .pcard .box { height: 132px; display: flex; align-items: flex-end; justify-content: center; background: radial-gradient(circle at 50% 70%, #2a2e3a, #17191f); border-radius: 10px; overflow: hidden; }
+  .pcard .nm { font-size: 13px; margin-top: 8px; font-weight: bold; }
+  .pcard .tm { font-size: 11px; color: #9a9da8; }
+  .pf-anim { display: inline-block; will-change: transform; }
+  .jump-smooth { animation: jumpS var(--jt, 420ms) ease-out; }
+  .jump-pixel { animation: jumpP var(--jt, 420ms) steps(1, end); }
+  @keyframes jumpS { 0% { transform: translateY(0); } 35% { transform: translateY(calc(var(--jh, 4px) * -1)); } 70% { transform: translateY(1px); } 100% { transform: translateY(0); } }
+  @keyframes jumpP { 0% { transform: translateY(0); } 25% { transform: translateY(calc(var(--jh, 4px) * -0.5)); } 50% { transform: translateY(calc(var(--jh, 4px) * -1)); } 75% { transform: translateY(calc(var(--jh, 4px) * -0.5)); } 100% { transform: translateY(0); } }
+  .blink .eye { transform: scaleY(0.1); }
+  .eye { transform-box: fill-box; transform-origin: center; transition: transform 60ms; }
+  canvas.px { image-rendering: pixelated; image-rendering: crisp-edges; }
+  @media (prefers-reduced-motion: reduce) { .jump-smooth, .jump-pixel { animation: none; } }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .compare { grid-template-columns: 1fr; } }
+  .panel { background: #15171c; border: 1px solid #2a2c33; border-radius: 14px; padding: 14px; }
+  .panel h3 { margin: 0 0 4px; font-size: 16px; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+  table.cmp td, table.cmp th { border-top: 1px solid #2a2c33; padding: 7px 6px; text-align: left; vertical-align: top; }
+  table.cmp th { color: #a0a3ad; font-weight: normal; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>디자인 시안 1 — 색감 · 포트레잇</h1>
+  <p class="lead">게임 규칙은 그대로, 모양만 바꾼 시안이에요. 실제 게임 데이터가 아니라 예시 값이에요. 위에서 색감을, 아래에서 포트레잇 스타일을 골라 주세요.</p>
+
+  <h2 class="sec">① 색감 3안 — 같은 대시보드</h2>
+  <div class="tabs" id="themeTabs">
+    <button data-t="theme-a" class="on">A. 지금 테마 다듬기</button>
+    <button data-t="theme-b">B. e스포츠 방송 (네온)</button>
+    <button data-t="theme-c">C. 밝은 캐주얼</button>
+  </div>
+  <div id="demo" class="demo theme-a">
+    <div class="side">
+      <div class="logo">프로게이머<br>커리어</div><div class="ver">ver 1.2 시안</div>
+      <div class="mi on">대시보드</div><div class="mi">훈련</div><div class="mi">SNS</div><div class="mi">선수 정보</div><div class="mi">소속팀</div><div class="mi">경기 결과</div><div class="mi">일정</div><div class="mi">이적 시장</div><div class="mi">기록실</div>
+    </div>
+    <div class="main">
+      <div class="topbar"><span><b>2022년 15주차</b> · 정규 시즌 1·2라운드</span><span style="display:flex;gap:8px"><span class="btn">💪 체력 62/80</span><span class="btn pri">다음 주로 진행 ▶</span></span></div>
+      <div class="hero">
+        <div class="pf" id="heroPf"></div>
+        <div>
+          <div class="name">테스트 <span class="muted" style="font-size:14px;font-weight:normal">미드 · 19세</span></div>
+          <div class="sub">T1 ZEPHYR · 1부 리그 · 주전 · 팀 순위 4위</div>
+          <div class="chips"><span class="chip s">🌟 라인전 지배자</span><span class="chip">강철 멘탈</span><span class="chip">강심장</span><span class="chip">💪 핵심 선수 64</span></div>
+        </div>
+        <div class="ovr"><div class="n">74.2</div><div class="l">종합 능력 · 리그 미드 3위</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>▶ 이번 주</h3>
+          <div class="row"><span class="tag">경기</span><span class="tag hot">🔥 통신사 더비</span><b>전반기 6라운드 · vs KT VALOR</b><span class="muted">전력 72.4 / 70.9</span></div>
+          <div class="row muted">📊 상대 전적 3승 1패 · 최근 ●●○● · ⚔️ 맞수 Burn 세트 6승 2패</div>
+          <div class="report">📊 분석 리포트 <span class="muted">(분석관 Tech <span class="g gA">A</span> · 정확도 80%)</span>: KT는 <b>🏹 포킹</b> 조합을 노릴 듯 → 추천 <b>메타 카운터</b></div>
+          <div class="row"><span class="tag" style="background:color-mix(in srgb,var(--gold) 20%,transparent);color:var(--gold)">퀘스트</span>빅게임 승리 <span class="muted">이번 주까지 · 멘탈 +2 · 집중력 +1</span></div>
+        </div>
+        <div class="card">
+          <h3>상태</h3>
+          <div class="stat"><span class="muted">체력</span><div class="bar g"><i style="width:77%"></i></div><b>62</b></div>
+          <div class="stat"><span class="muted">컨디션</span><div class="bar"><i style="width:88%"></i></div><b>88</b></div>
+          <div class="stat"><span class="muted">인기도</span><div class="bar y"><i style="width:56%"></i></div><b>56</b></div>
+          <div class="row" style="margin-top:6px"><span class="muted">🧑‍💼 스태프</span>👔<span class="g gS">S</span> 🧑‍🏫<span class="g gA">A</span> 📊<span class="g gA">A</span> 🏢<span class="g gB">B</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note">A: 지금 분위기 유지, 간격·대비·카드 모서리만 정리 · B: 검정 + 네온 하늘/보라 그라데이션, 각진 모서리, 방송 그래픽 느낌 · C: 밝은 크림 배경 + 주황 포인트, 둥근 카드, 육성 게임 느낌. 섞어서 고를 수도 있어요 (예: B 색 + C 둥근 모서리).</p>
+
+  <h2 class="sec">② 포트레잇 2안 — 가끔 1~5px 점프 · 눈 깜빡임</h2>
+  <p class="lead">아래 선수들은 이름(id)만으로 자동으로 만든 얼굴이에요. 같은 id면 언제나 같은 얼굴, 유니폼은 팀 색. 3~7초마다 무작위로 1~5px 점프하고 가끔 눈을 깜빡여요.</p>
+  <div class="tabs" id="moodTabs">
+    <button data-m="normal" class="on">😐 기본</button><button data-m="win">😄 이겼을 때</button><button data-m="lose">😞 졌을 때</button><button data-m="tired">😓 지쳤을 때</button>
+    <button data-m="jump">⤴ 지금 모두 점프</button>
+  </div>
+  <div class="compare">
+    <div class="panel">
+      <h3>가. SVG 일러스트 (파츠 조합)</h3>
+      <div class="note">매끄러운 단순화 그림. 크기를 키워도 깨지지 않음.</div>
+      <div class="pgrid" id="svgGrid" style="margin-top:10px"></div>
+    </div>
+    <div class="panel">
+      <h3>나. 픽셀 아트 (32×32 도트)</h3>
+      <div class="note">레트로 도트. 점프도 1px 단위로 끊어서 움직임.</div>
+      <div class="pgrid" id="pxGrid" style="margin-top:10px"></div>
+    </div>
+  </div>
+  <table class="cmp">
+    <tr><th></th><th>가. SVG 일러스트</th><th>나. 픽셀 아트</th></tr>
+    <tr><td>작게 (표 안 24px)</td><td>또렷함</td><td>뭉개질 수 있음 → 표에는 얼굴만</td></tr>
+    <tr><td>크게 (대시보드 120px)</td><td>깔끔</td><td>도트가 커져 레트로 느낌 강함</td></tr>
+    <tr><td>점프 모션</td><td>부드럽게</td><td>뚝뚝 끊겨서 게임 느낌</td></tr>
+    <tr><td>나중에 파츠 추가</td><td>모양 그리기 (조금 어려움)</td><td>점 찍기 (쉬움)</td></tr>
+  </table>
+</div>
+
+<script>
+// ===== 공통: 이름 → 같은 무작위 =====
+function seedOf(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rngOf(s) { let a = seedOf(s); return function () { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const SKIN = ["#f6d7c3", "#eec1a0", "#d9a27f", "#b97a57", "#8d5a3b"];
+const HAIRC = ["#1d1a1f", "#3b2a20", "#6b4226", "#c7923e", "#e7e1d4", "#2f4a8a", "#9b3d5a"];
+const PLAYERS = [
+  { id: "Faker2", team: "T1", c: ["#e2012d", "#1a1a1a"] }, { id: "Burn", team: "KT", c: ["#ff1e1e", "#111111"] },
+  { id: "Tech", team: "GEN.G", c: ["#a98b46", "#1b1b1b"] }, { id: "Aero", team: "Hanwha", c: ["#ff6a13", "#2a2a2a"] },
+  { id: "Kyro", team: "DN", c: ["#4ad3c5", "#16283a"] }, { id: "Wash", team: "BNK", c: ["#f5c400", "#20202a"] },
+];
+function look(id) {
+  const r = rngOf(id);
+  const pick = (a) => a[Math.floor(r() * a.length)];
+  return { skin: pick(SKIN), hairC: pick(HAIRC), hair: Math.floor(r() * 6), eyes: Math.floor(r() * 4), face: Math.floor(r() * 3), headset: r() < 0.55, brow: Math.floor(r() * 2), glasses: r() < 0.18 };
+}
+
+// ===== 가. SVG =====
+function svgPortrait(p, mood, size) {
+  const L = look(p.id), c1 = p.c[0], c2 = p.c[1];
+  const faceRx = [26, 24, 27][L.face], faceRy = [29, 31, 27][L.face];
+  const hairs = [
+    `<path d="M24 46 Q22 20 50 17 Q78 20 76 46 Q72 30 50 29 Q30 30 24 46Z"/>`,
+    `<path d="M22 50 Q20 16 50 14 Q80 16 78 50 L74 40 Q66 26 50 26 Q34 26 26 40Z"/><path d="M30 24 L44 34 L40 22Z"/>`,
+    `<path d="M23 48 Q24 14 52 15 Q80 18 77 48 Q70 24 56 30 Q44 22 23 48Z"/>`,
+    `<path d="M21 58 Q16 18 50 15 Q84 18 79 58 Q78 36 72 32 Q60 24 50 25 Q36 24 28 32 Q22 38 21 58Z"/>`,
+    `<path d="M25 42 Q28 18 50 18 Q72 18 75 42 Q64 32 50 33 Q36 32 25 42Z"/><path d="M38 18 L44 8 L50 17 L56 8 L62 18Z"/>`,
+    `<path d="M24 44 Q24 18 50 18 Q76 18 76 44 Q58 26 24 44Z"/>`,
+  ][L.hair];
+  const ey = 52, ex1 = 39, ex2 = 61;
+  const eyeShape = (x) => {
+    if (mood === "win") return `<path class="eye" d="M${x - 5} ${ey + 1} Q${x} ${ey - 5} ${x + 5} ${ey + 1}" stroke="#2a2230" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+    if (mood === "tired") return `<path class="eye" d="M${x - 5} ${ey} L${x + 5} ${ey}" stroke="#2a2230" stroke-width="2.4" stroke-linecap="round"/>`;
+    return [
+      `<circle class="eye" cx="${x}" cy="${ey}" r="3.2" fill="#2a2230"/>`,
+      `<g class="eye"><ellipse cx="${x}" cy="${ey}" rx="4" ry="4.6" fill="#2a2230"/><circle cx="${x + 1.3}" cy="${ey - 1.6}" r="1.4" fill="#fff"/></g>`,
+      `<rect class="eye" x="${x - 4.5}" y="${ey - 1.6}" width="9" height="3.2" rx="1.6" fill="#2a2230"/>`,
+      `<path class="eye" d="M${x - 5} ${ey + 1} L${x + 4} ${ey - 2} L${x + 4} ${ey + 2}Z" fill="#2a2230"/>`,
+    ][L.eyes];
+  };
+  const browY = mood === "lose" ? 44 : 43;
+  const brow = (x, s) => mood === "lose"
+    ? `<path d="M${x - 5} ${browY - 2 * s * -1} L${x + 5} ${browY + 2 * s * -1}" stroke="${L.hairC}" stroke-width="2.4" stroke-linecap="round"/>`
+    : `<path d="M${x - 5} ${browY} Q${x} ${browY - (L.brow ? 3 : 1.5)} ${x + 5} ${browY}" stroke="${L.hairC}" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  const mouth = { normal: `<path d="M44 66 Q50 70 56 66" stroke="#7a3b3b" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
+    win: `<path d="M42 64 Q50 74 58 64 Z" fill="#7a3b3b"/><path d="M44 65 L56 65" stroke="#fff" stroke-width="1.6"/>`,
+    lose: `<path d="M44 69 Q50 64 56 69" stroke="#7a3b3b" stroke-width="2.2" fill="none" stroke-linecap="round"/>`,
+    tired: `<ellipse cx="50" cy="67" rx="3.5" ry="2.5" fill="#7a3b3b"/>` }[mood];
+  const sweat = mood === "tired" ? `<path d="M74 40 Q77 46 74 49 Q71 46 74 40Z" fill="#7fc8ff"/>` : "";
+  const blush = mood === "win" ? `<ellipse cx="34" cy="60" rx="4" ry="2" fill="#ff8a8a" opacity=".5"/><ellipse cx="66" cy="60" rx="4" ry="2" fill="#ff8a8a" opacity=".5"/>` : "";
+  const glasses = L.glasses ? `<g stroke="#2a2230" stroke-width="1.6" fill="none"><rect x="32" y="47" width="14" height="10" rx="3"/><rect x="54" y="47" width="14" height="10" rx="3"/><path d="M46 51 L54 51"/></g>` : "";
+  const headset = L.headset ? `<path d="M22 50 Q22 14 50 13 Q78 14 78 50" stroke="#2b2b33" stroke-width="4" fill="none"/><rect x="16" y="46" width="9" height="16" rx="4" fill="#2b2b33"/><rect x="75" y="46" width="9" height="16" rx="4" fill="#2b2b33"/><path d="M20 60 Q24 72 38 70" stroke="#2b2b33" stroke-width="2" fill="none"/><circle cx="38" cy="70" r="2.4" fill="${c1}"/>` : "";
+  return `<svg viewBox="0 0 100 110" width="${size}" height="${size * 1.1}" aria-label="${p.id}">
+    <path d="M14 110 Q16 84 50 82 Q84 84 86 110Z" fill="${c1}"/>
+    <path d="M38 83 L50 96 L62 83" fill="${c2}"/><path d="M30 100 L70 100" stroke="${c2}" stroke-width="3" opacity=".5"/>
+    <rect x="43" y="74" width="14" height="12" rx="4" fill="${L.skin}"/>
+    <ellipse cx="50" cy="52" rx="${faceRx}" ry="${faceRy}" fill="${L.skin}"/>
+    <ellipse cx="${50 - faceRx}" cy="54" rx="4" ry="6" fill="${L.skin}"/><ellipse cx="${50 + faceRx}" cy="54" rx="4" ry="6" fill="${L.skin}"/>
+    <g fill="${L.hairC}">${hairs}</g>
+    ${brow(ex1, 1)}${brow(ex2, -1)}
+    ${eyeShape(ex1)}${eyeShape(ex2)}${glasses}${blush}${mouth}${sweat}${headset}
+  </svg>`;
+}
+
+// ===== 나. 픽셀 (32×32) =====
+function pxPortrait(p, mood, scale) {
+  const L = look(p.id), c1 = p.c[0], c2 = p.c[1];
+  const cv = document.createElement("canvas"); cv.width = 32; cv.height = 32; cv.className = "px";
+  cv.style.width = 32 * scale + "px"; cv.style.height = 32 * scale + "px";
+  const g = cv.getContext("2d");
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const dark = "#231f2b";
+  // 몸·유니폼
+  R(6, 26, 20, 6, c1); R(8, 25, 16, 1, c1); R(14, 25, 4, 3, c2); R(6, 30, 20, 1, c2);
+  R(14, 22, 4, 4, L.skin);
+  // 얼굴
+  const fw = [12, 11, 13][L.face];
+  const fx = 16 - fw / 2;
+  R(fx, 9, fw, 14, L.skin); R(fx + 1, 23, fw - 2, 1, L.skin); R(fx - 1, 14, 1, 4, L.skin); R(fx + fw, 14, 1, 4, L.skin);
+  // 머리
+  const H = L.hairC;
+  [() => { R(fx - 1, 6, fw + 2, 4, H); R(fx - 1, 10, 2, 4, H); R(fx + fw - 1, 10, 2, 4, H); },
+   () => { R(fx - 1, 5, fw + 2, 5, H); R(fx + 2, 10, 4, 2, H); R(fx - 1, 10, 1, 6, H); R(fx + fw, 10, 1, 6, H); },
+   () => { R(fx, 5, fw, 4, H); R(fx - 1, 8, fw + 2, 2, H); R(fx + fw - 4, 10, 4, 1, H); },
+   () => { R(fx - 2, 5, fw + 4, 5, H); R(fx - 2, 10, 2, 10, H); R(fx + fw, 10, 2, 10, H); },
+   () => { R(fx, 6, fw, 3, H); R(fx + 2, 4, 2, 2, H); R(fx + 6, 3, 2, 3, H); R(fx + fw - 3, 4, 2, 2, H); R(fx - 1, 8, fw + 2, 2, H); },
+   () => { R(fx - 1, 6, fw + 2, 3, H); R(fx - 1, 9, fw - 3, 2, H); }][L.hair]();
+  // 눈썹·눈
+  const ey = 15, e1 = fx + 2, e2 = fx + fw - 4;
+  if (mood === "lose") { R(e1, 12, 1, 1, H); R(e1 + 1, 13, 1, 1, H); R(e2 + 1, 12, 1, 1, H); R(e2, 13, 1, 1, H); }
+  else { R(e1, 13, 2, 1, H); R(e2, 13, 2, 1, H); }
+  const eye = (x) => {
+    if (mood === "win") { R(x, ey, 1, 1, dark); R(x + 1, ey - 1, 1, 1, dark); }
+    else if (mood === "tired") { R(x, ey, 2, 1, dark); }
+    else if (L.eyes === 1) { R(x, ey - 1, 2, 2, dark); R(x + 1, ey - 1, 1, 1, "#fff"); }
+    else { R(x, ey - 1, 2, 2, dark); }
+  };
+  eye(e1); eye(e2);
+  if (L.glasses) { R(e1 - 1, ey - 2, 4, 1, dark); R(e2 - 1, ey - 2, 4, 1, dark); R(e1 + 3, ey - 1, e2 - e1 - 3, 1, dark); }
+  // 입
+  if (mood === "win") { R(14, 19, 4, 1, "#7a3b3b"); R(15, 20, 2, 1, "#7a3b3b"); }
+  else if (mood === "lose") { R(15, 19, 2, 1, "#7a3b3b"); R(14, 20, 1, 1, "#7a3b3b"); R(17, 20, 1, 1, "#7a3b3b"); }
+  else if (mood === "tired") { R(15, 19, 2, 2, "#7a3b3b"); R(fx + fw + 1, 10, 1, 2, "#7fc8ff"); R(fx + fw + 1, 12, 1, 1, "#bfe4ff"); }
+  else { R(15, 20, 2, 1, "#7a3b3b"); }
+  if (mood === "win") { R(fx + 1, 17, 2, 1, "#f29a9a"); R(fx + fw - 3, 17, 2, 1, "#f29a9a"); }
+  // 헤드셋
+  if (L.headset) { R(fx - 1, 4, fw + 2, 1, "#2b2b33"); R(fx - 2, 5, 1, 9, "#2b2b33"); R(fx + fw + 1, 5, 1, 9, "#2b2b33"); R(fx - 3, 13, 2, 4, "#2b2b33"); R(fx + fw + 1, 13, 2, 4, "#2b2b33"); R(fx - 1, 17, 1, 2, "#2b2b33"); R(fx, 19, 3, 1, "#2b2b33"); R(fx + 3, 19, 1, 1, c1); }
+  return cv;
+}
+
+// ===== 그리기 · 애니메이션 =====
+let mood = "normal";
+function render() {
+  const sg = document.getElementById("svgGrid"), pg = document.getElementById("pxGrid");
+  sg.innerHTML = ""; pg.innerHTML = "";
+  PLAYERS.forEach(function (p) {
+    const a = document.createElement("div"); a.className = "pcard";
+    a.innerHTML = `<div class="box"><span class="pf-anim smooth">${svgPortrait(p, mood, 112)}</span></div><div class="nm">${p.id}</div><div class="tm">${p.team}</div>`;
+    sg.appendChild(a);
+    const b = document.createElement("div"); b.className = "pcard";
+    b.innerHTML = `<div class="box"><span class="pf-anim pixel"></span></div><div class="nm">${p.id}</div><div class="tm">${p.team}</div>`;
+    b.querySelector(".pf-anim").appendChild(pxPortrait(p, mood, 4));
+    pg.appendChild(b);
+  });
+  document.getElementById("heroPf").innerHTML = `<span class="pf-anim smooth">${svgPortrait(PLAYERS[0], mood, 112)}</span>`;
+}
+function jump(el) {
+  const cls = el.classList.contains("pixel") ? "jump-pixel" : "jump-smooth";
+  el.style.setProperty("--jh", (1 + Math.floor(Math.random() * 5)) + "px");
+  el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+}
+function blink(el) { el.classList.add("blink"); setTimeout(function () { el.classList.remove("blink"); }, 130); }
+// 각자 3~7초마다 점프, 2~6초마다 깜빡임
+setInterval(function () {
+  document.querySelectorAll(".pf-anim").forEach(function (el) {
+    const now = Date.now();
+    if (!el._nj) el._nj = now + 1000 + Math.random() * 6000;
+    if (!el._nb) el._nb = now + 1000 + Math.random() * 5000;
+    if (now > el._nj) { jump(el); el._nj = now + 3000 + Math.random() * 4000; }
+    if (now > el._nb && el.classList.contains("smooth") && mood !== "win" && mood !== "tired") { blink(el); el._nb = now + 2000 + Math.random() * 4000; }
+  });
+}, 200);
+
+document.getElementById("themeTabs").addEventListener("click", function (e) {
+  const b = e.target.closest("button"); if (!b) return;
+  this.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); });
+  document.getElementById("demo").className = "demo " + b.dataset.t;
+});
+document.getElementById("moodTabs").addEventListener("click", function (e) {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.m === "jump") { document.querySelectorAll(".pf-anim").forEach(jump); return; }
+  this.querySelectorAll("button").forEach(function (x) { if (x.dataset.m !== "jump") x.classList.toggle("on", x === b); });
+  mood = b.dataset.m; render();
+});
+render();
+</script>
+</body>
+</html>
