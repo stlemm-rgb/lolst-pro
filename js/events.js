@@ -562,6 +562,7 @@ function answerMessage(msgId, index) {
   if (msg.kind === "offer") { answerOffer(msg, index); return; } // 계약 제안 (js/contracts.js)
   if (msg.kind === "retire") { answerRetire(msg, index); return; } // 은퇴 권유 (js/retire.js)
   if (msg.kind === "friend") { answerFriend(msg, index); return; }
+  if (msg.kind === "staffPick") { answerStaffPick(msg, index); return; } // 구단 스태프 인사 (js/staff.js)
   if (msg.kind === "captain" || msg.kind === "captainPick") { answerStanding(msg, index); return; } // 팀 내 입지 (js/standing.js) // 분기 친구 활동 (js/friends.js)
   const ev = findEvent(msg.eventId);
   let choice = ev && ev.choices[index];

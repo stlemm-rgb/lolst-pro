@@ -178,6 +178,7 @@ function compPlanHTML() {
     '<div class="buttons">' + buttons + "</div>" +
     '<p class="muted small">' + escapeHTML(COMP_PLANS.find(function (p) { return p.id === plan; }).desc) +
       " 같은 성향 3명 이상이면 시너지, 주력 성향 상성에서 이기면 팀 점수 +" + COMP_RULES.matchup + ". " +
+      "📊 경기 줄 아래 분석 리포트에서 상대가 노리는 조합과 추천 전략을 볼 수 있어요. " +
       (mine.length ? "내 " + meta.name + " 챔피언: " + mine.map(function (n) { return n + "(" + state.mastery[n] + ")"; }).join(", ") : "") + "</p>"
   );
 }

@@ -222,6 +222,7 @@ pages.shop = function () {
     '<div class="card"><h2>🧑‍🏫 개인 고용 <span class="muted small">매주 비용이 나가는 동안만 효과 · 자금이 모자라면 자동 해지</span></h2>' +
       '<table class="roster shop-table">' + staffRows + "</table></div>" +
     investCardHTML() +
+    staffShopCardHTML() + // 🎫 스태프 스카우트 티켓 (js/staff.js)
     '<div class="card"><h2>🌟 팬·명성</h2>' +
       '<table class="roster shop-table">' + fameRows + "</table></div>"
   );
@@ -271,6 +272,7 @@ function bindShop(page) {
   page.querySelectorAll("[data-buygear]").forEach(function (b) { b.onclick = function () { buyGear(b.getAttribute("data-buygear")); }; });
   page.querySelectorAll("[data-staff]").forEach(function (b) { b.onclick = function () { toggleStaff(b.getAttribute("data-staff")); }; });
   page.querySelectorAll("[data-fame]").forEach(function (b) { b.onclick = function () { buyFame(b.getAttribute("data-fame")); }; });
+  page.querySelectorAll("[data-staffticket]").forEach(function (b) { b.onclick = function () { buyStaffTicket(); }; });
   page.querySelectorAll("[data-invest]").forEach(function (b) {
     b.onclick = function () { const v = b.getAttribute("data-invest").split(":"); invest(v[0], Number(v[1])); };
   });

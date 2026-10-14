@@ -182,8 +182,9 @@ pages.clubs = function () {
             '<span class="muted small">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b> · 연봉 " + moneyText(teamPayroll(t.id)) + " / 예산 " + moneyText(teamBudgetOf(t.tier)) + " · " + clubMoneyText(t.id) + (clubVsMineText(t.id) ? " · ⚔️ " + clubVsMineText(t.id) : "") + "</span>" +
           "</div>" +
           '<div class="muted small club-lineup">' + lineup + "</div>" +
+          '<div class="muted small club-lineup">🧑‍💼 스태프 ' + staffLineText(t.id) + "</div>" +
           (clubIncomeText(t.id) ? '<div class="muted small club-lineup">💰 ' + clubIncomeText(t.id) + "</div>" : "") +
-          (open ? clubRosterHTML(t.id) + clubH2HHTML(t.id) : "") +
+          (open ? clubRosterHTML(t.id) + staffCardHTML(t.id) + clubH2HHTML(t.id) : "") +
         "</div>"
       );
     }).join("");

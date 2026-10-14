@@ -115,6 +115,7 @@ function trainingBonusFor(statId) {
   if (isBonusStat(statId)) bonus += POSITION_BONUS.trainingBonus;
   if (typeof shopEffectKey === "function") bonus += shopEffectKey("trainingStat", statId); // 상점 장비·개인 고용
   if (typeof coachTrainingBonus === "function") bonus += coachTrainingBonus(); // 친구 코치 (js/retirement.js)
+  if (typeof staffTrainingBonus === "function") bonus += staffTrainingBonus(); // 구단 코치 등급 (js/staff.js)
   if (typeof dormTrainingBonus === "function") bonus += dormTrainingBonus(); // 합숙: 모든 훈련 보너스 (합숙 피로로 줄어듦) (js/housing.js)
   return bonus;
 }

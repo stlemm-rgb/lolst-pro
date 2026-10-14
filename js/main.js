@@ -898,6 +898,7 @@ function nextWeek(restWeek) {
   checkSignature100(); // 숙련도 100이 된 챔피언 → 시그니처 픽 독백 (js/signature.js)
   runWeeklyEvents();
   updateQuests();
+  staffWeekly(); // 구단 스태프: 분석 리포트·인사 추천권·시설 체력 회복 (js/staff.js)
   state.log = state.log.slice(0, 30);
   enforceConditionCap(); // 이벤트로 오른 컨디션도 상한까지만 (js/housing.js)
   state.currentMenu = "dashboard";
@@ -979,6 +980,7 @@ function renderAll() {
   ensureNpcTraits(); // 예전 세이브: 다른 선수 특성
   ensureWorld(); // 해외 리그 (새 게임·예전 세이브, js/era.js)
   ensureWorldV11(); // 예전 세이브: 해외 선수 숙련도·지역 3단계 수준 (js/era.js)
+  ensureStaff(); staffReports(); // 구단 스태프·이번 주 분석 리포트 (js/staff.js)
   if (state.league && state.league.season) { prepareWeek(state.week); prepareWeek(state.week + 1); } // 새 게임 1주차: 2주차 LCK 컵 대진도 미리
   ensureNpcStyles(); // 예전 세이브: 다른 선수 플레이 스타일 (js/league.js)
   ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)

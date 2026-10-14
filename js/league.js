@@ -509,7 +509,7 @@ function npcYearGrowth(ageAdd, forYear) {
       const picky = traitSumOf(tr, "pickyGrowth"); // 편식 성장: 강점 +n, 약점은 성장 없음
       const bias = styleGrowthBias(p, s.id);
       const pickyAdd = picky ? (bias > 0 ? picky : bias < 0 ? -9 : 0) : 0;
-      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id], tr, s.id) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + bias + pickyAdd));
+      if (d > 0) d = roundRandom(d * growthMultiplier(p.stats[s.id], tr, s.id) * Math.max(0, 1 + traitSumOf(tr, "trainingAll") + traitKeyOf(tr, "trainingStat", s.id) + dorm + bias + pickyAdd + staffGrowthBonus(p.teamId))); // 🧑‍🏫 코치 등급 (js/staff.js)
       else if (d < 0) d = -roundRandom(-d * Math.max(0, 1 - traitSumOf(tr, "agingCut")));
       const before = p.stats[s.id];
       p.stats[s.id] = Math.max(1, capRise(before, Math.min(100, before + d), statCapOf(tr, s.id)));

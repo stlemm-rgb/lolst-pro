@@ -192,7 +192,7 @@ function lineup(teamId, userCtx, setCtx) {
       power = playerScore(id) * randFloat(1 - down * (1 - steady), MATCH.npcMultiplier[1] + v);
       if (!wt && findTeam(teamId).tier === 2) power *= 1 + HOUSING.npcDormPower; // 2부는 합숙: 컨디션 상한 (data/shop.js)
     }
-    power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx) * scout;
+    power *= traitPowerMult(tr, teamId, setCtx) * statPowerMult(st, teamId, setCtx) * scout * staffPowerMult(teamId); // 👔 감독 등급 (js/staff.js)
     return { pos: pos, id: id, power: power, cf: id === USER_ID && userCtx.cf ? userCtx.cf : 1 }; // cf: 챔피언 배율 → 경기 흐름 사건 (다른 선수는 applyNpcChampPower에서)
   });
 }
@@ -282,7 +282,7 @@ function playMatch(m) {
   const mine = myTeam();
   const userIn = mine && (m.a === mine.id || m.b === mine.id) && !state.benched; // 후보면 출전 안 함
   // 조합 전략 (경기마다): 메타 따라가기 / 메타 카운터 / 자유 (js/comps.js)
-  const plans = { a: teamCompPlan(m.a), b: teamCompPlan(m.b) };
+  const plans = { a: scoutedPlan(m, m.a) || teamCompPlan(m.a), b: scoutedPlan(m, m.b) || teamCompPlan(m.b) }; // 분석 리포트로 미리 정한 상대 계획 (js/staff.js)
   const myTarget = userIn ? (m.a === mine.id ? plans.a : plans.b).target : null;
   const seriesUsed = []; // 피어리스: 이번 경기에서 한 번 나온 챔피언은 뒤 세트에서 아무도 못 고름
   const userPicks = [];
@@ -352,6 +352,7 @@ function playMatch(m) {
   sTraitsOnMatch(m, perf, downTwo); // 0:2 역전승 기록 (역전의 명수, js/straits.js)
   if (userIn) afterUserMatch(m, { pick: userPicks.map(function (u) { return (u.joker ? "🃏" : "") + u.pick; }).join(" / "), joker: false, events: userEvents }, lanes, perf[USER_ID]);
   bigGameOnMatch(m, userIn); // 빅게임 기사·인기도·퀘스트 (js/biggame.js)
+  if (userIn) scoutAfterMatch(m); // 분석 리포트 적중 여부를 경기 줄에 (js/staff.js)
   return m;
 }
 

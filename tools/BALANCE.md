@@ -149,3 +149,17 @@ python3 tools/measure_worlds.py --report /tmp/w.json          # 저장한 결과
 ```
 
 측정 기준 (변형마다 180시즌, 국내 우승 % 오차 약 ±3.5%p): 168(적용 전) 국내 59% · 연속 우승 판 7/18 · 국제 세트 64.8% → **169(지금) 국내 80% · 같은 해외 팀 2회+ 판 2/18 · 연속 0/18 · 국제 세트 70.0%**. 목표(사용자): 국내 70~80%, 같은 해외 팀 연속 우승 드물게. `@ovdyn` 시험은 이제 코드에 들어간 C와 겹치니 비교할 땐 `OVERSEAS_DYNASTY.moves=0`으로 끄고 잴 것.
+
+## 11. 구단 스태프 (173) — data/staff.js
+
+| 경로 | 지금 값 (S, A, B, C, D) | 뜻 |
+|---|---|---|
+| `STAFF_EFFECTS.manager.power` | 0.01 · 0.005 · 0 · −0.005 · −0.01 | 감독: 주전 경기력 배율 |
+| `STAFF_EFFECTS.coach.growth` | 0.12 · 0.06 · 0 · −0.05 · −0.10 | 코치: 그 팀 선수 해마다 성장(오르는 쪽) |
+| `STAFF_EFFECTS.coach.training` | 0.05 · 0.025 · 0 · −0.025 · −0.05 | 코치: 내 훈련 효과 |
+| `STAFF_EFFECTS.analyst.accuracy` | 0.9 · 0.8 · 0.7 · 0.6 · 0.5 | 분석 리포트 적중 확률 (+개인 분석가 0.1, 최대 0.95) |
+| `STAFF_EFFECTS.facility.stamina` | 2 · 1 · 0 · 0 · 0 | 내 체력 매주 회복 |
+| `STAFF_RULES.upkeep` / `upgradeCost` / `upgradeKeep` / `upgradeChance` | S 0.1·A 0.05 / 0.05~0.4 / 0.3 / 0.6 | 예산 대비 유지비·투자 비용, 투자 조건·확률 |
+| `STAFF_RULES.poachChance` / `drift` / `debtDownChance` | 0.5 / 0.08 / 0.5 | 우승팀 스태프 이적, 자연 변동, 빚일 때 하락 |
+
+측정 기준 (2012 2부 유망주 10시즌 × 씨앗 18, 효과 켬 vs 효과 0 `--set STAFF_EFFECTS.manager.power=[0,0,0,0,0]` 등): 리그 최다 우승 3.33 vs 3.06, 월드 최다 2.72 vs 2.72, 월드 국내 69% vs 73%, 상위 3팀 감독+코치 등급 3.89 vs 하위 3팀 3.92, 1·10위 전력 차 4.9 vs 5.2 → 쏠림 차이 없음 (오차 ±0.2~0.3). 효과를 키우면 이 표로 다시 비교할 것.

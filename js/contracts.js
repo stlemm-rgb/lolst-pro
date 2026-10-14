@@ -235,7 +235,8 @@ function offerText(o) {
     "\n· 계약 " + o.years + "년, 연봉 " + moneyText(o.salary) + (o.raised ? " (인상 반영)" : "") +
     (o.standing && o.standing.pct ? " (팀 내 입지 " + o.standing.icon + " " + o.standing.name + " " + (o.standing.pct > 0 ? "+" : "") + Math.round(o.standing.pct * 100) + "%)" : "") +
     "\n· 출전 보장: " + (o.guarantee ? "시즌 " + o.guarantee + "경기" : "없음") +
-    "\n· " + team.name + " (" + nextTierName(team.id) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)";
+    "\n· " + team.name + " (" + nextTierName(team.id) + ", 전력 " + teamStrength(team.id).toFixed(1) + " · 리그 내 " + rank + "위)" +
+    "\n· 구단 스태프: " + staffPlainText(team.id);
 }
 
 function offerChoices(o) {
@@ -585,6 +586,7 @@ function contractsNewSeason() {
   // 1.5) 강팀 쏠림 막기 (v1.1, js/dynasty.js): 우승 팀 연봉 압박 · 해외 러브콜 → 소식은 이적 소식과 같이
   const moves = [];
   dynastyNewSeason(moves);
+  staffNewSeason(moves); // 구단 스태프 투자·유지비·우승팀 스태프 이적 (js/staff.js)
   langNewSeason(); // 팀 언어 실력 +1년 (js/world_moves.js)
   returnHomeMoves(moves); // 해외에 간 한국 선수 복귀 → 국내 FA
   foreignReturnMoves(moves); // 우리 리그 외국인 선수 고향으로
