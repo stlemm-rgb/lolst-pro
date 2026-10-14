@@ -332,6 +332,7 @@ function playMatch(m) {
       countSocialPlays(set.events); // 선수 SNS용: 내 슈퍼플레이·실수 수 (js/match_events.js)
     }
     recordSet(set, m, perf);
+    h2hOnSet(set, m, userIn); // 내 맞수 전적 (js/h2h.js)
     if (detail) {
       const sd = setDetail(set, setCtx, m, userCtx ? userCtx.pick : null);
       if (userCtx) { sd.pick = userCtx.pick; sd.joker = !!userCtx.joker; sd.banned = userCtx.banned; }
@@ -347,6 +348,7 @@ function playMatch(m) {
   m.winner = m.score[0] > m.score[1] ? m.a : m.b;
   m.loser = m.winner === m.a ? m.b : m.a;
   finishSeriesRecord(m, perf);
+  h2hOnMatch(m); // 구단 맞대결 전적 (js/h2h.js)
   sTraitsOnMatch(m, perf, downTwo); // 0:2 역전승 기록 (역전의 명수, js/straits.js)
   if (userIn) afterUserMatch(m, { pick: userPicks.map(function (u) { return (u.joker ? "🃏" : "") + u.pick; }).join(" / "), joker: false, events: userEvents }, lanes, perf[USER_ID]);
   return m;

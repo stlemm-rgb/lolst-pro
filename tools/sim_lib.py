@@ -46,9 +46,17 @@ def apply_overrides(page, overrides):
             raise SystemExit("바꿔 끼우기 실패 (" + ok + "): " + path)
 
 
-def open_game(pw, overrides=None):
+SEED_JS = """(seed) => { let s = seed; Math.random = function () { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; }; }"""
+
+
+def open_game(pw, overrides=None, seed_value=None):
+    """seed_value: 게임 파일을 읽기 전부터 Math.random을 고정 (2026-10-14).
+    예전에는 페이지를 연 뒤에 씨앗을 넣어서, 페이지가 열릴 때 만든 캐릭터 생성용 구단 목록(draft)이 매번 달랐음
+    → '같은 씨앗'이어도 리그가 조금씩 달랐음. 이제 같은 씨앗 = 같은 결과"""
     browser = pw.chromium.launch()
     page = browser.new_page()
+    if seed_value is not None:
+        page.add_init_script("(" + SEED_JS + ")(" + str(int(seed_value) + 7919) + ")")
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.on("dialog", lambda d: d.accept())
@@ -57,7 +65,6 @@ def open_game(pw, overrides=None):
     return browser, page, errors
 
 
-SEED_JS = """(seed) => { let s = seed; Math.random = function () { s = (s * 1103515245 + 12345) % 2147483648; return s / 2147483648; }; }"""
 
 
 def seed(page, value):
@@ -89,7 +96,11 @@ def new_career(page, pos="mid", year=2012, archetype=None, team="tier1-mid", sta
 #   answer: "first"(첫 선택지) / "random"
 #   accept_offers: 계약 제안도 첫 선택지(수락)로 답할지
 #   hook_js: 매주 nextWeek 전에 실행할 JS (예: 특정 해에 S급 주기)
-WEEK_JS = """([answer, acceptOffers, hook]) => {
+# 빠르게 (2026-10-14): 한 주마다 파이썬 ↔ 브라우저를 오가지 않고 52주씩 페이지 안에서 돌림,
+#   측정 중에는 화면 그리기(renderMenu·renderTopbar·renderPage)와 자동 저장을 끔 → 약 2.5배 빠름.
+#   게임 규칙(renderAll 안의 prepareWeek·ensure… 등)은 그대로 돈다. 같은 씨앗이면 예전 방식과 결과가 같음 (확인함)
+WEEK_FN_JS = """() => {
+  window.__week = function (answer, acceptOffers, hook) {
     document.querySelectorAll('#news-popup').forEach(e => e.remove());
     state.retirePlanned = false;
     if (hook) eval(hook);
@@ -106,13 +117,34 @@ WEEK_JS = """([answer, acceptOffers, hook]) => {
     }
     nextWeek();
     return state.retired ? 1 : 0;
+  };
+}"""
+
+FAST_JS = """() => {
+  if (window.__fast) return;
+  window.__fast = true;
+  renderMenu = function () {}; renderTopbar = function () {}; renderPage = function () {};
+  state.settings.autoSave = false;
+}"""
+
+BATCH_JS = """([n, answer, acceptOffers, hook]) => {
+  for (let i = 0; i < n; i++) if (window.__week(answer, acceptOffers, hook)) return 1;
+  return 0;
 }"""
 
 
-def play_weeks(page, n, answer="first", accept_offers=False, hook_js=None):
-    for _ in range(n):
-        if page.evaluate(WEEK_JS, [answer, accept_offers, hook_js]):
+def play_weeks(page, n, answer="first", accept_offers=False, hook_js=None, fast=True, chunk=52):
+    """n주 진행. fast=True면 화면 그리기·자동 저장을 끄고 chunk주씩 페이지 안에서 돌림 (fast=False = 예전과 똑같이 한 주씩)"""
+    page.evaluate(WEEK_FN_JS)
+    if fast:
+        page.evaluate(FAST_JS)
+    step = chunk if fast else 1
+    done = 0
+    while done < n:
+        k = min(step, n - done)
+        if page.evaluate(BATCH_JS, [k, answer, accept_offers, hook_js]):
             break
+        done += k
 
 
 def season_table(page):

@@ -129,6 +129,7 @@ function playerDetailHTML(id) {
       '<div class="chips">' + styleChipHTML(id) + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
       strengthLineHTML(p) +
       champLineHTML(id) +
+      h2hDetailLineHTML(id) + // 나와의 전적 (js/h2h.js)
       '<div class="stat-columns">' + bars + "</div>" +
     "</div>"
   );
@@ -178,11 +179,11 @@ pages.clubs = function () {
           '<div class="club-head" data-club="' + t.id + '">' +
             '<span class="club-rank">' + (i + 1) + "</span>" +
             '<span class="club-name">' + escapeHTML(t.name) + (t.id === mine.id ? ' <span class="now-tag">내 팀</span>' : "") + "</span>" +
-            '<span class="muted small">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b> · 연봉 " + moneyText(teamPayroll(t.id)) + " / 예산 " + moneyText(teamBudgetOf(t.tier)) + " · " + clubMoneyText(t.id) + "</span>" +
+            '<span class="muted small">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b> · 연봉 " + moneyText(teamPayroll(t.id)) + " / 예산 " + moneyText(teamBudgetOf(t.tier)) + " · " + clubMoneyText(t.id) + (clubVsMineText(t.id) ? " · ⚔️ " + clubVsMineText(t.id) : "") + "</span>" +
           "</div>" +
           '<div class="muted small club-lineup">' + lineup + "</div>" +
           (clubIncomeText(t.id) ? '<div class="muted small club-lineup">💰 ' + clubIncomeText(t.id) + "</div>" : "") +
-          (open ? clubRosterHTML(t.id) : "") +
+          (open ? clubRosterHTML(t.id) + clubH2HHTML(t.id) : "") +
         "</div>"
       );
     }).join("");

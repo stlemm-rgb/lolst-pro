@@ -51,7 +51,7 @@ def run_pos(job):
     from playwright.sync_api import sync_playwright
     pos, level, n, configs, plus, overrides = job
     with sync_playwright() as pw:
-        browser, page, errors = open_game(pw, overrides)
+        browser, page, errors = open_game(pw, overrides, 42)
         seed(page, 42)
         page.evaluate("""(pos) => { draft.name='테스트'; draft.position=pos; draft.startYear=2012; renderCreation();
             const t1 = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1); draft.teamChoice = t1[Math.floor(t1.length / 2)][1]; startCareer(true); }""", pos)

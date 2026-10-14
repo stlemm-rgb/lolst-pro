@@ -31,7 +31,7 @@ def run_one(job):
     a, name, overrides, seed_value = job
     t0 = time.time()
     with sync_playwright() as pw:
-        browser, page, errors = open_game(pw, overrides)
+        browser, page, errors = open_game(pw, overrides, seed_value)
         new_career(page, pos=a["pos"], year=a["year"], archetype=a["arch"], team=a["team"], stat_boost=a["boost"],
                    mastery_min=a["mastery"], traits=a["traits"], seed_value=seed_value)
         hook = None

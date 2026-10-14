@@ -6,6 +6,12 @@
 - 조절 값 위치: **`tools/BALANCE.md`**
 - 파일: `sim_lib.py`(공통) · `measure_traits.py`(특성 효과) · `measure_seasons.py`(여러 시즌 진행) · `measure_worlds.py`(월드 우승 국내 vs 해외)
 
+## 빠르게 · 같은 씨앗 = 같은 결과 (170)
+
+- `play_weeks`는 52주씩 페이지 안에서 돌리고, 측정 중에는 화면 그리기·자동 저장을 끈다 (약 2.5배 빠름, 게임 규칙은 그대로). 예전 방식은 `fast=False` (measure_worlds는 `--slow`).
+- 씨앗은 게임 파일을 읽기 전에 고정 (`open_game(pw, overrides, seed)`). 예전에는 페이지가 열릴 때 만드는 구단 목록이 매번 달라서 같은 씨앗이어도 리그가 달랐다.
+- 측정은 두 단계: 씨앗 2개로 후보 거르기 → 유력한 2~3개만 씨앗 6개(180시즌).
+
 ## 숫자 바꿔 끼우기 (파일을 고치지 않고)
 
 `--set 경로=값` (여러 번 가능). 경로는 `data/*.js` 상수: `FOCUS_RULES.userPerS=0.2`, `SLUMP_RULES.chance=0.7`, `TRAIT_FIT.offMult=0.4`, `LEAGUE.veterans.chancePerTeam=1`

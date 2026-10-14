@@ -1,5 +1,5 @@
 // ===== [선수 정보] 내 선수의 모든 것 (2026-10-07, 예전 '나의 커리어'를 바꿈) =====
-// 맨 위 선수 카드(늘 보임) + 탭 6개: 능력 · 특성 · 챔피언 · 성장 보너스 · 기록 · 나이·은퇴
+// 맨 위 선수 카드(늘 보임) + 탭 7개: 능력 · 특성 · 챔피언 · 성장 보너스 · 기록 · 맞수(170, js/h2h.js) · 나이·은퇴
 // 기록용 데이터:
 //   state.career.statLog = [{ y, w, stats, score }]  매주 훈련 뒤 스탯 (최근 10주) → '4주 전' 비교
 //   state.career.seasonStart = { year, stats, score }  시즌이 시작될 때 스탯 → '이번 시즌' 비교
@@ -12,6 +12,7 @@ const PLAYER_TABS = [
   { id: "champs",  name: "⚔️ 챔피언" },
   { id: "growth",  name: "📈 성장 보너스" },
   { id: "records", name: "🏆 기록" },
+  { id: "rivals",  name: "⚔️ 맞수" },
   { id: "age",     name: "⏳ 나이·은퇴" },
 ];
 
@@ -22,7 +23,7 @@ pages.career = function () {
   }).join("");
   const body = {
     ability: playerAbilityHTML, traits: playerTraitsHTML, champs: playerChampsHTML,
-    growth: playerGrowthHTML, records: playerRecordsHTML, age: playerAgeHTML,
+    growth: playerGrowthHTML, records: playerRecordsHTML, rivals: playerRivalsHTML, age: playerAgeHTML,
   }[playerTab]();
   return "<h1>선수 정보</h1>" + playerHeaderHTML() + '<div class="buttons ptabs">' + tabs + "</div>" + body;
 };

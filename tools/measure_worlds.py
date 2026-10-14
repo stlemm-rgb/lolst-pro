@@ -125,12 +125,12 @@ def run_one(job):
     a, name, overrides, year, seed_value = job
     t0 = time.time()
     with sync_playwright() as pw:
-        browser, page, errors = open_game(pw, overrides)
+        browser, page, errors = open_game(pw, overrides, seed_value)
         new_career(page, pos=a["pos"], year=year, team=a["team"], seed_value=seed_value)
         page.evaluate(HOOK_INSTALL, INTL_COMPS)
         if a["proto"].get(name):
             page.evaluate(PROTO_INSTALL, a["proto"][name])
-        play_weeks(page, 52 * a["seasons"], answer="first", hook_js=YEAR_HOOK)
+        play_weeks(page, 52 * a["seasons"], answer="first", hook_js=YEAR_HOOK, fast=not a.get("slow"))
         data = page.evaluate("() => window.__W")
         browser.close()
     data.update({"variant": name, "year": year, "seed": seed_value, "errors": errors[:5], "minutes": round((time.time() - t0) / 60, 1)})
@@ -228,6 +228,7 @@ def main():
     ap.add_argument("--variant", action="append", default=[])
     ap.add_argument("--jobs", type=int, default=2)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--slow", action="store_true", help="예전 방식(한 주씩·화면 그리기)으로 — 빠른 방식과 결과 비교용")
     ap.add_argument("--report", default=None, help="저장한 결과 JSON(여러 개는 쉼표)으로 표만 출력")
     o = ap.parse_args()
     if o.report:
@@ -237,7 +238,7 @@ def main():
         variants = list(dict.fromkeys(r["variant"] for r in results))
         report(results, variants)
         return
-    a = {"pos": o.pos, "team": o.team, "seasons": o.seasons, "proto": {}}
+    a = {"pos": o.pos, "team": o.team, "seasons": o.seasons, "proto": {}, "slow": o.slow}
     common = parse_sets(o.set)
     variants = []
     for v in o.variant or ["기본"]:
