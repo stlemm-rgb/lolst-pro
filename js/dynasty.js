@@ -27,6 +27,7 @@ function dynastyNewSeason(news) {
   }
   dynastyPayRaise(lc.ids, news);
   abroadMoves(lc.ids, news);
+  overseasDynastyMoves(lc.ids, news);
 }
 
 // 이 선수가 지난 시즌 우승 팀에서 FA로 나갔으면 그해에는 원래 팀이 다시 못 데려감 (js/club_market.js sellable)
@@ -124,6 +125,35 @@ function abroadMoves(champs, news) {
     perTeam[c.team.id] = (perTeam[c.team.id] || 0) + 1;
     count++;
   });
+}
+
+// ----- B2. 🌏 해외 왕조 압박 (168) -----
+// 지난 시즌 월드 우승 팀이 해외 팀이면, 그 팀 주전 중 강한 순으로 OVERSEAS_DYNASTY.moves명을 같은 지역 다른 팀 주전과 맞바꿈
+function overseasDynastyMoves(champs, news) {
+  const W = state.world;
+  const t = champs.worlds && W ? findWorldTeam(champs.worlds) : null;
+  if (!t) return;
+  const others = W.teams.filter(function (x) { return x.region === t.region && x.id !== t.id; });
+  if (!others.length) return;
+  const st = worldStarters(t);
+  const region = findRegion(t.region);
+  const local = function (id) { const q = worldPlayer(id); return q && originOf(q) === t.region; };
+  POSITION_IDS.map(function (pos) { return st[pos]; })
+    .filter(function (id) { return id && local(id); })
+    .sort(function (a, b) { return worldScore(worldPlayer(b)) - worldScore(worldPlayer(a)); })
+    .slice(0, OVERSEAS_DYNASTY.moves)
+    .forEach(function (id) {
+      const p = worldPlayer(id);
+      // 같은 포지션 주전이 그 지역 출신(또는 없음)인 팀으로 → 외국인 수가 바뀌지 않음
+      const dest = shuffled(others).find(function (o) { const sw = worldStarters(o)[p.pos]; return !sw || local(sw); });
+      if (!dest) return;
+      const sw = worldStarters(dest)[p.pos];
+      t.roster.splice(t.roster.indexOf(id), 1);
+      dest.roster.push(id);
+      if (sw) { dest.roster.splice(dest.roster.indexOf(sw), 1); t.roster.push(sw); }
+      news.push("🔁 🌏 " + (region ? region.name + " " : "") + "월드 챔피언 " + t.name + "의 " + p.name + "(" + findPosition(p.pos).name + ", " + worldScore(p).toFixed(1) + ") → " + dest.name +
+        (sw ? " (" + worldPlayer(sw).name + "와(과) 맞트레이드)" : "") + " — 우승팀 해체 바람");
+    });
 }
 
 // 국내 선수를 해외 팀으로: 해외 선수로 다시 만들고(같은 이름·스탯·특성), 그 팀 같은 포지션 가장 약한 선수와 바꿈

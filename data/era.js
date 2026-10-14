@@ -73,12 +73,12 @@ const LANG_RULES = {
 
 // 월드 챔피언십 지역 (우리 리그 = 한국은 여기 없음). from: 처음 참가하는 해
 // strength: 우리 리그 1부 평균 대비 전력 (1.0 = 같음), teams: 그 지역 팀 수 (선수 명단을 가진 가상 팀)
-//   v1.1 (사용자 결정): 3단계 — 우리 리그(LCK) 1.0 > 중국·북미·유럽 0.94 > 나머지 0.86. 해마다 새해에 이 수준 쪽으로 반쯤 맞춤 (WORLD_RULES.tierPull)
+//   v1.1 (사용자 결정): 3단계 — 우리 리그(LCK) 1.0 > 중국·북미·유럽 0.92 (168에서 0.94 → 0.92, 해외 월드 우승이 너무 잦아서) > 나머지 0.86. 해마다 새해에 이 수준 쪽으로 반쯤 맞춤 (WORLD_RULES.tierPull)
 // 월드 자리: 강한 지역 1위부터 자리를 받고(전력 순 자리 openSlots개는 남겨 둠 → 약한 지역은 못 나갈 수도), 나머지는 전력 순
 const WORLD_REGIONS = [
-  { id: "na",  name: "북미",       from: 2012, strength: 0.94, teams: 8 },
-  { id: "eu",  name: "유럽",       from: 2012, strength: 0.94, teams: 8 },
-  { id: "cn",  name: "중국",       from: 2013, strength: 0.94,  teams: 8 },
+  { id: "na",  name: "북미",       from: 2012, strength: 0.92, teams: 8 },
+  { id: "eu",  name: "유럽",       from: 2012, strength: 0.92, teams: 8 },
+  { id: "cn",  name: "중국",       from: 2013, strength: 0.92, teams: 8 },
   { id: "tw",  name: "대만·홍콩",  from: 2013, strength: 0.86, teams: 6 },
   { id: "sea", name: "동남아시아", from: 2014, strength: 0.86, teams: 4 },
   { id: "br",  name: "브라질",     from: 2015, strength: 0.86, teams: 4 },

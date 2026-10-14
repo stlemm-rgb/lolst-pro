@@ -111,6 +111,7 @@
 | `ABROAD.base` / `perS` / `champ` / `max` | 0.04 / 0.06 / 0.08 / 0.35 | 해외 진출 확률 |
 | `ABROAD.perYear` / `perTeam` / `maxAge` | 3 / 1 / 29 | 한 해·팀당 최대, 나이 |
 | `SCOUTED.power` | 0.03 | 지난 월드 우승 팀 다음 시즌 경기력 − |
+| `OVERSEAS_DYNASTY.moves` | 2 | 🌏 해외 팀이 월드 우승하면 새 시즌에 그 팀 주전 중 강한 n명을 같은 지역 다른 팀 주전과 맞바꿈 (169) |
 | `PRIZE_SHARE.share` | 0.5 | 상금 중 선수단 몫 |
 | `DECOY.perS` | 0.25 | 견제받는 선수의 미끼 장면(도주·생존·존야…) 배율 S급당 |
 | `FOCUS_RULES` (data/match.js) | userPerS 0.15 · userMin 0.35 · matePerS 0.06 | 집중 견제 — 이제 다른 선수도 받음 |
@@ -127,3 +128,24 @@
 | `MATCH.jokerPowerBonus` | 0.03 | 조커픽 경기력 (예전 0.05) |
 
 측정 기준: 미드 종합 70, 1부 가운데 팀, 씨앗 1·3·5 × 1,000경기, 컨디션 난조 끔. 숙련도 20→100 +19.7%p, 메타 90·나머지 40 vs 메타 40·나머지 90 +8.9%p (예전 +6.8 / −2.1).
+
+## 10. 월드 우승 국내 vs 해외 (168) — tools/measure_worlds.py
+
+| 경로 | 지금 값 | 뜻 |
+|---|---|---|
+| `WORLD_REGIONS[0~2].strength` | 0.92 (169, 예전 0.94) | 북미·유럽·중국 수준 (우리 리그 1부 평균 = 1.0). `--set WORLD_REGIONS.0.strength=0.92` (0 북미 · 1 유럽 · 2 중국) |
+| `WORLD_REGIONS[3~].strength` | 0.86 | 나머지 지역 |
+| `WORLD_RULES.topBonus` | 1.08 … 0.90 | 지역 안 순위별 처음 전력 (1번 팀이 계속 강하게 남음) |
+| `WORLD_RULES.tierPull` | 0.5 | 새해마다 지역 출신 평균을 목표 수준 쪽으로 |
+| `ABROAD.*` · `DYNASTY.*` · `SCOUTED.power` · `OVERSEAS_DYNASTY.moves` | 8장 | 우승팀 흩어지기 (해외 우승팀은 SCOUTED + OVERSEAS_DYNASTY) |
+
+아직 코드에 없는 수정안은 변형에 `@이름=값`으로 시험: `@flat=0.3`(새해마다 해외 팀을 지역 평균 쪽으로 30%) · `@noise=2`(해외 팀 전력 ±2 흔들림) · `@ovdyn=2`(해외 월드 우승팀 주전 강한 2명 같은 지역 다른 팀으로).
+
+```
+python3 tools/measure_worlds.py --years 2012,2017,2022 --seeds 1,2,3,4,5,6 --seasons 10 --jobs 2 \
+  --variant "지금" --variant "지역0.92:WORLD_REGIONS.0.strength=0.92;WORLD_REGIONS.1.strength=0.92;WORLD_REGIONS.2.strength=0.92" \
+  --variant "B+C:@flat=0.3;@noise=2;@ovdyn=2" --out /tmp/w.json
+python3 tools/measure_worlds.py --report /tmp/w.json          # 저장한 결과로 표만 (쉼표로 여러 파일)
+```
+
+측정 기준 (변형마다 180시즌, 국내 우승 % 오차 약 ±3.5%p): 168(적용 전) 국내 59% · 연속 우승 판 7/18 · 국제 세트 64.8% → **169(지금) 국내 80% · 같은 해외 팀 2회+ 판 2/18 · 연속 0/18 · 국제 세트 70.0%**. 목표(사용자): 국내 70~80%, 같은 해외 팀 연속 우승 드물게. `@ovdyn` 시험은 이제 코드에 들어간 C와 겹치니 비교할 땐 `OVERSEAS_DYNASTY.moves=0`으로 끄고 잴 것.

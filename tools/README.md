@@ -4,7 +4,7 @@
 
 - 필요: `python3` + `playwright` (Claude 클라우드 작업 환경에는 있음. PC에서 쓰려면 `pip install playwright` 후 `playwright install chromium`)
 - 조절 값 위치: **`tools/BALANCE.md`**
-- 파일: `sim_lib.py`(공통) · `measure_traits.py`(특성 효과) · `measure_seasons.py`(여러 시즌 진행)
+- 파일: `sim_lib.py`(공통) · `measure_traits.py`(특성 효과) · `measure_seasons.py`(여러 시즌 진행) · `measure_worlds.py`(월드 우승 국내 vs 해외)
 
 ## 숫자 바꿔 끼우기 (파일을 고치지 않고)
 
@@ -37,8 +37,16 @@ python3 tools/measure_seasons.py --seasons 3 --answer random
 ```
 출력: 변형·씨앗별 시즌 시리즈 승률, S급 받은 해부터 평균, 해마다 받은 연락·은퇴·절친 수.
 
+## 3) 월드 우승 국내 vs 해외 — measure_worlds.py (10시즌 1판 ≈ 1.5분)
+
+```
+python3 tools/measure_worlds.py --years 2012,2017,2022 --seeds 1,2,3,4,5,6 --seasons 10 --jobs 2 --variant "지금" --variant "러브콜끔:ABROAD.perYear=0" --out /tmp/w.json
+python3 tools/measure_worlds.py --report /tmp/w.json
+```
+출력: 월드 우승 지역(국내/중국/북미/유럽/나머지), 같은 해외 팀 2회+·연속 우승 판 수, 해외 우승팀 한국 출신 주전 수·능력, 해외 이적(스타급), 국내 1위−해외 1위 전력(시즌 차수별), 국제대회 세트 승률. 아직 없는 수정안은 `@flat`·`@noise`·`@ovdyn` (BALANCE.md 10장).
+
 ## Claude 클라우드에서 돌릴 때
-- 명령 하나가 10분을 넘으면 끊김 → 길면 `nohup python3 tools/measure_seasons.py ... --out /tmp/x.json > /tmp/x.log 2>&1 &` 후 `sleep`으로 기다렸다 읽기
+- 명령 하나가 10분을 넘으면 끊김 → 길면 `setsid nohup python3 tools/measure_seasons.py ... --out /tmp/x.json > /tmp/x.log 2>&1 &` 후 `sleep`으로 기다렸다 읽기
 - 동시 실행은 3개까지가 적당 (`--jobs 3`)
 - `pkill -f`는 쓰지 말 것 (셸까지 끊김)
 
