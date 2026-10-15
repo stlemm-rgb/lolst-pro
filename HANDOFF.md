@@ -199,6 +199,22 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 - D4 끝 (PROGRESS 178): js/cards.js 뒤집는 카드 (인사 후보·대형 신인·우승 스킨).
 - D5 끝 (PROGRESS 179, 시안 8): 페이지 머리 A안 카드형(data/pagehead.js·js/pagehead.js) + 팀 배지·순위 메달·최근 5경기·구단 카드·거주지 2줄 카드·SNS 아이콘·수상 카드·계약 카드. 새 화면을 만들 때도 teamMarkHTML·rankBadgeHTML·emptyBoxHTML 쓰기. 
 - D6 끝 (PROGRESS 180): 설정 '움직임' 켜기·끄기, 경기 재생 창 휴대폰·태블릿, 가로 넘침 2곳, 터치 화면 버튼 34px. **디자인 리뉴얼 D0~D6 모두 끝.** 남은 위험: js/links.js lookbehind 정규식이 iOS 16.3 이하 Safari에서 오류 (사용자가 이번엔 안 고침). 다음은 ver 1.2 내 선수 해외 진출 (시작 전에 선택지로 묻기).
+**🧹 코드 정리 R0~R9 (해외 이적 전, 2026-10-15 사용자 결정: 전부)** — 원칙: 게임 결과·화면은 하나도 안 바뀌게. 단계마다 `python3 tools/check_all.py`(정답지) + `tools/shots.py`(화면) 통과 → 커밋 명령 안내.
+
+| 단계 | 작업 | 상태 |
+|---|---|---|
+| R0 안전망 | 정답지·스크린샷 비교·이름 겹침 검사, 연출 무작위 fxRandom 분리 | ✅ 186 |
+| R1 안 쓰는 것 지우기 | 안 쓰는 함수 7개(profileCardHTML·reputationBarHTML·champOptionsHTML·contractSummaryHTML·matchLine·careerRecordHTML·staffLineText), 안 쓰는 CSS 약 10개, 필요 없는 `typeof … === "function"` 약 42개, starsText 겹침, anti-slop 쓸 만한 것(shape 이름 2개 shapeNpcStats·NPC_STAT_SHAPE) | |
+| R2 파일 합치기 | 3KB 미만 19개 등 주제별로 묶기 111 → 약 80, 파일 지도 | |
+| R3 세이브 호환 한곳에 | '예전' 처리 86곳 → migrateSave() + 버전별 단계, 예전 세이브 샘플 테스트 | |
+| R4 CSS 정리 | 섹션 목차, 휴대폰 설정 모으기, 색 변수, 덮어쓰기 합치기 | |
+| R5 세이브 다이어트 | 10시즌 0.72MB(해외 0.30·리그 0.23·뉴스 0.12) → 0.45MB 이하, `golden.py check --loose` | |
+| R6 속도 | 한 주 89ms(11시즌째) → −30% 목표 | |
+| R7 배포 정리 | 시안·문서·도구 → _dev, GitHub Actions로 공개 사이트만 game.js 1개로 묶기 (C안), CLAUDE.md '빌드 도구 없음' 규칙에 예외 적어 두기 | |
+| R8 문서 정리 | PROGRESS 오래된 항목 따로 보관, HANDOFF·GAME_PLAN 최신화 | |
+| R9 마무리 | 전체 검사, 휴대폰, ver 1.2.1 태그 | |
+
+- 작업 방식: 클라우드 사본에서 고치고 검사 → `git diff` 패치를 PC 게임 폴더 `_sync/`(git 무시)에 보내 `git apply`. 파일을 지우는 단계(R2)는 PC 폴더 삭제 권한 필요.
 - 훈련 대성공 (PROGRESS 182, 유저 피드백): js/great.js · data/great.js, 새 저장 칸 state.great. 숫자 조절은 GREAT_RULES.
 
 - **ver 1.2 해외 진출(아래)은 디자인 리뉴얼 뒤로.**

@@ -8,6 +8,10 @@ function pfRng(s) {
   let a = pfSeed(s);
   return function () { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
+// 연출용 무작위 (R0): 점프·불꽃·꽃가루 같은 화면 연출은 게임 결과용 Math.random과 따로 뽑음
+//   → 화면 연출이 언제 몇 번 돌았는지에 따라 게임 결과(같은 씨앗 = 같은 결과)가 흔들리지 않게
+let FX_SEED = 1234567;
+function fxRandom() { FX_SEED = (FX_SEED * 1103515245 + 12345) % 2147483648; return FX_SEED / 2147483648; }
 function randomLook(seed) {
   const r = seed === undefined ? Math.random : pfRng(seed);
   const n = function (k) { return Math.floor(r() * k); };
@@ -156,11 +160,11 @@ function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: tr
     try { list = document.querySelectorAll(".pf-jump"); } catch (e) { return; }
     const now = Date.now();
     Array.prototype.forEach.call(list, function (el) {
-      if (!el._nj) el._nj = now + 600 + Math.random() * (J.maxGap - J.minGap);
+      if (!el._nj) el._nj = now + 600 + fxRandom() * (J.maxGap - J.minGap);
       if (now < el._nj) return;
-      el.style.setProperty("--jh", (J.minPx + Math.floor(Math.random() * (J.maxPx - J.minPx + 1))) + "px");
+      el.style.setProperty("--jh", (J.minPx + Math.floor(fxRandom() * (J.maxPx - J.minPx + 1))) + "px");
       el.classList.remove("jumping"); void el.offsetWidth; el.classList.add("jumping");
-      el._nj = now + J.minGap + Math.random() * (J.maxGap - J.minGap);
+      el._nj = now + J.minGap + fxRandom() * (J.maxGap - J.minGap);
     });
   }, 250);
 })();

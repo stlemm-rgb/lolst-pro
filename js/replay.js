@@ -252,10 +252,10 @@ function replayConfetti(u) {
   for (let i = 0; i < 40; i++) {
     const c = document.createElement("i");
     c.className = "rp-confetti";
-    c.style.left = Math.random() * 100 + "%";
+    c.style.left = fxRandom() * 100 + "%";
     c.style.background = [u[0], u[1], "#ffd23f", "#00e0ff"][i % 4];
-    c.style.animationDuration = (1.6 + Math.random() * 1.6) + "s";
-    c.style.animationDelay = Math.random() * 0.6 + "s";
+    c.style.animationDuration = (1.6 + fxRandom() * 1.6) + "s";
+    c.style.animationDelay = fxRandom() * 0.6 + "s";
     box.appendChild(c);
     setTimeout(function () { c.remove(); }, 4200);
   }

@@ -116,7 +116,7 @@ function showGreat(done) {
     for (let i = 0; i < 34; i++) {
       const s = document.createElement("i");
       s.className = "gs-spark";
-      const a = Math.random() * Math.PI * 2, d = 90 + Math.random() * 160;
+      const a = fxRandom() * Math.PI * 2, d = 90 + fxRandom() * 160;
       s.style.setProperty("--dx", Math.cos(a) * d + "px");
       s.style.setProperty("--dy", Math.sin(a) * d + "px");
       s.style.background = ["#ffd23f", "#fff3c4", "#ff9f1c", "#2bff9e"][i % 4];

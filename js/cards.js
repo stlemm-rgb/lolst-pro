@@ -24,7 +24,7 @@ function cardSparks(el, n, col) {
     const s = document.createElement("i");
     s.className = "fc-spark";
     if (col) s.style.background = col;
-    const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 90;
+    const a = fxRandom() * Math.PI * 2, d = 60 + fxRandom() * 90;
     s.style.setProperty("--dx", Math.cos(a) * d + "px");
     s.style.setProperty("--dy", Math.sin(a) * d + "px");
     el.appendChild(s);
