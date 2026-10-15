@@ -515,6 +515,7 @@ function renderTopbar() {
     '<span class="topbar-actions">' +
       planBadgeHTML() +
       staminaBadgeHTML() +
+      fireBadgeHTML() + // 불타는 손: 2주 연속 대성공 (js/great.js)
       '<button id="rest-week" class="tip" data-tip="고른 훈련은 그대로 두고 이번 주만 쉬어요 (체력·컨디션 회복)">휴식 주 💤</button>' +
       '<button class="primary" id="next-week">다음 주로 진행 ▶</button>' +
     "</span>";
@@ -579,6 +580,7 @@ function renderPage() {
   }
   page.innerHTML = html;
   linkifyNames(page); // 선수·구단 이름을 누르면 선수 검색·구단 탐색으로 (js/links.js)
+  if (state.currentMenu === "dashboard") greatDashJump(page); // 대성공 주: 내 포트레잇 크게 점프 (js/great.js)
   maybeShowNews(); // 대회 결과 뉴스 팝업 (js/news_popup.js)
   // 안내 문구에서 SNS로 바로 가기 (예: 선수 SNS 언급 알림 → 💬 선수 SNS 탭)
   page.querySelectorAll("[data-gosns]").forEach(function (el) {
@@ -686,6 +688,7 @@ function nextWeek(restWeek) {
   state.weekCtx.training = training.id; // 선수 SNS용 (이번 주 훈련 글)
   if (training.id === "rest" && state.tutorial) state.tutorial.restDone = true; // 처음 안내: 쉬어 보기
   const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
+  const great = rollGreat(training); // 훈련 대성공: 오른 스탯·숙련도 2배 (js/great.js)
   const changes = {};
   Object.keys(training.effects).forEach(function (id) {
     const range = training.effects[id];
@@ -717,6 +720,7 @@ function nextWeek(restWeek) {
       const now = state.mastery[name];
       let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
       if (tired) gain *= 0.5;
+        if (great) gain *= GREAT_RULES.mult; // 훈련 대성공 (js/great.js)
       state.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
       changes["m:" + name] = state.mastery[name] - now;
     } else if (id === "masteryMeta") {
@@ -727,18 +731,20 @@ function nextWeek(restWeek) {
         const now = state.mastery[name];
         let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
         if (tired) gain *= 0.5;
+        if (great) gain *= GREAT_RULES.mult; // 훈련 대성공 (js/great.js)
         state.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
         changes["m:" + name] = state.mastery[name] - now;
       }
     } else if (id === "mastery") {
       // 챔피언 숙련도: 고른 챔피언(또는 자동으로 고른 챔피언)들에게
-      const gained = practiceChampions(range, tired);
+      const gained = practiceChampions(range, tired, great ? GREAT_RULES.mult : 1);
       Object.keys(gained).forEach(function (name) { changes["m:" + name] = gained[name]; });
     } else if (state.stats[id] !== undefined) {
       // 실력 스탯: 오를 때만 보너스(가산점·유형·특성)를 붙임
       if (amount > 0) {
         let boosted = amount * (1 + trainingBonusFor(id)) * growthMultiplier(state.stats[id], state.player.traits, id) * agingTrainingMultiplier(id); // 높은 스탯일수록 덜 오름, 노화하면 손 스탯 덜 오름
         if (tired) boosted *= 0.5;
+        if (great) boosted *= GREAT_RULES.mult; // 훈련 대성공 (js/great.js)
         amount = roundRandom(Math.max(0, boosted));
       }
       before = state.stats[id];
@@ -750,6 +756,7 @@ function nextWeek(restWeek) {
   let message = pick(training.messages);
   const gainsStats = Object.keys(training.effects).some(function (id) { return state.stats[id] !== undefined || id === "mastery"; });
   if (tired && gainsStats) message += " (너무 지쳐서 훈련 효과가 절반이었다.)";
+  if (great) message = "🔥 대성공! " + message;
 
   // 결과 기록 (최근 10개만 보관)
   state.log.unshift({
@@ -764,6 +771,7 @@ function nextWeek(restWeek) {
   // 솔로 랭크(가상 래더)와 지난주 결과 기록 시작
   startWeekReport(training, message, changes, playLadder(training));
   state.weekReport.growthBase = growthBase;
+  if (great) state.weekReport.great = { streak: greatState().streak }; // 대성공 연출·도장 (js/great.js)
   playNpcLadder(); // 다른 선수들도 솔로 랭크 (리그 솔로 랭크 순위)
   npcPractice(); // 다른 선수들도 매주 챔피언 연습 (js/npc_mastery.js)
   progressQuests(training, changes); // 퀘스트 진행 (js/quests.js)
@@ -1009,5 +1017,6 @@ function renderAll() {
 // 측정 도구는 nextWeek만 부르므로 재생 창이 뜨지 않음
 function advanceWeek(rest) {
   nextWeek(rest);
-  if (typeof afterWeekReplay === "function") afterWeekReplay();
+  // 훈련 대성공이면 연출을 먼저 보고, 닫으면 경기 자동 재생 (js/great.js, js/replay.js)
+  showGreat(function () { if (typeof afterWeekReplay === "function") afterWeekReplay(); });
 }

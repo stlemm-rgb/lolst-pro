@@ -201,6 +201,7 @@ function trainingCardHTML(t, badges) {
   const statIds = Object.keys(t.effects).filter(function (id) { return state.stats[id] !== undefined; });
   return '<div class="card training tcard' + (selected ? " selected" : "") + '" data-tcard="' + t.id + '" data-stats="' + statIds.join(",") + '">' +
     '<div class="tc-head"><h2>' + t.name + "</h2>" + badgesHTML(badges) + "</div>" +
+    (greatEligible(t) ? '<div class="tc-great">' + greatChipHTML() + "</div>" : "") + // 대성공 확률 (js/great.js)
     '<p class="muted small tc-desc">' + t.desc + "</p>" +
     '<div class="tgains">' + gains.join("") + "</div>" +
     '<p class="muted small">체력 ' + signed1(exp.stamina) + (exp.ladder ? " · 솔로 랭크 " + exp.ladder + "판" : "") + "</p>" +
@@ -257,7 +258,7 @@ pages.training = function () {
   const rest = findTraining("rest");
   // 고르는 칸(카드)을 맨 위에: 이번 주 예상 한 줄 → 카드 → 휴식 → (아래) 내 스탯·예상·최근 4주·퀘스트 → 비교표
   return (
-    "<h1>훈련</h1>" + tired + trainForecastStripHTML(cur, exp) +
+    "<h1>훈련</h1>" + tired + greatLineHTML() + trainForecastStripHTML(cur, exp) +
     '<div class="tcards tcards-3 tfirst">' + statCards + "</div>" +
     '<div class="tcards tcards-2">' + champCards + "</div>" +
     (rest ? restRowHTML(rest, badges.rest) : "") +

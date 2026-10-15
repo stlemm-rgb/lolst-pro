@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 9 — 훈련 대성공</title>
+</head>
+<body>
+<style>
+:root{--bg:#07070d;--panel:#11111c;--panel-2:#181828;--border:#26263d;--text:#f1f1f7;--muted:#8a8aa6;--accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--good:#2bff9e;--bad:#ff3d71;--r:14px;--r-s:10px;--grad:linear-gradient(90deg,#b44dff,#00e0ff);--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7)}
+*{box-sizing:border-box}body{margin:0;font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 16px 60px}h1{font-size:24px;margin:0 0 6px}h2.sec{font-size:18px;margin:36px 0 10px;padding-top:14px;border-top:1px solid var(--border)}
+.lead,.note{color:var(--muted);font-size:14px;line-height:1.6}
+button{font:inherit;color:var(--text);cursor:pointer;border-radius:var(--r-s);border:1px solid rgba(0,224,255,.35);background:linear-gradient(180deg,#22223a,#1a1a2d);padding:8px 14px;font-size:13px}
+button.primary{background:var(--grad-btn);border-color:transparent;color:#fff;font-weight:bold}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.px{image-rendering:pixelated}.pf{display:block}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.chip{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--border);background:var(--panel-2)}
+.up{color:var(--good)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+summary{cursor:pointer}
+/* ===== ① 대성공 연출 ===== */
+#gs{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:rgba(0,0,0,.72);padding:16px}
+#gs[hidden]{display:none}
+.gs-flash{position:fixed;inset:0;background:radial-gradient(circle,rgba(255,210,63,.55),transparent 60%);animation:gsFlash .7s ease-out forwards;pointer-events:none}
+@keyframes gsFlash{from{opacity:1;transform:scale(.6)}to{opacity:0;transform:scale(1.6)}}
+.gs-box{position:relative;width:min(420px,100%);border-radius:22px;padding:22px 22px 18px;text-align:center;overflow:hidden;
+ background:radial-gradient(circle at 50% 0%,rgba(255,210,63,.28),transparent 60%),linear-gradient(180deg,#1d1a10,#11111c);border:2px solid rgba(255,210,63,.8);
+ box-shadow:0 0 0 1px rgba(255,210,63,.3),0 0 60px rgba(255,210,63,.35);animation:gsIn .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes gsIn{from{transform:scale(.5) rotate(-4deg);opacity:0}to{transform:none;opacity:1}}
+.gs-rays{position:absolute;left:50%;top:120px;width:620px;height:620px;margin:-310px 0 0 -310px;background:repeating-conic-gradient(rgba(255,210,63,.12) 0 10deg,transparent 10deg 24deg);animation:gsSpin 14s linear infinite;pointer-events:none}
+@keyframes gsSpin{to{transform:rotate(360deg)}}
+.gs-title{position:relative;font-size:40px;font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#fff3c4,#ffd23f 40%,#ff9f1c 60%,#fff3c4);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:gsShine 1.6s linear infinite;filter:drop-shadow(0 2px 10px rgba(255,160,30,.5))}
+@keyframes gsShine{to{background-position:-200% 0}}
+.gs-sub{position:relative;color:#e9dcb0;font-size:13px;margin-top:2px}
+.gs-pf{position:relative;display:flex;justify-content:center;margin:12px 0 6px}
+.gs-pf .jumpy{animation:gsJump .7s ease-out .25s 2}
+@keyframes gsJump{0%,100%{transform:translateY(0)}35%{transform:translateY(-22px)}60%{transform:translateY(0)}75%{transform:translateY(-6px)}}
+.gs-pf .flex{position:absolute;right:calc(50% - 76px);top:6px;font-size:26px;animation:gsPop .4s .6s both}
+@keyframes gsPop{from{transform:scale(0)}70%{transform:scale(1.4)}to{transform:scale(1)}}
+.gs-rows{position:relative;display:grid;gap:6px;margin:8px 0 12px;text-align:left}
+.gs-row{display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.35);border:1px solid rgba(255,210,63,.25);border-radius:10px;padding:7px 12px;font-size:14px;opacity:0;animation:gsRow .35s ease-out forwards}
+@keyframes gsRow{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.gs-row b.n{margin-left:auto;font-size:20px;color:var(--good);font-variant-numeric:tabular-nums}
+.gs-row .x2{font-size:11px;font-weight:bold;color:#1a1405;background:var(--gold);border-radius:999px;padding:1px 7px}
+.gs-row s{color:var(--muted);font-size:12px}
+.gs-streak{position:relative;margin:0 0 12px;padding:8px 10px;border-radius:12px;font-size:13px;font-weight:bold;color:#fff;background:linear-gradient(90deg,#ff3d00,#ff9f1c);box-shadow:0 0 20px rgba(255,90,0,.5);animation:gsPop .4s 1.4s both}
+.spark{position:absolute;left:50%;top:40%;width:7px;height:7px;border-radius:2px;background:var(--gold);pointer-events:none;animation:spark 1.1s ease-out forwards}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) rotate(400deg);opacity:0}}
+/* ② 대시보드 지난주 결과 도장 */
+.rep{position:relative;overflow:hidden}
+.stamp{position:absolute;right:14px;top:10px;transform:rotate(-12deg);border:3px solid var(--gold);color:var(--gold);font-weight:900;font-size:18px;padding:2px 10px;border-radius:8px;letter-spacing:2px;box-shadow:0 0 18px rgba(255,210,63,.35),inset 0 0 12px rgba(255,210,63,.25);background:rgba(255,210,63,.06)}
+.chip.gold{border-color:rgba(255,210,63,.7);color:var(--gold);position:relative;overflow:hidden}
+.chip.gold::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);transform:translateX(-100%);animation:sweep 2.4s ease-in-out infinite}
+@keyframes sweep{60%,100%{transform:translateX(100%)}}
+.rep-row{display:flex;gap:10px;align-items:center}
+.pfbox{position:relative}.pfbox .jumping{animation:gsJump .8s ease-out}
+/* 훈련 카드 확률 · 불타는 손 */
+.tcard{border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;background:var(--panel)}
+.gsc{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid rgba(255,210,63,.5);color:var(--gold);background:rgba(255,210,63,.07)}
+.gsc .bar{width:60px;height:5px;border-radius:9px;background:#2a2a40;overflow:hidden}.gsc .bar i{display:block;height:100%;background:linear-gradient(90deg,#ffd23f,#ff9f1c)}
+.fire{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:bold;padding:4px 10px;border-radius:var(--r-s);color:#fff;background:linear-gradient(90deg,#ff3d00,#ff9f1c);box-shadow:0 0 14px rgba(255,90,0,.45);animation:flick 1.2s ease-in-out infinite}
+@keyframes flick{50%{box-shadow:0 0 22px rgba(255,140,0,.75)}}
+.tip-box{font-size:12px;color:var(--muted);line-height:1.7;margin-top:8px;background:var(--panel-2);border-radius:8px;padding:8px 10px}
+.summary{width:100%;border-collapse:collapse;font-size:13px}.summary td,.summary th{border:1px solid var(--border);padding:7px 9px;text-align:left}.summary th{background:var(--panel-2)}
+</style>
+<div class="wrap">
+<h1>디자인 시안 9 — 훈련 대성공 🔥</h1>
+<p class="lead">사용자 선택: ① 화면 가운데 연출 · ② 대시보드 도장 · ③ 포트레잇 점프 · ⑥ 연속 보너스 '불타는 손' · 대성공만 · 확률 보여 주기. 아래 버튼으로 연출을 다시 볼 수 있어요.</p>
+<div class="ctrl"><button class="primary" onclick="showGS(false)">▶ 대성공 연출 보기</button><button onclick="showGS(true)">🔥 2주 연속 (불타는 손) 보기</button></div>
+
+<table class="summary">
+<tr><th>항목</th><th>안</th></tr>
+<tr><td>확률</td><td>기본 7% + 컨디션(80 이상 +2%) + 구단 코치 등급(S +3% ~ D 0%) + 장비 단계(합 1단계당 +0.3%) · 최대 15%</td></tr>
+<tr><td>효과</td><td>그 주 훈련으로 오른 스탯·숙련도 ×2 (체력 소모는 그대로)</td></tr>
+<tr><td>불타는 손</td><td>대성공 다음 주에 또 대성공 → '불타는 손' 상태. 다음 주 확률 +3% (끊길 때까지)</td></tr>
+<tr><td>밸런스</td><td>적용 후 10시즌 측정 → 평균 성장이 너무 오르면 보통 성장을 조금 낮춰 맞춤</td></tr>
+<tr><td>휴식 주 · 너무 지침</td><td>휴식 주에는 안 나옴 · 체력이 너무 낮으면(효과 절반) 확률 절반</td></tr>
+</table>
+
+<h2 class="sec">① 다음 주 진행 직후 — 화면 가운데</h2>
+<p class="note">금빛 번쩍 → 카드 튀어나옴 → 내 포트레잇 점프 + 💪 → 스탯이 한 줄씩 들어오며 +2 → +4 카운트업 → 금가루. 아무 곳이나 누르면 닫혀요. 경기 자동 재생이 있는 주는 이 다음에 재생돼요. 움직임 끄기면 번쩍임·점프 없이 카드만.</p>
+
+<h2 class="sec">② + ③ 대시보드 '지난주 결과' + ⑥ 상단바</h2>
+<div class="grid2">
+ <div class="card rep"><div class="stamp">대성공</div>
+  <div style="font-weight:bold;margin-bottom:8px">📋 지난주 결과 <span style="color:var(--muted);font-weight:normal;font-size:12px">2018년 20주차 · 솔로 랭크</span></div>
+  <div class="rep-row"><div class="pfbox"><span id="dashpf"></span></div>
+   <div><div style="font-size:13px;margin-bottom:6px">🔥 손이 미친 듯이 풀린 한 주! 오른 스탯이 2배.</div>
+   <span class="chip gold">입력 정확도 <b class="up">+4</b></span> <span class="chip gold">반응속도 <b class="up">+2</b></span> <span class="chip gold">라인전 <b class="up">+2</b></span> <span class="chip">체력 −6</span></div></div>
+  <div style="margin-top:10px"><button onclick="jumpDash()">③ 포트레잇 점프 다시</button></div>
+ </div>
+ <div class="card"><div style="font-weight:bold;margin-bottom:8px">⑥ 상단바 (연속일 때만)</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span class="chip">🏋️ 솔로 랭크</span><span class="chip" style="color:var(--gold)">💪 체력 52/80</span><span class="fire">🔥 불타는 손 ×2</span></div>
+  <p class="note" style="margin:10px 0 0">대성공이 끊기면 사라져요. 마우스를 올리면 "2주 연속 대성공 · 이번 주 대성공 확률 +3%".</p></div>
+</div>
+
+<h2 class="sec">확률 보여 주기 — 훈련 카드</h2>
+<div class="grid2">
+ <div class="tcard"><div style="display:flex;justify-content:space-between;align-items:center"><b>솔로 랭크</b><span class="gsc">🎯 대성공 11% <span class="bar"><i style="width:73%"></i></span></span></div>
+  <p class="note" style="margin:6px 0">랭크 게임을 쉬지 않고 돌리며 손을 단련한다.</p>
+  <details><summary class="note">🎯 대성공 확률이 왜 11%?</summary><div class="tip-box">기본 7% · 컨디션 80 이상 +2% · 구단 코치 B급 +1% · 장비 3단계 +0.9% ≈ 11% (최대 15%)<br>🔥 불타는 손이면 +3%</div></details>
+ </div>
+ <div class="tcard"><b>훈련 화면 맨 위 한 줄</b><p class="note" style="margin:6px 0 0">"🎯 이번 주 대성공 확률 11% · 컨디션을 80 이상으로 유지하면 +2%" — 확률을 올리는 방법을 같이 알려 줘요.</p></div>
+</div>
+</div>
+
+<div id="gs" hidden onclick="hideGS()"></div>
+
+<script>
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 코드는 js/portrait.js =====
+// 32×32 도트. 내 선수는 캐릭터 만들 때 고른 얼굴(state.player.look), 다른 선수는 선수 id로 정해지는 얼굴 (저장 안 함)
+// 크기: 최대 3배(96px) (사용자 결정), 표에는 얼굴만 잘라서
+const PORTRAIT = {
+  skins: [
+    { name: "아주 밝게", c: "#f6d7c3" }, { name: "밝게", c: "#eec1a0" }, { name: "보통", c: "#d9a27f" },
+    { name: "조금 어둡게", c: "#b97a57" }, { name: "어둡게", c: "#8d5a3b" },
+  ],
+  hairStyles: ["짧은 앞머리", "덮은 머리", "옆으로 넘김", "긴 머리", "뾰족 머리", "대머리", "아프로"],
+  hairColors: [
+    { name: "검정", c: "#1d1a1f" }, { name: "갈색", c: "#6b4226" }, { name: "금발", c: "#c7923e" }, { name: "은발", c: "#e7e1d4" },
+    { name: "파랑", c: "#2f4a8a" }, { name: "빨강", c: "#c8322b" }, { name: "주황", c: "#e8792a" },
+  ],
+  eyes: ["점 눈", "반짝 눈"],
+  faces: ["보통", "갸름", "넓적"],   // 얼굴 너비 12 · 11 · 13 도트
+  headsetChance: 0.55,
+  glassesChance: 0.18,
+  // 움직임: 크게 보이는 그림(.pf-jump)만 가끔 1~5px 점프
+  jump: { minGap: 3000, maxGap: 7000, minPx: 1, maxPx: 5 },
+  tiredStamina: 30, // 내 선수 체력이 이 아래면 지친 표정
+};
+
+// 구단 유니폼 [바탕, 포인트(깃·줄)] — 1부 기업 10곳 고정 (사용자 확인 시안 3)
+const TEAM_UNIFORMS = {
+  "T1": ["#e2012d", "#141414"], "KT": ["#f2f2f2", "#e1251b"], "GEN.G": ["#a98b46", "#1b1b1b"], "Hanwha": ["#ff6a13", "#2a2a2a"],
+  "Dplus": ["#1b1b1b", "#4fd1c5"], "BNK": ["#f5c400", "#1f2a44"], "BRION": ["#1fae5c", "#f2f2f2"], "NS": ["#8e1c2b", "#e8dcc2"],
+  "KW": ["#1e3a8a", "#7cc4ff"], "DN": ["#6b2fbf", "#f2f2f2"],
+};
+// 2부·신생 구단: 기업명으로 정해지는 색 (이 중 하나)
+const UNIFORM_POOL = [
+  ["#3b82f6", "#f2f2f2"], ["#14b8a6", "#111827"], ["#a3e635", "#1f2937"], ["#f472b6", "#1f2937"], ["#64748b", "#f8fafc"], ["#f59e0b", "#7c2d12"],
+  ["#0ea5e9", "#0f172a"], ["#ef4444", "#fde68a"], ["#8b5cf6", "#fde68a"], ["#10b981", "#064e3b"], ["#e11d48", "#f1f5f9"], ["#facc15", "#111111"],
+];
+// 해외 팀: 지역마다 2~3가지 중 팀 id로
+const REGION_UNIFORMS = {
+  na: [["#1d4ed8", "#f8fafc"], ["#0f766e", "#f8fafc"], ["#111827", "#60a5fa"]],
+  eu: [["#f8fafc", "#1e3a8a"], ["#7c3aed", "#f8fafc"], ["#111827", "#f59e0b"]],
+  cn: [["#dc2626", "#facc15"], ["#111827", "#ef4444"], ["#f8fafc", "#dc2626"]],
+};
+const FREE_AGENT_UNIFORM = ["#4b5563", "#9ca3af"]; // 소속 없음
+
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/portrait.js =====
+// portraitImg(id, opts) → <img> HTML (canvas로 그린 그림을 data URL로, 같은 그림은 캐시)
+//   opts: scale 1~3, mood "normal"|"win"|"lose"|"tired", face true = 얼굴만 18×18 잘라서(표용), jump true = 가끔 점프, size(face일 때 px: 18 또는 36)
+// 내 선수 얼굴: state.player.look { skin, hs, hairC, eyes, face, headset, glasses } (캐릭터 만들 때 고름, 예전 세이브는 이름으로 자동)
+
+function pfSeed(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function pfRng(s) {
+  let a = pfSeed(s);
+  return function () { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function randomLook(seed) {
+  const r = seed === undefined ? Math.random : pfRng(seed);
+  const n = function (k) { return Math.floor(r() * k); };
+  const P = PORTRAIT;
+  return { skin: n(P.skins.length), hairC: n(P.hairColors.length), hs: n(P.hairStyles.length), eyes: n(P.eyes.length), face: n(P.faces.length),
+    headset: r() < P.headsetChance, glasses: r() < P.glassesChance };
+}
+function lookOf(id) {
+  if (id === USER_ID && state.player) {
+    if (!state.player.look) state.player.look = randomLook("me:" + state.player.name); // 예전 세이브
+    return state.player.look;
+  }
+  return randomLook(id);
+}
+
+// ----- 유니폼 -----
+function uniformByShort(short) {
+  return TEAM_UNIFORMS[short] || UNIFORM_POOL[pfSeed(short) % UNIFORM_POOL.length];
+}
+function uniformOfTeam(teamId) {
+  if (!teamId) return FREE_AGENT_UNIFORM;
+  const t = findTeam(teamId);
+  if (t) return uniformByShort(t.short);
+  const w = typeof findWorldTeam === "function" ? findWorldTeam(teamId) : null;
+  const reg = w ? w.region : null;
+  const list = REGION_UNIFORMS[reg] || UNIFORM_POOL;
+  return list[pfSeed(teamId) % list.length];
+}
+function teamIdOfPlayer(id) {
+  if (id === USER_ID) { const t = myTeam(); return t ? t.id : null; }
+  const p = state.league && state.league.players[id];
+  if (p) return p.teamId || null;
+  if (state.world && String(id).charAt(0) === "X") {
+    const wt = state.world.teams.find(function (t) { return t.roster.indexOf(id) !== -1; });
+    return wt ? wt.id : null;
+  }
+  return null;
+}
+// 내 선수 표정: 체력이 낮으면 지침, 아니면 지난주 경기 결과 (이긴 경기가 더 많으면 웃음)
+function myMood() {
+  if (state.stamina < PORTRAIT.tiredStamina) return "tired";
+  const L = state.weekReport && state.weekReport.userLines;
+  if (!L || !L.length) return "normal";
+  const w = L.filter(function (l) { return l.won; }).length;
+  return w * 2 > L.length ? "win" : w * 2 < L.length ? "lose" : "normal";
+}
+
+// ----- 그리기 (32×32, 시안 4 그대로) -----
+function drawPortrait32(g, L, c, mood) {
+  const P = PORTRAIT;
+  const R = function (x, y, w, h, col) { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const sk = P.skins[L.skin].c, H = P.hairColors[L.hairC].c, dark = "#231f2b", M = "#7a3b3b";
+  // 몸·유니폼
+  R(6, 26, 20, 6, c[0]); R(8, 25, 16, 1, c[0]); R(14, 25, 4, 3, c[1]); R(6, 30, 20, 1, c[1]); R(14, 22, 4, 4, sk);
+  // 얼굴
+  const fw = [12, 11, 13][L.face], fx = Math.floor(16 - fw / 2);
+  const face = function () { R(fx, 9, fw, 14, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk); };
+  face();
+  // 머리
+  if (L.hs === 6) { // 아프로: 얼굴 뒤를 감싸고 얼굴을 다시
+    R(fx - 4, 3, fw + 8, 10, H); R(fx - 3, 2, fw + 6, 1, H); R(fx - 5, 5, 1, 10, H); R(fx + fw + 4, 5, 1, 10, H); R(fx - 4, 13, 3, 5, H); R(fx + fw + 1, 13, 3, 5, H);
+    R(fx, 10, fw, 13, sk); R(fx + 1, 9, fw - 2, 1, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk);
+    R(fx - 2, 4, 2, 1, "rgba(255,255,255,.18)"); R(fx + 3, 3, 3, 1, "rgba(255,255,255,.18)");
+  } else [
+    function () { R(fx - 1, 6, fw + 2, 4, H); R(fx - 1, 10, 2, 4, H); R(fx + fw - 1, 10, 2, 4, H); },
+    function () { R(fx - 1, 5, fw + 2, 5, H); R(fx + 2, 10, 4, 2, H); R(fx - 1, 10, 1, 6, H); R(fx + fw, 10, 1, 6, H); },
+    function () { R(fx, 5, fw, 4, H); R(fx - 1, 8, fw + 2, 2, H); R(fx + fw - 4, 10, 4, 1, H); },
+    function () { R(fx - 2, 5, fw + 4, 5, H); R(fx - 2, 10, 2, 10, H); R(fx + fw, 10, 2, 10, H); },
+    function () { R(fx, 6, fw, 3, H); R(fx + 2, 4, 2, 2, H); R(fx + 6, 3, 2, 3, H); R(fx + fw - 3, 4, 2, 2, H); R(fx - 1, 8, fw + 2, 2, H); },
+    function () { R(fx + 1, 7, fw - 2, 2, sk); R(fx + 2, 6, fw - 4, 1, sk); R(fx + 2, 7, 2, 1, "rgba(255,255,255,.55)"); R(fx - 1, 12, 1, 2, H); R(fx + fw, 12, 1, 2, H); },
+  ][L.hs]();
+  // 눈썹·눈
+  const ey = 15, e1 = fx + 2, e2 = fx + fw - 4;
+  if (mood === "lose") { R(e1, 12, 1, 1, H); R(e1 + 1, 13, 1, 1, H); R(e2 + 1, 12, 1, 1, H); R(e2, 13, 1, 1, H); }
+  else { R(e1, 13, 2, 1, H); R(e2, 13, 2, 1, H); }
+  const eye = function (x) {
+    if (mood === "win") { R(x, ey, 1, 1, dark); R(x + 1, ey - 1, 1, 1, dark); }
+    else if (mood === "tired") R(x, ey, 2, 1, dark);
+    else if (L.eyes === 1) { R(x, ey - 1, 2, 2, dark); R(x + 1, ey - 1, 1, 1, "#fff"); }
+    else R(x, ey - 1, 2, 2, dark);
+  };
+  eye(e1); eye(e2);
+  if (L.glasses) { R(e1 - 1, ey - 2, 4, 1, dark); R(e2 - 1, ey - 2, 4, 1, dark); R(e1 + 3, ey - 1, e2 - e1 - 3, 1, dark); }
+  // 입
+  if (mood === "win") { R(14, 19, 4, 1, M); R(15, 20, 2, 1, M); R(fx + 1, 17, 2, 1, "#f29a9a"); R(fx + fw - 3, 17, 2, 1, "#f29a9a"); }
+  else if (mood === "lose") { R(15, 19, 2, 1, M); R(14, 20, 1, 1, M); R(17, 20, 1, 1, M); }
+  else if (mood === "tired") { R(15, 19, 2, 2, M); R(fx + fw + 1, 10, 1, 2, "#7fc8ff"); }
+  else R(15, 20, 2, 1, M);
+  // 헤드셋: 머리띠 + 귀 이어컵(밝은 테두리, 안쪽 팀색) + 마이크
+  if (L.headset) {
+    const k = "#2b2b38", kl = "#6c6c86", top = L.hs === 6 ? 2 : 4;
+    R(fx, top, fw, 1, k); R(fx - 1, top + 1, 1, 1, k); R(fx + fw, top + 1, 1, 1, k); R(fx - 2, top + 2, 1, 12 - top, k); R(fx + fw + 1, top + 2, 1, 12 - top, k);
+    R(fx - 4, 12, 4, 7, k); R(fx - 4, 12, 4, 1, kl); R(fx - 4, 12, 1, 7, kl); R(fx - 3, 14, 2, 3, c[0]);
+    R(fx + fw, 12, 4, 7, k); R(fx + fw, 12, 4, 1, kl); R(fx + fw + 3, 12, 1, 7, kl); R(fx + fw + 1, 14, 2, 3, c[0]);
+    R(fx - 1, 19, 1, 1, k); R(fx, 20, 3, 1, k); R(fx + 3, 20, 1, 1, "#ff3d71");
+  }
+}
+
+// 그림 → data URL (캐시)
+const PF_CACHE = {};
+function portraitURL(look, uni, mood, face) {
+  const key = JSON.stringify([look, uni, mood || "normal", !!face]);
+  if (PF_CACHE[key] !== undefined) return PF_CACHE[key];
+  let url = "";
+  try {
+    const cv = document.createElement("canvas");
+    cv.width = 32; cv.height = 32;
+    const g = cv.getContext && cv.getContext("2d");
+    if (g) {
+      drawPortrait32(g, look, uni, mood || "normal");
+      if (face) { // 얼굴만: 머리~턱 18×18 (표에서 2배 = 36px로 선명하게)
+        const c2 = document.createElement("canvas");
+        c2.width = 18; c2.height = 18;
+        c2.getContext("2d").drawImage(cv, 7, 5, 18, 18, 0, 0, 18, 18);
+        url = c2.toDataURL();
+      } else url = cv.toDataURL();
+    }
+  } catch (e) { url = ""; }
+  PF_CACHE[key] = url;
+  return url;
+}
+function portraitHTMLFrom(look, uni, opts) {
+  opts = opts || {};
+  const url = portraitURL(look, uni, opts.mood, opts.face);
+  if (!url) return "";
+  const size = opts.face ? (opts.size || 36) : 32 * Math.max(1, Math.min(3, opts.scale || 1));
+  const img = '<img class="pf px' + (opts.face ? " pf-face" : "") + '" src="' + url + '" width="' + size + '" height="' + size + '" alt="">';
+  return opts.jump ? '<span class="pf-jump">' + img + "</span>" : img;
+}
+function portraitImg(id, opts) {
+  opts = Object.assign({}, opts);
+  if (id === USER_ID && !opts.mood && !opts.face) opts.mood = myMood();
+  return portraitHTMLFrom(lookOf(id), uniformOfTeam(opts.teamId !== undefined ? opts.teamId : teamIdOfPlayer(id)), opts);
+}
+// 표에 넣는 얼굴 칸
+function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: true, size: 36 }) + "</td>"; }
+
+// ----- 가끔 점프 (크게 보이는 그림만) -----
+(function () {
+  if (typeof setInterval !== "function" || typeof document === "undefined" || !document.querySelectorAll) return;
+  const J = PORTRAIT.jump;
+  setInterval(function () {
+    if (typeof motionOff === "function" && motionOff()) return; // 움직임 끄기 (디자인 D6)
+    let list;
+    try { list = document.querySelectorAll(".pf-jump"); } catch (e) { return; }
+    const now = Date.now();
+    Array.prototype.forEach.call(list, function (el) {
+      if (!el._nj) el._nj = now + 600 + Math.random() * (J.maxGap - J.minGap);
+      if (now < el._nj) return;
+      el.style.setProperty("--jh", (J.minPx + Math.floor(Math.random() * (J.maxPx - J.minPx + 1))) + "px");
+      el.classList.remove("jumping"); void el.offsetWidth; el.classList.add("jumping");
+      el._nj = now + J.minGap + Math.random() * (J.maxGap - J.minGap);
+    });
+  }, 250);
+})();
+
+</script>
+<script>
+const ME = randomLook("me-gs"); ME.skin=1; const UNI = TEAM_UNIFORMS["GEN.G"];
+document.getElementById("dashpf").innerHTML = '<span id="dj">'+portraitHTMLFrom(ME, UNI, {scale:2, mood:"win"})+'</span>';
+function jumpDash(){ const e=document.getElementById("dj"); e.classList.remove("jumping"); void e.offsetWidth; e.classList.add("jumping"); }
+document.getElementById("dj").parentElement.classList.add("pfbox");
+const ROWS=[["입력 정확도",2],["반응속도",1],["라인전",1]];
+function showGS(streak){
+  const el=document.getElementById("gs");
+  el.innerHTML='<div class="gs-flash"></div><div class="gs-box" onclick="event.stopPropagation()"><div class="gs-rays"></div>'+
+   '<div class="gs-title">대성공!</div><div class="gs-sub">🏋️ 솔로 랭크 · 오른 스탯 2배</div>'+
+   '<div class="gs-pf"><span class="jumpy">'+portraitHTMLFrom(ME, UNI, {scale:3, mood:"win"})+'</span><span class="flex">💪</span></div>'+
+   '<div class="gs-rows">'+ROWS.map((r,i)=>'<div class="gs-row" style="animation-delay:'+(0.55+i*0.22)+'s">'+r[0]+' <s>+'+r[1]+'</s> <span class="x2">×2</span><b class="n" data-to="'+(r[1]*2)+'" data-from="'+r[1]+'">+'+r[1]+'</b></div>').join("")+'</div>'+
+   (streak?'<div class="gs-streak">🔥 불타는 손! 2주 연속 대성공 · 다음 주 확률 +3%</div>':'')+
+   '<button class="primary" onclick="hideGS()">좋아! ▶</button></div>';
+  el.hidden=false;
+  ROWS.forEach((r,i)=>setTimeout(()=>{const n=el.querySelectorAll(".gs-row b.n")[i]; let v=r[1]; const t=setInterval(()=>{v++; n.textContent="+"+v; n.style.transform="scale(1.35)"; setTimeout(()=>n.style.transform="",120); if(v>=r[1]*2) clearInterval(t);},160);}, 900+i*220));
+  setTimeout(()=>sparks(el.querySelector(".gs-box"),34),350);
+}
+function sparks(box,n){ for(let i=0;i<n;i++){const s=document.createElement("i");s.className="spark";const a=Math.random()*Math.PI*2,d=90+Math.random()*160;s.style.setProperty("--dx",Math.cos(a)*d+"px");s.style.setProperty("--dy",Math.sin(a)*d+"px");s.style.background=["#ffd23f","#fff3c4","#ff9f1c","#2bff9e"][i%4];box.appendChild(s);setTimeout(()=>s.remove(),1200);} }
+function hideGS(){ const el=document.getElementById("gs"); el.hidden=true; el.innerHTML=""; }
+setTimeout(()=>showGS(false),400);
+</script>
+
+</body>
+</html>

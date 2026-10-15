@@ -174,7 +174,7 @@ function weekReportHTML() {
   // 훈련 + 솔로 랭크
   const t = r.training;
   html += '<div class="rep-row"><span class="rep-tag train">훈련</span><b>' + escapeHTML(t.name) + "</b> · " + escapeHTML(t.message) +
-    ' <span class="log-changes">' + changesText(t.changes) + "</span></div>";
+    ' <span class="log-changes' + (r.great ? " gs-chips" : "") + '">' + changesText(t.changes) + "</span></div>" + greatReportRowHTML(r); // 훈련 대성공 (js/great.js)
   (r.questLines || []).forEach(function (q) {
     html += '<div class="rep-row"><span class="rep-tag rank">퀘스트</span>' + escapeHTML(q) + "</div>";
   });
@@ -193,7 +193,7 @@ function weekReportHTML() {
   if (r.news.length) html += reportNewsHTML(r.news);
 
   const newsBtn = r.headlines && r.headlines.length ? '<button class="news-btn" data-news-open="1" title="이번 주 대회 결과 뉴스 다시 보기">📰 NEWS ' + r.headlines.length + "</button>" : "";
-  return '<div class="card report"><h2>📅 지난주 결과 <span class="muted small">' + escapeHTML(r.when) + "</span>" + newsBtn + "</h2>" + html + "</div>";
+  return '<div class="card report' + (r.great ? " gs-on" : "") + '">' + (r.great ? '<span class="gs-stamp">대성공</span>' : "") + '<h2>📅 지난주 결과 <span class="muted small">' + escapeHTML(r.when) + "</span>" + newsBtn + "</h2>" + html + "</div>";
 }
 
 // 지난주 결과의 소식: 한 줄에 하나씩, 나·우리 팀 소식만 바로 보이고 나머지는 접어 둠

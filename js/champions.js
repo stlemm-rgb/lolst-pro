@@ -162,7 +162,7 @@ function masteryGrowthMultiplier(champName) {
 // 챔피언 연습: 숙련도 올리기. 바뀐 값을 { 이름: +n } 으로 돌려줌
 // - 특정 챔피언을 골랐으면 그 챔피언만 크게
 // - "자동"이면 내 포지션의 메타 챔피언 중 숙련도 낮은 순으로 3명에게 나눠서
-function practiceChampions(range, tired) {
+function practiceChampions(range, tired, mult) {
   let targets, share;
   if (state.practiceChamp && state.mastery[state.practiceChamp] !== undefined) {
     targets = [state.practiceChamp];
@@ -180,6 +180,7 @@ function practiceChampions(range, tired) {
     // 숙련도가 높을수록 조금씩 덜 오름
     let gain = randInt(range[0], range[1]) * share * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
     if (tired) gain *= 0.5;
+    if (mult) gain *= mult; // 훈련 대성공 (js/great.js)
     gain = roundRandom(gain);
     state.mastery[name] = Math.min(MASTERY.max, now + gain);
     result[name] = state.mastery[name] - now;

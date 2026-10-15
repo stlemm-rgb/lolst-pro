@@ -1314,3 +1314,54 @@ table.standings th, table.standings td { white-space: nowrap; }
   .rp-tm .pf { width: 32px; height: 32px; }
   .rp-nm { font-size: 13px; overflow-wrap: anywhere; }
 }
+
+/* ===== 훈련 대성공 (182, js/great.js, 시안 9) ===== */
+#gs-overlay { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; background: rgba(0, 0, 0, 0.72); padding: 16px; }
+#gs-overlay[hidden] { display: none; }
+.gs-flash { position: fixed; inset: 0; background: radial-gradient(circle, rgba(var(--gold-rgb), 0.55), transparent 60%); animation: gsFlash 0.7s ease-out forwards; pointer-events: none; }
+@keyframes gsFlash { from { opacity: 1; transform: scale(0.6); } to { opacity: 0; transform: scale(1.6); } }
+.gs-box { position: relative; width: min(420px, 100%); border-radius: 22px; padding: 22px 22px 18px; text-align: center; overflow: hidden; cursor: default;
+  background: radial-gradient(circle at 50% 0%, rgba(var(--gold-rgb), 0.28), transparent 60%), linear-gradient(180deg, #1d1a10, #11111c); border: 2px solid rgba(var(--gold-rgb), 0.8);
+  box-shadow: 0 0 0 1px rgba(var(--gold-rgb), 0.3), 0 0 60px rgba(var(--gold-rgb), 0.35); animation: gsIn 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
+@keyframes gsIn { from { transform: scale(0.5) rotate(-4deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.gs-rays { position: absolute; left: 50%; top: 120px; width: 620px; height: 620px; margin: -310px 0 0 -310px; background: repeating-conic-gradient(rgba(var(--gold-rgb), 0.12) 0 10deg, transparent 10deg 24deg); animation: gsSpin 14s linear infinite; pointer-events: none; }
+@keyframes gsSpin { to { transform: rotate(360deg); } }
+.gs-title { position: relative; font-size: 40px; font-weight: 900; letter-spacing: 2px; background: linear-gradient(90deg, #fff3c4, #ffd23f 40%, #ff9f1c 60%, #fff3c4); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gsShine 1.6s linear infinite; filter: drop-shadow(0 2px 10px rgba(255, 160, 30, 0.5)); }
+@keyframes gsShine { to { background-position: -200% 0; } }
+.gs-sub { position: relative; color: #e9dcb0; font-size: 13px; margin-top: 2px; }
+.gs-pf { position: relative; display: flex; justify-content: center; margin: 12px 0 6px; }
+.gs-jumpy { display: inline-block; animation: gsJump 0.7s ease-out 0.25s 2; }
+@keyframes gsJump { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(-22px); } 60% { transform: translateY(0); } 75% { transform: translateY(-6px); } }
+.gs-flex { position: absolute; right: calc(50% - 76px); top: 6px; font-size: 26px; animation: gsPop 0.4s 0.6s both; }
+@keyframes gsPop { from { transform: scale(0); } 70% { transform: scale(1.4); } to { transform: scale(1); } }
+.gs-rows { position: relative; display: grid; gap: 6px; margin: 8px 0 12px; text-align: left; }
+.gs-row { display: flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(var(--gold-rgb), 0.25); border-radius: 10px; padding: 7px 12px; font-size: 14px; opacity: 0; animation: gsRow 0.35s ease-out forwards; }
+@keyframes gsRow { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+.gs-row b.n { margin-left: auto; font-size: 20px; color: var(--good); font-variant-numeric: tabular-nums; }
+.gs-row b.n.bump { animation: gsBump 0.15s ease-out; }
+@keyframes gsBump { 50% { transform: scale(1.35); } }
+.gs-row .x2 { font-size: 11px; font-weight: bold; color: #1a1405; background: var(--gold); border-radius: 999px; padding: 1px 7px; }
+.gs-row s { color: var(--muted); font-size: 12px; }
+.gs-streak { position: relative; margin: 0 0 12px; padding: 8px 10px; border-radius: 12px; font-size: 13px; font-weight: bold; color: #fff; background: linear-gradient(90deg, #ff3d00, #ff9f1c); box-shadow: 0 0 20px rgba(255, 90, 0, 0.5); animation: gsPop 0.4s 1.4s both; }
+.gs-spark { position: absolute; left: 50%; top: 40%; width: 7px; height: 7px; border-radius: 2px; pointer-events: none; animation: gsSparkFly 1.1s ease-out forwards; }
+@keyframes gsSparkFly { to { transform: translate(var(--dx), var(--dy)) rotate(400deg); opacity: 0; } }
+.no-motion .gs-row, .no-motion .gs-streak, .no-motion .gs-flex { opacity: 1; }
+.no-motion .gs-flash, .no-motion .gs-rays { display: none; }
+/* 대시보드 지난주 결과: 도장 · 반짝이는 칩 · 포트레잇 크게 점프 */
+.card.report.gs-on { position: relative; overflow: hidden; border-color: rgba(var(--gold-rgb), 0.45); }
+.gs-stamp { position: absolute; right: 14px; top: 10px; transform: rotate(-12deg); border: 3px solid var(--gold); color: var(--gold); font-weight: 900; font-size: 17px; padding: 1px 10px; border-radius: 8px; letter-spacing: 2px; box-shadow: 0 0 18px rgba(var(--gold-rgb), 0.35), inset 0 0 12px rgba(var(--gold-rgb), 0.25); background: rgba(var(--gold-rgb), 0.06); pointer-events: none; z-index: 1; }
+.card.report.gs-on h2 { padding-right: 96px; }
+.log-changes.gs-chips { position: relative; display: inline-block; overflow: hidden; color: var(--gold); border-radius: 6px; padding: 0 4px; box-shadow: inset 0 0 0 1px rgba(var(--gold-rgb), 0.45); }
+.log-changes.gs-chips::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%); transform: translateX(-100%); animation: gsSweep 2.4s ease-in-out infinite; }
+@keyframes gsSweep { 60%, 100% { transform: translateX(100%); } }
+.rep-tag.gs { background: linear-gradient(90deg, #ffd23f, #ff9f1c); color: #1a1405; font-weight: bold; }
+.gs-bigjump { display: inline-block; animation: gsJump 0.8s ease-out 2; }
+/* 불타는 손 · 확률 칩 */
+.fire-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: var(--r-s); color: #fff; background: linear-gradient(90deg, #ff3d00, #ff9f1c); box-shadow: 0 0 14px rgba(255, 90, 0, 0.45); animation: gsFlick 1.2s ease-in-out infinite; white-space: nowrap; }
+.fire-badge.small { font-size: 11px; padding: 1px 7px; }
+@keyframes gsFlick { 50% { box-shadow: 0 0 22px rgba(255, 140, 0, 0.75); } }
+.gsc { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 10px; border-radius: 999px; border: 1px solid rgba(var(--gold-rgb), 0.5); color: var(--gold); background: rgba(var(--gold-rgb), 0.07); white-space: nowrap; }
+.gsc-bar { width: 50px; height: 5px; border-radius: 9px; background: #2a2a40; overflow: hidden; display: inline-block; }
+.gsc-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ffd23f, #ff9f1c); }
+.tc-great { margin: 4px 0 2px; }
+.gs-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
