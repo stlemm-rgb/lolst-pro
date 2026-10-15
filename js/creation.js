@@ -133,9 +133,7 @@ function teamStarCount(def) {
   return Math.max(1, Math.min(5, Math.round(3 + 2 * (def.shift || 0) / max)));
 }
 
-function starsText(n) {
-  return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n);
-}
+// 별 표시 starsText(n)는 js/retire.js 것을 같이 씀 (예전엔 여기에도 같은 이름이 있어 retire.js 것이 덮어썼음, R1)
 
 // 같은 리그 안에서 예상 순위 구간
 function teamRankText(def) {

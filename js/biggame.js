@@ -5,7 +5,6 @@
 
 // 두 구단이 고정 라이벌이면 그 빅게임 (해외 팀·없는 팀이면 null)
 function bigGameOf(x, y) {
-  if (typeof BIG_GAMES === "undefined") return null;
   const a = findTeam(x), b = findTeam(y);
   if (!a || !b) return null;
   return BIG_GAMES.find(function (g) { return (g.a === a.short && g.b === b.short) || (g.a === b.short && g.b === a.short); }) || null;

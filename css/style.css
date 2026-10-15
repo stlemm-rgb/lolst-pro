@@ -261,7 +261,6 @@ button.danger:hover:not(:disabled) { border-color: var(--bad); background: linea
 }
 
 /* 프로필 */
-.profile-name { font-size: 20px; font-weight: bold; margin: 0 0 4px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip {
   padding: 4px 10px;
@@ -308,7 +307,6 @@ button.danger:hover:not(:disabled) { border-color: var(--bad); background: linea
 .pm { display: flex; gap: 4px; }
 .pm button { padding: 2px 10px; }
 
-.start-card .buttons { justify-content: flex-start; }
 
 /* 생성 화면: 왼쪽 선택 + 오른쪽 선수 카드 (2026-10-07 리뉴얼) */
 .creation-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 12px; }
@@ -439,7 +437,6 @@ table.ladder-board th { text-align: left; padding: 7px 8px; }
 table.ladder-board th.r { text-align: right; }
 table.ladder-board tr.gap td { color: var(--muted); text-align: center; padding: 2px; }
 .my-team { color: var(--accent); }
-.big-vs { font-size: 18px; font-weight: bold; margin: 6px 0; }
 table td.r, table th.r { text-align: right; }
 table td.c { text-align: center; }
 
@@ -491,7 +488,6 @@ tr.sel { outline: 1px solid var(--accent); }
 .club { border: 1px solid var(--border); border-radius: var(--r-s); padding: 10px 14px; margin-bottom: 8px; background: var(--panel-2); }
 .club.mine { border-color: var(--accent); }
 .club-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; cursor: pointer; }
-.club-rank { color: var(--muted); width: 20px; }
 .club-name { font-weight: bold; flex: 1; min-width: 160px; }
 .club-lineup { margin-top: 4px; }
 .club-roster { margin-top: 8px; }
@@ -603,11 +599,6 @@ td.pf-cell { width: 44px; padding-top: 3px; padding-bottom: 3px; padding-right: 
 
 /* ===== 경기 상세 ===== */
 .detail-mark { color: var(--accent); margin-left: 4px; }
-tr.detail-row > td { background: rgba(0, 0, 0, 0.2); padding: 12px; }
-.rep-detail { margin: 6px 0 12px; padding: 12px; background: rgba(0, 0, 0, 0.2); border-radius: var(--r-s); }
-.match-detail .md-head { margin-bottom: 10px; }
-.set-card { border: 1px solid var(--border); border-radius: var(--r-s); padding: 10px 12px; margin-bottom: 10px; }
-.set-head { margin-bottom: 6px; }
 table.lane-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 6px; }
 table.lane-table td, table.lane-table th { padding: 4px 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
 table.lane-table th { color: var(--muted, #8b95a7); font-weight: normal; text-align: left; }
@@ -628,8 +619,6 @@ table.ev-table td:last-child { width: 72px; white-space: nowrap; }
 ul.ev-key { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.7; }
 ul.focus-note { list-style: none; padding-left: 0; margin: 4px 0 8px; }
 .ev-call { font-size: 12px; font-style: italic; color: var(--gold); margin-top: 2px; }
-.md-ratings { margin-top: 8px; }
-.md-ratings h3 { margin: 0 0 4px; }
 
 /* 상단바 체력 · 조커픽 */
 .stamina-badge { display: inline-block; padding: 6px 12px; border: 1px solid var(--border); border-radius: var(--r-xs); font-size: 14px; white-space: nowrap; }
@@ -730,7 +719,6 @@ details.log-card[open] summary { margin-bottom: 12px; }
 /* 초보자 도움: 처음 안내 · 지금 목표 · 이번 주 추천 (js/guide.js) */
 .card.tutorial { border-color: #22c55e; background: rgba(var(--good-rgb), 0.06); }
 .card.tutorial h2 { display: flex; align-items: center; gap: 8px; }
-.tut-off { margin-left: auto; }
 .tut-steps { margin: 0; padding-left: 4px; list-style: none; }
 .tut-steps li { padding: 4px 0; color: var(--muted); }
 .tut-steps li.done { text-decoration: line-through; text-decoration-color: rgba(255,255,255,0.2); }
@@ -949,8 +937,6 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .sig-stars { font-size: 26px; color: var(--gold); letter-spacing: 2px; margin: 4px 0 8px; }
 .sig-tag, .skin-tag { border-color: var(--gold); color: var(--gold); }
 .skin-list { display: flex; flex-wrap: wrap; gap: 10px; }
-.skin-choice { cursor: pointer; color: inherit; font: inherit; }
-.skin-choice:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(var(--gold-rgb), 0.35); }
 .skin-pick { border-color: var(--gold); margin-bottom: 14px; }
 .skin-card { min-width: 120px; padding: 10px 12px; border-radius: var(--r); border: 1px solid var(--gold); background: linear-gradient(160deg, rgba(var(--gold-rgb), 0.18), rgba(var(--gold-rgb), 0.03)); text-align: center; }
 .skin-year { font-size: 12px; color: var(--gold); font-weight: bold; }

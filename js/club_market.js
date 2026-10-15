@@ -247,7 +247,7 @@ function logTransfer(e) {
   const L = state.league;
   if (!L.transferLog) L.transferLog = [];
   e.y = state.year; e.w = state.week;
-  if (!e.origin && typeof originOf === "function") { const p = findPlayer(e.id); e.origin = (p && originOf(p)) || HOME_ORIGIN.id; } // 출신 리그 (v1.1)
+  if (!e.origin) { const p = findPlayer(e.id); e.origin = (p && originOf(p)) || HOME_ORIGIN.id; } // 출신 리그 (v1.1)
   L.transferLog.push(e);
   const from = state.year - CLUB_MARKET.logYears + 1;
   L.transferLog = L.transferLog.filter(function (x) { return x.y >= from; });

@@ -25,7 +25,7 @@ function shopEffectList() {
   });
   SHOP_STAFF.forEach(function (st) { if ((s.staff || {})[st.id]) list.push(st.effects); });
   SHOP_FAME.forEach(function (f) { if (f.once && (s.fame || {})[f.id]) list.push(f.effects); });
-  if (typeof housingEffects === "function") housingEffects().forEach(function (e) { list.push(e); }); // 거주지 (js/housing.js)
+  housingEffects().forEach(function (e) { list.push(e); }); // 거주지 (js/housing.js)
   return list;
 }
 

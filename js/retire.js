@@ -178,7 +178,7 @@ function careerSummary(includeCurrent) {
   (c.awards || []).forEach(function (a) { points += P[awardKeyOf(a.title)] || 0; });
   points += Math.max(0, Math.round(peak - P.peakFrom)) + sum.tier1Seasons * P.tier1Season;
   // 인성 점수 (커리어 평균 평판, js/fame.js) · 올스타 선정
-  const repPoints = typeof reputationPoints === "function" ? reputationPoints() : 0;
+  const repPoints = reputationPoints();
   const allstars = c.allstars || 0;
   points += repPoints + allstars * (P.allstar || 0);
   const grade = CAREER.grades.find(function (g) { return points >= g.min; }) || CAREER.grades[CAREER.grades.length - 1]; // 평판이 나빠 점수가 0 아래여도 '평범' (v1.1 버그 수정: 매주 멈추던 문제)
@@ -193,7 +193,7 @@ function careerSummary(includeCurrent) {
     sets: sum.sets, setWins: sum.setWins, rating: sum.sets ? sum.ratingSum / sum.sets : 0,
     pog: sum.pog, solo: sum.solo, tier1Seasons: sum.tier1Seasons,
     earned: c.earned || 0, soloPeak: state.soloRank ? state.soloRank.peak : 0,
-    repPoints: repPoints, avgRep: Math.round(typeof careerAvgReputation === "function" ? careerAvgReputation() : state.reputation), allstars: allstars,
+    repPoints: repPoints, avgRep: Math.round(careerAvgReputation()), allstars: allstars,
     peakFame: state.fame ? FAME.tiers[state.fame.best || 0].name : "",
     points: points, grade: grade.name, stars: grade.stars, gradeText: grade.text,
   };
@@ -208,7 +208,7 @@ function finishCareer(reason, includeCurrent) {
   s.retiredAt = state.year + "년 " + state.week + "주차";
   addMoment("🎤", s.age + "세, 은퇴 (" + RETIRE_REASONS[reason] + ")");
   s.moments = state.career.moments.slice();
-  s.romance = typeof romanceEndingLine === "function" ? romanceEndingLine() : ""; // 연애 중이면 엔딩에 한 줄 (js/romance.js)
+  s.romance = romanceEndingLine(); // 연애 중이면 엔딩에 한 줄 (js/romance.js)
   state.retired = s;
   state.retirePlanned = false;
   addToHallOfFame(s);

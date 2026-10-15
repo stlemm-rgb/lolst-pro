@@ -123,7 +123,7 @@ function shakeupNews() {
   mine = mine.replace("{me}", state.player.name).replace("{pos}", posName(myPos));
 
   addNews("대격변 패치", "🌋 " + state.year + "년 대격변 패치! 리워크: " + pend.reworks.join(", ") + " · 포지션 변경: " + movesText + " · " + item.name + " (" + item.desc + ") · 올해 메타 챔피언 포지션마다 " + SHAKEUP.metaWide.perPosition + "명 (S급 " + SHAKEUP.metaWide.sCount + "명). 리워크 챔피언 숙련도 −" + Math.round((1 - SHAKEUP.rework.keep) * 100) + "%, 나머지 챔피언도 숙련도 " + SHAKEUP.masteryCut.from + " 이상이면 −" + Math.round((1 - SHAKEUP.masteryCut.keep) * 100) + "%.");
-  if (typeof addMoment === "function") addMoment("🌋", state.year + "년 대격변 패치 (" + item.name + ")");
+  addMoment("🌋", state.year + "년 대격변 패치 (" + item.name + ")");
 
   const r = state.weekReport;
   if (!r) return;

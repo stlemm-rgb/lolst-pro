@@ -104,7 +104,7 @@ function traitPowerMult(traits, teamId, setCtx) {
   if (setCtx.deciding) mult *= 1 + traitSumOf(traits, "clutch");                      // 클러치
   if (setCtx.behind === teamId) mult *= 1 + traitSumOf(traits, "comeback");           // 역전의 명수
   const vs = traitSumOf(traits, "vsUser");                                             // ⚔️ 숙명의 라이벌: 내 팀과 경기할 때
-  if (vs && setCtx.match && typeof myTeam === "function" && myTeam()) {
+  if (vs && setCtx.match && myTeam()) {
     const mine = myTeam().id;
     if (teamId !== mine && (setCtx.match.a === mine || setCtx.match.b === mine)) mult *= 1 + vs;
   }
@@ -168,7 +168,7 @@ function lineup(teamId, userCtx, setCtx) {
   setCtx = setCtx || {};
   const overseas = findOverseas(teamId);
   const scout = scoutedMult(teamId); // 🔍 지난 시즌 월드 우승 팀: 상대가 연구해서 경기력 − (js/dynasty.js)
-  const wt = overseas && typeof findWorldTeam === "function" ? findWorldTeam(teamId) : null; // v1.1: 해외 리그 팀은 실제 선수 5명으로
+  const wt = overseas ? findWorldTeam(teamId) : null; // v1.1: 해외 리그 팀은 실제 선수 5명으로
   if (overseas && !wt) {
     return POSITION_IDS.map(function (pos) {
       return { pos: pos, id: null, power: overseas.power * randFloat(0.85, 1.15) * scout };
@@ -243,7 +243,7 @@ function playSet(a, b, userCtx, setCtx) {
   // 경기 흐름: 스틸·슈퍼플레이·실수·심리 사건이 점수를 흔듦 (js/match_events.js) + 남은 작은 운
   const series = setCtx.series || newSeriesMood();
   // 장인: 숙련도 1위 챔피언을 골랐는지 (특성 사건 효과)
-  if (userCtx && typeof signatureBonus === "function" && signatureBonus(userCtx.pick) > 0) {
+  if (userCtx && signatureBonus(userCtx.pick) > 0) {
     la.concat(lb).forEach(function (p) { if (p.id === USER_ID) p.sig = true; });
   }
   const ev = rollSetEvents(la, lb, a, b, laneResults, series, {
@@ -461,11 +461,6 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
     changes: changes,
     match: true,
   });
-}
-
-// 한 경기 결과를 짧은 글로 (예: "BLZ 2:1 IWF")
-function matchLine(m) {
-  return teamShort(m.a) + " " + m.score[0] + ":" + m.score[1] + " " + teamShort(m.b);
 }
 
 // ----- 주차별 진행 -----

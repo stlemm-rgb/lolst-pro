@@ -20,8 +20,8 @@ files.forEach(function (f) {
     else seen[name] = f;
   }
 });
-// 정리(R1) 전까지 알려진 겹침 (둘 다 같은 일을 해서 화면은 그대로) — R1에서 없앰
-const KNOWN = ["starsText"];
+// 알려진 겹침 (일부러 둔 것만): 없음 (R1에서 starsText 정리)
+const KNOWN = [];
 const real = dup.filter(function (d) { return KNOWN.indexOf(d.split(":")[0]) === -1; });
 console.log("이름 " + Object.keys(seen).length + "개 검사 · 겹침 " + dup.length + "개" + (dup.length ? " (" + dup.join(" / ") + ")" : ""));
 if (real.length) { console.log("❌ 새 이름 겹침: " + real.join(" / ")); process.exit(1); }

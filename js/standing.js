@@ -44,7 +44,7 @@ function standingParts() {
   }
   parts.form = form;
   parts.tenure = Math.min(R.tenure.max, Math.max(0, state.year - S.since) * R.tenure.perSeason);
-  parts.romance = typeof romanceStandingPenalty === "function" ? romanceStandingPenalty() : 0; // 사내 연애 공개 (js/romance.js)
+  parts.romance = romanceStandingPenalty(); // 사내 연애 공개 (js/romance.js)
   parts.captain = 0;
   if (S.captain) {
     const C = R.captain;

@@ -167,7 +167,7 @@ function compPlanHTML() {
   const meta = findComp(metaComp());
   const plan = state.compPlan || "auto";
   const counters = countersOf(meta.id).map(function (id) { return compChipHTML(id); }).join(" ");
-  const rec = typeof scoutBestPlan === "function" ? scoutBestPlan() : null; // 분석 리포트 추천 (js/staff.js)
+  const rec = scoutBestPlan(); // 분석 리포트 추천 (js/staff.js)
   const buttons = COMP_PLANS.map(function (p) {
     const cls = (plan === p.id ? "on" : "") + (rec === p.id ? " rec" : "");
     return '<button data-compplan="' + p.id + '"' + (cls ? ' class="' + cls.trim() + '"' : "") + ' title="' + escapeHTML(p.desc) + '">' + p.name +

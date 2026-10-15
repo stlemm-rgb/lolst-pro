@@ -206,7 +206,7 @@ function makeOffer(teamId, renewal) {
     salary = Math.round(salary * (1 + clubPct) / 1000000) * 1000000;
   }
   let standing = null;
-  if (renewal && teamId === (myTeam() && myTeam().id) && typeof standingSalaryPct === "function") { // 팀 내 입지 (js/standing.js)
+  if (renewal && teamId === (myTeam() && myTeam().id)) { // 팀 내 입지 (js/standing.js)
     standing = { pct: standingSalaryPct(), name: standingGrade().name, icon: standingGrade().icon };
     salary = Math.round(salary * (1 + standing.pct) / 1000000) * 1000000;
   }
@@ -392,7 +392,7 @@ function requestTransfer(teamId) {
 function releaseToFA(id) {
   const p = findPlayer(id);
   const team = p.teamId && findTeam(p.teamId);
-  if (typeof noteFriendLeaving === "function") noteFriendLeaving(id, team, null); // 친한 동료 작별 (js/stories.js)
+  noteFriendLeaving(id, team, null); // 친한 동료 작별 (js/stories.js)
   if (team) team.roster.splice(team.roster.indexOf(id), 1);
   p.teamId = null;
   if (state.league.freeAgents.indexOf(id) === -1) state.league.freeAgents.push(id);

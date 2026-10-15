@@ -276,11 +276,6 @@ function staffEffectText(role, g) {
 }
 
 // ----- 화면 -----
-function staffLineText(teamId) {
-  const s = teamStaff(teamId);
-  if (!s) return "";
-  return STAFF_ROLES.map(function (r) { return r.icon + gradeTag(s[r.id].g); }).join(" ");
-}
 function staffPlainText(teamId) {
   const s = teamStaff(teamId);
   if (!s) return "";

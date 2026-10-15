@@ -127,7 +127,7 @@ function makeWorldPlayer(pos, avg, ageRange, origin) {
   W.seq = (W.seq || 0) + 1;
   const p = { id: "X" + W.seq, name: worldNick(), pos: pos, age: randInt(ageRange[0], ageRange[1]), stats: stats, traits: randomNpcTraits(), style: pickStyle(pos), origin: origin || null };
   applyStyle(p);
-  shapeNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (js/league.js)
+  spreadNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (js/league.js)
   npcMasteryInit(p); // 챔피언 숙련도 (국제대회에서 국내 선수와 같은 밴픽·숙련도 규칙, v1.1)
   W.players[p.id] = p;
   return p;

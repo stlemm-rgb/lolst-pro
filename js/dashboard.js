@@ -359,19 +359,6 @@ function homeLineHTML() {
   return '<div class="sum-sub home-line muted">' + h.icon + " " + h.name + (conditionCap() < 100 ? " · 컨디션 최대 " + conditionCap() : "") + "</div>";
 }
 
-// ----- 오른쪽: 프로필 (이름·나이·포지션·유형·특성) -----
-function profileCardHTML() {
-  const p = state.player;
-  const traits = p.traits.map(traitChipHTML).join("") || '<span class="muted">없음</span>';
-  return (
-    '<div class="card profile-card"><div class="profile-top"><span class="pf-frame">' + portraitImg(USER_ID, { scale: 3, jump: true }) + "</span><div>" + // 도트 포트레잇 (js/portrait.js)
-      "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + p.age + "세 · " + findPosition(p.position).name + " · " + findArchetype(p.archetype).name + "</span></h2>" +
-      '<div class="chips">' + traits + "</div></div></div>" +
-      goalLineHTML() + // 🎯 지금 목표 (js/guide.js)
-    "</div>"
-  );
-}
-
 // ----- 오른쪽: 챔피언 (이번 패치 메타 + 내 숙련도 상위 5) -----
 function championCardHTML() {
   const myPos = state.player.position;
@@ -618,7 +605,7 @@ function heroCardHTML() {
 function matchCardHTML(m, mine, opp, big) {
   const ua = uniformOfTeam(mine.id), ub = uniformOfTeam(opp);
   const pa = teamStrength(mine.id), pb = strengthOf(opp);
-  const wt = typeof findWorldTeam === "function" ? findWorldTeam(opp) : null;
+  const wt = findWorldTeam(opp);
   const os = wt ? worldStarters(wt) : findTeam(opp) ? starters(opp) : null;
   const mate = os && os[state.player.position];
   const sw = function (u) { return '<span class="uni-sw"><i style="background:' + u[0] + '"></i><i style="background:' + u[1] + '"></i></span>'; };

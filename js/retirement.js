@@ -9,7 +9,7 @@
 function addVeterans() {
   const V = LEAGUE.veterans;
   if (!V) return;
-  const named = (typeof NAMED_PLAYERS !== "undefined" ? NAMED_PLAYERS : []).map(function (n) { return n.name; });
+  const named = NAMED_PLAYERS.map(function (n) { return n.name; });
   state.league.teams.forEach(function (t) {
     if (Math.random() >= V.chancePerTeam) return;
     const pool = t.roster.filter(function (id) { const p = state.league.players[id]; return id !== USER_ID && p && named.indexOf(p.name) === -1; });
@@ -66,12 +66,12 @@ function metaRetire() {
   const team = findTeam(p.teamId);
   const score = playerScore(p.id).toFixed(1); // 은퇴 처리(선수 삭제) 전에 기록
   const ctx = { player: p.name + "(" + score + ")", pteam: team ? team.name : "FA", pos: findPosition(p.pos).name, age: p.age }; // 이름(종합 능력) 예: Jar(77.2)
-  const ints = typeof META_RETIRE_INTERVIEWS !== "undefined" ? META_RETIRE_INTERVIEWS : [];
+  const ints = META_RETIRE_INTERVIEWS;
   ctx.interview = ints.length ? fillText(pick(ints), ctx) : "요즘 메타를 따라가기가 너무 힘들어요. 여기까지인 것 같습니다.";
   p.retireTag = "meta";
   retirePlayer(p); // 자리는 신인이 채움 (js/league.js)
   addNews("은퇴", ctx.pteam + "의 " + ctx.pos + " " + p.name + "(" + score + ", " + ctx.age + "세)이(가) 개인 방송에서 은퇴를 발표했다. \"" + ctx.interview + "\"");
-  if (typeof NEWS_ARTICLES !== "undefined" && NEWS_ARTICLES.meta_retire) queueHeadline("meta_retire", "any", ctx);
+  if (NEWS_ARTICLES.meta_retire) queueHeadline("meta_retire", "any", ctx);
 }
 
 // ----- 4) 은퇴 상담 -----
@@ -119,7 +119,7 @@ function coachJoin(p) {
   const old = F.coach;
   F.coach = { pid: p.id, name: p.name, pos: p.pos, teamId: p.coachFor, since: state.year, role: "코치" };
   const ctx = { player: p.name, pteam: teamName(p.coachFor), pos: findPosition(p.pos).name, old: old ? old.name : "" };
-  const S = typeof COACH_STORIES !== "undefined" ? COACH_STORIES : {};
+  const S = COACH_STORIES;
   postMessage("news", "🧑‍🏫 " + p.name + ", " + ctx.pteam + " 코치로", fillText(S.join && S.join.length ? pick(S.join) : "{player}이(가) 선수 생활을 마치고 {pteam} 코치로 새 출발을 했다.", ctx),
     { notes: ["우리 팀에 있는 동안 내 훈련 효과 +" + Math.round(RETIRE_RULES.coach.trainingBonus * 100) + "%", RETIRE_RULES.coach.toManagerYears + "년 뒤 감독이 될 수 있어요"].concat(old ? [old.name + " 코치는 다른 길을 찾아 떠났다"] : []) });
   addMoment("🧑‍🏫", p.name + " 코치 합류");
@@ -132,7 +132,7 @@ function coachWeekly() {
   c.role = "감독";
   c.managerSince = state.year;
   const ctx = { player: c.name, pteam: teamName(c.teamId) };
-  const S = typeof COACH_STORIES !== "undefined" ? COACH_STORIES : {};
+  const S = COACH_STORIES;
   postMessage("news", "📋 " + c.name + " 코치, " + ctx.pteam + " 감독으로", fillText(S.promote && S.promote.length ? pick(S.promote) : "{player} 코치가 {pteam}의 새 감독이 됐다.", ctx),
     { notes: ["우리 팀에 있는 동안 감독 신뢰 +" + RETIRE_RULES.coach.managerTrust + " (주전 경쟁에서 유리)"] });
   addMoment("📋", c.name + " 감독 취임");

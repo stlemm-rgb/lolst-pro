@@ -7,7 +7,7 @@ let RP = null; // 재생 상태 (화면에서만, 저장 안 함)
 function replayAutoSetting() { return (state.settings && state.settings.replayAuto) || REPLAY_RULES.defaultAuto; }
 function replaySpeedSetting() { const s = state.settings && state.settings.replaySpeed; return REPLAY_RULES.speeds.indexOf(s) !== -1 ? s : REPLAY_RULES.defaultSpeed; }
 function isReplayBig(m) {
-  return m.label.indexOf("결승") !== -1 || (typeof bigGameOf === "function" && !!bigGameOf(m.a, m.b));
+  return m.label.indexOf("결승") !== -1 || !!bigGameOf(m.a, m.b);
 }
 
 function afterWeekReplay() {
@@ -230,7 +230,7 @@ function replayFinal() {
   if (won) replayConfetti(uniformOfTeam(m.winner));
 }
 function replayIntroHTML(m) {
-  const big = typeof bigGameOf === "function" ? bigGameOf(m.a, m.b) : null;
+  const big = bigGameOf(m.a, m.b);
   return '<span class="rp-tag">' + (big ? "🔥 " + escapeHTML(big.name) : "🏆 " + escapeHTML(m.label)) + '</span><div class="rp-vs"><span>' + rpUni(uniformOfTeam(m.a)) + " " + escapeHTML(teamName(m.a)) +
     '</span><span class="rp-vsx">VS</span><span>' + escapeHTML(teamName(m.b)) + " " + rpUni(uniformOfTeam(m.b)) + '</span></div><div class="muted">' + escapeHTML(m.label) + " · " + m.bo + "판 " + Math.ceil(m.bo / 2) + '선승</div><button class="primary" data-rpnext="1">경기 시작 ▶</button>';
 }

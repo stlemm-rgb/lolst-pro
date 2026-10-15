@@ -34,7 +34,7 @@ function repHoldLeft() {
 }
 
 // 감독 신뢰: 2군행 판정에서 경쟁 선수와 점수 차이에 더하는 값
-function managerTrust() { return repTier().trust + (typeof coachTrust === "function" ? coachTrust() : 0); } // + 친구 감독 (js/retirement.js)
+function managerTrust() { return repTier().trust + coachTrust(); } // + 친구 감독 (js/retirement.js)
 
 // 인기도 기준 팬 수 (예전 공식, 팬 수의 바닥값). pop을 주면 그 인기도 기준
 function baseFans(pop) {
@@ -92,7 +92,6 @@ function peopleText(n) {
 }
 // 팬 1,000만·5,000만·1억 돌파 → 공중파 뉴스 기사 (data/fame.js FAN_MILESTONES), 한 번씩
 function checkFanMilestones() {
-  if (typeof FAN_MILESTONES === "undefined") return;
   const F = state.fame;
   F.fanMiles = F.fanMiles || [];
   const fans = fansCount();
@@ -136,7 +135,7 @@ function weeklyFame() {
   const w = state.weekCtx || {};
   const played = w.results && w.results.length;
   // 1) 인기도 자연 감소: 이번 주 경기에 안 나왔고 개인 방송도 안 하면
-  if (!played && !(typeof hasActivity === "function" && hasActivity("stream"))) {
+  if (!played && !hasActivity("stream")) {
     const d = (state.popularity - FAME.decay.floor) * FAME.decay.perWeek;
     if (d > 0) addPopularity(-roundRandom(d));
   }

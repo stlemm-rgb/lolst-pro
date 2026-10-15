@@ -47,7 +47,7 @@ function startMastery(stats, position, year, week) {
 // 대격변이 있는 해는 메타 판 확대: 포지션마다 SHAKEUP.metaWide.perPosition 명, S급 sCount 명 (data/shakeup.js)
 function makePatch(year, week, prefer) {
   const pool = releasedChampions(year, week);
-  const wide = typeof isShakeupYear === "function" && isShakeupYear(year);
+  const wide = isShakeupYear(year);
   const perPos = wide ? SHAKEUP.metaWide.perPosition : MASTERY.metaPerPosition;
   const champs = {};
   const theme = pick(COMPS).id; // 이번 패치 테마 성향 (js/comps.js) → 메타 챔피언을 그 성향 위주로

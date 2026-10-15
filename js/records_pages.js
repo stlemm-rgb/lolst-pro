@@ -1,10 +1,6 @@
 // ===== 기록 화면: 선수 정보 기록(위쪽), 개인 시상, 대회 일정(아래쪽) =====
 
 // ----- 선수 정보(예전 나의 커리어): 요약·시즌별 기록·능력 변화 -----
-function careerRecordHTML() {
-  const x = careerRecordParts();
-  return x.summary + x.season + x.growth;
-}
 
 // [선수 정보] 탭마다 나눠 쓰기: summary 커리어 요약 / season 시즌별 기록 / growth 능력 변화
 function careerRecordParts() {
@@ -162,7 +158,7 @@ pages.awards = function () {
 function competitionGuideHTML() {
   const rows = COMPETITION_GUIDE.map(function (c) {
     const id = { "First Stand": "first_stand", "Road to MSI": "road_to_msi", "MSI": "msi", "플레이인": "playin" }[c.name];
-    const off = id && typeof scheduleOffReason === "function" ? scheduleOffReason(id) : ""; // 올해 안 열리면 반투명 (js/main.js)
+    const off = id ? scheduleOffReason(id) : ""; // 올해 안 열리면 반투명 (js/main.js)
     return "<tr" + (off ? ' class="off"' : "") + "><td><b>" + c.name + "</b>" + (off ? offTagHTML(off) : "") + '</td><td class="muted">' + c.weeks + "</td><td>" + c.who + '</td><td class="muted small">' + c.how + "</td></tr>";
   }).join("");
   return '<div class="card"><h2>대회 안내</h2><table class="roster"><tr><th>대회</th><th>주차</th><th>참가</th><th>방식·진출 조건</th></tr>' + rows + "</table></div>";

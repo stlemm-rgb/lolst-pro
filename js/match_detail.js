@@ -131,7 +131,7 @@ function focusNoteHTML(m, sets) {
 
 // 미끼 장면 해설 외침 한 줄
 function decoyCallHTML(e) {
-  return e.call !== undefined && typeof DECOY !== "undefined" && DECOY.calls[e.call] ? '<div class="ev-call">' + escapeHTML(DECOY.calls[e.call]) + "</div>" : "";
+  return e.call !== undefined && DECOY.calls[e.call] ? '<div class="ev-call">' + escapeHTML(DECOY.calls[e.call]) + "</div>" : "";
 }
 
 // 경기 흐름 타임라인 (js/match_events.js)

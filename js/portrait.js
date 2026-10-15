@@ -35,7 +35,7 @@ function uniformOfTeam(teamId) {
   if (!teamId) return FREE_AGENT_UNIFORM;
   const t = findTeam(teamId);
   if (t) return uniformByShort(t.short);
-  const w = typeof findWorldTeam === "function" ? findWorldTeam(teamId) : null;
+  const w = findWorldTeam(teamId);
   const reg = w ? w.region : null;
   const list = REGION_UNIFORMS[reg] || UNIFORM_POOL;
   return list[pfSeed(teamId) % list.length];
@@ -155,7 +155,7 @@ function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: tr
   if (typeof setInterval !== "function" || typeof document === "undefined" || !document.querySelectorAll) return;
   const J = PORTRAIT.jump;
   setInterval(function () {
-    if (typeof motionOff === "function" && motionOff()) return; // 움직임 끄기 (디자인 D6)
+    if (motionOff()) return; // 움직임 끄기 (디자인 D6)
     let list;
     try { list = document.querySelectorAll(".pf-jump"); } catch (e) { return; }
     const now = Date.now();

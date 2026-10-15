@@ -78,7 +78,7 @@ function traitKeyOf(traits, effect, key) {
 // 내 특성들의 효과 합
 function traitEffectSum(key) {
   // 내 선수: 특성 + 상점 장비·개인 고용 효과 (js/shop.js)
-  return traitSumOf(state.player.traits, key) + (typeof shopEffectSum === "function" ? shopEffectSum(key) : 0);
+  return traitSumOf(state.player.traits, key) + shopEffectSum(key);
 }
 
 // 선수 id의 특성 목록 (내 선수 포함)
@@ -113,10 +113,10 @@ function trainingBonusFor(statId) {
     if (perStat && perStat[statId]) bonus += perStat[statId];
   });
   if (isBonusStat(statId)) bonus += POSITION_BONUS.trainingBonus;
-  if (typeof shopEffectKey === "function") bonus += shopEffectKey("trainingStat", statId); // 상점 장비·개인 고용
-  if (typeof coachTrainingBonus === "function") bonus += coachTrainingBonus(); // 친구 코치 (js/retirement.js)
-  if (typeof staffTrainingBonus === "function") bonus += staffTrainingBonus(); // 구단 코치 등급 (js/staff.js)
-  if (typeof dormTrainingBonus === "function") bonus += dormTrainingBonus(); // 합숙: 모든 훈련 보너스 (합숙 피로로 줄어듦) (js/housing.js)
+  bonus += shopEffectKey("trainingStat", statId); // 상점 장비·개인 고용
+  bonus += coachTrainingBonus(); // 친구 코치 (js/retirement.js)
+  bonus += staffTrainingBonus(); // 구단 코치 등급 (js/staff.js)
+  bonus += dormTrainingBonus(); // 합숙: 모든 훈련 보너스 (합숙 피로로 줄어듦) (js/housing.js)
   return bonus;
 }
 
@@ -185,7 +185,7 @@ function topGrowthMultiplier(value, traits, statId) {
 
 // 내 특성 효과 중 { 키: 값 } 모양(예: typeMastery: { carry: 0.3 })에서 한 키의 합
 function traitEffectKey(effect, key) {
-  return traitKeyOf(state.player.traits, effect, key) + (typeof shopEffectKey === "function" ? shopEffectKey(effect, key) : 0);
+  return traitKeyOf(state.player.traits, effect, key) + shopEffectKey(effect, key);
 }
 
 // "각 스탯이 하는 일" 표 (대시보드·훈련·캐릭터 생성 화면). 펼친 상태는 화면을 다시 그려도 유지

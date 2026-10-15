@@ -101,7 +101,7 @@ function makeNpc(pos, level, ageRange) {
     origin: HOME_ORIGIN.id, // 출신 리그 (v1.1, data/era.js)
   };
   applyStyle(p);
-  shapeNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (점수는 그대로)
+  spreadNpcStats(p); // 스탯 차이 키우기·포지션 중요 스탯 (점수는 그대로)
   if (state.year) npcMasteryInit(p); // 챔피언 숙련도 (js/npc_mastery.js)
   state.league.players[p.id] = p;
   return p;
@@ -126,10 +126,10 @@ function applyStyle(p) {
   });
 }
 
-// ----- 스탯 모양 (127, data/league.js NPC_STAT_SHAPE) -----
+// ----- 스탯 모양 (127, data/league.js NPC_STAT_SPREAD) -----
 // 스탯 점수는 그대로, 강점은 더 높게·약점은 더 낮게, 포지션 중요 스탯은 평균보다 꼭 높게
-function shapeNpcStats(p) {
-  const S = typeof NPC_STAT_SHAPE !== "undefined" ? NPC_STAT_SHAPE : null;
+function spreadNpcStats(p) {
+  const S = NPC_STAT_SPREAD;
   if (!S) return;
   const st = p.stats;
   const ids = STATS.map(function (s) { return s.id; });

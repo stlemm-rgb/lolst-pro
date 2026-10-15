@@ -117,7 +117,7 @@ function h2hPreviewHTML(oppId) {
   const r = h2hTeam(mine.id, oppId);
   parts.push(r ? "📊 상대 전적 " + h2hRecordText(r) + " · 최근 " + h2hDotsHTML(r.last) + (h2hStreakText(r.streak) ? " · " + h2hStreakText(r.streak) : "") +
     (r.fw + r.fl ? " · 결승 " + r.fw + "승 " + r.fl + "패" : "") : "📊 첫 맞대결");
-  const wt = typeof findWorldTeam === "function" ? findWorldTeam(oppId) : null;
+  const wt = findWorldTeam(oppId);
   const os = wt ? worldStarters(wt) : findTeam(oppId) ? starters(oppId) : null;
   const oppMate = os && os[state.player.position];
   if (oppMate && !state.benched) {

@@ -7,7 +7,7 @@ const PAGE_HEAD_SIDE = {
   sns: function () { const n = unreadCount("inbox") + unreadCount("news") + unreadCount("social"); return n ? ["안 읽음", n + "개"] : null; },
   career: function () { return ["종합 능력", playerScore(USER_ID).toFixed(1)]; },
   shop: function () { return ["💰 자금", moneyText(state.money)]; },
-  team: function () { return typeof standingValue === "function" ? ["팀 내 입지", String(standingValue())] : null; },
+  team: function () { return ["팀 내 입지", String(standingValue())]; },
   calendar: function () { return ["지금", state.week + "주차"]; },
   standings: function () { const r = myLeagueRank(); return r ? ["우리 팀", r + "위"] : null; },
   achievements: function () { return ["달성", achDoneCount() + " / " + ACHIEVEMENTS.length]; },

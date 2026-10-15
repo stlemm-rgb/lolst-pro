@@ -4,14 +4,14 @@
 //                   yearN: { y, n }, cooldownUntil, threats: { sasaeng, stalker }(해), history: [{ tid, name, from, to }] }
 // 효과 키 (js/events.js applyEffects): affection (ctx.tid 호감 ±) · romance: "start" | "end" | "public" | "secret"
 
-function romanceOn() { return typeof ROMANCE_TARGETS !== "undefined" && ROMANCE_TARGETS.length && !(state.romance && state.romance.off); }
+function romanceOn() { return ROMANCE_TARGETS.length && !(state.romance && state.romance.off); }
 
 function ensureRomance() {
   if (!state.romance) state.romance = { off: false, met: {}, partner: null, since: 0, secret: true, decided: false, annivYear: 0, yearN: { y: 0, n: 0 }, cooldownUntil: 0, threats: {}, history: [] };
   return state.romance;
 }
 
-function findTarget(id) { return (typeof ROMANCE_TARGETS !== "undefined" ? ROMANCE_TARGETS : []).find(function (t) { return t.id === id; }); }
+function findTarget(id) { return ROMANCE_TARGETS.find(function (t) { return t.id === id; }); }
 
 // 대상 이름: 게임마다 names 중 하나 (처음 만날 때 정함)
 function targetName(tid) {
@@ -196,7 +196,7 @@ function romanceEndingLine() {
 
 // ----- [친구] 화면 카드 -----
 function romanceCardHTML() {
-  if (typeof ROMANCE_TARGETS === "undefined" || !ROMANCE_TARGETS.length) return "";
+  if (!ROMANCE_TARGETS.length) return "";
   const R = ensureRomance(), RR = ROMANCE_RULES;
   const toggle = '<button class="small-btn" data-romance-toggle="1">' + (R.off ? "연애 요소 켜기" : "연애 요소 끄기") + "</button>";
   if (R.off) return '<div class="card"><h2>💕 연애 <span class="muted small">꺼짐</span></h2><p class="muted small">연애 연락이 오지 않아요.</p>' + toggle + "</div>";

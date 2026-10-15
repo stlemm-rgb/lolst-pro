@@ -428,7 +428,7 @@ function postSocial() {
   const w = state.weekCtx;
   const R = SOCIAL_RULES;
   const ctx = { opp: w.opp ? teamName(w.opp) : "", cup: (w.champion || "").replace(/ 우승$/, "") }; // "리그 우승" → "리그"
-  const proLists = typeof SOCIAL_PRO_POSTS !== "undefined" ? SOCIAL_PRO_POSTS : {};
+  const proLists = SOCIAL_PRO_POSTS;
 
   // 분류 cat의 글 목록 (경기 결과 세부 분류는 win/loss 글도 같이 섞어서)
   const listOf = function (posts, cat) {

@@ -13,7 +13,7 @@ function queueHeadline(key, who, vars) {
   const id = newsIdentity("article", key, [who, vars || {}]);
   if (findNewsArticle(id)) return null;
   const r = state.weekReport;
-  const list = (typeof NEWS_ARTICLES !== "undefined" && NEWS_ARTICLES[key]) || [];
+  const list = NEWS_ARTICLES[key] || [];
   const pool = list.filter(function (a) { return a.who === who; });
   const art = pick(pool.length ? pool : list.filter(function (a) { return a.who === "any"; }));
   if (!r || !art) return;
@@ -48,11 +48,10 @@ function queueFinalNews(champKey, eventName, f, st) {
 
 function peatName(n) {
   if (n < 2) return "";
-  return (typeof REPEAT_NEWS !== "undefined" && REPEAT_NEWS.names[n]) || n + "연패";
+  return REPEAT_NEWS.names[n] || n + "연패";
 }
 // 방금 넣은 결승 기사에 연속 우승 제목·문장 더하기 + 우리 팀이면 소식·주요 순간
 function repeatNews(who, vars, st, art) {
-  if (typeof REPEAT_NEWS === "undefined") return;
   if (!art) return;
   const team = myTeam();
   const v = Object.assign({ year: state.year, me: state.player.name, myTeam: team ? team.name : "" }, vars);

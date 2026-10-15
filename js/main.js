@@ -181,20 +181,6 @@ function typeScoresHTML() {
   }).join("");
 }
 
-// 평판 막대 (-100 ~ +100, 가운데가 0)
-function reputationBarHTML() {
-  const v = state.reputation;
-  const left = v < 0 ? 50 + v / 2 : 50;
-  const width = Math.abs(v) / 2;
-  return (
-    '<div class="stat">' +
-      '<div class="stat-label tip" tabindex="0" data-tip="-100 ~ +100. 좋은 이미지인지 나쁜 이미지인지. 구단 제안·이적에 영향">평판</div>' +
-      '<div class="bar rep-bar"><div class="rep-mid"></div><div class="bar-fill ' + (v < 0 ? "neg" : "pos") + '" style="margin-left:' + left + "%;width:" + width + '%"></div></div>' +
-      '<div class="stat-value ' + (v < 0 ? "down" : v > 0 ? "up" : "") + '">' + (v > 0 ? "+" : "") + v + "</div>" +
-    "</div>"
-  );
-}
-
 // 챔피언 숙련도 한 줄
 // pos: 그 포지션 기준 메타 표시 (기본은 내 포지션)
 function masteryRowHTML(name, pos) {
@@ -274,16 +260,6 @@ function retireCardHTML() {
       '<div class="buttons"><button class="danger" data-retire="now">지금 은퇴하기</button></div>' +
     "</div>"
   );
-}
-
-// 챔피언 연습에서 연습할 챔피언 고르기
-function champOptionsHTML(selected) {
-  return myPositionChampions().map(function (name) {
-    const tier = metaTier(name);
-    return '<option value="' + name + '"' + (selected === name ? " selected" : "") + ">" +
-      name + (tier ? " ★메타 " + tier + "급" : "") + " · " + findChampionType(findChampion(name).type).name +
-      " (숙련도 " + state.mastery[name] + ", 성장 " + percentText(masteryGrowthMultiplier(name) - 1) + ")</option>";
-  }).join("");
 }
 
 // 챔피언 집중 연습: 한 명 고르기 (안 골랐으면 S급 메타)
@@ -871,7 +847,7 @@ function nextWeek(restWeek) {
     // 메타 유지: 지난 메타 챔피언 일부는 다음 메타에도 남음 (내 숙련도 1위가 메타였으면 더 잘 남음). 대격변 해는 제외
     const myTop = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
     const topWasMeta = !!(myTop && state.meta && isMeta(myTop));
-    if (state.meta && !(typeof isShakeupYear === "function" && isShakeupYear(state.year))) {
+    if (state.meta && !isShakeupYear(state.year)) {
       POSITION_IDS.forEach(function (pos) {
         (state.meta.champs[pos] || []).forEach(function (n) {
           const keepP = pos === state.player.position && n === myTop ? MASTERY.metaKeepMine : MASTERY.metaKeep;
@@ -1019,5 +995,5 @@ function renderAll() {
 function advanceWeek(rest) {
   nextWeek(rest);
   // 훈련 대성공이면 연출을 먼저 보고, 닫으면 경기 자동 재생 (js/great.js, js/replay.js)
-  showGreat(function () { if (typeof afterWeekReplay === "function") afterWeekReplay(); });
+  showGreat(afterWeekReplay);
 }

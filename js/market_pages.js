@@ -64,7 +64,7 @@ pages.search = function () {
   }).join("") + state.league.teams.map(function (t) {
     return '<option value="' + t.id + '"' + (searchFilter.team === t.id ? " selected" : "") + ">" + escapeHTML(t.name) + "</option>";
   }).join("");
-  const originOpts = '<option value="">전체 출신</option>' + (typeof HOME_ORIGIN !== "undefined" ? [[HOME_ORIGIN.id, HOME_ORIGIN.name + " (KR)"]].concat(activeRegions().map(function (r) { return [r.id, r.name + " (" + originShort(r.id) + ")"]; })) : []).map(function (o) {
+  const originOpts = '<option value="">전체 출신</option>' + [[HOME_ORIGIN.id, HOME_ORIGIN.name + " (KR)"]].concat(activeRegions().map(function (r) { return [r.id, r.name + " (" + originShort(r.id) + ")"]; })).map(function (o) {
     return '<option value="' + o[0] + '"' + (searchFilter.origin === o[0] ? " selected" : "") + ">" + escapeHTML(o[1]) + "</option>";
   }).join("");
   const sortOpts = [["score", "스탯 점수 높은 순"], ["age", "나이 어린 순"], ["salary", "연봉 높은 순"], ["name", "이름순"]].map(function (o) {
@@ -74,7 +74,7 @@ pages.search = function () {
   const rows = ids.map(function (id) {
     const p = playerInfo(id);
     const team = p.teamId ? findTeam(p.teamId) : null;
-    const wt = !team && id !== USER_ID && typeof worldTeamIdOf === "function" && state.world && state.world.players[id] ? findWorldTeam(worldTeamIdOf(id)) : null; // 해외 리그 선수
+    const wt = !team && id !== USER_ID && state.world && state.world.players[id] ? findWorldTeam(worldTeamIdOf(id)) : null; // 해외 리그 선수
     return (
       '<tr class="click' + (id === USER_ID ? " me" : "") + (selectedPlayer === id ? " sel" : "") + '" data-player="' + id + '">' + faceTd(id) + // 얼굴 (js/portrait.js)
         "<td>" + escapeHTML(p.name) + (id !== USER_ID && findPlayer(id) && findPlayer(id).named ? ' <span title="네임드 선수">⭐</span>' : "") +
@@ -116,15 +116,15 @@ function playerDetailHTML(id) {
     return barHTML(s.name, p.stats[s.id], s.desc + (cap < 100 ? " (상한선 " + cap + ")" : ""), bonus.indexOf(s.id) !== -1, cap);
   }).join("");
   const team = p.teamId ? findTeam(p.teamId) : null;
-  const wtId = !team && typeof worldTeamIdOf === "function" ? worldTeamIdOf(id) : null; // 해외 선수 (v1.1)
+  const wtId = !team ? worldTeamIdOf(id) : null; // 해외 선수 (v1.1)
   const wt = wtId ? findWorldTeam(wtId) : null;
   const traits = traitsOf(id);
   return (
     '<div class="card detail">' +
       "<h2>" + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.pos).name + " · " + p.age + "세 · " +
         (team ? escapeHTML(team.name) : wt ? "🌏 " + escapeHTML(wt.name) + " (" + escapeHTML((findRegion(wt.region) || {}).name || "해외") + ")" : "FA") +
-        (typeof originOf === "function" ? " · 출신 " + escapeHTML(originName(originOf(p))) + " · 모국어 " + escapeHTML(langName(langOf(p))) : "") +
-        (typeof teamLangOf === "function" && id !== USER_ID && (team || wt) && langSkill(p, teamLangOf((team || wt).id)) < 100 ? ' · <span class="down">🗣️ 팀 언어(' + escapeHTML(langName(teamLangOf((team || wt).id))) + ") " + langSkill(p, teamLangOf((team || wt).id)) + "/100</span>" : "") + '</span> <span class="detail-score">스탯 점수 <b>' + playerScore(id).toFixed(1) + "</b></span></h2>" +
+        " · 출신 " + escapeHTML(originName(originOf(p))) + " · 모국어 " + escapeHTML(langName(langOf(p))) +
+        (id !== USER_ID && (team || wt) && langSkill(p, teamLangOf((team || wt).id)) < 100 ? ' · <span class="down">🗣️ 팀 언어(' + escapeHTML(langName(teamLangOf((team || wt).id))) + ") " + langSkill(p, teamLangOf((team || wt).id)) + "/100</span>" : "") + '</span> <span class="detail-score">스탯 점수 <b>' + playerScore(id).toFixed(1) + "</b></span></h2>" +
       posScoresHTML(id, p) +
       '<div class="chips">' + styleChipHTML(id) + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
       strengthLineHTML(p) +
@@ -333,14 +333,6 @@ pages.transfer = function () {
     '<div class="grid">' + contractCard + offerCard + "</div>" + requestCard + transferLogCardHTML() + faCard
   );
 };
-
-// 대시보드용 계약 한 줄
-function contractSummaryHTML() {
-  const c = state.contract;
-  if (!c) return "";
-  return '<p class="muted small">' + (state.benched ? '<span class="down">후보 (2군)</span>' : '<span class="up">주전</span>') +
-    " · 연봉 " + moneyText(c.salary) + " · 계약 " + contractEndText(c) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") + "</p>";
-}
 
 // ----- 버튼 연결 -----
 function bindMarket(page) {

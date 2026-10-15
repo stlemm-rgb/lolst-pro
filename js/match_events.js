@@ -157,7 +157,7 @@ function sCountOfId(id) {
 function focusSelfMult(n) { return n ? Math.max(FOCUS_RULES.userMin, 1 - FOCUS_RULES.userPerS * n) : 1; }
 function focusUserMult() { return focusSelfMult(userSCount()); }
 function focusMateMult(n) { return 1 + FOCUS_RULES.matePerS * (n === undefined ? userSCount() : n); }
-function isDecoyEvent(ev) { return typeof DECOY !== "undefined" && DECOY.events.indexOf(ev.id) !== -1; }
+function isDecoyEvent(ev) { return DECOY.events.indexOf(ev.id) !== -1; }
 // 좋은 장면 주인공 배율: 집중 견제(본인 −, 동료 +) · 미끼 장면(견제받는 본인 +) · 컨디션 난조(나만, 숨김)
 //   v1.1: 나만이 아니라 S급을 가진 모든 선수에게 (모든 대회). focus = 이 세트 선수별 S급 수 { id: n }
 function userFocusMult(ev, p, side, teamId, ctx) {
