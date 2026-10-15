@@ -189,7 +189,7 @@ pages.clubs = function () {
             '<span class="chip">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b></span>" +
           "</div>" +
           '<div class="club-faces">' + faces + "</div>" +
-          '<div class="club-kv"><span>연봉 / 예산</span>' + miniBarHTML(budget ? pay / budget : 0) + "<b>" + moneyText(pay) + " / " + moneyText(budget) + "</b></div>" +
+          '<div class="club-kv"><span>연봉 / 예산</span>' + pwBarHTML(budget ? pay / budget : 0) + "<b>" + moneyText(pay) + " / " + moneyText(budget) + "</b></div>" +
           '<div class="muted small club-lineup">' + clubMoneyText(t.id) + (clubIncomeText(t.id) ? ' · <span class="tip" tabindex="0" data-tip="' + escapeHTML(clubIncomeText(t.id).replace(/<[^>]*>/g, "")) + '">💰 수입</span>' : "") + "</div>" +
           '<div class="club-foot">' + staffChips + (vs ? '<span class="chip ' + (/상대 0승/.test(vs) ? "bad" : "") + '">⚔️ ' + vs + "</span>" : "") + "</div>" +
           (open ? clubRosterHTML(t.id) + staffCardHTML(t.id) + clubH2HHTML(t.id) : "") +

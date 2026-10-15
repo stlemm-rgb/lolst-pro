@@ -24,7 +24,7 @@ function greatChance() {
   if (state.stamina < TIRED_LIMIT) p *= R.tiredMult;
   return p;
 }
-function pctText(p) { return (Math.round(p * 1000) / 10) + "%"; }
+function greatPct(p) { return (Math.round(p * 1000) / 10) + "%"; }
 // 스탯이나 숙련도가 오르는 훈련만 대성공 가능 (휴식 제외)
 function greatEligible(training) {
   return training && training.id !== "rest" && Object.keys(training.effects).some(function (id) { return state.stats[id] !== undefined || /^mastery/.test(id); });
@@ -41,13 +41,13 @@ function rollGreat(training) {
 // ----- 훈련 화면 -----
 function greatChipHTML() {
   const p = greatChance();
-  const why = greatChanceParts().map(function (x) { return x[0] + " +" + pctText(x[1]); }).join(" · ") + " (최대 " + pctText(GREAT_RULES.max) + ")" +
-    (greatFire() ? " · 🔥 불타는 손 +" + pctText(GREAT_RULES.streakBonus) : "") + (state.stamina < TIRED_LIMIT ? " · 너무 지쳐서 절반" : "");
-  return '<span class="gsc tip" tabindex="0" data-tip="' + escapeHTML("대성공이면 그 주 오른 스탯·숙련도 2배. " + why) + '">🎯 대성공 ' + pctText(p) +
+  const why = greatChanceParts().map(function (x) { return x[0] + " +" + greatPct(x[1]); }).join(" · ") + " (최대 " + greatPct(GREAT_RULES.max) + ")" +
+    (greatFire() ? " · 🔥 불타는 손 +" + greatPct(GREAT_RULES.streakBonus) : "") + (state.stamina < TIRED_LIMIT ? " · 너무 지쳐서 절반" : "");
+  return '<span class="gsc tip" tabindex="0" data-tip="' + escapeHTML("대성공이면 그 주 오른 스탯·숙련도 2배. " + why) + '">🎯 대성공 ' + greatPct(p) +
     ' <span class="gsc-bar"><i style="width:' + Math.round(p / (GREAT_RULES.max + GREAT_RULES.streakBonus) * 100) + '%"></i></span></span>';
 }
 function greatLineHTML() {
-  const hint = state.condition < GREAT_RULES.condMin ? " · 컨디션을 " + GREAT_RULES.condMin + " 이상으로 올리면 +" + pctText(GREAT_RULES.condBonus) : "";
+  const hint = state.condition < GREAT_RULES.condMin ? " · 컨디션을 " + GREAT_RULES.condMin + " 이상으로 올리면 +" + greatPct(GREAT_RULES.condBonus) : "";
   return '<div class="gs-line">' + greatChipHTML() + ' <span class="muted small">이번 주 훈련 대성공 확률' + hint + (greatState().season ? " · 올해 대성공 " + greatState().season + "번" : "") + "</span>" +
     (greatFire() ? " " + fireBadgeHTML() : "") + "</div>";
 }

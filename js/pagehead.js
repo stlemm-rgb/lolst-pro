@@ -56,7 +56,7 @@ function recentWLHTML(list) {
   return '<span class="wl5">' + list.slice(-5).map(function (r) { return '<i class="' + r + '">' + (r === "w" ? "승" : "패") + "</i>"; }).join("") + "</span>";
 }
 // 작은 막대 (0~1)
-function miniBarHTML(frac, text) {
+function pwBarHTML(frac, text) { // (이름 주의: miniBarHTML은 대시보드 막대 — js/dashboard.js)
   const p = Math.max(0, Math.min(100, Math.round(frac * 100)));
   return '<span class="pwbar"><span class="pwbar-in"><span style="width:' + p + '%"></span></span>' + (text !== undefined ? "<small>" + text + "</small>" : "") + "</span>";
 }

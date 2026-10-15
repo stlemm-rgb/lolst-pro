@@ -106,7 +106,7 @@ function standingsTableHTML(rows, notes) {
           '<td class="r">' + r.w + '</td><td class="r">' + r.l + "</td>" +
           '<td class="r ' + (diff > 0 ? "up" : diff < 0 ? "down" : "") + '">' + (diff > 0 ? "+" : "") + diff + "</td>" +
           "<td>" + recentWLHTML(r.recent) + "</td>" +
-          "<td>" + miniBarHTML(hi > lo ? (pw[i] - lo) / (hi - lo) : 1, pw[i].toFixed(1)) + "</td>" +
+          "<td>" + pwBarHTML(hi > lo ? (pw[i] - lo) / (hi - lo) : 1, pw[i].toFixed(1)) + "</td>" +
           '<td class="muted small">' + note + "</td>" +
         "</tr>"
       );
