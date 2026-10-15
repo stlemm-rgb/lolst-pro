@@ -506,6 +506,7 @@ function renderTopbar() {
   };
   document.getElementById("plan-badge").onclick = function () { selectMenu("training"); };
   document.getElementById("rest-week").onclick = function () { advanceWeek(true); };
+  renderMobileNav(); // 휴대폰 아래 탭 + 진행 막대 (197, js/mobile_nav.js)
 }
 
 // 상단바: 지금 고른 훈련 ([다음 주로 진행]을 누르면 할 훈련). 누르면 훈련 화면으로

@@ -4,6 +4,8 @@
 
 let snsTab = "inbox";
 let openMsgId = null; // 펼쳐 둔 메시지
+let deckIdx = 0;        // 받은 연락 카드: 지금 보는 카드 번호 (197)
+let deckLastId = null;  // 받은 연락 카드: 방금 답한 연락 (결과 한 줄)
 
 pages.sns = function () {
   const tabs = [["inbox", "📩 받은 연락"], ["news", "📰 소식"], ["social", "💬 선수 SNS"]];
@@ -35,6 +37,11 @@ pages.sns = function () {
         (m.mention ? ' <span class="mention-tag">📣 나를 언급</span>' : "") +
         "<div>" + escapeHTML(m.text) + "</div></div>";
     }).join("");
+  } else if (snsTab === "inbox") {
+    // 197 (시안 13 P1): 답장 대기 연락은 맨 위 카드로, 나머지는 '지난 연락' 목록
+    const deck = deckMessages();
+    const rest = list.filter(function (m) { return deck.indexOf(m) === -1; });
+    body = msgDeckHTML(deck) + (deck.length && rest.length ? '<div class="deck-past muted small">' + MSG_DECK.pastTitle + "</div>" : "") + rest.map(messageHTML).join("");
   } else {
     body = list.map(messageHTML).join("");
   }
@@ -82,12 +89,7 @@ function messageHTML(m) {
     if (m.kind === "offer" && m.offer) inner += '<div class="msg-text">' + offerBreakdownHTML(m.offer) + "</div>";
     if (waiting && m.kind === "staffPick" && m.staffPick) inner += staffPickDeckHTML(m); // 인사 후보 카드 뒤집기 (js/ui.js)
     else if (waiting) {
-      inner += '<div class="msg-choices">' + m.choices.map(function (c, i) {
-        const poor = choiceTooExpensive(m, i);
-        const hint = [c.hint, poor ? "자금이 부족해요" : ""].filter(Boolean).join(" · ");
-        return '<button data-answer="' + m.id + ":" + i + '"' + (poor ? " disabled" : "") + ">" + escapeHTML(c.label) + "</button>" +
-          (hint ? '<div class="hint">' + escapeHTML(hint) + "</div>" : "");
-      }).join("") + "</div>";
+      inner += '<div class="msg-choices">' + choiceButtonsHTML(m) + "</div>";
     } else if (m.choices && m.answered !== "ignored") {
       inner += '<div class="msg-answer">선택: <b>' + escapeHTML(m.choices[m.answered].label) + "</b></div>";
       if (m.result) inner += '<div class="msg-result">' + escapeHTML(m.result) + "</div>"; // 결과 이야기 (js/events.js answerMessage)
@@ -112,6 +114,49 @@ function messageHTML(m) {
   );
 }
 
+// ----- 받은 연락 카드 (197, 시안 13 P1: PC = 카드 왼쪽·버튼 오른쪽, 휴대폰 = 카드 아래 세로 버튼) -----
+function deckMessages() {
+  return state.inbox.filter(function (m) {
+    return m.tab === "inbox" && m.choices && m.answered === null && MSG_DECK.skipKinds.indexOf(m.kind) === -1;
+  }).sort(function (a, b) { return a.id - b.id; }); // 오래된(곧 지나가는) 연락부터
+}
+
+function msgDeckHTML(deck) {
+  const last = deckLastId !== null ? state.inbox.find(function (m) { return m.id === deckLastId; }) : null;
+  const lastHTML = last && last.choices && last.answered !== null && last.answered !== "ignored"
+    ? '<div class="deck-last"><span class="rep-tag msg">방금 답함</span><b>' + escapeHTML(msgAvatar(last).title) + "</b> · " + escapeHTML(last.choices[last.answered].label) +
+      (last.result ? '<div class="msg-result">' + escapeHTML(last.result) + "</div>" : "") + (changesText(last.changes) ? '<div class="log-changes">' + changesText(last.changes) + "</div>" : "") + "</div>"
+    : "";
+  if (!deck.length) return lastHTML;
+  if (deckIdx >= deck.length) deckIdx = deck.length - 1;
+  if (deckIdx < 0) deckIdx = 0;
+  const m = deck[deckIdx];
+  m.read = true;
+  const av = msgAvatar(m);
+  const age = (state.year - m.year) * CREATION.weeksPerSeason + state.week - m.week;
+  const left = Math.max(0, EVENT_RULES.ignoreAfterWeeks - age);
+  const nav = deck.length > 1 ? '<span class="deck-nav"><button data-deck="-1"' + (deckIdx === 0 ? " disabled" : "") + '>◀</button><button data-deck="1"' + (deckIdx === deck.length - 1 ? " disabled" : "") + ">▶</button></span>" : "";
+  return lastHTML +
+    '<div class="deck-head"><span>📩 <b>' + MSG_DECK.title + " " + (deckIdx + 1) + " / " + deck.length + '</b> <span class="muted small">· ' + MSG_DECK.later + "</span></span>" + nav + "</div>" +
+    '<div class="deck">' +
+      '<div class="deck-card"><div class="deck-top"><span>' + m.year + "년 " + m.week + "주차</span><span>" + (left ? left + "주 안에 답하기" : "이번 주가 마지막") + "</span></div>" +
+        '<div class="deck-pic">' + av.icon + "</div>" +
+        '<div class="deck-title">' + escapeHTML(av.title) + "</div>" +
+        '<div class="deck-text">' + escapeHTML(m.text) + "</div></div>" +
+      '<div class="deck-choices">' + choiceButtonsHTML(m) + "</div>" +
+    "</div>";
+}
+
+// 선택 버튼 (카드·목록 같이 씀): 버튼 + 아래 작은 글씨(🎲 확률 · ⚠️ 위험 · 💚 극복 · 자금 부족)
+function choiceButtonsHTML(m) {
+  return m.choices.map(function (c, i) {
+    const poor = choiceTooExpensive(m, i);
+    const hint = [c.hint, poor ? "자금이 부족해요" : ""].filter(Boolean).join(" · ");
+    return '<button data-answer="' + m.id + ":" + i + '"' + (poor ? " disabled" : "") + ">" + escapeHTML(c.label) + "</button>" +
+      (hint ? '<div class="hint">' + escapeHTML(hint) + "</div>" : "");
+  }).join("");
+}
+
 // 메시지 아이콘: 선수 글이면 얼굴, 제목이 그림 글자로 시작하면 그 글자 (제목에서는 뺌)
 function msgAvatar(m) {
   if (m.proId && state.league.players[m.proId]) return { icon: portraitImg(m.proId, { face: true, size: 36 }), title: m.title };
@@ -128,7 +173,10 @@ function bindSns(page) {
     renderMenu();
   }
   page.querySelectorAll("[data-snstab]").forEach(function (btn) {
-    btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; selectMenu("sns"); };
+    btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; deckLastId = null; selectMenu("sns"); };
+  });
+  page.querySelectorAll("[data-deck]").forEach(function (btn) {
+    btn.onclick = function () { deckIdx += Number(btn.getAttribute("data-deck")); deckLastId = null; renderPage(); };
   });
   page.querySelectorAll("[data-msg]").forEach(function (el) {
     el.onclick = function () {
@@ -144,6 +192,7 @@ function bindSns(page) {
   page.querySelectorAll("[data-answer]").forEach(function (btn) {
     btn.onclick = function () {
       const parts = btn.getAttribute("data-answer").split(":");
+      if (btn.closest(".deck")) deckLastId = Number(parts[0]); // 카드에서 답함 → 결과 한 줄 + 다음 카드 (197)
       answerMessage(Number(parts[0]), Number(parts[1]));
       if (state.settings.autoSave) saveGame();
       renderAll();

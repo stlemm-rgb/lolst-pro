@@ -22,6 +22,7 @@
  *  20. 훈련 대성공 (182, js/great.js, 시안 9)
  *  21. 내 캐릭터 얼굴 바꾸기 (184, js/look_edit.js)
  *  22. 대시보드·진행 개선 (196, js/dash_plus.js, 시안 10): 요약 창 · 다음 목표 · 성장 그래프 · 칭호
+ *  23. 휴대폰 아래 탭·진행 막대 (197, js/mobile_nav.js, 시안 12 A1) · 받은 연락 카드 (197, js/sns_page.js, 시안 13 P1)
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
  */
@@ -1450,3 +1451,51 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ttl-picker { display: flex; gap: 6px; flex-wrap: wrap; }
 .ttl-chip { border: 1px solid var(--border); background: var(--panel-2); color: var(--muted); border-radius: 999px; padding: 3px 12px; font-size: 13px; cursor: pointer; }
 .ttl-chip.on { border-color: var(--gold); color: var(--gold); background: rgba(var(--gold-rgb), 0.1); }
+
+/* ===== 23. 휴대폰 아래 탭·진행 막대 (197, js/mobile_nav.js) · 받은 연락 카드 (197, js/sns_page.js) ===== */
+/* 받은 연락 카드: PC = 카드 왼쪽 · 버튼 오른쪽, 휴대폰 = 카드 아래 세로 버튼 */
+.deck-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 4px 0 8px; }
+.deck-nav { display: flex; gap: 6px; }
+.deck-nav button { padding: 3px 12px; }
+.deck { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: center; border: 1px solid rgba(var(--accent-rgb), 0.35); border-radius: var(--r); padding: 14px; background: rgba(var(--accent-rgb), 0.04); margin-bottom: 14px; }
+.deck-card { border-radius: 18px; padding: 16px; background: linear-gradient(160deg, rgba(var(--accent2-rgb), 0.16), var(--panel) 60%); border: 2px solid rgba(var(--gold-rgb), 0.5); box-shadow: 0 0 30px rgba(var(--gold-rgb), 0.12); }
+.deck-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.deck-pic { height: 96px; margin: 12px 0; border-radius: 12px; display: grid; place-items: center; font-size: 46px; background: radial-gradient(circle at 50% 40%, rgba(var(--accent-rgb), 0.18), transparent 70%), var(--panel-2); border: 1px solid var(--border); }
+.deck-pic img { width: 72px; height: 72px; }
+.deck-title { font-size: 18px; font-weight: 800; text-align: center; }
+.deck-text { text-align: center; color: var(--muted); margin-top: 6px; white-space: pre-line; }
+.deck-choices { display: flex; flex-direction: column; gap: 4px; }
+.deck-choices button { text-align: left; white-space: normal; padding: 10px 14px; margin-top: 4px; }
+.deck-choices .hint { font-size: 12px; color: var(--muted); padding-left: 6px; }
+.deck-last { border: 1px solid var(--border); border-radius: var(--r-s); padding: 8px 12px; margin-bottom: 10px; background: var(--panel-2); }
+.deck-past { margin: 4px 0 6px; }
+@media (max-width: 760px) { .deck { grid-template-columns: 1fr; padding: 10px; gap: 10px; } }
+/* 휴대폰 아래 탭 + 진행 막대 (PC에서는 안 보임) */
+#mnav { display: none; }
+@media (max-width: 760px) {
+  #mnav:not([hidden]) { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; }
+  body.has-mnav { padding-bottom: 140px; }
+  .topbar #rest-week, .topbar #next-week, .menu-toggle { display: none !important; }
+  .mnav-bar { display: flex; align-items: center; gap: 10px; margin: 0 10px 8px; padding: 8px 10px 8px 14px; border-radius: 14px; background: var(--grad-btn); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12), 0 6px 24px rgba(var(--accent-rgb), 0.35); }
+  .mnav-bar.low { box-shadow: inset 0 0 0 2px var(--bad), 0 6px 24px rgba(var(--bad-rgb), 0.35); }
+  .mnav-go { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; background: none; border: 0; color: #fff; padding: 0; text-align: left; }
+  .mnav-big { font-size: 16px; font-weight: 900; }
+  .mnav-sub { font-size: 11px; opacity: 0.9; }
+  .mnav-season { font-size: 11px; color: #fff; text-align: right; white-space: nowrap; }
+  .mnav-track { display: block; width: 70px; height: 4px; border-radius: 4px; background: rgba(0, 0, 0, 0.35); margin-top: 4px; overflow: hidden; }
+  .mnav-track i { display: block; height: 100%; background: #fff; }
+  .mnav-rest { border: 1px solid rgba(255, 255, 255, 0.45); background: rgba(0, 0, 0, 0.2); color: #fff; border-radius: 10px; padding: 6px 10px; font-size: 12px; white-space: nowrap; }
+  .mnav-tabs { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--sidebar); border-top: 1px solid var(--border); padding: 6px 0 calc(8px + env(safe-area-inset-bottom)); }
+  .mnav-tab { position: relative; background: none; border: 0; color: var(--muted); font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 2px 0; }
+  .mnav-tab.on { color: var(--accent); }
+  .mnav-ic { font-size: 18px; line-height: 1.3; }
+  .mnav-badge { position: absolute; top: -2px; left: calc(50% + 6px); background: var(--bad); color: #fff; border-radius: 999px; font-size: 10px; font-weight: 700; padding: 0 5px; }
+  .mnav-dim { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); }
+  .mnav-sheet { position: relative; margin: 0; max-height: 60vh; overflow-y: auto; background: var(--panel); border-top: 1px solid rgba(var(--accent-rgb), 0.35); border-radius: 18px 18px 0 0; padding: 10px 14px 12px; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6); }
+  .mnav-gt { font-size: 11px; color: var(--muted); margin: 8px 2px 4px; }
+  .mnav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mnav-item { background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 11.5px; padding: 8px 2px; display: flex; flex-direction: column; align-items: center; white-space: normal; }
+  .mnav-item.on { border-color: var(--accent); color: var(--accent); }
+  #mnav button, #mnav button:hover:not(:disabled) { box-shadow: none; transform: none; }
+  .mnav-go:hover:not(:disabled), .mnav-tab:hover:not(:disabled) { background: none; border-color: transparent; }
+}

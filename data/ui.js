@@ -88,3 +88,23 @@ const TITLE_RULES = {
 const TREND_RULES = {
   minPoints: 2,                     // 이만큼 쌓여야 그래프를 그림
 };
+
+// ━━━━━ 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) · 받은 연락 카드 (197, 시안 13 P1) ━━━━━
+// 휴대폰 폭(760px 이하)에서만 보임. 코드는 js/mobile_nav.js, 연락 카드는 js/sns_page.js
+const MOBILE_NAV = {
+  tabs: [
+    { id: "dashboard", icon: "🏠", name: "대시보드" },
+    { id: "training",  icon: "🏋️", name: "훈련" },
+    { id: "sns",       icon: "📱", name: "SNS" },
+    { id: "more",      icon: "☰",  name: "전체" },   // 나머지 메뉴판
+  ],
+  sheetIcons: { dashboard: "🏠", team: "🛡️" },      // 메뉴판 아이콘 (나머지는 PAGE_HEADS 아이콘)
+  goText: "▶ 다음 주",
+  restText: "💤 휴식",
+};
+const MSG_DECK = {
+  skipKinds: ["offer", "staffPick", "retire"],      // 카드로 안 보여 주는 연락 (계약 제안·인사 카드·은퇴는 지금처럼 목록에서)
+  title: "답장 대기",
+  pastTitle: "지난 연락",
+  later: "◀ ▶로 넘겨 보고, 지금 안 답해도 돼요",
+};

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시안 11 · 휴대폰 조작</title>
+<style>
+:root{
+  --bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;
+  --accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--good:#2bff9e;--bad:#ff3d71;
+  --accent-rgb:0,224,255;--accent2-rgb:180,77,255;--good-rgb:43,255,158;--bad-rgb:255,61,113;--gold-rgb:255,210,63;
+  --grad:linear-gradient(90deg,#b44dff,#00e0ff);--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7);
+  --r:14px;--r-s:10px;--r-xs:6px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:14px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:24px;margin:0 0 6px}
+h2{font-size:19px;margin:44px 0 6px;padding-top:20px;border-top:1px solid var(--border)}
+.lead{color:var(--muted);margin:0 0 16px}
+.row{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+.col{flex:1 1 330px;min-width:0}
+.opt-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tag{font-weight:700;border-radius:var(--r-xs);padding:1px 8px;font-size:12px;background:rgba(var(--accent2-rgb),.2);color:#d9b3ff}
+.tag.rec{background:rgba(var(--gold-rgb),.18);color:var(--gold)}
+.tag.now{background:var(--panel-2);color:var(--muted)}
+.desc{color:var(--muted);font-size:12.5px;margin:10px 0 0}
+.desc b{color:var(--text)}
+/* 휴대폰 틀 */
+.phone{width:330px;max-width:100%;height:640px;margin:0 auto;border:2px solid #2c2c44;border-radius:34px;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.notch{height:22px}
+.topbar{padding:6px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.topbar .l1{display:flex;align-items:center;gap:8px}
+.burger{border:1px solid var(--border);border-radius:8px;padding:2px 8px}
+.tb-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tbb{border:1px solid var(--border);border-radius:8px;padding:4px 8px;font-size:11.5px;background:var(--panel)}
+.tbb.go{background:var(--grad-btn);border:0;font-weight:700}
+.tbb.hp{border-color:rgba(var(--bad-rgb),.6);color:var(--bad)}
+.slim{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;border-bottom:1px solid var(--border);font-size:12px}
+.slim b{font-size:13px}
+.chip{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:0 8px;font-size:11.5px}
+.chip.hp{border-color:rgba(var(--bad-rgb),.6);color:var(--bad)}
+.content{padding:12px;display:flex;flex-direction:column;gap:8px}
+.ghost{height:14px;border-radius:7px;background:var(--panel-2)}
+.gcard{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:10px}
+.goal{display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(var(--gold-rgb),.45);background:linear-gradient(120deg,rgba(var(--gold-rgb),.1),var(--panel));border-radius:12px;padding:6px 12px}
+.goal .n{font-size:28px;font-weight:900;font-style:italic;color:var(--gold)}
+/* 아래 탭 */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:68px;background:#0c0c16;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding-bottom:8px}
+.tab{text-align:center;font-size:10.5px;color:var(--muted);position:relative}
+.tab .ic{font-size:18px;display:block;line-height:1.3}
+.tab.on{color:var(--accent)}
+.badge{position:absolute;top:-4px;left:calc(50% + 4px);background:var(--bad);color:#fff;border-radius:999px;font-size:10px;padding:0 5px;font-weight:700}
+.go-btn{position:relative;top:-14px;margin:0 auto;width:58px;height:58px;border-radius:18px;transform:rotate(45deg);background:var(--grad-btn);box-shadow:0 0 22px rgba(var(--accent-rgb),.45);display:grid;place-items:center;border:2px solid rgba(255,255,255,.25)}
+.go-btn span{transform:rotate(-45deg);font-size:20px}
+.go-lbl{position:relative;top:-6px;font-weight:700;color:var(--text)}
+.pop{position:absolute;bottom:84px;left:50%;transform:translateX(-50%);background:var(--panel-2);border:1px solid rgba(var(--accent-rgb),.4);border-radius:12px;padding:8px 12px;font-size:12px;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.pop::after{content:"";position:absolute;bottom:-7px;left:50%;margin-left:-6px;border:6px solid transparent;border-top-color:rgba(var(--accent-rgb),.4)}
+/* B: 떠 있는 버튼 */
+.tabbar4{position:absolute;left:0;right:0;bottom:0;height:58px;background:#0c0c16;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);align-items:center}
+.fab{position:absolute;right:16px;bottom:74px;background:var(--grad-btn);border-radius:999px;padding:12px 18px;font-weight:800;box-shadow:0 0 22px rgba(var(--accent-rgb),.45)}
+/* 메뉴 시트 */
+.sheet{position:absolute;left:0;right:0;bottom:68px;background:var(--panel);border-top:1px solid rgba(var(--accent-rgb),.35);border-radius:18px 18px 0 0;padding:12px 14px;box-shadow:0 -10px 30px rgba(0,0,0,.6)}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.5)}
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+.mi{background:var(--panel-2);border:1px solid var(--border);border-radius:10px;text-align:center;padding:8px 2px;font-size:11px}
+.mi .ic{display:block;font-size:18px}
+.mh{font-size:11px;color:var(--muted);margin-top:8px}
+/* ⑥ 연락 카드 */
+.msg-card{margin:14px;border-radius:18px;padding:16px;background:linear-gradient(160deg,#1c1530,#11111c 60%);border:2px solid rgba(var(--accent2-rgb),.55);box-shadow:0 0 30px rgba(var(--accent2-rgb),.2)}
+.mc-top{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.mc-pic{height:120px;border-radius:12px;margin:12px 0;display:grid;place-items:center;font-size:52px;background:radial-gradient(circle at 50% 40%,rgba(var(--accent-rgb),.18),transparent 70%),var(--panel-2);border:1px solid var(--border)}
+.mc-title{font-size:18px;font-weight:800;text-align:center}
+.mc-text{text-align:center;color:#c9c9dc;font-size:13px;margin-top:6px}
+.lr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 14px}
+.choice{border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:10px 12px;font-size:12.5px;font-weight:700;position:relative}
+.choice small{display:block;font-weight:400;color:var(--muted);font-size:11px;margin-top:2px}
+.choice.l{border-color:rgba(var(--accent-rgb),.45)}
+.choice.r{border-color:rgba(var(--gold-rgb),.45);text-align:right}
+.choice .ar{color:var(--accent)}.choice.r .ar{color:var(--gold)}
+.vlist{display:flex;flex-direction:column;gap:7px;margin:0 14px}
+.vlist .choice{text-align:left}
+.hint{font-size:10.5px;color:var(--muted);text-align:center;margin-top:8px}
+.ic-risk{color:var(--bad)}.ic-dice{color:var(--accent)}
+.stack{position:absolute;left:24px;right:24px;top:30px;height:60px;border-radius:18px;border:1px solid var(--border);background:var(--panel)}
+.count{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px}
+/* 지금 */
+.old-list .it{display:flex;gap:8px;align-items:center;border:1px solid var(--border);border-radius:10px;padding:8px;background:var(--panel);font-size:12px;margin-bottom:6px}
+.old-list .it.on{border-color:rgba(var(--accent-rgb),.5)}
+.note{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-s);padding:10px 14px;margin-top:28px;color:var(--muted)}
+.note b{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>시안 11 · 휴대폰 조작</h1>
+<p class="lead">「풋볼 에이전시」에서 가져온 ⑤ 아래 탭 + 큰 진행 버튼, ⑥ 연락 카드입니다. PC 화면(왼쪽 메뉴)은 그대로 두고 <b>휴대폰 폭(760px 이하)에서만</b> 바뀝니다. 게임 결과는 그대로입니다.</p>
+
+<h2>⑤ 아래 탭 + 큰 진행 버튼</h2>
+<p class="lead">지금은 휴대폰 맨 위에 버튼 4개가 두 줄로 쌓여 화면의 약 20%를 차지합니다. 엄지가 닿는 아래로 옮깁니다.</p>
+<div class="row">
+  <div class="col">
+    <div class="opt-head"><span class="tag now">지금</span><b>위쪽 버튼 두 줄 + ☰ 메뉴</b></div>
+    <div class="phone"><div class="notch"></div>
+      <div class="topbar"><div class="l1"><span class="burger">☰</span><span>2017년 <b>13</b>주차 · 정규 시즌 1·2라운드</span></div>
+        <div style="margin-top:4px">💰 415만 원</div>
+        <div class="tb-btns"><span class="tbb">🏋️ 팀 스크림</span><span class="tbb hp">💪 체력 1/80</span><span class="tbb">휴식 주 💤</span><span class="tbb go">다음 주로 진행 ▶</span></div></div>
+      <div class="content"><div class="goal"><div><div style="font-size:11px;color:var(--muted)">다음 일정</div><b>Road to MSI 개막</b></div><span class="n">2</span></div>
+        <div class="gcard"><div class="ghost" style="width:50%"></div><div class="ghost" style="margin-top:8px"></div><div class="ghost" style="margin-top:8px;width:70%"></div></div>
+        <div class="gcard"><div class="ghost" style="width:40%"></div><div class="ghost" style="margin-top:8px"></div></div></div>
+    </div>
+    <p class="desc">진행하려면 위로 손을 뻗어야 하고, 다른 화면은 ☰ 안 22개 목록에서 찾아야 합니다.</p>
+  </div>
+  <div class="col">
+    <div class="opt-head"><span class="tag rec">A 추천</span><b>아래 탭 5칸, 가운데 다이아몬드 진행 버튼</b></div>
+    <div class="phone"><div class="notch"></div>
+      <div class="slim"><span>2017 · <b>13주차</b></span><span><span class="chip">🏋️ 팀 스크림</span> <span class="chip hp">💪 1</span> <span class="chip">💰 415만</span></span></div>
+      <div class="content"><div class="goal"><div><div style="font-size:11px;color:var(--muted)">다음 일정</div><b>Road to MSI 개막</b></div><span class="n">2</span></div>
+        <div class="gcard"><div class="ghost" style="width:50%"></div><div class="ghost" style="margin-top:8px"></div><div class="ghost" style="margin-top:8px;width:70%"></div></div>
+        <div class="gcard"><div class="ghost" style="width:40%"></div><div class="ghost" style="margin-top:8px"></div></div>
+        <div class="gcard"><div class="ghost" style="width:60%"></div><div class="ghost" style="margin-top:8px"></div></div></div>
+      <div class="pop">길게 누르면 <b>💤 휴식 주로 진행</b></div>
+      <div class="tabbar">
+        <div class="tab on"><span class="ic">🏠</span>대시보드</div>
+        <div class="tab"><span class="ic">🏋️</span>훈련</div>
+        <div class="tab"><div class="go-btn"><span>▶</span></div><div class="go-lbl">다음 주</div></div>
+        <div class="tab"><span class="badge">5</span><span class="ic">📱</span>SNS</div>
+        <div class="tab"><span class="ic">☰</span>전체</div>
+      </div>
+    </div>
+    <p class="desc"><b>위쪽은 한 줄</b>(주차 · 지금 훈련 · 체력 · 돈). 훈련 칩을 누르면 훈련 화면. <b>▶ 누르면 다음 주, 길게 누르면 휴식 주</b>(처음 몇 번 말풍선으로 알려 줌). 체력이 너무 낮으면 ▶ 테두리가 빨갛게. ☰ 전체 = 나머지 메뉴(아래 그림).</p>
+  </div>
+  <div class="col">
+    <div class="opt-head"><span class="tag">B</span><b>아래 탭 4칸 + 떠 있는 진행 버튼</b></div>
+    <div class="phone"><div class="notch"></div>
+      <div class="slim"><span>2017 · <b>13주차</b></span><span><span class="chip">🏋️ 팀 스크림</span> <span class="chip hp">💪 1</span> <span class="chip">💰 415만</span></span></div>
+      <div class="content"><div class="goal"><div><div style="font-size:11px;color:var(--muted)">다음 일정</div><b>Road to MSI 개막</b></div><span class="n">2</span></div>
+        <div class="gcard"><div class="ghost" style="width:50%"></div><div class="ghost" style="margin-top:8px"></div><div class="ghost" style="margin-top:8px;width:70%"></div></div>
+        <div class="gcard"><div class="ghost" style="width:40%"></div><div class="ghost" style="margin-top:8px"></div></div></div>
+      <div class="fab">다음 주 ▶</div>
+      <div class="tabbar4">
+        <div class="tab on"><span class="ic">🏠</span>대시보드</div>
+        <div class="tab"><span class="ic">🏋️</span>훈련</div>
+        <div class="tab"><span class="badge">5</span><span class="ic">📱</span>SNS</div>
+        <div class="tab"><span class="ic">☰</span>전체</div>
+      </div>
+    </div>
+    <p class="desc">버튼 글자가 분명함. 대신 오른쪽 아래 카드 내용을 가끔 가리고, 휴식 주는 따로 버튼이 필요(위쪽 칩 옆).</p>
+  </div>
+</div>
+
+<div class="row" style="margin-top:22px">
+  <div class="col" style="flex:0 1 360px">
+    <div class="opt-head"><span class="tag rec">A·B 공통</span><b>☰ 전체 = 아래에서 올라오는 메뉴판</b></div>
+    <div class="phone" style="height:520px"><div class="notch"></div>
+      <div class="content"><div class="gcard"><div class="ghost"></div></div></div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="mh">내 선수</div>
+        <div class="mgrid"><div class="mi"><span class="ic">👥</span>친구</div><div class="mi"><span class="ic">🧑‍💻</span>선수 정보</div><div class="mi"><span class="ic">🛒</span>상점</div><div class="mi"><span class="ic">🏅</span>업적</div></div>
+        <div class="mh">경기</div>
+        <div class="mgrid"><div class="mi"><span class="ic">🛡️</span>소속팀</div><div class="mi"><span class="ic">📊</span>경기 결과</div><div class="mi"><span class="ic">📅</span>일정</div><div class="mi"><span class="ic">🏆</span>리그 순위</div></div>
+        <div class="mh">이적 · 기록 · 그 밖</div>
+        <div class="mgrid"><div class="mi"><span class="ic">💼</span>이적 시장</div><div class="mi"><span class="ic">📚</span>기록실</div><div class="mi"><span class="ic">🌏</span>해외 리그</div><div class="mi"><span class="ic">⚙️</span>설정</div></div>
+      </div>
+      <div class="tabbar"><div class="tab"><span class="ic">🏠</span>대시보드</div><div class="tab"><span class="ic">🏋️</span>훈련</div><div class="tab"><div class="go-btn"><span>▶</span></div><div class="go-lbl">다음 주</div></div><div class="tab"><span class="ic">📱</span>SNS</div><div class="tab on"><span class="ic">☰</span>전체</div></div>
+    </div>
+    <p class="desc">지금 ☰ 목록(세로 22줄)을 4칸 격자로. 아이콘은 이미 있는 페이지 머리 아이콘(data/ui.js PAGE_HEADS)을 그대로 씀.</p>
+  </div>
+</div>
+
+<h2>⑥ 받은 연락을 카드로</h2>
+<p class="lead">지금은 목록 → 펼치기 → 선택 버튼입니다. 답장할 연락이 있으면 카드 한 장씩 넘기며 답합니다. 선택지 아래 작은 글씨(🎲 성공 확률 · ⚠️ 위험 · 💚 극복)는 지금 게임에 나오는 그대로입니다 — 정보를 더 알려 주지 않습니다.</p>
+<div class="row">
+  <div class="col">
+    <div class="opt-head"><span class="tag now">지금</span><b>목록에서 펼쳐 답하기</b></div>
+    <div class="phone"><div class="notch"></div>
+      <div class="content old-list">
+        <div style="font-weight:700">📩 받은 연락 <span class="chip">2</span></div>
+        <div class="it on">✉️ <div><b>길어지는 후보 생활</b><div style="color:var(--muted);font-size:11px">후보로 지낸 지 꽤 됐다. 경…</div></div></div>
+        <div class="it on">🎤 <div><b>정규 시즌 미디어데이</b><div style="color:var(--muted);font-size:11px">정규 시즌 개막을 앞두고 미…</div></div></div>
+        <div class="it" style="opacity:.5">✉️ <div>손목 통증 <span style="font-size:10px">지나감</span></div></div>
+        <div class="it" style="opacity:.5">✉️ <div>Yacht 선수가 사고를 칠 것 같다</div></div>
+        <div class="it" style="opacity:.5">📋 <div>새 퀘스트: 리플레이 숙제</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="opt-head"><span class="tag rec">A 추천</span><b>선택지 2개 = 좌우 버튼</b></div>
+    <div class="phone"><div class="notch"></div>
+      <div class="count">답장 대기 <b style="color:var(--text)">1 / 2</b> · 4주 안에 답하기</div>
+      <div class="msg-card">
+        <div class="mc-top"><span>✉️ 받은 연락 · 감독</span><span>12주차</span></div>
+        <div class="mc-pic">🪑</div>
+        <div class="mc-title">길어지는 후보 생활</div>
+        <div class="mc-text">후보로 지낸 지 꽤 됐다. 경기장 대기실에서 동료들의 경기를 모니터로만 본다.</div>
+      </div>
+      <div class="lr">
+        <div class="choice l"><span class="ar">◀</span> 이적하고 싶다고 말한다<small>비시즌 이적 제안이 늘어남</small></div>
+        <div class="choice r">주전을 되찾을 때까지 버틴다 <span class="ar">▶</span><small>&nbsp;</small></div>
+      </div>
+      <div class="hint">카드를 왼쪽·오른쪽으로 밀어도 골라져요 · 나중에 답하기 ⌄</div>
+    </div>
+    <p class="desc">2지선다는 좌우로 밀기(스와이프)도 됨. 결과는 지금처럼 카드 뒷면에 한 줄로.</p>
+  </div>
+  <div class="col">
+    <div class="opt-head"><span class="tag rec">A 추천</span><b>선택지 3개 이상 = 카드 아래 세로 버튼</b></div>
+    <div class="phone"><div class="notch"></div>
+      <div class="count">답장 대기 <b style="color:var(--text)">2 / 2</b></div>
+      <div class="msg-card" style="border-color:rgba(var(--gold-rgb),.55);box-shadow:0 0 30px rgba(var(--gold-rgb),.15)">
+        <div class="mc-top"><span>🎤 시즌 이야기</span><span>12주차</span></div>
+        <div class="mc-pic" style="height:96px">🎤</div>
+        <div class="mc-title">정규 시즌 미디어데이</div>
+        <div class="mc-text">사회자가 테스트에게 마이크를 넘겼다. "올 시즌 각오 한마디!"</div>
+      </div>
+      <div class="vlist">
+        <div class="choice">"올해는 저희가 우승합니다."<small><span class="ic-dice">🎲</span> 성공 확률 10% (인기도 3)</small></div>
+        <div class="choice">"한 경기 한 경기 최선을 다하겠습니다."</div>
+        <div class="choice">다른 팀 선수를 지목해 도발한다<small><span class="ic-risk">⚠️</span> 낮은 확률(2%)로 나쁜 특성 '구설수'</small></div>
+      </div>
+    </div>
+    <p class="desc">답장할 연락이 남아 있으면 다음 카드가 바로 이어짐. PC에서도 같은 카드를 SNS 화면 가운데에 띄울 수 있음(B: PC는 지금 그대로).</p>
+  </div>
+</div>
+
+<div class="note"><b>추천:</b> ⑤ A (아래 탭 5칸 + 다이아몬드 진행, 길게 = 휴식 주) · ⑥ A (2개는 좌우, 3개 이상은 세로). ⑥을 PC에도 넣을지는 A(PC도 카드) / B(PC는 지금 목록 그대로) 중에서 골라 주세요.</div>
+</div>
+</body>
+</html>
