@@ -904,7 +904,7 @@ function nextWeek(restWeek) {
     ? '<span class="notice-go no-link" data-gosns="social" tabindex="0" title="눌러서 선수 SNS 보기">📣 선수 SNS에서 ' + escapeHTML(state.player.name) + " 선수를 언급한 글이 " + state.newMentions + '개 올라왔어요. <b>💬 선수 SNS 보기 ▶</b></span>'
     : "";
   state.newMentions = 0;
-  if (state.settings.autoSave) saveGame();
+  if (state.settings.autoSave) saveGameSoon(); // 압축 저장(약 0.2초)은 화면을 먼저 그린 뒤에 (R5, js/save.js)
   renderAll();
 }
 

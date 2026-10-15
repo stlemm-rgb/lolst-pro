@@ -3,6 +3,7 @@
 #   - 불러오기(페이지를 새로 열 때 js/start.js)가 멈추지 않는지
 #   - 화면 23개가 오류 없이 그려지는지
 #   - 1시즌(52주) 진행해도 오류가 없고, 빠졌던 칸이 다시 채워지는지
+#   - 압축 저장(R5, 'LZ1|')한 것을 새 창에서 다시 열면 같은 주로 이어지는지
 # 예전 버전 세이브 파일이 남아 있지 않아서, 버전별로 없던 칸을 빼서 흉내 냄 (PROGRESS의 기능 추가 순서 기준)
 import copy, json, sys
 from pathlib import Path
@@ -106,6 +107,16 @@ def main():
             for p in PAGES:
                 pg.evaluate("(p) => { const n = document.getElementById('news-popup'); if (n) n.remove(); state.currentMenu = p; renderAll(); }", p)
             after = pg.evaluate(CHECK_JS)
+            # 압축 저장(R5) → 새 창에서 다시 열기
+            raw = pg.evaluate("() => { saveGame(); return localStorage.getItem('progamer-career-save'); }")
+            pg2 = br.new_page()
+            pg2.on("pageerror", lambda e: errs.append(str(e)))
+            pg2.add_init_script("localStorage.setItem('progamer-career-save', " + json.dumps(raw) + ")")
+            pg2.goto(GAME)
+            pg2.wait_for_timeout(200)
+            again = pg2.evaluate("() => [state.year, state.week, !!state.player && state.player.name]")
+            if not raw.startswith("LZ1|") or again != [after["year"], after["week"], "예전"]:
+                errs.append("압축 저장 다시 열기 실패: " + str(again) + " 압축 " + str(raw[:4] == "LZ1|"))
             br.close()
             need = ["loaded", "look", "league", "staff", "world", "contract", "stats", "money"]
             miss = [k for k in need if not after[k]] + (["불러오기 실패"] if not first["loaded"] else [])

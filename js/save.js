@@ -204,24 +204,124 @@ function stateFromSave(save) {
 }
 
 // 브라우저에 저장. 성공하면 true
+// R5: 압축해서 저장 (10시즌 약 0.72MB → 약 0.2MB). 압축본을 바로 풀어 보고 똑같을 때만 압축본을 씀
+const SAVE_PACK_PREFIX = "LZ1|";
 function saveGame() {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(makeSaveData()));
+    localStorage.setItem(SAVE_KEY, packSaveText(JSON.stringify(makeSaveData())));
     return true;
   } catch (e) {
     return false;
   }
+}
+// 다음 주 진행 자동 저장: 화면을 먼저 그리고 바로 뒤에 저장 (여러 번 불려도 한 번만)
+let saveSoonTimer = null;
+function saveGameSoon() {
+  if (saveSoonTimer) return;
+  saveSoonTimer = setTimeout(function () { saveSoonTimer = null; saveGame(); }, 30);
+}
+function packSaveText(json) {
+  const packed = lzPack(json);
+  return lzUnpack(packed) === json ? SAVE_PACK_PREFIX + packed : json;
+}
+// 저장된 글자 → 세이브 (압축본·예전 그대로 둘 다)
+function unpackSaveText(text) {
+  if (text.indexOf(SAVE_PACK_PREFIX) === 0) return JSON.parse(lzUnpack(text.slice(SAVE_PACK_PREFIX.length)));
+  return JSON.parse(text);
 }
 
 // 브라우저에서 세이브 꺼내기. 없거나 망가졌으면 null
 function readSave() {
   try {
     const text = localStorage.getItem(SAVE_KEY);
-    return text ? JSON.parse(text) : null;
+    return text ? unpackSaveText(text) : null;
   } catch (e) {
     return null;
   }
 }
+
+// ----- 세이브 압축 (R5): LZ 방식(lz-string의 UTF16 방식과 같은 원리)으로 글자 수를 줄여 브라우저 저장소에 저장 -----
+// 저장할 때 압축 → 바로 풀어 보고 똑같을 때만 압축본을 씀 (아니면 예전처럼 그대로 저장)
+function lzPack(input) {
+  const bitsPerChar = 15;
+  const out = [];
+  const dict = new Map(), toCreate = new Set();
+  let w = "", enlargeIn = 2, dictSize = 3, numBits = 2, val = 0, pos = 0;
+  const put = function (bit) {
+    val = (val << 1) | bit;
+    if (pos === bitsPerChar - 1) { pos = 0; out.push(String.fromCharCode(val + 32)); val = 0; } else pos++;
+  };
+  const putValue = function (value, n) { for (let i = 0; i < n; i++) { put(value & 1); value >>= 1; } };
+  const emitW = function () {
+    if (toCreate.has(w)) {
+      const code = w.charCodeAt(0);
+      if (code < 256) { putValue(0, numBits); putValue(code, 8); } else { putValue(1, numBits); putValue(code, 16); }
+      enlargeIn--;
+      if (enlargeIn === 0) { enlargeIn = Math.pow(2, numBits); numBits++; }
+      toCreate.delete(w);
+    } else {
+      putValue(dict.get(w), numBits);
+    }
+    enlargeIn--;
+    if (enlargeIn === 0) { enlargeIn = Math.pow(2, numBits); numBits++; }
+  };
+  for (let i = 0; i < input.length; i++) {
+    const c = input.charAt(i);
+    if (!dict.has(c)) { dict.set(c, dictSize++); toCreate.add(c); }
+    const wc = w + c;
+    if (dict.has(wc)) { w = wc; continue; }
+    emitW();
+    dict.set(wc, dictSize++);
+    w = c;
+  }
+  if (w !== "") emitW();
+  putValue(2, numBits); // 끝 표시
+  for (;;) { val = val << 1; if (pos === bitsPerChar - 1) { out.push(String.fromCharCode(val + 32)); break; } pos++; }
+  return out.join("") + " ";
+}
+function lzUnpack(input) {
+  if (!input) return "";
+  const length = input.length, reset = 16384;
+  const get = function (i) { return input.charCodeAt(i) - 32; };
+  const dict = [0, 1, 2];
+  let enlargeIn = 4, dictSize = 4, numBits = 3, w, entry, c;
+  let dval = get(0), dpos = reset, dindex = 1;
+  const result = [];
+  const read = function (n) {
+    let bits = 0, power = 1;
+    const max = Math.pow(2, n);
+    while (power !== max) {
+      const b = dval & dpos;
+      dpos >>= 1;
+      if (dpos === 0) { dpos = reset; dval = get(dindex++); }
+      bits |= (b > 0 ? 1 : 0) * power;
+      power <<= 1;
+    }
+    return bits;
+  };
+  const first = read(2);
+  if (first === 0) c = String.fromCharCode(read(8));
+  else if (first === 1) c = String.fromCharCode(read(16));
+  else return "";
+  dict[3] = c; w = c; result.push(c);
+  for (;;) {
+    if (dindex > length) return "";
+    let code = read(numBits);
+    if (code === 0) { dict[dictSize++] = String.fromCharCode(read(8)); code = dictSize - 1; enlargeIn--; }
+    else if (code === 1) { dict[dictSize++] = String.fromCharCode(read(16)); code = dictSize - 1; enlargeIn--; }
+    else if (code === 2) return result.join("");
+    if (enlargeIn === 0) { enlargeIn = Math.pow(2, numBits); numBits++; }
+    if (dict[code]) entry = dict[code];
+    else if (code === dictSize) entry = w + w.charAt(0);
+    else return null;
+    result.push(entry);
+    dict[dictSize++] = w + entry.charAt(0);
+    enlargeIn--;
+    w = entry;
+    if (enlargeIn === 0) { enlargeIn = Math.pow(2, numBits); numBits++; }
+  }
+}
+
 
 // 브라우저 세이브로 게임 상태 만들기. 없으면 null
 function loadGame() {
@@ -257,7 +357,7 @@ function importSave(file, onDone) {
   const reader = new FileReader();
   reader.onload = function () {
     try {
-      onDone(stateFromSave(JSON.parse(reader.result)), "");
+      onDone(stateFromSave(unpackSaveText(String(reader.result).trim())), ""); // 압축본(R5)·보통 JSON 둘 다
     } catch (e) {
       onDone(null, e instanceof SyntaxError ? "파일 내용을 읽을 수 없습니다." : e.message);
     }
