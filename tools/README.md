@@ -86,7 +86,7 @@ python3 tools/measure_worlds.py --report /tmp/w.json
 
 ### 역사 뉴스 (5단계)
 
-node tools/test_historical_news.cjs: 2012~2026 기사 편성·중복·저장·게임 수치 무변경 검사. 출처는 data/historical_news.js의 source 필드. 새 게임은 SNS 신문 보관함, 다음 해부터 기존 신년 기사에 합쳐진다. 실제 53주 진행과 병합은 node tools/test_news.cjs에서도 검사한다. Node VM 검사로 화면 배치까지 검증하지는 않는다.
+node tools/test_historical_news.cjs: 2012~2026 기사 편성·중복·저장·게임 수치 무변경 검사. 출처는 data/news.js(예전 historical_news.js 부분)의 source 필드. 새 게임은 SNS 신문 보관함, 다음 해부터 기존 신년 기사에 합쳐진다. 실제 53주 진행과 병합은 node tools/test_news.cjs에서도 검사한다. Node VM 검사로 화면 배치까지 검증하지는 않는다.
 
 ### 작은 시대 효과 (6단계)
 
