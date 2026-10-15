@@ -91,7 +91,7 @@ function progressQuests(training, changes) {
   done.forEach(completeQuest);
 }
 
-// 퀘스트 완료 처리 (훈련 퀘스트 + 빅게임 퀘스트 js/biggame.js)
+// 퀘스트 완료 처리 (훈련 퀘스트 + 빅게임 퀘스트 js/rivals.js)
 function completeQuest(q) {
     const tpl = findQuest(q.id);
     // 모범생: 보상 +50%
@@ -118,7 +118,7 @@ function questMastered(tpl) {
 }
 
 // 기한 지난 퀘스트 정리, 새 퀘스트 주기 (주가 넘어간 뒤 부름)
-// 새 퀘스트 비중 (data/quests.js QUEST_RULES.lowMastery)
+// 새 퀘스트 비중 (data/training.js QUEST_RULES.lowMastery)
 function questWeight(tpl) {
   const L = QUEST_RULES.lowMastery;
   const lowBoost = function (m) { return 1 + L.boost * Math.max(0, Math.min(1, (L.pivot - m) / L.range)); };

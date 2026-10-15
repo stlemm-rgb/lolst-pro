@@ -85,7 +85,7 @@ node tools/test_historical_news.cjs: 2012~2026 기사 편성·중복·저장·�
 
 ### 작은 시대 효과 (6단계)
 
-node tools/test_era_match.cjs: 날짜 경계·저장·양 팀 대칭·뉴스 무보상, 시대별500세트 동일 난수 전후 비교. 실제 playSet을 사용하며 로스터 생성에 따라 측정값은 달라집니다. 전체 장기 밸런스나 실제 화면 검사는 아닙니다. 조절 값은 data/era_match.js.
+node tools/test_era_match.cjs: 날짜 경계·저장·양 팀 대칭·뉴스 무보상, 시대별500세트 동일 난수 전후 비교. 실제 playSet을 사용하며 로스터 생성에 따라 측정값은 달라집니다. 전체 장기 밸런스나 실제 화면 검사는 아닙니다. 조절 값은 data/era.js.
 
 ### 뉴스 개편 통합 검증 (7단계)
 

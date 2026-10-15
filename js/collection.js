@@ -1,3 +1,51 @@
+// ===== js/collection.js — 시그니처 픽·업적·컬렉션 (R2: 파일 2개를 합침) =====
+
+// ━━━━━ (예전 js/signature.js) ━━━━━
+// ===== 시그니처 픽 (값: data/match.js MATCH.signaturePick, 글: data/events.js signature_found) =====
+// 내 포지션 챔피언 숙련도가 100이 되면 독백 연락 → "맞다"를 고르면 그 챔피언이 시그니처 픽 (한 번 정하면 그대로)
+// "아니다"를 고르면 다음에 다른 챔피언이 100이 될 때 다시 물어봄 (같은 챔피언도 숙련도가 떨어졌다가 다시 100이 되면 다시)
+// 저장: state.signature (챔피언 이름 또는 null), state.sig100 (이미 물어본 100 챔피언 목록)
+
+function checkSignature100() {
+  if (!state.player || state.signature) return;
+  const noted = state.sig100 = (state.sig100 || []).filter(function (n) { return (state.mastery[n] || 0) >= MASTERY.max; }); // 100 아래로 떨어지면 다시 물어볼 수 있게
+  const fresh = myPositionChampions().filter(function (n) { return state.mastery[n] >= MASTERY.max && noted.indexOf(n) === -1; });
+  if (!fresh.length) return;
+  const ev = findEvent("signature_found");
+  if (!ev) return;
+  const champ = fresh[0];
+  noted.push(champ); // 한 주에 하나씩만
+  fireEvent(ev, { champ: champ });
+}
+
+// 시그니처 픽 표시 칩
+function sigTagHTML(name) {
+  return state.signature && name === state.signature
+    ? ' <span class="joker-tag sig-tag" title="시그니처 픽 ' + starText(sigStar()) + ': 메타와 상관없이 고를 때 가치 +' + sigValue("pickBonus") + ' · 경기력 +' + Math.round(sigValue("powerBonus") * 100) +
+      '%, 고른 세트에서 좋은 장면 1번 보장, 상대가 ' + Math.round(sigValue("banChance") * 100) + '% 확률로 먼저 밴, 대격변 패치에도 숙련도·포지션 그대로">✒️ 시그니처 ' + "★".repeat(sigStar()) + '</span>'
+    : "";
+}
+
+// 시그니처 픽을 고른 세트: 내 선수 좋은 장면이 없으면 하나 만들어 줌 (있으면 첫 장면에 ✒️ 표시) — js/match_events.js rollSetEvents
+function sigGuaranteedPlay(out, sides, R) {
+  const s = sides[0].some(function (q) { return q.id === USER_ID; }) ? 0 : sides[1].some(function (q) { return q.id === USER_ID; }) ? 1 : -1;
+  if (s < 0) return;
+  const p = sides[s].find(function (q) { return q.id === USER_ID; });
+  const mine = out.list.filter(function (e) { return e.p === USER_ID && e.k === "good"; });
+  if (mine.length) { mine[0].sg = true; return; }
+  const pool = MATCH_EVENTS.filter(function (e) { return e.kind === "good" && !e.finisher && (!e.pos || e.pos[p.pos]); });
+  const ev = weightedPick(pool, function (e) { return e.w * (e.pos ? e.pos[p.pos] : 1); });
+  if (!ev) return;
+  const victim = evVictim(ev, sides[1 - s], p.pos);
+  const r = R.size[ev.size];
+  const x = Math.round(randFloat(r[0], r[1]) * R.scale * evSizeMult(traitsOf(USER_ID), ev) * 10) / 10;
+  if (s === 0) out.a += x; else out.b += x;
+  addRate(out.rate, USER_ID, R.rating[ev.size]);
+  if (victim) addRate(out.rate, victim.id, -R.victimRating);
+  out.list.push({ t: randInt(ev.t[0], ev.t[1]), e: ev.id, s: s, p: USER_ID, pp: p.pos, v: victim ? victim.id : null, vp: victim ? victim.pos : null, x: x, k: "good", sg: true });
+}
+
+// ━━━━━ (예전 js/collection.js) ━━━━━
 // ===== 수집·강화 (값: data/collection.js) =====
 // 1) 🏆 월드 우승 스킨: 월드 결승(모든 세트)에서 우승 팀 선수가 쓴 챔피언 중 하나 → state.league.worldsSkins (모든 해 기록)
 //    다른 선수는 결승에서 쓴 챔피언 중 무작위, 내 선수는 [컬렉션]에서 직접 고름 (고르기 전 champ null, choices 후보)
@@ -61,7 +109,7 @@ function chooseSkin(year, champ) {
 // 내 스킨이 정해졌을 때: 주요 순간 · 디자인 회의 연락 · 소식
 function skinChosen(entry, me, auto) {
   addMoment("🎨", entry.year + " 월드 우승 스킨 '" + skinName(entry, me.champ) + "'");
-  queueTrigger("skinMade", { champ: me.champ }); // 스킨 디자인 연락 (js/stories.js)
+  queueTrigger("skinMade", { champ: me.champ }); // 스킨 디자인 연락 (js/friends.js)
   postMessage("news", "🎨 월드 우승 스킨 제작 확정", entry.year + " 월드 챔피언십 우승을 기념해 " + entry.team + " 선수들의 우승 스킨이 만들어진다.\n" +
     state.player.name + "의 스킨은 " + (auto ? "결승에서 쓴 " : "직접 고른 ") + me.champ + ".", {
     notes: ["🎨 " + me.champ + "을(를) 고르면 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "% (스킨 효과)", "[수집] → 컬렉션에서 볼 수 있어요."],
@@ -132,7 +180,7 @@ function achContext() {
 const ACH_VALUES = {
   games: function (x) { return x.c.games || 0; },
   wins: function (x) { return x.c.wins || 0; },
-  bigWins: function (x) { return (x.c.bigGames && x.c.bigGames.w) || 0; }, // 빅게임 (js/biggame.js)
+  bigWins: function (x) { return (x.c.bigGames && x.c.bigGames.w) || 0; }, // 빅게임 (js/rivals.js)
   bigStreak: function (x) { return (x.c.bigGames && x.c.bigGames.best) || 0; },
   pog: function (x) { return x.s.pog; },
   solo: function (x) { return x.s.solo; },
@@ -240,7 +288,7 @@ pages.collection = function () {
     return '<div class="card skin-pick"><h2>🎨 ' + e.year + " 월드 우승 스킨 — 챔피언 고르기</h2>" +
       '<p class="muted small">' + escapeHTML(e.team) + " 우승! 결승에서 내가 쓴 챔피언 중 하나를 골라 우승 스킨으로 만들어요. 고른 챔피언은 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "%.</p>" +
       '<div class="fc-deck fc-skins">' + me.choices.map(function (c) {
-        return flipCardHTML({ flipped: true, grade: "", cls: "fc-skin", name: c, eff: "🏆 " + e.year + " 월드 결승 · 숙련도 " + Math.round(state.mastery[c] || 0), // 카드 (js/cards.js)
+        return flipCardHTML({ flipped: true, grade: "", cls: "fc-skin", name: c, eff: "🏆 " + e.year + " 월드 결승 · 숙련도 " + Math.round(state.mastery[c] || 0), // 카드 (js/ui.js)
           pick: '<button class="fc-pick" data-skin-year="' + e.year + '" data-skin-champ="' + escapeHTML(c) + '">이 스킨으로</button>' });
       }).join("") + "</div></div>";
   }).join("");

@@ -1,3 +1,6 @@
+// ===== js/era.js — 시대·해외 리그·시대별 경기 환경 (R2: 파일 2개를 합침) =====
+
+// ━━━━━ (예전 js/era.js) ━━━━━
 // ===== 시대별 리그 성장 · 해외 리그 (값: data/era.js) =====
 // - 돈·인기도 배율 (eraMoney, eraPop)
 // - 구단 수 (eraTeams) → 새 시즌에 확장 승격·신생 구단 창단 (expandLeague)
@@ -426,4 +429,19 @@ function leagueGrowthNews() {
   const vars = { t1: now[1], t2: now[2], before: leagueFanMultiplier(state.year - 1).toFixed(1), after: leagueFanMultiplier().toFixed(1) };
   const texts = LEAGUE_GROWTH.investment;
   return [fillNews(LEAGUE_GROWTH.popularity, vars), texts[(leagueExpansionCount() - 1) % texts.length]];
+}
+
+// ━━━━━ (예전 js/era_match.js) ━━━━━
+// 현재 날짜로만 계산하므로 뉴스 열람·저장·연도 진행으로 중첩되지 않는다.
+function eraMatchRule(year, week) {
+  const y = year === undefined ? state.year : year;
+  const w = week === undefined ? state.week : week;
+  let rule = ERA_MATCH[0];
+  ERA_MATCH.forEach(function (r) {
+    if (y > r.year || y === r.year && w >= r.week) rule = r;
+  });
+  return rule;
+}
+function eraPhaseMultiplier(phase) {
+  return eraMatchRule()[phase] || 1;
 }

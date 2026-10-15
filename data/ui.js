@@ -1,3 +1,6 @@
+// ===== data/ui.js — 화면: 도트 포트레잇·페이지 머리 (R2: 파일 2개를 합침) =====
+
+// ━━━━━ (예전 data/portrait.js) ━━━━━
 // ===== 2D 도트 포트레잇 (175, 디자인 D1) — 코드는 js/portrait.js =====
 // 32×32 도트. 내 선수는 캐릭터 만들 때 고른 얼굴(state.player.look), 다른 선수는 선수 id로 정해지는 얼굴 (저장 안 함)
 // 크기: 최대 3배(96px) (사용자 결정), 표에는 얼굴만 잘라서
@@ -38,3 +41,26 @@ const REGION_UNIFORMS = {
   cn: [["#dc2626", "#facc15"], ["#111827", "#ef4444"], ["#f8fafc", "#dc2626"]],
 };
 const FREE_AGENT_UNIFORM = ["#4b5563", "#9ca3af"]; // 소속 없음
+
+// ━━━━━ (예전 data/pagehead.js) ━━━━━
+// ===== 페이지 머리 (179, 디자인 D5) — 코드는 js/ui.js =====
+// 화면 맨 위 제목을 카드로: 아이콘 + 제목 + 한 줄 설명 (+ 오른쪽 요약 숫자는 js/ui.js PAGE_HEAD_SIDE)
+// 합친 메뉴(일정·이적 시장·기록실)는 부모 메뉴 id로 찾아요. 대시보드는 따로 (히어로 카드)
+const PAGE_HEADS = {
+  training:     { icon: "🏋️", desc: "이번 주 할 훈련을 골라요. [다음 주로 진행]을 누르면 훈련해요" },
+  sns:          { icon: "📱", desc: "받은 연락에 답하고, 기사와 선수들의 글을 봐요" },
+  friends:      { icon: "🤝", desc: "친구와 함께하면 관계가 깊어지고, 절친은 경기에서 힘이 돼요" },
+  career:       { icon: "🧑‍💻", desc: "내 선수의 능력·특성·챔피언·기록을 한눈에" },
+  shop:         { icon: "🛍️", desc: "모은 돈으로 집·장비·개인 고용·투자" },
+  team:         { icon: "🏠", desc: "팀 내 입지, 우리 팀 전력, 선수단과 스태프" },
+  results:      { icon: "📺", desc: "지난 경기 기록과 다시 보기" },
+  calendar:     { icon: "🗓️", desc: "올해 시즌 흐름과 대회 대진표" },
+  standings:    { icon: "🏆", desc: "리그별 순위표 · 세트 득실과 최근 5경기" },
+  world:        { icon: "🌏", desc: "해외 지역 리그 순위와 스타 선수" },
+  achievements: { icon: "🎖️", desc: "커리어·우승·개인상·명장면 업적 모음" },
+  collection:   { icon: "🎨", desc: "시그니처 픽과 월드 우승 스킨" },
+  market:       { icon: "💼", desc: "내 계약, 이적 요청, 선수 검색과 구단 탐색" },
+  records:      { icon: "📚", desc: "개인 시상 레이스, 역사관, 리그 생태계" },
+  howto:        { icon: "❓", desc: "게임 규칙과 화면 설명" },
+  settings:     { icon: "⚙️", desc: "저장·불러오기와 게임 설정" },
+};

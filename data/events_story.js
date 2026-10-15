@@ -1,6 +1,6 @@
 // ===== 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) =====
 // 모양은 data/events.js 맨 위 설명과 같아요. 여기서는 EVENTS 목록에 더해요.
-// 트리거 설명: data/events.js 맨 위 '2026-10-08 리뉴얼' (주차 트리거는 js/stories.js storyTriggerContext)
+// 트리거 설명: data/events.js 맨 위 '2026-10-08 리뉴얼' (주차 트리거는 js/friends.js storyTriggerContext)
 
 EVENTS.push(
   // ===== K. 시즌 흐름 (그 시기에만, always: 연락 수 상한과 상관없이) =====

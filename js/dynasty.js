@@ -1,5 +1,5 @@
 // ===== 강팀 쏠림 막기 (v1.1): 왕조의 연봉 압박 · 해외 러브콜 · 분석 당하는 챔피언 =====
-// 값은 data/dynasty.js. 새 시즌(contractsNewSeason, 계약 만료 처리 전)에 dynastyNewSeason을 부름.
+// 값은 data/records.js. 새 시즌(contractsNewSeason, 계약 만료 처리 전)에 dynastyNewSeason을 부름.
 // 집중 견제(C1)는 js/match_events.js, 상금 선수 분배(D)는 js/club_market.js payPrize.
 
 // ----- C2. 🔍 분석 당하는 챔피언 -----
@@ -85,7 +85,7 @@ function dynastyPayRaise(champs, news) {
 function dynastyLeave(id, team, why, news) {
   const p = findPlayer(id);
   logTransfer({ kind: "leave", team: null, from: team.id, id: id, name: p.name, pos: p.pos, score: Math.round(playerScore(id) * 10) / 10, age: p.age, fee: 0 });
-  noteFriendLeaving(id, team, null); // 친한 동료면 작별 연락 (js/stories.js)
+  noteFriendLeaving(id, team, null); // 친한 동료면 작별 연락 (js/friends.js)
   releaseToFA(id);
   p.leftFrom = team.id;
   p.leftYear = state.year;

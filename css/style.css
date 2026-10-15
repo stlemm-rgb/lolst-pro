@@ -208,7 +208,7 @@ button.primary:hover:not(:disabled) { background: var(--grad-btn-hover); border-
 .notice-go b { color: var(--accent); white-space: nowrap; }
 .notice:has(.notice-go):hover { border-color: var(--accent); }
 
-/* 대시보드 제목 옆 우승 트로피 (js/trophies.js) */
+/* 대시보드 제목 옆 우승 트로피 (js/history_pages.js) */
 .dash-title { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
 .trophy-shelf { display: inline-flex; align-items: flex-end; gap: 10px; font-size: 13px; font-weight: normal; }
 .trophy { position: relative; display: inline-flex; align-items: flex-end; cursor: default; filter: drop-shadow(0 2px 3px rgba(0,0,0,.45)); }
@@ -789,7 +789,7 @@ table.calc.mastery-table td:last-child { text-align: center; }
 .pos-now { color: var(--text); }
 /* 이름 링크로 이동할 때 위쪽 상단바에 가리지 않게 (js/links.js) */
 .card.detail, .club { scroll-margin-top: 80px; }
-/* 대회 결과 뉴스 팝업 (js/news_popup.js) */
+/* 대회 결과 뉴스 팝업 (js/news.js) */
 #news-popup { position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, 0.65); display: flex; align-items: center; justify-content: center; padding: 24px; cursor: pointer; }
 #news-popup[hidden] { display: none; }
 .np-paper { width: min(620px, 100%); max-height: 85vh; overflow-y: auto; background: #f4efe3; color: #1d1b16; border-radius: var(--r-xs); padding: 18px 26px 14px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); font-family: Georgia, "Batang", serif; animation: np-in 0.25s ease-out; }
@@ -942,7 +942,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .skin-year { font-size: 12px; color: var(--gold); font-weight: bold; }
 .skin-champ { font-size: 18px; font-weight: bold; margin: 2px 0; }
 
-/* ===== 받은 연락 리뉴얼 (js/stories.js) ===== */
+/* ===== 받은 연락 리뉴얼 (js/friends.js) ===== */
 .msg-result { margin: 0 14px 10px; padding: 8px 12px; border-left: 3px solid var(--accent); background: var(--panel-2); border-radius: 0 6px 6px 0; font-size: 14px; white-space: pre-line; }
 .rel-bar-cell { width: 34%; min-width: 120px; }
 .rel-bar { position: relative; height: 8px; background: var(--border); border-radius: var(--r-xs); }
@@ -971,7 +971,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 #confirm-box .cb-text { margin: 0 0 16px; white-space: pre-line; line-height: 1.6; }
 #confirm-box .cb-buttons { display: flex; justify-content: flex-end; gap: 8px; }
 
-/* 맞대결 전적 (170, js/h2h.js) */
+/* 맞대결 전적 (170, js/rivals.js) */
 .h2h-dots { letter-spacing: 2px; font-size: 12px; }
 .h2h-row { padding-top: 2px; }
 
@@ -1127,7 +1127,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
   .rp-feed { height: 220px; }
 }
 
-/* ===== 디자인 D4 뒤집는 카드 (178, js/cards.js) ===== */
+/* ===== 디자인 D4 뒤집는 카드 (178, js/ui.js) ===== */
 .fc-deck { display: grid; grid-template-columns: repeat(auto-fit, 210px); gap: 18px; justify-content: center; perspective: 1200px; margin: 10px 0; }
 .fc-deck.fc-skins { grid-template-columns: repeat(auto-fill, 150px); justify-content: start; }
 .fcard { position: relative; height: 290px; cursor: pointer; }

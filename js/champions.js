@@ -44,7 +44,7 @@ function startMastery(stats, position, year, week) {
 
 // 새 패치: 포지션마다 메타 챔피언을 무작위로 뽑음
 // prefer: { 포지션: [챔피언...] } 메타에 꼭 넣을 챔피언 (대격변 리워크·포지션 변경, js/shakeup.js)
-// 대격변이 있는 해는 메타 판 확대: 포지션마다 SHAKEUP.metaWide.perPosition 명, S급 sCount 명 (data/shakeup.js)
+// 대격변이 있는 해는 메타 판 확대: 포지션마다 SHAKEUP.metaWide.perPosition 명, S급 sCount 명 (data/era.js)
 function makePatch(year, week, prefer) {
   const pool = releasedChampions(year, week);
   const wide = isShakeupYear(year);
@@ -156,7 +156,7 @@ function masteryGrowthMultiplier(champName) {
   let traitBonus = traitEffectSum("masteryGrowth");
   if (c) traitBonus += traitEffectKey("typeMastery", c.type);          // 유형별 특성 (캐리 본능 등)
   if (champName && isMeta(champName)) traitBonus += traitEffectSum("metaMastery"); // 메타 리더
-  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitBonus + typeBonus + dormTrainingBonus()); // 합숙 보너스 (js/housing.js dormRate)
+  return findArchetype(state.player.archetype).masteryGrowth * Math.max(0, 1 + traitBonus + typeBonus + dormTrainingBonus()); // 합숙 보너스 (js/shop.js dormRate)
 }
 
 // 챔피언 연습: 숙련도 올리기. 바뀐 값을 { 이름: +n } 으로 돌려줌
@@ -252,7 +252,7 @@ function myJokerFactor(name) {
   return myJokers().indexOf(name) !== -1 ? jokerFactor(state.mastery[name], isMeta(name)) : 0;
 }
 
-// 시그니처 픽 보너스 (js/signature.js) — 메타와 상관없이
+// 시그니처 픽 보너스 (js/collection.js) — 메타와 상관없이
 //   값은 시그니처 별(★1~★5)에 따라 커짐 (js/collection.js sigValue)
 function sigPickBonus(name) { return state.signature && name === state.signature ? sigValue("pickBonus") : 0; }
 function sigPowerBonus(name) { return state.signature && name === state.signature ? sigValue("powerBonus") : 0; }

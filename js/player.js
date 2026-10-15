@@ -116,7 +116,7 @@ function trainingBonusFor(statId) {
   bonus += shopEffectKey("trainingStat", statId); // 상점 장비·개인 고용
   bonus += coachTrainingBonus(); // 친구 코치 (js/retirement.js)
   bonus += staffTrainingBonus(); // 구단 코치 등급 (js/staff.js)
-  bonus += dormTrainingBonus(); // 합숙: 모든 훈련 보너스 (합숙 피로로 줄어듦) (js/housing.js)
+  bonus += dormTrainingBonus(); // 합숙: 모든 훈련 보너스 (합숙 피로로 줄어듦) (js/shop.js)
   return bonus;
 }
 
@@ -163,7 +163,7 @@ function traitChipsMini(id) {
   return list.length || named ? ' <span class="mini-chips">' + named + list.map(traitChipHTML).join("") + "</span>" : "";
 }
 
-// 성장 곡선 배율: 스탯이 높을수록 덜 오름 (data/growth.js)
+// 성장 곡선 배율: 스탯이 높을수록 덜 오름 (data/player.js)
 // traits·statId를 주면 한계 특성의 '85 이상 성장 ×n'(topGrowth)까지 넣어요
 function growthMultiplier(value, traits, statId) {
   const row = GROWTH_CURVE.find(function (g) { return value < g.upTo; });
@@ -171,7 +171,7 @@ function growthMultiplier(value, traits, statId) {
   return base * topGrowthMultiplier(value, traits, statId);
 }
 
-// 퀘스트·이벤트 스탯 보상 배율 (높은 스탯일수록 덜 오름, data/growth.js REWARD_CURVE)
+// 퀘스트·이벤트 스탯 보상 배율 (높은 스탯일수록 덜 오름, data/player.js REWARD_CURVE)
 function rewardMultiplier(value, traits, statId) {
   const row = REWARD_CURVE.find(function (r) { return value >= r.from; });
   return row ? Math.min(1, row.mult * topGrowthMultiplier(value, traits, statId)) : 1;

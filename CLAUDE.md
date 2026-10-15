@@ -8,6 +8,10 @@ A text career simulation game. Double-clicking `index.html` in the browser runs 
 2. **Commit each time a feature is finished.** Work in small units, and once one feature works, make a git commit.
 3. **Keep event data separate from code.** Write event content (text, choices, effects) in a separate data file, not inside the game-logic code.
 
+## 파일 찾기
+
+- 어느 파일에 무엇이 있는지: **`FILEMAP.md`** (`python3 tools/filemap.py`로 다시 만들기). 새 파일을 만들면 index.html에 넣고 지도도 다시 만들 것.
+
 ## Technical Constraints
 
 - Opening `index.html` directly (`file://`) must work, so `fetch()` cannot load JSON files.

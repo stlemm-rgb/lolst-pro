@@ -129,7 +129,7 @@ function playerDetailHTML(id) {
       '<div class="chips">' + styleChipHTML(id) + (traits.length ? traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div>" +
       strengthLineHTML(p) +
       champLineHTML(id) +
-      h2hDetailLineHTML(id) + // 나와의 전적 (js/h2h.js)
+      h2hDetailLineHTML(id) + // 나와의 전적 (js/rivals.js)
       '<div class="stat-columns">' + bars + "</div>" +
     "</div>"
   );

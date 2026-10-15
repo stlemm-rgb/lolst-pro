@@ -61,9 +61,9 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 
 | 번호 | 내용 | 주요 파일 |
 |---|---|---|
-| 134 | 친구 피드백 '강팀 쏠림': 🔥리그의 에이스·🏰왕조의 심장 1년짜리, 🎯집중 견제를 S급 가진 다른 선수에게도(+미끼 장면·해설 외침), 🔍월드 우승팀 다음 시즌 −3%, 💸왕조 연봉 압박(FA 선언·협상 결렬), ✈️해외 러브콜, 💰상금 절반 선수 몫. 🐞평판이 나빠 커리어 점수 음수면 매주 멈추던 버그 | data/dynasty.js, js/dynasty.js, js/straits.js, js/match_events.js, js/match_detail.js |
+| 134 | 친구 피드백 '강팀 쏠림': 🔥리그의 에이스·🏰왕조의 심장 1년짜리, 🎯집중 견제를 S급 가진 다른 선수에게도(+미끼 장면·해설 외침), 🔍월드 우승팀 다음 시즌 −3%, 💸왕조 연봉 압박(FA 선언·협상 결렬), ✈️해외 러브콜, 💰상금 절반 선수 몫. 🐞평판이 나빠 커리어 점수 음수면 매주 멈추던 버그 | data/records.js, js/dynasty.js, js/straits.js, js/match_events.js, js/match_detail.js |
 | 135 | 새 게임 훈련 기본값 솔로 랭크, 처음 안내 1단계 '훈련 바꿔 보기'(다른 훈련으로 바꿔야 완료, tutorial.startPlan) | js/main.js, js/guide.js, data/guide.js, js/creation.js |
-| 136 | 네임드 선수 Jimul(원딜)·Kibai(탑) 추가 → 7명. 같은 포지션 네임드는 다른 팀 | data/named_players.js, js/league.js |
+| 136 | 네임드 선수 Jimul(원딜)·Kibai(탑) 추가 → 7명. 같은 포지션 네임드는 다른 팀 | data/names.js, js/league.js |
 | 137 | 훈련 특성: 천재적 감각 +12%, 전문 특성 = 훈련 하나의 스탯 3개 +30% (라인전 괴물=솔랭, 냉철한 판단=스크림, 분석의 눈(예전 빠른 손, id fast_hands)=리플레이) | data/traits.js |
 | 138 | 2012년 시작 2주차 리그 규모 소개 신문 기사 | data/era.js ERA_INTRO, js/era.js |
 | 139 | 해외 리그 ①: 국제대회 해외 팀도 실제 선수 5명, findPlayer가 해외 선수(id 'X…')도 찾음, 해외 선수 숙련도. 지역 3단계 수준 (우리 리그 1.0 > 중국·북미·유럽 0.94(169에서 0.92) > 나머지 0.86) | js/matchsim.js, js/era.js, js/league.js, js/npc_mastery.js |
@@ -79,7 +79,7 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 | 149 | 평판 등급이 오르면 4주 하락 유예 (state.fame.repHold, REPUTATION.holdWeeks) | js/fame.js, data/fame.js |
 | 150 | 월드 우승 스킨: 결승 모든 세트 기록, 다른 선수는 결승 챔피언 중 무작위, 내 선수는 [컬렉션]에서 직접 고름 | js/collection.js, js/matchsim.js, js/main.js |
 | 151 | 대시보드 '이번 주' 훈련 줄 삭제 (미선택이면 💡 추천 줄) | js/dashboard.js, js/guide.js |
-| 152 | 연속 우승 결승 기사 리핏·쓰리핏… (state.league.titleStreaks, REPEAT_NEWS) | js/news_popup.js, data/news_articles.js |
+| 152 | 연속 우승 결승 기사 리핏·쓰리핏… (state.league.titleStreaks, REPEAT_NEWS) | js/news.js, data/news.js |
 | 153 | 대시보드 종합 능력 칸: 이번 주 스탯·특성 변화만 (weekReport.growthBase) | js/dashboard.js, js/main.js |
 | 154 | 솔로 랭크 이번 주 결과를 대시보드 솔로 랭크 칸으로 옮김 | js/dashboard.js, css/style.css |
 | 155 | 트로피 말풍선 아래로 (상단바에 가려짐) | css/style.css |
@@ -88,12 +88,12 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 | 158 | 팬 수 따로 쌓기(addPopularity, 인기도 100 넘게 오른 만큼도), 우승 팬 보너스, 1억부터 완만, 1,000만·5,000만·1억 공중파 기사 | js/fame.js, data/fame.js + 인기도 바꾸는 11곳 |
 | 159 | 팬 돌파 공중파 기사 단계마다 4개 (다른 AI 작성) | data/fame.js |
 | 168 | 해외 월드 우승 측정 도구 tools/measure_worlds.py (국내 우승 59%) | tools/ |
-| 169 | 해외 월드 우승 밸런스: 중국·북미·유럽 0.94 → 0.92, 🌏 해외 왕조 압박(해외 월드 우승팀 주전 강한 2명 같은 지역 다른 팀으로) → 국내 80%, 같은 해외 팀 연속 우승 0 | data/era.js, data/dynasty.js OVERSEAS_DYNASTY, js/dynasty.js overseasDynastyMoves, data/guide.js |
+| 169 | 해외 월드 우승 밸런스: 중국·북미·유럽 0.94 → 0.92, 🌏 해외 왕조 압박(해외 월드 우승팀 주전 강한 2명 같은 지역 다른 팀으로) → 국내 80%, 같은 해외 팀 연속 우승 0 | data/era.js, data/records.js OVERSEAS_DYNASTY, js/dynasty.js overseasDynastyMoves, data/guide.js |
 | 170 | 측정 도구 빠르게(52주씩 페이지 안·화면 그리기 끔, 약 2.5배) + 씨앗을 게임 파일 읽기 전에 고정(같은 씨앗 = 같은 결과) | tools/sim_lib.py |
-| 171 | ⚔️ 맞대결 전적: 구단끼리(구단 탐색·대시보드 경기 줄) + 내 선수 vs 같은 라인 상대([선수 정보] ⚔️ 맞수 탭·선수 검색 상세) | data/h2h.js, js/h2h.js, js/matchsim.js, js/dashboard.js, js/market_pages.js, js/player_page.js |
-| 172 | 🔥 구단별 빅게임: 고정 라이벌 📡 통신사 더비(T1·KT)·👑 왕좌의 전쟁(T1·GEN.G). 예고·결과 기사, 내가 뛰면 인기도 승 +3/패 −1, 그 주 감독 퀘스트 '빅게임 승리', 업적 3개, 대시보드 🔥 표시. 경기 결과는 안 바뀜 | data/biggame.js, js/biggame.js, js/quests.js completeQuest, js/matchsim.js, js/main.js, js/dashboard.js |
-| 173 | 🧑‍💼 구단 스태프: 감독(경기력 ±1%)·코치(성장 ±, 내 훈련 ±)·전략 분석관(분석 리포트 정확도)·시설(내 체력) S~D. 새해 자금 투자·유지비·우승팀 스태프 이적, 인사 추천권(48주) + 🎫 스카우트 티켓, 친구 코치 S급. 대시보드 📊 분석 리포트(상대 조합 예측 + 추천 전략) | data/staff.js, js/staff.js, js/matchsim.js, js/league.js, js/player.js, js/contracts.js, js/dashboard.js |
-| 160 | 후보 구성 규칙: 포지션당 후보 1명, 가장 강한 포지션 후보 X, 가장 약한 포지션 후보 필수 (surplusPlayer·fixBench) | js/contracts.js, js/club_market.js, js/summer_market.js, js/league.js, js/era.js, js/main.js |
+| 171 | ⚔️ 맞대결 전적: 구단끼리(구단 탐색·대시보드 경기 줄) + 내 선수 vs 같은 라인 상대([선수 정보] ⚔️ 맞수 탭·선수 검색 상세) | data/records.js, js/rivals.js, js/matchsim.js, js/dashboard.js, js/market_pages.js, js/player_page.js |
+| 172 | 🔥 구단별 빅게임: 고정 라이벌 📡 통신사 더비(T1·KT)·👑 왕좌의 전쟁(T1·GEN.G). 예고·결과 기사, 내가 뛰면 인기도 승 +3/패 −1, 그 주 감독 퀘스트 '빅게임 승리', 업적 3개, 대시보드 🔥 표시. 경기 결과는 안 바뀜 | data/club.js, js/rivals.js, js/quests.js completeQuest, js/matchsim.js, js/main.js, js/dashboard.js |
+| 173 | 🧑‍💼 구단 스태프: 감독(경기력 ±1%)·코치(성장 ±, 내 훈련 ±)·전략 분석관(분석 리포트 정확도)·시설(내 체력) S~D. 새해 자금 투자·유지비·우승팀 스태프 이적, 인사 추천권(48주) + 🎫 스카우트 티켓, 친구 코치 S급. 대시보드 📊 분석 리포트(상대 조합 예측 + 추천 전략) | data/club.js, js/staff.js, js/matchsim.js, js/league.js, js/player.js, js/contracts.js, js/dashboard.js |
+| 160 | 후보 구성 규칙: 포지션당 후보 1명, 가장 강한 포지션 후보 X, 가장 약한 포지션 후보 필수 (surplusPlayer·fixBench) | js/contracts.js, js/club_market.js, js/club_market.js, js/league.js, js/era.js, js/main.js |
 
 ## 4. 기술 규칙과 코드 위치
 
@@ -121,7 +121,7 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 - 비시즌(새해) contractsNewSeason 순서: 내 이동 → **1.5) dynastyNewSeason(연봉 압박·해외 러브콜) → langNewSeason → returnHomeMoves → foreignReturnMoves** → 계약 만료 → **importMoves** → offseasonRebuild(fireSale → starTransfers → tryBuy → depthSignings) → fillRosters → **faAbroadMoves** → FA 정리.
 - **후보 구성 규칙 (160)**: 선수단이 넘쳐 내보낼 때는 weakestPlayer가 아니라 `surplusPlayer(teamId, 새로 온 id)`, 채울 때는 fillRosters (benchWanted 순서). 새 영입 경로도 이것을 쓸 것.
 - **외국인 1명 제한**: 모든 영입 경로에서 `foreignOk(id, teamId)` / `foreignRoom(teamId)` 확인 (sellable, starTransfers, depthSignings, tryLoan, fillPosition, fillRosters, 해외 러브콜). 새 영입 경로를 만들면 꼭 넣을 것.
-- 여름(23~28주) js/summer_market.js. 모든 이동은 logTransfer → state.league.transferLog (e.origin 자동 기록). kind: buy·star·depth·loan·leave·import·abroad·return·retire.
+- 여름(23~28주) js/club_market.js. 모든 이동은 logTransfer → state.league.transferLog (e.origin 자동 기록). kind: buy·star·depth·loan·leave·import·abroad·return·retire.
 
 ### 해외 리그 (139~145)
 - state.world = { teams[{id 'O…', region, roster}], players{ 'X…': {name,pos,age,stats,traits,style,mastery,origin,langs,abroadYear} }, history[], storyYear, tierDone }.
@@ -131,16 +131,16 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 - 해외 선수 상세는 [선수 검색] 상세(playerDetailHTML)에서 해외 팀·출신·모국어·팀 언어 실력.
 
 ### 강팀 쏠림 막기 (134, 143)
-- 값 data/dynasty.js. 새해 lastChamps 기준 연봉 압박, p.leftFrom/leftYear로 원래 팀 재영입 막음.
+- 값 data/records.js. 새해 lastChamps 기준 연봉 압박, p.leftFrom/leftYear로 원래 팀 재영입 막음.
 - 집중 견제: sCountOfId(내 선수 = userSCount; 다른 선수는 라이벌 전용도 셈, GOAT 제외).
 - 라이벌 1년짜리: clearRivalTitle. 규모는 RIVAL_SCALE(내 S급 수). 은퇴로 빈 에이스는 refillRivalAces.
 
 ### 수집·연락·기타 (이전 기록)
 - 업적 보상 없음 (120, 다시 넣지 말 것). 시그니처 보너스는 sigValue(key).
-- 받은 연락: data/events*.js + js/events.js·js/stories.js. 새 시스템 트리거는 queueTrigger + QUEUE_TRIGGERS.
+- 받은 연락: data/events*.js + js/events.js·js/friends.js. 새 시스템 트리거는 queueTrigger + QUEUE_TRIGGERS.
 - **인기도는 꼭 addPopularity(v)로 바꿀 것** (팬 수 state.fame.fans가 같이 움직임, js/fame.js). state.popularity에 직접 넣지 말 것.
 - 구단 스태프(173): team.staff[role].g (0=S ~ 4=D). 효과 읽기는 staffPowerMult·staffGrowthBonus·staffTrainingBonus·analystAccuracy. 상대 조합 계획은 m.scout에 미리 정해 두고 playMatch가 scoutedPlan으로 씀 — 리포트를 바꾸면 경기 계획과 어긋나지 않게 주의. 인사 연락 kind staffPick (events.js answerMessage에서 분기).
-- 빅게임(172): bigGameOf(x, y)는 team.short(기업명)로 BIG_GAMES 찾음. 특별 퀘스트는 data/quests.js `special: true` (일반 퀘스트 뽑기에서 빠짐, 완료는 completeQuest(q)).
+- 빅게임(172): bigGameOf(x, y)는 team.short(기업명)로 BIG_GAMES 찾음. 특별 퀘스트는 data/training.js `special: true` (일반 퀘스트 뽑기에서 빠짐, 완료는 completeQuest(q)).
 - 은퇴 기사: js/retirement.js metaRetire (점수는 retirePlayer 전에 기록해야 함 — 삭제 뒤엔 playerScore 오류).
 
 ## 5. ⚠️ 클라우드 세션(Claude Cowork)에서 PC 파일을 고칠 때
@@ -148,7 +148,7 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 이 PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 1. 고치기 전에 PC 파일을 stage해서 최신 내용으로 작업 (Claude Code가 고쳤을 수 있음).
-2. **줄바꿈**: PC 파일 중 CRLF인 것이 있음 (data/era.js, js/era.js, js/creation.js, js/intl.js, js/records.js, js/boxscore.js, js/links.js, js/summer_market.js, js/npc_mastery.js, js/retirement.js 등). 원래 CRLF였던 파일은 CRLF로 맞춰서 넣기.
+2. **줄바꿈**: PC 파일 중 CRLF인 것이 있음 (data/era.js, js/era.js, js/creation.js, js/intl.js, js/records.js, js/boxscore.js, js/links.js, js/club_market.js, js/npc_mastery.js, js/retirement.js 등). 원래 CRLF였던 파일은 CRLF로 맞춰서 넣기.
 3. **device_commit_files가 같은 stagedPath를 다시 쓰면 옛 내용을 넣는 경우가 있었음** (140 때 data/era.js가 옛 내용으로 들어가 게임이 빈 화면, 142 때도 재발). → **넘길 때마다 새 폴더(/mnt/user-data/outputs/c<시간>/…)에 복사해서 넘기고, 넘긴 직후 다시 stage해서 cmp로 같은지 확인.** 그리고 PC 파일 묶음으로 게임을 띄워 오류가 없는지 확인.
 4. expectedMtimeMs로 넘겨서 그사이 PC 파일이 바뀌었으면 덮어쓰지 않게.
 5. **PC 파일 일부가 읽기 전용일 때가 있음** (172: js/matchsim.js·index.html·css/style.css 쓰기 거부). device_bash에서 `chmod u+w 파일`로 풀린다.
@@ -174,8 +174,8 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 | 순서 | 작업 | 메모 |
 |---|---|---|
 | ① | ~~해외 월드 우승 밸런스~~ ✅ | 168 측정 → 169 적용 (A 지역 0.92 + C 해외 왕조 압박): 국내 59% → 80%, 같은 해외 팀 연속 우승 7 → 0판 |
-| ② | ~~라이벌 맞대결 전적~~ ✅ | 171: 구단 쌍 + 내 선수 vs 상대 (state.league.h2h, js/h2h.js h2hTeam·h2hTeamList·h2hMe). 다른 선수끼리·전적 기사는 사용자가 안 고름 |
-| ③ | ~~구단별 빅게임~~ ✅ | 172: 고정 라이벌 2쌍만(사용자 선택), 기사·인기도·퀘스트·업적. 경기 긴장감(심리)·전적으로 생기는 라이벌은 사용자가 안 고름. 쌍 추가는 data/biggame.js BIG_GAMES 한 줄 |
+| ② | ~~라이벌 맞대결 전적~~ ✅ | 171: 구단 쌍 + 내 선수 vs 상대 (state.league.h2h, js/rivals.js h2hTeam·h2hTeamList·h2hMe). 다른 선수끼리·전적 기사는 사용자가 안 고름 |
+| ③ | ~~구단별 빅게임~~ ✅ | 172: 고정 라이벌 2쌍만(사용자 선택), 기사·인기도·퀘스트·업적. 경기 긴장감(심리)·전적으로 생기는 라이벌은 사용자가 안 고름. 쌍 추가는 data/club.js BIG_GAMES 한 줄 |
 | ④ | ~~구단 능력치 (감독·코치·시설)~~ ✅ | 173: 구단 스태프 4칸 + 분석 리포트 + 인사 추천권·티켓. 측정상 강팀 쏠림 차이 없음 (BALANCE.md 11장) |
 
 **🎨 디자인 리뉴얼 (사용자 결정 2026-10-15: 해외 진출보다 먼저)** — 단계마다 HTML 시안 2~3개 → 사용자 고르기 → 적용. 게임 규칙·밸런스는 안 바꿈. 외부 라이브러리 없이 SVG·CSS·캔버스로.
@@ -193,11 +193,11 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 - **사용자 결정 (2026-10-15)**: 색 = 시안 1의 **B(e스포츠 네온) 색 + C 둥근 모서리** / 포트레잇 = **32×32 픽셀 아트** (시안 2 그림 그대로, "귀엽다"), **최대 3배(96px)까지만** 키움 (저화질 도트를 크게 보일 필요 없음), **선수단 표에는 얼굴만 잘라서** (사용자가 아주 마음에 들어 함). 시안: `Claude outputs/design_mockup_1.html`, `design_mockup_2.html` (포트레잇 그리기 코드 draw32·face 그대로 옮겨 쓸 것).
 - D0 끝 (PROGRESS 174, css/style.css만). 다음 D1 포트레잇.
 - **D1 파츠 확정 (사용자, 시안 3·4)**: 피부 5 · 머리 모양 7 (짧은 앞머리·덮은 머리·옆으로 넘김·긴 머리·뾰족 머리·**대머리·아프로**, 쉼표 머리 뺌) · 머리색 7 (검정·갈색·금발·은발·파랑·**빨강·주황**, 진갈색·와인 뺌) · 눈 2 · 얼굴 너비 3 · 헤드셋 55% (**귀 이어컵이 보이게**, 팀색 안쪽 + 마이크) · 안경 18% · 표정 4 · 유니폼 = 팀 색. 수염·주근깨·머리띠·모자는 **안 넣음**. 구단 유니폼 색은 시안 3 표 그대로 OK (KT는 흰 바탕+빨강). 팀 고르기 카드에 유니폼 입은 내 캐릭터 + 색 두 칸. 그리기 코드는 `Claude outputs/design_mockup_4.html` draw32 (얼굴 x는 Math.floor — 홀수 너비가 흐려지던 문제 고침). 시안 4 사용자 OK ("최고").
-- D1 끝 (PROGRESS 175: data/portrait.js·js/portrait.js, portraitImg/faceTd로 어디서나 얼굴).
+- D1 끝 (PROGRESS 175: data/ui.js·js/portrait.js, portraitImg/faceTd로 어디서나 얼굴).
 - D2 끝 (PROGRESS 176, 사용자 선택 A안 + 퀘스트 1줄 2칸): heroCardHTML·matchCardHTML·questCardsHTML, 휴대폰 ☰ 메뉴 (남은 숙제였던 휴대폰 가로 넘침 해결). 
 - D3 끝 (PROGRESS 177): js/replay.js. **'다' 안(자동 재생 + 설정 끄기)으로 시작, 유저 반응을 보고 '가' 안(다시 보기만)으로 바꿀 수 있게 남겨 둠** → REPLAY_RULES.defaultAuto = "off" 한 줄. 
-- D4 끝 (PROGRESS 178): js/cards.js 뒤집는 카드 (인사 후보·대형 신인·우승 스킨).
-- D5 끝 (PROGRESS 179, 시안 8): 페이지 머리 A안 카드형(data/pagehead.js·js/pagehead.js) + 팀 배지·순위 메달·최근 5경기·구단 카드·거주지 2줄 카드·SNS 아이콘·수상 카드·계약 카드. 새 화면을 만들 때도 teamMarkHTML·rankBadgeHTML·emptyBoxHTML 쓰기. 
+- D4 끝 (PROGRESS 178): js/ui.js 뒤집는 카드 (인사 후보·대형 신인·우승 스킨).
+- D5 끝 (PROGRESS 179, 시안 8): 페이지 머리 A안 카드형(data/ui.js·js/ui.js) + 팀 배지·순위 메달·최근 5경기·구단 카드·거주지 2줄 카드·SNS 아이콘·수상 카드·계약 카드. 새 화면을 만들 때도 teamMarkHTML·rankBadgeHTML·emptyBoxHTML 쓰기. 
 - D6 끝 (PROGRESS 180): 설정 '움직임' 켜기·끄기, 경기 재생 창 휴대폰·태블릿, 가로 넘침 2곳, 터치 화면 버튼 34px. **디자인 리뉴얼 D0~D6 모두 끝.** 남은 위험: js/links.js lookbehind 정규식이 iOS 16.3 이하 Safari에서 오류 (사용자가 이번엔 안 고침). 다음은 ver 1.2 내 선수 해외 진출 (시작 전에 선택지로 묻기).
 **🧹 코드 정리 R0~R9 (해외 이적 전, 2026-10-15 사용자 결정: 전부)** — 원칙: 게임 결과·화면은 하나도 안 바뀌게. 단계마다 `python3 tools/check_all.py`(정답지) + `tools/shots.py`(화면) 통과 → 커밋 명령 안내.
 
@@ -205,7 +205,7 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 |---|---|---|
 | R0 안전망 | 정답지·스크린샷 비교·이름 겹침 검사, 연출 무작위 fxRandom 분리 | ✅ 186 |
 | R1 안 쓰는 것 지우기 | 안 쓰는 함수 7개(profileCardHTML·reputationBarHTML·champOptionsHTML·contractSummaryHTML·matchLine·careerRecordHTML·staffLineText), 안 쓰는 CSS 약 10개, 필요 없는 `typeof … === "function"` 약 42개, starsText 겹침, anti-slop 쓸 만한 것(shape 이름 2개) | ✅ 187 |
-| R2 파일 합치기 | 3KB 미만 19개 등 주제별로 묶기 111 → 약 80, 파일 지도 | |
+| R2 파일 합치기 | 3KB 미만 19개 등 주제별로 묶기 111 → 83, 파일 지도 FILEMAP.md | ✅ 188 |
 | R3 세이브 호환 한곳에 | '예전' 처리 86곳 → migrateSave() + 버전별 단계, 예전 세이브 샘플 테스트 | |
 | R4 CSS 정리 | 섹션 목차, 휴대폰 설정 모으기, 색 변수, 덮어쓰기 합치기 | |
 | R5 세이브 다이어트 | 10시즌 0.72MB(해외 0.30·리그 0.23·뉴스 0.12) → 0.45MB 이하, `golden.py check --loose` | |
@@ -245,11 +245,11 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 
 | 번호 | 내용 | 주요 파일 |
 |---|---|---|
-| 161 | 뉴스 공통 등록: 신문 `publishHeadline`, 단신 `publishNotice`(addNews). 같은 주 같은 사건 중복 방지, 기사별 발생 날짜, SNS 소식 맨 위 **신문 기사 보관함**(최근 160건), 답 안 한 연락은 보관 한도와 별도로 보존(trimMessages) | js/news.js, js/news_popup.js, js/sns_page.js, js/save.js |
-| 162 | **월즈 특집**: 41주 진입 시 다음 주 개막 예고(개최지·창작 주제곡/MV·올해 주요 경기·지역 MVP·전년도 우승팀/장면), 42주 개막 단신. 2012 LA 고정, 이후 활성 지역 수도 무작위 | data/worlds_news.js, js/worlds_news.js |
+| 161 | 뉴스 공통 등록: 신문 `publishHeadline`, 단신 `publishNotice`(addNews). 같은 주 같은 사건 중복 방지, 기사별 발생 날짜, SNS 소식 맨 위 **신문 기사 보관함**(최근 160건), 답 안 한 연락은 보관 한도와 별도로 보존(trimMessages) | js/news.js, js/news.js, js/sns_page.js, js/save.js |
+| 162 | **월즈 특집**: 41주 진입 시 다음 주 개막 예고(개최지·창작 주제곡/MV·올해 주요 경기·지역 MVP·전년도 우승팀/장면), 42주 개막 단신. 2012 LA 고정, 이후 활성 지역 수도 무작위 | data/news.js, js/news.js |
 | 163 | **리그 성장**: 국내 리그 확대(2014·2016) 때 인기·투자 관심 기사, 새로 늘어나는 팬 1.0 → 1.1 → 1.2배 (addFans 양수에 한 번) | data/era.js LEAGUE_GROWTH, js/era.js, js/fame.js |
-| 164 | **역사 뉴스** 2012~2026 26건: 1주 시대 소개(신년 기사에 합침), 29주·49주 소식. 게임 규칙은 바꾸지 않음 | data/historical_news.js, js/historical_news.js |
-| 165 | **작은 시대 효과**: 운영·한타 스타일 점수 배율 2016 29주 운영 1.10 / 2022 29주 +한타 1.10 / 2024 1주 운영 1.15 (교체, 양 팀 같게). 게임 방법에 '현재 경기 환경' | data/era_match.js, js/era_match.js, js/matchsim.js phaseTeamScore |
+| 164 | **역사 뉴스** 2012~2026 26건: 1주 시대 소개(신년 기사에 합침), 29주·49주 소식. 게임 규칙은 바꾸지 않음 | data/news.js, js/news.js |
+| 165 | **작은 시대 효과**: 운영·한타 스타일 점수 배율 2016 29주 운영 1.10 / 2022 29주 +한타 1.10 / 2024 1주 운영 1.15 (교체, 양 팀 같게). 게임 방법에 '현재 경기 환경' | data/era.js, js/era.js, js/matchsim.js phaseTeamScore |
 | 166 | 자동 검사 8개 (tools/test_*.cjs) | tools/ |
 | 167 | 실제 화면 검증 (클라우드 Chromium) + 휴대폰 폭 CSS 2건 | css/style.css |
 

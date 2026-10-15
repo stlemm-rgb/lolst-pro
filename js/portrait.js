@@ -1,4 +1,4 @@
-// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/portrait.js =====
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js =====
 // portraitImg(id, opts) → <img> HTML (canvas로 그린 그림을 data URL로, 같은 그림은 캐시)
 //   opts: scale 1~3, mood "normal"|"win"|"lose"|"tired", face true = 얼굴만 18×18 잘라서(표용), jump true = 가끔 점프, size(face일 때 px: 18 또는 36)
 // 내 선수 얼굴: state.player.look { skin, hs, hairC, eyes, face, headset, glasses } (캐릭터 만들 때 고름, 예전 세이브는 이름으로 자동)

@@ -177,7 +177,7 @@ function checkBench() {
     if (rival && playerScore(rival) >= me + CONTRACT.benchGap + managerTrust() && !protectedByContract) {
       state.benched = true;
       state.career.benchedYear = state.year; // 잡초 (S급 특성) 조건
-      queueTrigger("benchedNow", { pid: rival, player: playerName(rival), pteam: myTeam().name }); // 2군행 반응 연락 (js/stories.js)
+      queueTrigger("benchedNow", { pid: rival, player: playerName(rival), pteam: myTeam().name }); // 2군행 반응 연락 (js/friends.js)
       state.benchWeeks = 0;
       postMessage("inbox", CONTRACT_TEXTS.benchTitle, contractText(CONTRACT_TEXTS.bench, { rival: playerName(rival) }), {
         notes: ["후보일 때는 경기에 나가지 못해요. 스탯 점수가 " + playerName(rival) + "(" + playerScore(rival).toFixed(1) + ")보다 높아지면 주전으로 돌아가요."],
@@ -339,7 +339,7 @@ function answerOffer(msg, index) {
     state.contract = { teamId: team.id, salary: o.salary, endYear: endYear, guarantee: o.guarantee };
     msg.notes.push("재계약 완료! " + (o.summer ? "지금부터 " : (state.year + 1) + "년부터 ") + endYear + "년 시즌 종료까지, 연봉 " + moneyText(o.salary));
   } else if (o.summer) {
-    // 여름 이적·임대: 29주에 반영 (js/summer_market.js)
+    // 여름 이적·임대: 29주에 반영 (js/club_market.js)
     state.pendingMove = { teamId: team.id, salary: o.salary, endYear: o.loan ? state.contract.endYear : state.year + Math.max(1, o.years), guarantee: o.guarantee, summer: true, loan: !!o.loan, fee: o.fee };
     msg.notes.push((o.loan ? "임대 합의! " : "이적 합의! ") + "후반기(" + SUMMER_MARKET.applyWeek + "주)부터 " + team.name + "에서 뛴다." + (o.loan ? " 시즌이 끝나면 원래 팀으로 돌아온다." : ""));
   } else {
@@ -392,7 +392,7 @@ function requestTransfer(teamId) {
 function releaseToFA(id) {
   const p = findPlayer(id);
   const team = p.teamId && findTeam(p.teamId);
-  noteFriendLeaving(id, team, null); // 친한 동료 작별 (js/stories.js)
+  noteFriendLeaving(id, team, null); // 친한 동료 작별 (js/friends.js)
   if (team) team.roster.splice(team.roster.indexOf(id), 1);
   p.teamId = null;
   if (state.league.freeAgents.indexOf(id) === -1) state.league.freeAgents.push(id);
@@ -541,7 +541,7 @@ function contractsNewSeason() {
   const news = [];
   const lastYear = state.year - 1;
 
-  // 0) 여름에 임대 갔던 선수들 원래 팀으로 (js/summer_market.js)
+  // 0) 여름에 임대 갔던 선수들 원래 팀으로 (js/club_market.js)
   returnLoans(news);
 
   // 1) 내 선수

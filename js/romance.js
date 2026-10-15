@@ -1,4 +1,4 @@
-// ===== 연애 요소 (128) — 규칙 data/romance_rules.js, 대상·대사·연락 data/romance.js =====
+// ===== 연애 요소 (128) — 규칙 data/romance.js, 대상·대사·연락 data/romance.js =====
 // 인기도가 오르면 여성 연애 대상이 다가옴. 관심(0~29) → 썸(30~59) → 고백(60↑) 성공 시 연애 → 결별 가능. 결혼 없음 (은퇴 엔딩에 한 줄)
 // state.romance = { off, met: {대상 id: { name, aff, exUntil }}, partner, since, secret, decided, annivYear,
 //                   yearN: { y, n }, cooldownUntil, threats: { sasaeng, stalker }(해), history: [{ tid, name, from, to }] }

@@ -142,7 +142,7 @@ function applyEffects(eff, ctx) {
       state.reputation = Math.max(-100, Math.min(100, state.reputation + v));
       add(key, state.reputation - before);
     } else if (key === "setSignature") {
-      // 시그니처 픽 정하기 (js/signature.js)
+      // 시그니처 픽 정하기 (js/collection.js)
       if (ctx && ctx.champ && !state.signature) {
         state.signature = ctx.champ;
         notes.push("✒️ '" + ctx.champ + "'이(가) 나의 시그니처 픽이 됐다");
@@ -156,7 +156,7 @@ function applyEffects(eff, ctx) {
     } else if (key === "unflag") {
       (Array.isArray(v) ? v : [v]).forEach(function (k) { if (state.flags) delete state.flags[k]; });
     } else if (key === "relation") {
-      if (ctx && ctx.pid) changeRelation(ctx.pid, v, notes); // js/stories.js
+      if (ctx && ctx.pid) changeRelation(ctx.pid, v, notes); // js/friends.js
     } else if (key === "teamRelation") {
       const t = myTeam();
       if (t) t.roster.forEach(function (id) { if (id !== USER_ID) changeRelation(id, v, null); });
@@ -270,7 +270,7 @@ function choiceHint(choice, ctx) {
   const sg = choice.check && choice.success && choice.success.gain;
   if (sg) parts.push("성공하면 ✨ 낮은 확률로 좋은 특성 '" + findTrait(sg.trait).name + "'");
   if (choice.gain) parts.push("✨ 낮은 확률로 좋은 특성 '" + findTrait(choice.gain.trait).name + "'");
-  if (choice.check) parts.unshift("🎲 성공 확률 " + Math.round(checkChance(choice.check) * 100) + "% (" + checkStatName(choice.check.stat) + " " + Math.round(checkValue(choice.check.stat)) + ")"); // js/stories.js
+  if (choice.check) parts.unshift("🎲 성공 확률 " + Math.round(checkChance(choice.check) * 100) + "% (" + checkStatName(choice.check.stat) + " " + Math.round(checkValue(choice.check.stat)) + ")"); // js/friends.js
   return parts.join(" · ");
 }
 
@@ -288,7 +288,7 @@ function eventReady(ev) {
   if (need.minWeek && state.week < need.minWeek) return false;
   if (need.trait && !hasTrait(need.trait)) return false;
   if (need.noTrait && hasTrait(need.noTrait)) return false;
-  if (!storyNeedOk(need)) return false; // 리뉴얼 조건 (js/stories.js)
+  if (!storyNeedOk(need)) return false; // 리뉴얼 조건 (js/friends.js)
   // 한 시즌에 같은 연락은 seasonMax번까지, 받은 연락은 inboxPerSeason개까지 (always·후속 연락은 예외)
   if (ev.tab === "inbox" && !ev.always && ev.trigger !== "followUp" && ev.trigger !== "signature") {
     const L = eventLog();
@@ -300,7 +300,7 @@ function eventReady(ev) {
 
 function fireEvent(ev, ctx) {
   state.eventCooldown[ev.id] = absWeek();
-  logEventFired(ev); // js/stories.js
+  logEventFired(ev); // js/friends.js
   const title = fillText(ev.title, ctx);
   const text = fillText(ev.text, ctx);
   if (ev.tab === "news") {
@@ -334,7 +334,7 @@ function triggerContext(trigger) {
     case "highCondition": return state.condition >= 90 ? {} : null;
     case "lowStamina": return state.stamina <= 20 ? {} : null;
     case "benchLong": return state.benched && state.benchWeeks >= CONTRACT.benchTalkWeeks ? {} : null;
-    default: return storyTriggerContext(trigger); // 시즌 흐름 트리거 (js/stories.js)
+    default: return storyTriggerContext(trigger); // 시즌 흐름 트리거 (js/friends.js)
   }
 }
 
@@ -347,7 +347,7 @@ function traitWeight(ev) {
 
 // 매주 한 번: 조건 이벤트 → 무작위 이벤트 → 특성 얻기 → 선수 SNS → 답 안 한 연락 정리
 function runWeeklyEvents() {
-  // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/stories.js) → 조건 연락 → 무작위
+  // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/friends.js) → 조건 연락 → 무작위
   let inboxFired = friendWeekly(); // 분기 친구 활동 · 친구 트리거 (js/friends.js)
   inboxFired = retirementWeekly() || inboxFired;
   inboxFired = standingWeekly() || inboxFired; // 팀 내 입지: 주장 제안·영입 후보·조기 재계약 (js/standing.js) // 메타 적응 은퇴 기사 · 은퇴 상담 · 코치→감독 (js/retirement.js)
@@ -574,7 +574,7 @@ function answerMessage(msgId, index) {
   const r = applyEffects(choice.effects, msg.ctx);
   rollTraitEffects(choice, r.notes);
   scheduleFollowUps(choice.followUp, msg.ctx); // 몇 주 뒤 후속 연락
-  // 능력치 판정 🎲 → 성공/실패 결과 (js/stories.js)
+  // 능력치 판정 🎲 → 성공/실패 결과 (js/friends.js)
   let result = choice.result;
   if (choice.check) {
     const ok = Math.random() < checkChance(choice.check);
@@ -631,7 +631,7 @@ function whoContext(who) {
     return same.length ? make(same[0]) : null;
   }
   if (who === "otherPro") return others.length ? make(pick(others)) : null;
-  // 관계 (js/stories.js): 절친 동료 · 앙숙
+  // 관계 (js/friends.js): 절친 동료 · 앙숙
   if (who === "friend") {
     const f = mates.filter(function (id) { return relationOf(id) >= 40; });
     return f.length ? make(pick(f)) : null;

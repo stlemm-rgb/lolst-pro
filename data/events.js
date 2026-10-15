@@ -48,7 +48,7 @@
 // cure: { trait, chance }  나쁜 특성이 없어질 확률 (💚)
 // gain: { trait, chance }  좋은 특성을 얻을 확률
 
-// ----- 2026-10-08 리뉴얼 (js/events.js · js/stories.js) -----
+// ----- 2026-10-08 리뉴얼 (js/events.js · js/friends.js) -----
 // - seasonMax: 이 연락이 한 시즌에 올 수 있는 최대 횟수 (없으면 EVENT_RULES.seasonMax)
 // - always: true → 한 시즌 연락 수 상한(inboxPerSeason)·한 주 1개 제한과 상관없이 옴 (시즌 흐름·연작 이야기)
 // - 선택지 result: 고른 뒤 나오는 결과 이야기 (배열이면 하나를 무작위로)
@@ -60,7 +60,7 @@
 // - 효과 salaryRaise: 0.1 → 지금 계약 연봉 +10%
 // - need 추가: minScore · maxScore · tier(1/2) · weeks: [시작 주, 끝 주] · flag · noFlag · benched(true/false) · titleThisYear(true/false) · minSalary
 // - who 추가: "friend" 관계 40 이상 동료 · "foe" 관계 −30 이하 선수
-// - trigger 추가 (js/stories.js): mediaDay(12주) · seasonGoal(2주) · msiDepart(25주) · worldsDepart(42주) · promotion(39주) · contractYear(30주)
+// - trigger 추가 (js/friends.js): mediaDay(12주) · seasonGoal(2주) · msiDepart(25주) · worldsDepart(42주) · promotion(39주) · contractYear(30주)
 //     allStarVote(48주) · seasonReview(47주) · offseasonPlan(50주) · birthday(생일 주)
 //     rivalSigned(경쟁자 합류) · fameUp(스타 등급 상승) · skinMade(우승 스킨) · benchedNow(2군행) · friendLeft(친한 동료 이적)
 const EVENT_RULES = {
@@ -638,7 +638,7 @@ const EVENTS = [
     effects: { popularity: 2 },
   },
 
-  // ===== J. 시그니처 픽 (js/signature.js) — 숙련도 100이 된 주에만 =====
+  // ===== J. 시그니처 픽 (js/collection.js) — 숙련도 100이 된 주에만 =====
   {
     id: "signature_found", tab: "inbox", trigger: "signature", cooldown: 0,
     title: "✒️ 혼잣말: '{champ}'",

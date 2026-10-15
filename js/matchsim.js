@@ -85,11 +85,11 @@ function isBigMatch(match) {
 // 내 선수 한 세트 준비: 밴·픽·경기력 (세트마다 새로. used = 이번 경기에서 이미 나온 챔피언 → 다시 못 고름)
 function userMatchContext(match, target, used) {
   const m = matchPower(rollBans(used), target, used); // 세트마다 밴 수·대상이 달라짐, 조합 성향 반영
-  let mult = TEAM_MATCH.conditionBase + Math.min(state.condition, conditionCap()) / TEAM_MATCH.conditionDiv; // 합숙이면 컨디션 상한 (js/housing.js)
+  let mult = TEAM_MATCH.conditionBase + Math.min(state.condition, conditionCap()) / TEAM_MATCH.conditionDiv; // 합숙이면 컨디션 상한 (js/shop.js)
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
   mult *= 1 + activityMatchBoost(match); // 라이벌 선언한 팀과 경기 (js/events.js)
-  mult *= 1 + chemistryBonus(); // 주전 동료와의 관계 (js/stories.js)
+  mult *= 1 + chemistryBonus(); // 주전 동료와의 관계 (js/friends.js)
   // 특성(큰 무대·클러치·역전 등)은 다른 선수와 똑같이 traitPowerMult에서 계산
   return { power: m.power * mult, pick: m.pick, banned: m.banned, joker: m.joker, cf: m.score ? m.power / m.score : 1 }; // cf: 챔피언 배율 (숙련도·메타·조커·시그니처 − 메타 페널티)
 }
@@ -248,7 +248,7 @@ function playSet(a, b, userCtx, setCtx) {
   }
   const ev = rollSetEvents(la, lb, a, b, laneResults, series, {
     big: !!(setCtx.match && isBigMatch(setCtx.match)), deciding: !!setCtx.deciding, behind: setCtx.behind || null,
-    sigUser: !!(userCtx && state.signature && userCtx.pick === state.signature), // 시그니처 픽 (js/signature.js)
+    sigUser: !!(userCtx && state.signature && userCtx.pick === state.signature), // 시그니처 픽 (js/collection.js)
     slump: !!setCtx.slump, // 컨디션 난조 (숨김, js/match_events.js)
   });
   const R = MATCH_EVENT_RULES.residual;
@@ -332,7 +332,7 @@ function playMatch(m) {
       countSocialPlays(set.events); // 선수 SNS용: 내 슈퍼플레이·실수 수 (js/match_events.js)
     }
     recordSet(set, m, perf);
-    h2hOnSet(set, m, userIn); // 내 맞수 전적 (js/h2h.js)
+    h2hOnSet(set, m, userIn); // 내 맞수 전적 (js/rivals.js)
     if (detail) {
       const sd = setDetail(set, setCtx, m, userCtx ? userCtx.pick : null);
       if (userCtx) { sd.pick = userCtx.pick; sd.joker = !!userCtx.joker; sd.banned = userCtx.banned; }
@@ -348,10 +348,10 @@ function playMatch(m) {
   m.winner = m.score[0] > m.score[1] ? m.a : m.b;
   m.loser = m.winner === m.a ? m.b : m.a;
   finishSeriesRecord(m, perf);
-  h2hOnMatch(m); // 구단 맞대결 전적 (js/h2h.js)
+  h2hOnMatch(m); // 구단 맞대결 전적 (js/rivals.js)
   sTraitsOnMatch(m, perf, downTwo); // 0:2 역전승 기록 (역전의 명수, js/straits.js)
   if (userIn) afterUserMatch(m, { pick: userPicks.map(function (u) { return (u.joker ? "🃏" : "") + u.pick; }).join(" / "), joker: false, events: userEvents }, lanes, perf[USER_ID]);
-  bigGameOnMatch(m, userIn); // 빅게임 기사·인기도·퀘스트 (js/biggame.js)
+  bigGameOnMatch(m, userIn); // 빅게임 기사·인기도·퀘스트 (js/rivals.js)
   if (userIn) scoutAfterMatch(m); // 분석 리포트 적중 여부를 경기 줄에 (js/staff.js)
   return m;
 }
@@ -609,7 +609,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   }
   addNews(title + " 우승", teamName(f.winner) + "이(가) " + teamName(f.loser) + "을(를) " +
     Math.max(f.score[0], f.score[1]) + ":" + Math.min(f.score[0], f.score[1]) + "로 꺾고 " + title + " 우승!");
-  queueFinalNews(champKey, title, f, titleStreak(champKey, f)); // 화면 뉴스 (js/news_popup.js)
+  queueFinalNews(champKey, title, f, titleStreak(champKey, f)); // 화면 뉴스 (js/news.js)
   if (champKey === "playoffs") {
     const wt = seasonOf().worldsTeams;
     queueHeadline("worlds_qualify", mine && wt.indexOf(mine.id) !== -1 ? "myTeam" : "other", { teams: wt.map(teamName).join(", "), count: wt.length });
@@ -661,7 +661,7 @@ function setupWorlds() {
       pairs.forEach(function (p) { schedule(42 + Math.floor(r / 3), "worlds_group", label, p[0], p[1], LEAGUE.bestOf.worlds_group); });
     });
   });
-  // 참가 안내는 42주 진입의 월즈 개막 단신에 통합 (js/worlds_news.js).
+  // 참가 안내는 42주 진입의 월즈 개막 단신에 통합 (js/news.js).
 }
 
 // 한 주 진행: 그 주의 행사(조 편성·토너먼트) → 잡힌 경기 진행

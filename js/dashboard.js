@@ -348,7 +348,7 @@ function conditionBarHTML() {
     '<span class="mini-value">' + v + (cap < 100 ? '<span class="muted">/' + cap + "</span>" : "") + "</span></div>";
 }
 
-// 상태 칸 맨 아래: 지금 사는 곳 (js/housing.js)
+// 상태 칸 맨 아래: 지금 사는 곳 (js/shop.js)
 function homeLineHTML() {
   if (inDorm()) {
     return '<div class="sum-sub home-line tip" tabindex="0" data-tip="집이 없어서 팀 합숙 중이에요. 모든 훈련 효과 +' + Math.round(dormRate() * 100) +
@@ -621,7 +621,7 @@ function matchCardHTML(m, mine, opp, big) {
         '<div class="muted small">전력 ' + pb.toFixed(1) + (mate ? " · 맞수: " + escapeHTML(playerName(mate)) : "") + "</div></div></div>" +
     "</div>" +
     '<div class="mpower"><i class="a" style="width:' + (pa / Math.max(1, pa + pb) * 100).toFixed(1) + '%"></i><i class="b"></i></div>' +
-    h2hPreviewHTML(opp) + // 상대 전적·내 맞수 (js/h2h.js)
+    h2hPreviewHTML(opp) + // 상대 전적·내 맞수 (js/rivals.js)
     scoutReportHTML(m) + // 분석 리포트 (js/staff.js)
   "</div>";
 }

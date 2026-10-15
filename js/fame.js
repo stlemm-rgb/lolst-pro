@@ -159,7 +159,7 @@ function checkFameTiers() {
     const t = FAME.tiers[fi];
     if (fi > F.tier) {
       addNews("스타 등급", t.icon + " " + state.player.name + ", 이제 '" + t.name + "'! 팬 " + peopleText(fansCount()) + ".");
-      if (fi > (F.best || 0)) queueTrigger("fameUp", { tier: t.name, fans: peopleText(fansCount()) }); // 처음 오른 등급이면 연락 (js/stories.js)
+      if (fi > (F.best || 0)) queueTrigger("fameUp", { tier: t.name, fans: peopleText(fansCount()) }); // 처음 오른 등급이면 연락 (js/friends.js)
       if (fi > (F.best || 0)) { addMoment(t.icon, "스타 등급 '" + t.name + "' 달성 (팬 " + peopleText(fansCount()) + ")"); F.best = fi; }
     } else addNews("스타 등급", "인기가 조금 식었다. 스타 등급이 '" + t.name + "'(으)로 내려갔다.");
     F.tier = fi;

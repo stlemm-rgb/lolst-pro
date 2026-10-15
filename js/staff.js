@@ -1,4 +1,4 @@
-// ===== 구단 스태프 (173, 로드맵 ④) — 값은 data/staff.js =====
+// ===== 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js =====
 // team.staff = { manager: {name, g, since, friend?}, coach: {...}, analyst: {...}, facility: {g} }  (g = 0 S ~ 4 D)
 // state.league 안이라 저장 자동. 예전 세이브는 renderAll → ensureStaff에서 채움
 // 부르는 곳: main.js nextWeek(staffWeekly) · 새해 contractsNewSeason(staffNewSeason) · matchsim.js lineup(staffPowerMult)·playMatch(분석 리포트 계획)
@@ -240,7 +240,7 @@ function postStaffPick() {
   for (let i = 0; i < R.pickCount; i++) {
     let g = Math.max(0, Math.min(4, cur.g - pick(R.candShift)));
     if (ticket && i === 0) g = Math.random() < R.ticket.sChance ? 0 : 1;
-    cands.push({ name: staffName(), g: g, ticket: ticket && i === 0 }); // 티켓 카드는 뒷면부터 금빛 (js/cards.js)
+    cands.push({ name: staffName(), g: g, ticket: ticket && i === 0 }); // 티켓 카드는 뒷면부터 금빛 (js/ui.js)
   }
   cands.sort(function (a, b) { return a.g - b.g; });
   const rr = staffRole(role);

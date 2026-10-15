@@ -265,7 +265,7 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
     else if (ev.kind === "good" && sides[s].some(function (q) { return q !== p && q.id && ctx.focus[q.id]; })) rec.fm = 1; // 견제받는 동료 덕분에 생긴 기회
     out.list.push(rec);
   });
-  if (ctx.sigUser) sigGuaranteedPlay(out, sides, R); // 시그니처 픽: 좋은 장면 1번 보장 (js/signature.js)
+  if (ctx.sigUser) sigGuaranteedPlay(out, sides, R); // 시그니처 픽: 좋은 장면 1번 보장 (js/collection.js)
   out.list.sort(function (x, y) { return x.t - y.t; });
   return out;
 }

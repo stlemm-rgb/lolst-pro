@@ -131,10 +131,10 @@ pages.dashboard = function () {
   // 맨 위 요약 4칸 → 왼쪽(이번 주 할 일: 지난주 결과·이번 주·최근 경기) / 오른쪽(내 선수: 프로필·챔피언·솔로 랭크) → 맨 아래 내 스탯
   // 조각들은 js/dashboard.js
   return (
-    '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/trophies.js)
+    '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/history_pages.js)
     tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 내 선수 카드, 💡 추천은 '이번 주' 카드 안
     heroCardHTML() + // 맨 위 내 선수 카드 (디자인 D2, js/dashboard.js)
-    rookieCardsHTML() + // 새 시즌 대형 신인 카드 (디자인 D4, js/cards.js)
+    rookieCardsHTML() + // 새 시즌 대형 신인 카드 (디자인 D4, js/ui.js)
     '<div class="dash">' +
       '<div class="dash-main">' +
         thisWeekHTML() +
@@ -312,7 +312,7 @@ pages.settings = function () {
         '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
       "</div>" +
       replaySettingsHTML() + // 경기 자동 재생 (js/replay.js)
-      motionSettingHTML() + // 움직임 켜기·끄기 (디자인 D6, js/pagehead.js)
+      motionSettingHTML() + // 움직임 켜기·끄기 (디자인 D6, js/ui.js)
       '<div class="setting-row">처음 안내 (📘 대시보드 맨 위) ' +
         (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
       "</div>" +
@@ -533,7 +533,7 @@ function staminaBadgeHTML() {
 
 // ===== 우측 본문 =====
 function renderPage() {
-  applyMotion(); // 움직임 끄기 설정 (디자인 D6, js/pagehead.js)
+  applyMotion(); // 움직임 끄기 설정 (디자인 D6, js/ui.js)
   updateTutorial(); // 처음 안내 단계 확인 (js/guide.js)
   renderTopbar(); // 상단바 (고른 훈련·체력이 바뀌었을 수 있어서)
   const page = document.getElementById("page");
@@ -551,14 +551,14 @@ function renderPage() {
     lastMenuTab[parent.id] = state.currentMenu;
     html = subTabsHTML(parent) + html.replace(/^\s*<h1>[\s\S]*?<\/h1>/, "");
   }
-  html = applyPageHead(html, parent ? parent.id : state.currentMenu); // 맨 위 제목 → 페이지 머리 카드 (디자인 D5, js/pagehead.js)
+  html = applyPageHead(html, parent ? parent.id : state.currentMenu); // 맨 위 제목 → 페이지 머리 카드 (디자인 D5, js/ui.js)
   if (state.notice) {
     html = '<div class="notice">' + state.notice + "</div>" + html;
   }
   page.innerHTML = html;
   linkifyNames(page); // 선수·구단 이름을 누르면 선수 검색·구단 탐색으로 (js/links.js)
   if (state.currentMenu === "dashboard") greatDashJump(page); // 대성공 주: 내 포트레잇 크게 점프 (js/great.js)
-  maybeShowNews(); // 대회 결과 뉴스 팝업 (js/news_popup.js)
+  maybeShowNews(); // 대회 결과 뉴스 팝업 (js/news.js)
   // 안내 문구에서 SNS로 바로 가기 (예: 선수 SNS 언급 알림 → 💬 선수 SNS 탭)
   page.querySelectorAll("[data-gosns]").forEach(function (el) {
     el.onclick = function () { snsTab = el.getAttribute("data-gosns"); openMsgId = null; selectMenu("sns"); };
@@ -582,7 +582,7 @@ function renderPage() {
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
   bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
-  bindFlipCards(page); // 뒤집는 카드 (js/cards.js)
+  bindFlipCards(page); // 뒤집는 카드 (js/ui.js)
   bindCompPlan(page); // 조합 전략 (js/comps.js)
   bindShop(page); // 상점 (js/shop.js)
   bindGuide(page); // 이번 주 추천·처음 안내 (js/guide.js)
@@ -761,7 +761,7 @@ function nextWeek(restWeek) {
   if (state.career.seasonOverYear !== state.year && userSeasonOver(playedWeek)) startOffseason();
   paySalary();
   payStaff(); // 상점 개인 고용 비용 (js/shop.js)
-  payHousing(); // 월세 (js/housing.js)
+  payHousing(); // 월세 (js/shop.js)
   runActivities(); // 스폰서·개인 방송 등 매주 효과 (js/events.js)
   weeklyFame(); // 인기도 자연 감소·평판 제자리 찾기·등급 소식 (js/fame.js)
   checkAchievements(); // 업적 도감 (js/collection.js)
@@ -817,7 +817,7 @@ function nextWeek(restWeek) {
   worldsNewsForWeek(); // 41주 진입 특집·42주 개막 단신
   historicalNewsForWeek();
   eraIntroArticle(); // 2012년 시작: 2주차에 리그 규모 소개 기사 (js/era.js)
-  bigGameWeek(); // 이번 주 우리 팀 빅게임: 예고 기사 + 감독 퀘스트 (js/biggame.js)
+  bigGameWeek(); // 이번 주 우리 팀 빅게임: 예고 기사 + 감독 퀘스트 (js/rivals.js)
 
   // 이번 주에 출시된 새 챔피언 (숙련도 1부터 시작)
   newlyReleased(state.year, state.week).forEach(function (c) {
@@ -880,7 +880,7 @@ function nextWeek(restWeek) {
   // 2군행/승격 판정, 비시즌 시작이면 재계약·영입 제안
   checkBench();
   if (state.week === ALL_STAR.week) runAllStar(); // 올스타전 팬 투표 (js/fame.js)
-  if (state.week === SUMMER_MARKET.start) startSummerWindow(); // 여름 이적 기간 (js/summer_market.js)
+  if (state.week === SUMMER_MARKET.start) startSummerWindow(); // 여름 이적 기간 (js/club_market.js)
   if (state.week === SUMMER_MARKET.applyWeek) summerMarket().forEach(function (text) { addNews(text.indexOf("🤝") === 0 ? "임대" : "여름 이적 시장", text.replace(/^(🔁|🤝) /, "")); });
   if (state.week === CONTRACT.windowStart) {
     if (state.league.grownYear !== state.year) {
@@ -893,12 +893,12 @@ function nextWeek(restWeek) {
   }
 
   // 이번 주 이벤트 (SNS), 퀘스트 기한·새 퀘스트
-  checkSignature100(); // 숙련도 100이 된 챔피언 → 시그니처 픽 독백 (js/signature.js)
+  checkSignature100(); // 숙련도 100이 된 챔피언 → 시그니처 픽 독백 (js/collection.js)
   runWeeklyEvents();
   updateQuests();
   staffWeekly(); // 구단 스태프: 분석 리포트·인사 추천권·시설 체력 회복 (js/staff.js)
   state.log = state.log.slice(0, 30);
-  enforceConditionCap(); // 이벤트로 오른 컨디션도 상한까지만 (js/housing.js)
+  enforceConditionCap(); // 이벤트로 오른 컨디션도 상한까지만 (js/shop.js)
   state.currentMenu = "dashboard";
   state.notice = state.newMentions
     ? '<span class="notice-go no-link" data-gosns="social" tabindex="0" title="눌러서 선수 SNS 보기">📣 선수 SNS에서 ' + escapeHTML(state.player.name) + " 선수를 언급한 글이 " + state.newMentions + '개 올라왔어요. <b>💬 선수 SNS 보기 ▶</b></span>'
@@ -921,7 +921,7 @@ function saveSeasonHistory() {
   state.league.lastChamps = { year: season.year, ids: Object.assign({}, season.champions) }; // 새 시즌 왕조 연봉 압박·해외 러브콜 (js/dynasty.js)
 }
 
-// 신년 신문 기사: 리그 확장·신생 구단·해외 리그·대형 신인을 한 기사로 (js/news_popup.js 팝업)
+// 신년 신문 기사: 리그 확장·신생 구단·해외 리그·대형 신인을 한 기사로 (js/news.js 팝업)
 function newYearArticle(lines) {
   const r = state.weekReport;
   if (!r) { lines.forEach(function (t) { addNews("새 시즌", t); }); return; }
@@ -982,7 +982,7 @@ function renderAll() {
   if (state.league && state.league.season) { prepareWeek(state.week); prepareWeek(state.week + 1); } // 새 게임 1주차: 2주차 LCK 컵 대진도 미리
   ensureNpcStyles(); // 예전 세이브: 다른 선수 플레이 스타일 (js/league.js)
   ensureNpcMastery(); // 예전 세이브: 다른 선수 챔피언 숙련도 (js/npc_mastery.js)
-  enforceConditionCap(); // 거주지 컨디션 상한 (집이 없으면 합숙, js/housing.js)
+  enforceConditionCap(); // 거주지 컨디션 상한 (집이 없으면 합숙, js/shop.js)
   if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦
   ensureCareerRecords(); // 데뷔 기록 등
   renderMenu();

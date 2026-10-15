@@ -156,10 +156,10 @@ function stateFromSave(save) {
   if (s.world && typeof s.world === "object" && Array.isArray(s.world.teams)) fresh.world = s.world; // 해외 리그 (js/era.js)
   if (Number.isFinite(s.dormWeeks)) fresh.dormWeeks = s.dormWeeks;
   if (s.fame && typeof s.fame === "object") fresh.fame = s.fame;
-  if (typeof s.signature === "string") fresh.signature = s.signature; // 시그니처 픽 (js/signature.js)
+  if (typeof s.signature === "string") fresh.signature = s.signature; // 시그니처 픽 (js/collection.js)
   if (s.sigGrowth && typeof s.sigGrowth === "object") fresh.sigGrowth = s.sigGrowth; // 시그니처 성장 (js/collection.js)
   if (s.achievements && typeof s.achievements === "object") fresh.achievements = s.achievements; // 업적 도감
-  // 받은 연락 리뉴얼 (js/stories.js): 연락 기록·이야기 기억·선수 관계·시스템 트리거 대기열
+  // 받은 연락 리뉴얼 (js/friends.js): 연락 기록·이야기 기억·선수 관계·시스템 트리거 대기열
   ["eventLog", "flags", "relations", "friends", "standing", "romance", "great"].forEach(function (k) { if (s[k] && typeof s[k] === "object") fresh[k] = s[k]; });
   if (Array.isArray(s.trigQueue)) fresh.trigQueue = s.trigQueue;
   if (Array.isArray(s.sig100)) fresh.sig100 = s.sig100; // 스타·평판 등급 (js/fame.js) // 합숙한 주 수 (합숙 피로)

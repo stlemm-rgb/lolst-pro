@@ -240,7 +240,7 @@ function makeTeamDefs(year) {
   return defs;
 }
 
-// 구단 전력 보정: 선수 수준이 이만큼 높거나 낮게 (data/archetypes.js CREATION.teamShift)
+// 구단 전력 보정: 선수 수준이 이만큼 높거나 낮게 (data/player.js CREATION.teamShift)
 function teamShiftRoll(tier) {
   const r = CREATION.teamShift[tier];
   return r ? randInt(r[0], r[1]) : 0;
@@ -279,14 +279,14 @@ function makeLeague(defs, chosenIndex) {
     state.league.teams.push(team);
   });
   placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
-  placeNamedPlayers(); // 네임드 선수 (data/named_players.js)
+  placeNamedPlayers(); // 네임드 선수 (data/names.js)
   addVeterans(); // 나이 많은 선수 몇 명 (세대교체, js/retirement.js)
   fillRosters(); // 내 선수·네임드 배치 뒤 후보 구성 정리 (js/contracts.js 후보 구성 규칙)
   startSeason();
   initContracts(); // 선수들 연봉·계약 기간, 내 첫 계약 (2년)
 }
 
-// ----- 네임드 선수 (data/named_players.js): 1부 강팀 주전 자리에 넣기 -----
+// ----- 네임드 선수 (data/names.js): 1부 강팀 주전 자리에 넣기 -----
 // 그 자리에 있던 선수를 네임드 선수로 바꿔요 (이름·나이·스탯·특성). 선수마다 한 번만 (state.league.namedDone)
 // 목록에 나중에 추가한 선수는 예전 세이브를 불러올 때 들어와요
 function placeNamedPlayers() {
@@ -535,7 +535,7 @@ function addBigRookies() {
   const t1 = shuffled(tierTeams(1).filter(function (t) { return !mine || t.id !== mine.id; }));
   for (let k = 0; k < (R.tier1Count || 0) && t1.length; k++) teams.unshift(t1[k]);
   const news = [];
-  state.league.rookieCards = { year: state.year, ids: [], avg: avg, seen: false }; // 대시보드 대형 신인 카드 (js/cards.js)
+  state.league.rookieCards = { year: state.year, ids: [], avg: avg, seen: false }; // 대시보드 대형 신인 카드 (js/ui.js)
   const count = randInt(R.count[0], R.count[1]);
   for (let i = 0; i < count && i < teams.length; i++) {
     const team = teams[i];
