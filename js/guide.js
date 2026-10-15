@@ -168,7 +168,7 @@ function bindGuide(page) {
       const a = adviceActions[Number(b.getAttribute("data-advice"))];
       if (!a) return;
       if (a.go) selectMenu(a.go);
-      else if (a.rest) nextWeek(true);
+      else if (a.rest) advanceWeek(true);
       else if (a.sns) { snsTab = "inbox"; selectMenu("sns"); }
       else if (a.plan) { state.plan = a.plan; if (a.plan === "champion") state.practiceChamp = ""; state.notice = "이번 주 훈련을 <b>" + findTraining(a.plan).name + "</b>(으)로 골랐어요."; renderPage(); }
       else if (a.quest) {

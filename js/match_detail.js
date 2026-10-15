@@ -217,7 +217,7 @@ pages.results = function () {
     "<h1>경기 결과</h1>" +
     '<div class="results-layout">' +
       '<div class="card res-list"><h2>' + state.year + " 시즌</h2>" + items + "</div>" +
-      '<div class="res-main">' + matchHeaderHTML(m) + '<div class="buttons res-tabs">' + tabs + "</div>" + body + "</div>" +
+      '<div class="res-main"><div class="buttons"><button class="primary" data-replay="' + matchKey(m) + '">▶ 다시 보기</button><span class="muted small">경기 흐름을 미니맵으로 재생해요 (결과는 같아요)</span></div>' + matchHeaderHTML(m) + '<div class="buttons res-tabs">' + tabs + "</div>" + body + "</div>" +
     "</div>"
   );
 };
@@ -381,6 +381,9 @@ function detailButtonHTML(key) {
 function bindMatchDetail(page) {
   page.querySelectorAll("[data-mdetail]").forEach(function (el) {
     el.onclick = function () { goResults(el.getAttribute("data-mdetail")); };
+  });
+  page.querySelectorAll("[data-replay]").forEach(function (el) { // ▶ 다시 보기 (js/replay.js)
+    el.onclick = function () { openReplay(el.getAttribute("data-replay")); };
   });
   page.querySelectorAll("[data-rsel]").forEach(function (el) {
     el.onclick = function () { resultsKey = el.getAttribute("data-rsel"); resultsTab = "sum"; renderPage(); };

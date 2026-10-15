@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 6 — 경기 연출</title>
+<style>
+:root { --bg:#07070d; --panel:#11111c; --panel-2:#181828; --border:#26263d; --text:#f1f1f7; --muted:#8a8aa6; --accent:#00e0ff; --accent2:#b44dff; --gold:#ffd23f; --good:#2bff9e; --bad:#ff3d71;
+  --r:14px; --r-s:10px; --r-xs:6px; --grad: linear-gradient(90deg,#b44dff,#00e0ff); --grad-btn: linear-gradient(90deg,#8a3dff,#0096c7); }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 60px; }
+h1 { font-size: 24px; margin: 0 0 6px; }
+.lead { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 14px; }
+.muted { color: var(--muted); } .sm { font-size: 12px; }
+button { font: inherit; color: var(--text); cursor: pointer; border-radius: var(--r-s); border: 1px solid rgba(0,224,255,.35); background: linear-gradient(180deg,#22223a,#1a1a2d); padding: 7px 12px; }
+button.on, button.primary { background: var(--grad-btn); border-color: transparent; color: #fff; font-weight: bold; }
+.px { image-rendering: pixelated; image-rendering: crisp-edges; } .pf { display: block; }
+.pf-face { display: inline-block; vertical-align: middle; border-radius: var(--r-xs); background: radial-gradient(circle at 50% 70%, #34305e, #1c1b30); }
+.pf-frame { display: inline-flex; align-items: flex-end; padding: 3px 3px 0; border-radius: var(--r-s); background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); }
+.uni { display: inline-flex; gap: 2px; vertical-align: middle; } .uni i { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(255,255,255,.25); display: inline-block; }
+
+.replay { background: var(--panel); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; position: relative; }
+/* 점수판 */
+.board { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; padding: 14px 18px; background: linear-gradient(180deg, #171730, #11111c); border-bottom: 1px solid var(--border); }
+.tm { display: flex; align-items: center; gap: 10px; min-width: 0; } .tm.b { flex-direction: row-reverse; text-align: right; }
+.tm .nm { font-weight: bold; font-size: 17px; } .tm .mine { font-size: 11px; color: var(--accent); }
+.score { text-align: center; } .score .big { font-size: 30px; font-weight: bold; letter-spacing: 4px; } .score .lbl { font-size: 12px; color: var(--muted); }
+.setbar { display: flex; gap: 6px; padding: 10px 18px; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+.setbar .st { font-size: 12px; padding: 5px 10px; border-radius: 99px; border: 1px solid var(--border); background: var(--panel-2); cursor: pointer; }
+.setbar .st.on { border-color: var(--accent); color: var(--accent); }
+.setbar .clock { margin-left: auto; font-variant-numeric: tabular-nums; font-size: 13px; }
+.setbar .kills { font-weight: bold; font-variant-numeric: tabular-nums; }
+/* 본문 */
+.stage { display: grid; grid-template-columns: 380px 1fr; gap: 16px; padding: 16px 18px; }
+.map { position: relative; width: 100%; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; background: #0d1a14; border: 1px solid var(--border); }
+.map svg { width: 100%; height: 100%; display: block; }
+.ping { position: absolute; transform: translate(-50%, -50%); pointer-events: none; font-size: 18px; text-shadow: 0 1px 3px #000; }
+.ping .ring { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; border: 2px solid currentColor; animation: ring 1.1s ease-out forwards; }
+.ping .ic { position: relative; animation: pop .35s ease-out; display: block; }
+.ping.a { color: #00e0ff; } .ping.b { color: #ff3d71; }
+.ping.old { opacity: .35; } .ping.old .ring { display: none; }
+@keyframes ring { from { transform: scale(1); opacity: 1; } to { transform: scale(6); opacity: 0; } }
+@keyframes pop { 0% { transform: scale(.3); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+.momentum { margin-top: 12px; }
+.mom-bar { position: relative; height: 12px; border-radius: 99px; background: rgba(255,61,113,.55); overflow: hidden; }
+.mom-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #8a3dff, #00e0ff); transition: width .4s; }
+.mom-bar b { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 2px; background: #fff; opacity: .6; }
+.mom-lbl { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
+.timeline { position: relative; height: 26px; margin-top: 12px; border-radius: 8px; background: var(--panel-2); cursor: pointer; }
+.timeline .fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 8px; background: rgba(0,224,255,.12); }
+.timeline .tick { position: absolute; top: 5px; width: 3px; height: 16px; border-radius: 2px; }
+.timeline .tick.a { background: #00e0ff; } .timeline .tick.b { background: #ff3d71; } .timeline .tick.big { height: 22px; top: 2px; width: 4px; }
+.timeline .head { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #fff; }
+.ctrl { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+/* 오른쪽 */
+.side { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.lanes { background: var(--panel-2); border-radius: var(--r); padding: 8px 10px; }
+.lane { display: grid; grid-template-columns: 44px 1fr 40px 1fr; gap: 6px; align-items: center; font-size: 12px; padding: 3px 0; }
+.lane .r { text-align: right; } .lane .who { display: flex; gap: 6px; align-items: center; min-width: 0; } .lane .who.r { flex-direction: row-reverse; }
+.lane .res { text-align: center; font-weight: bold; font-size: 11px; color: var(--muted); }
+.lane .res.wa { color: #00e0ff; } .lane .res.wb { color: #ff3d71; }
+.lane .me { color: var(--accent); font-weight: bold; }
+.feed { background: var(--panel-2); border-radius: var(--r); padding: 8px 10px; height: 300px; overflow-y: auto; }
+.fe { display: grid; grid-template-columns: 34px 22px 1fr; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,.05); font-size: 13px; animation: slide .3s ease-out; }
+.fe .t { font-variant-numeric: tabular-nums; font-size: 11px; color: var(--muted); }
+.fe.a { box-shadow: inset 3px 0 0 #00e0ff; } .fe.b { box-shadow: inset 3px 0 0 #ff3d71; }
+.fe.big { background: rgba(255,210,63,.07); } .fe.mine { background: rgba(0,224,255,.08); }
+.fe .k-bad { color: var(--bad); } .fe .k-psych { color: #d6a6ff; }
+@keyframes slide { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
+/* 배너 */
+.banner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(7,7,13,.82); backdrop-filter: blur(3px); z-index: 5; text-align: center; animation: fade .3s; }
+.banner .big { font-size: 34px; font-weight: bold; }
+.banner .vs { display: flex; gap: 22px; align-items: center; font-size: 22px; font-weight: bold; }
+.banner .tag { font-size: 14px; padding: 4px 12px; border-radius: 99px; background: rgba(255,138,61,.2); color: #ff8a3d; }
+.banner.win .big { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 42px; }
+.banner.hide { display: none; }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+.confetti { position: absolute; top: -10px; width: 8px; height: 12px; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(560px) rotate(540deg); opacity: .2; } }
+.where { margin-top: 26px; } .where table { border-collapse: collapse; width: 100%; font-size: 13px; } .where td, .where th { border-top: 1px solid var(--border); padding: 8px; text-align: left; }
+@media (max-width: 820px) { .stage { grid-template-columns: 1fr; } .feed { height: 220px; } .board { padding: 10px; } .tm .nm { font-size: 14px; } .score .big { font-size: 24px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>디자인 시안 6 — 경기 연출 (D3)</h1>
+  <p class="lead">실제 게임에서 뽑은 경기 기록(사건·시간·라인전·킬 수)을 그대로 재생해요. 결과는 이미 정해져 있고 <b>보여 주는 방식만</b> 바뀌어요. ▶를 누르세요. 2배속·4배속, ⏭ 결과 바로 보기, 타임라인을 눌러 그 시간으로 이동도 돼요.</p>
+  <div class="ctrl" style="margin-bottom:12px"><button id="optIntro" class="on">빅게임·결승 첫 화면 연출 켜짐</button></div>
+  <div class="replay" id="replay">
+    <div class="board" id="board"></div>
+    <div class="setbar" id="setbar"></div>
+    <div class="stage">
+      <div>
+        <div class="map" id="map"></div>
+        <div class="momentum"><div class="mom-bar"><i id="mom"></i><b></b></div><div class="mom-lbl"><span id="momA"></span><span>경기 흐름</span><span id="momB"></span></div></div>
+        <div class="timeline" id="tl"><div class="fill" id="tlfill"></div><div class="head" id="tlhead"></div></div>
+        <div class="ctrl"><button id="play" class="primary">▶ 재생</button><button data-sp="1" class="on">1배</button><button data-sp="2">2배</button><button data-sp="4">4배</button><button id="skip">⏭ 결과 보기</button></div>
+      </div>
+      <div class="side">
+        <div class="lanes" id="lanes"></div>
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+    <div class="banner hide" id="banner"></div>
+  </div>
+  <div class="where">
+    <h2 style="font-size:17px">어디서 보여 줄까요? (골라 주세요)</h2>
+    <table>
+      <tr><th>안</th><th>언제</th><th>느낌</th></tr>
+      <tr><td><b>가</b></td><td>[경기 결과] 화면의 경기마다 <b>▶ 다시 보기</b> 버튼 (원할 때만)</td><td>지금 흐름 그대로, 보고 싶은 경기만</td></tr>
+      <tr><td><b>나</b></td><td>내 경기가 있는 주에 [다음 주로 진행]을 누르면 <b>바로 재생</b> → 끝나거나 ⏭ 누르면 대시보드</td><td>매주 경기를 '보는' 느낌, 한 주가 조금 길어짐</td></tr>
+      <tr><td><b>다</b></td><td>나 + <b>설정에서 끄기</b> (빅게임·결승만 자동 재생 같은 선택도)</td><td>둘 다</td></tr>
+    </table>
+  </div>
+</div>
+<script>
+const MATCH = {"label": "전반기 7라운드", "week": 16, "year": 2017, "bo": 3, "score": [1, 2], "a": {"id": "T5", "name": "KT IGNITE", "short": "KT", "uni": ["#f2f2f2", "#e1251b"]}, "b": {"id": "T6", "name": "BNK KINETIC", "short": "BNK", "uni": ["#f5c400", "#1f2a44"]}, "mineSide": 1, "pog": "Cyan", "sets": [{"w": 0, "min": 26.2, "kills": [22, 4], "pick": "루시안", "champsA": ["쉔", "뽀삐", "오리아나", "바루스", "타릭"], "champsB": ["블라디미르", "마스터 이", "루시안", "드레이븐", "스웨인"], "lanes": [{"a": "P29", "b": "P36", "an": "Kick", "bn": "Cyan", "aWon": false, "solo": false}, {"a": "P30", "b": "P37", "an": "Glow", "bn": "Fog", "aWon": false, "solo": false}, {"a": "P31", "b": "USER", "an": "Yacht", "bn": "테스트", "aWon": true, "solo": true}, {"a": "P32", "b": "P41", "an": "Heat", "bn": "Hint", "aWon": true, "solo": true}, {"a": "P33", "b": "P42", "an": "Web", "bn": "Oil", "aWon": false, "solo": false}], "ev": [{"t": 4, "e": "solo", "s": 0, "p": "P31", "pn": "Yacht", "pp": "mid", "v": "USER", "vn": "테스트", "x": 0, "k": "good"}, {"t": 6, "e": "solo", "s": 0, "p": "P32", "pn": "Heat", "pp": "adc", "v": "P41", "vn": "Hint", "x": 0, "k": "good"}, {"t": 12, "e": "zhonya", "s": 0, "p": "P29", "pn": "Kick", "pp": "top", "v": null, "vn": null, "x": 12.5, "k": "good"}, {"t": 12, "e": "carry_burst", "s": 1, "p": "P41", "pn": "Hint", "pp": "adc", "v": null, "vn": null, "x": -25.3, "k": "bad"}, {"t": 18, "e": "recall_miss", "s": 1, "p": "P41", "pn": "Hint", "pp": "adc", "v": null, "vn": null, "x": -12, "k": "bad"}, {"t": 20, "e": "zhonya", "s": 1, "p": "P36", "pn": "Cyan", "pp": "top", "v": null, "vn": null, "x": 15.9, "k": "good"}, {"t": 21, "e": "escape", "s": 1, "p": "P36", "pn": "Cyan", "pp": "top", "v": null, "vn": null, "x": 13.1, "k": "good"}, {"t": 24, "e": "split_131", "s": 0, "p": "P29", "pn": "Kick", "pp": "top", "v": null, "vn": null, "x": 30.2, "k": "good"}, {"t": 24, "e": "cleanse", "s": 0, "p": "P32", "pn": "Heat", "pp": "adc", "v": null, "vn": null, "x": 9.6, "k": "good"}, {"t": 26, "e": "auto:tilted", "s": 1, "p": "P41", "pn": "Hint", "pp": "adc", "v": null, "vn": null, "x": 0, "k": "psych"}, {"t": 26, "e": "auto:momentum", "s": 0, "p": null, "pn": null, "pp": null, "v": null, "vn": null, "x": 0, "k": "psych"}]}, {"w": 1, "min": 30.1, "kills": [3, 18], "pick": "라이즈", "champsA": ["레넥톤", "카직스", "다이애나", "시비르", "갈리오"], "champsB": ["오공", "쉬바나", "라이즈", "베인", "브랜드"], "lanes": [{"a": "P29", "b": "P36", "an": "Kick", "bn": "Cyan", "aWon": true, "solo": false}, {"a": "P30", "b": "P37", "an": "Glow", "bn": "Fog", "aWon": true, "solo": true}, {"a": "P31", "b": "USER", "an": "Yacht", "bn": "테스트", "aWon": true, "solo": true}, {"a": "P32", "b": "P41", "an": "Heat", "bn": "Hint", "aWon": true, "solo": true}, {"a": "P33", "b": "P42", "an": "Web", "bn": "Oil", "aWon": true, "solo": true}], "ev": [{"t": 3, "e": "counter_gank", "s": 0, "p": "P29", "pn": "Kick", "pp": "top", "v": null, "vn": null, "x": 9.8, "k": "good"}, {"t": 4, "e": "solo", "s": 0, "p": "P30", "pn": "Glow", "pp": "jungle", "v": "P37", "vn": "Fog", "x": 0, "k": "good"}, {"t": 4, "e": "escape", "s": 0, "p": "P29", "pn": "Kick", "pp": "top", "v": null, "vn": null, "x": 14.7, "k": "good"}, {"t": 9, "e": "solo", "s": 0, "p": "P31", "pn": "Yacht", "pp": "mid", "v": "USER", "vn": "테스트", "x": 0, "k": "good"}, {"t": 9, "e": "solo", "s": 0, "p": "P32", "pn": "Heat", "pp": "adc", "v": "P41", "vn": "Hint", "x": 0, "k": "good"}, {"t": 9, "e": "solo", "s": 0, "p": "P33", "pn": "Web", "pp": "support", "v": "P42", "vn": "Oil", "x": 0, "k": "good"}, {"t": 12, "e": "cleanse", "s": 1, "p": "USER", "pn": "테스트", "pp": "mid", "v": null, "vn": null, "x": 31.4, "k": "good"}, {"t": 17, "e": "star_tilt", "s": 1, "p": "P41", "pn": "Hint", "pp": "adc", "v": null, "vn": null, "x": 0, "k": "psych"}, {"t": 18, "e": "call_clash", "s": 0, "p": "P32", "pn": "Heat", "pp": "adc", "v": null, "vn": null, "x": 0, "k": "psych"}, {"t": 25, "e": "call_clash", "s": 1, "p": "P37", "pn": "Fog", "pp": "jungle", "v": null, "vn": null, "x": 0, "k": "psych"}, {"t": 25, "e": "big_init", "s": 0, "p": "P33", "pn": "Web", "pp": "support", "v": null, "vn": null, "x": 26.1, "k": "good"}, {"t": 28, "e": "bounty", "s": 0, "p": "P31", "pn": "Yacht", "pp": "mid", "v": null, "vn": null, "x": -55.8, "k": "bad"}, {"t": 30, "e": "auto:momentum", "s": 1, "p": null, "pn": null, "pp": null, "v": null, "vn": null, "x": 0, "k": "psych"}]}, {"w": 1, "min": 28.1, "kills": [5, 19], "pick": "아우렐리온 솔", "champsA": ["초가스", "아이번", "카사딘", "코그모", "소라카"], "champsB": ["렝가", "스카너", "아우렐리온 솔", "트위치", "룰루"], "lanes": [{"a": "P29", "b": "P36", "an": "Kick", "bn": "Cyan", "aWon": false, "solo": false}, {"a": "P30", "b": "P37", "an": "Glow", "bn": "Fog", "aWon": true, "solo": false}, {"a": "P31", "b": "USER", "an": "Yacht", "bn": "테스트", "aWon": true, "solo": true}, {"a": "P32", "b": "P41", "an": "Heat", "bn": "Hint", "aWon": true, "solo": true}, {"a": "P33", "b": "P42", "an": "Web", "bn": "Oil", "aWon": false, "solo": false}], "ev": [{"t": 5, "e": "solo", "s": 0, "p": "P31", "pn": "Yacht", "pp": "mid", "v": "USER", "vn": "테스트", "x": 0, "k": "good"}, {"t": 7, "e": "solo", "s": 0, "p": "P32", "pn": "Heat", "pp": "adc", "v": "P41", "vn": "Hint", "x": 0, "k": "good"}, {"t": 9, "e": "call_clash", "s": 0, "p": "P32", "pn": "Heat", "pp": "adc", "v": null, "vn": null, "x": 0, "k": "psych"}, {"t": 11, "e": "dodge_ult", "s": 0, "p": "P29", "pn": "Kick", "pp": "top", "v": "USER", "vn": "테스트", "x": 12.8, "k": "good"}, {"t": 13, "e": "recall_miss", "s": 1, "p": "P41", "pn": "Hint", "pp": "adc", "v": null, "vn": null, "x": -13.2, "k": "bad"}, {"t": 14, "e": "zhonya", "s": 1, "p": "P36", "pn": "Cyan", "pp": "top", "v": null, "vn": null, "x": 14.5, "k": "good"}, {"t": 19, "e": "pick_reverse", "s": 0, "p": "P30", "pn": "Glow", "pp": "jungle", "v": null, "vn": null, "x": 27, "k": "good"}, {"t": 20, "e": "fight_reverse", "s": 1, "p": "P36", "pn": "Cyan", "pp": "top", "v": null, "vn": null, "x": 59.1, "k": "good"}, {"t": 25, "e": "chase_reverse", "s": 0, "p": "P31", "pn": "Yacht", "pp": "mid", "v": null, "vn": null, "x": -21.4, "k": "bad"}]}], "evDef": {"lv1_invade": {"icon": "⚡", "name": "레벨 1 인베이드 성공", "text": "{p}의 콜로 레벨 1 인베이드 성공", "cat": "early", "size": "s"}, "lv1_invade_fail": {"icon": "⚡", "name": "레벨 1 인베이드 실패", "text": "레벨 1 인베이드 실패, {p}의 점멸이 빠짐", "cat": "early", "size": "s"}, "first_blood": {"icon": "🩸", "name": "퍼스트 블러드", "text": "{p}, {v} 상대로 퍼스트 블러드", "cat": "early", "size": "s"}, "buff_steal": {"icon": "⚡", "name": "정글 버프 카정", "text": "{p}의 정글 버프 카정", "cat": "early", "size": "s"}, "three_buff": {"icon": "⚡", "name": "3버프 컨트롤", "text": "{p}, 상대 정글을 장악하며 3버프 컨트롤", "cat": "early", "size": "s"}, "lv2_gank": {"icon": "⚡", "name": "레벨 2 갱 성공", "text": "{p}의 레벨 2 갱, {v} 사망", "cat": "early", "size": "s"}, "counter_gank": {"icon": "⚡", "name": "역갱 성공", "text": "{p}, 갱킹을 읽고 역갱 성공", "cat": "early", "size": "s"}, "top_dive": {"icon": "⚡", "name": "탑 다이브 성공", "text": "{p}의 탑 다이브 성공", "cat": "early", "size": "s"}, "bot_dive": {"icon": "⚡", "name": "바텀 4인 다이브", "text": "{p}의 콜로 바텀 4인 다이브, 2킬 + 포탑", "cat": "early", "size": "m"}, "first_dragon": {"icon": "🐲", "name": "첫 용 독식", "text": "{p} 주도로 첫 용 독식", "cat": "early", "size": "s"}, "first_herald": {"icon": "🦀", "name": "첫 전령 획득", "text": "{p}의 첫 전령 획득", "cat": "early", "size": "s"}, "first_tower": {"icon": "🏰", "name": "첫 포탑 획득", "text": "{p}, 첫 포탑 파괴", "cat": "early", "size": "s"}, "jungle_death": {"icon": "💀", "name": "정글러 초반 사망", "text": "{p} 초반 사망, 정글 동선이 무너짐", "cat": "early", "size": "m"}, "baron_steal": {"icon": "🐉", "name": "바론 스틸", "text": "{p}의 바론 스틸!", "cat": "object", "size": "l"}, "elder_steal": {"icon": "🐉", "name": "장로 스틸", "text": "{p}의 장로 드래곤 스틸!", "cat": "object", "size": "l"}, "dragon_steal": {"icon": "🐲", "name": "드래곤 스틸", "text": "{p}, 드래곤 스틸", "cat": "object", "size": "m"}, "herald_steal": {"icon": "🦀", "name": "전령 스틸", "text": "{p}, 전령 스틸", "cat": "object", "size": "s"}, "smite_lose": {"icon": "🐲", "name": "스마이트 싸움 패배", "text": "{p}, 스마이트 싸움에서 {v}에게 패배", "cat": "object", "size": "m"}, "obj_burst": {"icon": "🐉", "name": "오브젝트 버스트", "text": "{p} 주도로 바론 순삭 (오브젝트 버스트)", "cat": "object", "size": "m"}, "obj_wipe": {"icon": "☠️", "name": "오브젝트 치다 전멸", "text": "{p}의 콜로 바론을 치다가 전멸", "cat": "object", "size": "l"}, "baron_throw": {"icon": "☠️", "name": "바론 먹고 대량 사망", "text": "바론을 먹고도 {p} 앞장서다 3~4명 사망", "cat": "object", "size": "l"}, "sneaky_baron": {"icon": "🐉", "name": "몰래 바론", "text": "{p}의 판단으로 몰래 바론 성공", "cat": "object", "size": "m"}, "sneaky_elder": {"icon": "🐉", "name": "몰래 장로", "text": "{p}의 판단으로 몰래 장로 성공", "cat": "object", "size": "l"}, "obj_fake": {"icon": "🎭", "name": "오브젝트 페이크 매복", "text": "{p}의 오브젝트 페이크, 매복 성공", "cat": "object", "size": "m"}, "tp_flank": {"icon": "🌀", "name": "뒷텔 성공", "text": "{p}의 뒷텔 성공, 한타 대승", "cat": "macro", "size": "m"}, "tp_flank_fail": {"icon": "🌀", "name": "뒷텔 발각", "text": "{p}의 뒷텔이 들켜 혼자 사망", "cat": "macro", "size": "m"}, "backdoor_stop": {"icon": "🛡️", "name": "백도어 저지", "text": "{p}, {v}의 백도어 저지", "cat": "macro", "size": "m"}, "side_inhib": {"icon": "🏰", "name": "사이드 억제기 철거", "text": "{p}, 사이드 억제기 철거", "cat": "macro", "size": "s"}, "split_131": {"icon": "🗺️", "name": "1-3-1 운영", "text": "{p} 중심 1-3-1 운영으로 포탑 연속 철거", "cat": "macro", "size": "m"}, "split_pull": {"icon": "🗺️", "name": "스플릿으로 2명 끌어냄", "text": "{p}, 사이드에서 상대 2명을 묶어 둠", "cat": "macro", "size": "s"}, "no_tp_force": {"icon": "🗺️", "name": "텔포 없는 타이밍 강제 한타", "text": "상대 텔포가 없는 걸 본 {p}의 콜, 강제 한타 승리", "cat": "macro", "size": "m"}, "wave_fail": {"icon": "🏚️", "name": "라인 관리 실패", "text": "{p}의 라인 관리 실패로 포탑 손실", "cat": "macro", "size": "s"}, "big_wave": {"icon": "🏚️", "name": "대형 웨이브 방치", "text": "대형 웨이브를 방치, {p}의 판단 실수로 억제기 위기", "cat": "macro", "size": "s"}, "vision_pick": {"icon": "👁️", "name": "시야 장악 후 픽", "text": "{p}의 시야 장악, {v} 끊어냄", "cat": "macro", "size": "m"}, "five_ult": {"icon": "💥", "name": "5인 궁 적중", "text": "{p}의 궁극기, 5명 적중!", "cat": "fight", "size": "m"}, "big_init": {"icon": "💥", "name": "대박 이니시", "text": "{p}의 대박 이니시", "cat": "fight", "size": "m"}, "counter_init": {"icon": "💥", "name": "역이니시", "text": "{p}의 역이니시 성공", "cat": "fight", "size": "m"}, "free_dps": {"icon": "🏹", "name": "원딜 프리딜", "text": "{p}, 프리딜 구도로 한타 지배", "cat": "fight", "size": "m"}, "carry_burst": {"icon": "💀", "name": "딜러 초반 폭사", "text": "{p}, 한타 시작하자마자 폭사", "cat": "fight", "size": "m"}, "tank_reach": {"icon": "🛡️", "name": "딜러에게 진입 성공", "text": "{p}, {v}에게 진입 성공", "cat": "fight", "size": "m"}, "skill_miss": {"icon": "❌", "name": "핵심 스킬 미스", "text": "{p}의 핵심 스킬이 빗나감", "cat": "fight", "size": "m"}, "zhonya": {"icon": "⏳", "name": "존야 슈퍼플레이", "text": "{p}의 존야 타이밍, 스킬을 전부 받아냄", "cat": "fight", "size": "s"}, "flash_react": {"icon": "⚡", "name": "점멸 반응", "text": "{p}, 점멸 반응으로 이니시 회피", "cat": "fight", "size": "s"}, "carry_survive": {"icon": "🏹", "name": "딜러 끝까지 생존", "text": "{p}, 한타 끝까지 살아남아 딜 마무리", "cat": "fight", "size": "s"}, "fight_4v5": {"icon": "🔥", "name": "4:5 한타 승리", "text": "4:5 한타 승리! {p} 중심", "cat": "fight", "size": "l"}, "fight_reverse": {"icon": "🔥", "name": "불리한 한타 역전", "text": "불리한 한타를 뒤집음, {p}의 활약", "cat": "fight", "size": "l"}, "ace": {"icon": "🏆", "name": "에이스", "text": "{p}의 마무리로 에이스!", "cat": "fight", "size": "m"}, "nodeath_fight": {"icon": "✨", "name": "노데스 한타", "text": "{p}의 이니시로 노데스 한타 승리", "cat": "fight", "size": "m"}, "pick_reverse": {"icon": "🔥", "name": "끊긴 뒤 역한타", "text": "한 명이 끊겼지만 {p} 중심으로 역으로 한타 승리", "cat": "fight", "size": "m"}, "duel_1v2": {"icon": "⭐", "name": "1대2 승리", "text": "{p}, 1대2 승리!", "cat": "play", "size": "m"}, "survive_1v3": {"icon": "⭐", "name": "1대3 생존", "text": "{p}, 1대3에서 살아나감", "cat": "play", "size": "s"}, "escape": {"icon": "🏃", "name": "도주 성공", "text": "{p}, 아슬아슬하게 도주 성공", "cat": "play", "size": "s"}, "super_save": {"icon": "🛟", "name": "슈퍼 세이브", "text": "{p}의 슈퍼 세이브", "cat": "play", "size": "m"}, "dying_kill": {"icon": "⭐", "name": "죽기 직전 딜러 처치", "text": "{p}, 쓰러지기 직전 {v} 처치", "cat": "play", "size": "s"}, "dodge_ult": {"icon": "⭐", "name": "궁극기 회피", "text": "{p}, {v}의 궁극기를 피함", "cat": "play", "size": "s"}, "cleanse": {"icon": "⭐", "name": "CC 해제", "text": "{p}, 결정적인 CC를 정화로 해제", "cat": "play", "size": "s"}, "blind_shot": {"icon": "🎯", "name": "블라인드 스킬샷", "text": "{p}의 블라인드 스킬샷, {v} 적중", "cat": "play", "size": "s"}, "predict_flash": {"icon": "🎯", "name": "예측 점멸 적중", "text": "{p}, {v}의 점멸 위치를 읽고 스킬 적중", "cat": "play", "size": "s"}, "burst_carry": {"icon": "🗡️", "name": "순간 폭딜로 캐리 제거", "text": "{p}의 순간 폭딜, {v} 순삭", "cat": "play", "size": "m"}, "facecheck": {"icon": "💀", "name": "페이스체크 사망", "text": "{p}, 풀숲 페이스체크하다 사망", "cat": "mistake", "size": "s"}, "carry_caught": {"icon": "💀", "name": "딜러 혼자 잘림", "text": "{p}, 혼자 있다가 잘림", "cat": "mistake", "size": "m"}, "top_caught": {"icon": "💀", "name": "사이드에서 잘림", "text": "{p}, 사이드 라인에서 잘림", "cat": "mistake", "size": "s"}, "ward_death": {"icon": "💀", "name": "시야 잡다 사망", "text": "{p}, 와드를 박으러 갔다가 사망", "cat": "mistake", "size": "s"}, "tp_misuse": {"icon": "🌀", "name": "텔포 잘못 사용", "text": "{p}의 텔포 판단 실수", "cat": "mistake", "size": "s"}, "flash_fail": {"icon": "😵", "name": "플래시 실수", "text": "{p}의 점멸이 벽을 못 넘음", "cat": "mistake", "size": "s"}, "ult_whiff": {"icon": "❌", "name": "궁극기 허공", "text": "{p}, 궁극기를 허공에 사용", "cat": "mistake", "size": "m"}, "no_smite": {"icon": "🐲", "name": "스마이트 없음", "text": "오브젝트 싸움인데 {p}의 스마이트가 없음", "cat": "mistake", "size": "m"}, "recall_miss": {"icon": "😵", "name": "귀환 타이밍 실수", "text": "{p}의 귀환 타이밍 실수, 한타 합류 실패", "cat": "mistake", "size": "s"}, "baron_overstay": {"icon": "💀", "name": "바론 버프 들고 무리", "text": "{p}, 바론 버프를 믿고 무리하다 사망", "cat": "mistake", "size": "m"}, "bounty": {"icon": "💰", "name": "현상금 헌납", "text": "{p}, 쌓인 현상금을 헌납", "cat": "mistake", "size": "m"}, "invade_fail": {"icon": "💀", "name": "정글 침범하다 사망", "text": "{p}, 상대 정글에 들어갔다가 역으로 사망", "cat": "mistake", "size": "s"}, "dive_fail": {"icon": "💀", "name": "다이브 실패", "text": "{p} 주도 다이브 실패, 2명 사망", "cat": "mistake", "size": "m"}, "chase_reverse": {"icon": "😵", "name": "추격하다 역전당함", "text": "{p}, 무리하게 쫓다가 역으로 당함", "cat": "mistake", "size": "s"}, "call_clash": {"icon": "🗯️", "name": "팀 콜 충돌", "text": "{p}의 팀, 콜이 엇갈리며 우왕좌왕", "cat": "psych", "size": "s"}, "obj_call_fail": {"icon": "🗯️", "name": "오브젝트 콜 실패", "text": "{p}의 오브젝트 콜 실패, 용을 내줌", "cat": "psych", "size": "s"}, "synergy_up": {"icon": "🤝", "name": "팀 호흡 상승", "text": "{p}의 콜에 팀원들이 척척 맞춤, 호흡 상승", "cat": "psych", "size": "s"}, "focus_target": {"icon": "🎯", "name": "집중 견제", "text": "{p}, 상대의 집중 견제를 받음", "cat": "psych", "size": "s"}, "star_tilt": {"icon": "😰", "name": "핵심 선수 멘탈 흔들림", "text": "{p}, 멘탈이 흔들림", "cat": "psych", "size": "s"}}, "looks": {"P29": {"skin": 4, "hairC": 6, "hs": 4, "eyes": 1, "face": 0, "headset": true, "glasses": false}, "P36": {"skin": 1, "hairC": 3, "hs": 4, "eyes": 0, "face": 2, "headset": true, "glasses": false}, "P30": {"skin": 0, "hairC": 3, "hs": 4, "eyes": 1, "face": 1, "headset": false, "glasses": false}, "P37": {"skin": 0, "hairC": 1, "hs": 5, "eyes": 0, "face": 2, "headset": false, "glasses": false}, "P31": {"skin": 2, "hairC": 2, "hs": 2, "eyes": 1, "face": 0, "headset": false, "glasses": true}, "USER": {"skin": 4, "hairC": 0, "hs": 1, "eyes": 1, "face": 1, "headset": false, "glasses": false}, "P32": {"skin": 1, "hairC": 4, "hs": 3, "eyes": 1, "face": 1, "headset": true, "glasses": true}, "P41": {"skin": 2, "hairC": 0, "hs": 1, "eyes": 0, "face": 1, "headset": true, "glasses": false}, "P33": {"skin": 3, "hairC": 4, "hs": 1, "eyes": 0, "face": 0, "headset": true, "glasses": false}, "P42": {"skin": 4, "hairC": 3, "hs": 5, "eyes": 0, "face": 0, "headset": true, "glasses": false}}, "me": "테스트"};
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 코드는 js/portrait.js =====
+// 32×32 도트. 내 선수는 캐릭터 만들 때 고른 얼굴(state.player.look), 다른 선수는 선수 id로 정해지는 얼굴 (저장 안 함)
+// 크기: 최대 3배(96px) (사용자 결정), 표에는 얼굴만 잘라서
+const PORTRAIT = {
+  skins: [
+    { name: "아주 밝게", c: "#f6d7c3" }, { name: "밝게", c: "#eec1a0" }, { name: "보통", c: "#d9a27f" },
+    { name: "조금 어둡게", c: "#b97a57" }, { name: "어둡게", c: "#8d5a3b" },
+  ],
+  hairStyles: ["짧은 앞머리", "덮은 머리", "옆으로 넘김", "긴 머리", "뾰족 머리", "대머리", "아프로"],
+  hairColors: [
+    { name: "검정", c: "#1d1a1f" }, { name: "갈색", c: "#6b4226" }, { name: "금발", c: "#c7923e" }, { name: "은발", c: "#e7e1d4" },
+    { name: "파랑", c: "#2f4a8a" }, { name: "빨강", c: "#c8322b" }, { name: "주황", c: "#e8792a" },
+  ],
+  eyes: ["점 눈", "반짝 눈"],
+  faces: ["보통", "갸름", "넓적"],   // 얼굴 너비 12 · 11 · 13 도트
+  headsetChance: 0.55,
+  glassesChance: 0.18,
+  // 움직임: 크게 보이는 그림(.pf-jump)만 가끔 1~5px 점프
+  jump: { minGap: 3000, maxGap: 7000, minPx: 1, maxPx: 5 },
+  tiredStamina: 30, // 내 선수 체력이 이 아래면 지친 표정
+};
+
+// 구단 유니폼 [바탕, 포인트(깃·줄)] — 1부 기업 10곳 고정 (사용자 확인 시안 3)
+const TEAM_UNIFORMS = {
+  "T1": ["#e2012d", "#141414"], "KT": ["#f2f2f2", "#e1251b"], "GEN.G": ["#a98b46", "#1b1b1b"], "Hanwha": ["#ff6a13", "#2a2a2a"],
+  "Dplus": ["#1b1b1b", "#4fd1c5"], "BNK": ["#f5c400", "#1f2a44"], "BRION": ["#1fae5c", "#f2f2f2"], "NS": ["#8e1c2b", "#e8dcc2"],
+  "KW": ["#1e3a8a", "#7cc4ff"], "DN": ["#6b2fbf", "#f2f2f2"],
+};
+// 2부·신생 구단: 기업명으로 정해지는 색 (이 중 하나)
+const UNIFORM_POOL = [
+  ["#3b82f6", "#f2f2f2"], ["#14b8a6", "#111827"], ["#a3e635", "#1f2937"], ["#f472b6", "#1f2937"], ["#64748b", "#f8fafc"], ["#f59e0b", "#7c2d12"],
+  ["#0ea5e9", "#0f172a"], ["#ef4444", "#fde68a"], ["#8b5cf6", "#fde68a"], ["#10b981", "#064e3b"], ["#e11d48", "#f1f5f9"], ["#facc15", "#111111"],
+];
+// 해외 팀: 지역마다 2~3가지 중 팀 id로
+const REGION_UNIFORMS = {
+  na: [["#1d4ed8", "#f8fafc"], ["#0f766e", "#f8fafc"], ["#111827", "#60a5fa"]],
+  eu: [["#f8fafc", "#1e3a8a"], ["#7c3aed", "#f8fafc"], ["#111827", "#f59e0b"]],
+  cn: [["#dc2626", "#facc15"], ["#111827", "#ef4444"], ["#f8fafc", "#dc2626"]],
+};
+const FREE_AGENT_UNIFORM = ["#4b5563", "#9ca3af"]; // 소속 없음
+
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/portrait.js =====
+// portraitImg(id, opts) → <img> HTML (canvas로 그린 그림을 data URL로, 같은 그림은 캐시)
+//   opts: scale 1~3, mood "normal"|"win"|"lose"|"tired", face true = 얼굴만 18×18 잘라서(표용), jump true = 가끔 점프, size(face일 때 px: 18 또는 36)
+// 내 선수 얼굴: state.player.look { skin, hs, hairC, eyes, face, headset, glasses } (캐릭터 만들 때 고름, 예전 세이브는 이름으로 자동)
+
+function pfSeed(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function pfRng(s) {
+  let a = pfSeed(s);
+  return function () { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function randomLook(seed) {
+  const r = seed === undefined ? Math.random : pfRng(seed);
+  const n = function (k) { return Math.floor(r() * k); };
+  const P = PORTRAIT;
+  return { skin: n(P.skins.length), hairC: n(P.hairColors.length), hs: n(P.hairStyles.length), eyes: n(P.eyes.length), face: n(P.faces.length),
+    headset: r() < P.headsetChance, glasses: r() < P.glassesChance };
+}
+function lookOf(id) {
+  if (id === USER_ID && state.player) {
+    if (!state.player.look) state.player.look = randomLook("me:" + state.player.name); // 예전 세이브
+    return state.player.look;
+  }
+  return randomLook(id);
+}
+
+// ----- 유니폼 -----
+function uniformByShort(short) {
+  return TEAM_UNIFORMS[short] || UNIFORM_POOL[pfSeed(short) % UNIFORM_POOL.length];
+}
+function uniformOfTeam(teamId) {
+  if (!teamId) return FREE_AGENT_UNIFORM;
+  const t = findTeam(teamId);
+  if (t) return uniformByShort(t.short);
+  const w = typeof findWorldTeam === "function" ? findWorldTeam(teamId) : null;
+  const reg = w ? w.region : null;
+  const list = REGION_UNIFORMS[reg] || UNIFORM_POOL;
+  return list[pfSeed(teamId) % list.length];
+}
+function teamIdOfPlayer(id) {
+  if (id === USER_ID) { const t = myTeam(); return t ? t.id : null; }
+  const p = state.league && state.league.players[id];
+  if (p) return p.teamId || null;
+  if (state.world && String(id).charAt(0) === "X") {
+    const wt = state.world.teams.find(function (t) { return t.roster.indexOf(id) !== -1; });
+    return wt ? wt.id : null;
+  }
+  return null;
+}
+// 내 선수 표정: 체력이 낮으면 지침, 아니면 지난주 경기 결과 (이긴 경기가 더 많으면 웃음)
+function myMood() {
+  if (state.stamina < PORTRAIT.tiredStamina) return "tired";
+  const L = state.weekReport && state.weekReport.userLines;
+  if (!L || !L.length) return "normal";
+  const w = L.filter(function (l) { return l.won; }).length;
+  return w * 2 > L.length ? "win" : w * 2 < L.length ? "lose" : "normal";
+}
+
+// ----- 그리기 (32×32, 시안 4 그대로) -----
+function drawPortrait32(g, L, c, mood) {
+  const P = PORTRAIT;
+  const R = function (x, y, w, h, col) { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const sk = P.skins[L.skin].c, H = P.hairColors[L.hairC].c, dark = "#231f2b", M = "#7a3b3b";
+  // 몸·유니폼
+  R(6, 26, 20, 6, c[0]); R(8, 25, 16, 1, c[0]); R(14, 25, 4, 3, c[1]); R(6, 30, 20, 1, c[1]); R(14, 22, 4, 4, sk);
+  // 얼굴
+  const fw = [12, 11, 13][L.face], fx = Math.floor(16 - fw / 2);
+  const face = function () { R(fx, 9, fw, 14, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk); };
+  face();
+  // 머리
+  if (L.hs === 6) { // 아프로: 얼굴 뒤를 감싸고 얼굴을 다시
+    R(fx - 4, 3, fw + 8, 10, H); R(fx - 3, 2, fw + 6, 1, H); R(fx - 5, 5, 1, 10, H); R(fx + fw + 4, 5, 1, 10, H); R(fx - 4, 13, 3, 5, H); R(fx + fw + 1, 13, 3, 5, H);
+    R(fx, 10, fw, 13, sk); R(fx + 1, 9, fw - 2, 1, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk);
+    R(fx - 2, 4, 2, 1, "rgba(255,255,255,.18)"); R(fx + 3, 3, 3, 1, "rgba(255,255,255,.18)");
+  } else [
+    function () { R(fx - 1, 6, fw + 2, 4, H); R(fx - 1, 10, 2, 4, H); R(fx + fw - 1, 10, 2, 4, H); },
+    function () { R(fx - 1, 5, fw + 2, 5, H); R(fx + 2, 10, 4, 2, H); R(fx - 1, 10, 1, 6, H); R(fx + fw, 10, 1, 6, H); },
+    function () { R(fx, 5, fw, 4, H); R(fx - 1, 8, fw + 2, 2, H); R(fx + fw - 4, 10, 4, 1, H); },
+    function () { R(fx - 2, 5, fw + 4, 5, H); R(fx - 2, 10, 2, 10, H); R(fx + fw, 10, 2, 10, H); },
+    function () { R(fx, 6, fw, 3, H); R(fx + 2, 4, 2, 2, H); R(fx + 6, 3, 2, 3, H); R(fx + fw - 3, 4, 2, 2, H); R(fx - 1, 8, fw + 2, 2, H); },
+    function () { R(fx + 1, 7, fw - 2, 2, sk); R(fx + 2, 6, fw - 4, 1, sk); R(fx + 2, 7, 2, 1, "rgba(255,255,255,.55)"); R(fx - 1, 12, 1, 2, H); R(fx + fw, 12, 1, 2, H); },
+  ][L.hs]();
+  // 눈썹·눈
+  const ey = 15, e1 = fx + 2, e2 = fx + fw - 4;
+  if (mood === "lose") { R(e1, 12, 1, 1, H); R(e1 + 1, 13, 1, 1, H); R(e2 + 1, 12, 1, 1, H); R(e2, 13, 1, 1, H); }
+  else { R(e1, 13, 2, 1, H); R(e2, 13, 2, 1, H); }
+  const eye = function (x) {
+    if (mood === "win") { R(x, ey, 1, 1, dark); R(x + 1, ey - 1, 1, 1, dark); }
+    else if (mood === "tired") R(x, ey, 2, 1, dark);
+    else if (L.eyes === 1) { R(x, ey - 1, 2, 2, dark); R(x + 1, ey - 1, 1, 1, "#fff"); }
+    else R(x, ey - 1, 2, 2, dark);
+  };
+  eye(e1); eye(e2);
+  if (L.glasses) { R(e1 - 1, ey - 2, 4, 1, dark); R(e2 - 1, ey - 2, 4, 1, dark); R(e1 + 3, ey - 1, e2 - e1 - 3, 1, dark); }
+  // 입
+  if (mood === "win") { R(14, 19, 4, 1, M); R(15, 20, 2, 1, M); R(fx + 1, 17, 2, 1, "#f29a9a"); R(fx + fw - 3, 17, 2, 1, "#f29a9a"); }
+  else if (mood === "lose") { R(15, 19, 2, 1, M); R(14, 20, 1, 1, M); R(17, 20, 1, 1, M); }
+  else if (mood === "tired") { R(15, 19, 2, 2, M); R(fx + fw + 1, 10, 1, 2, "#7fc8ff"); }
+  else R(15, 20, 2, 1, M);
+  // 헤드셋: 머리띠 + 귀 이어컵(밝은 테두리, 안쪽 팀색) + 마이크
+  if (L.headset) {
+    const k = "#2b2b38", kl = "#6c6c86", top = L.hs === 6 ? 2 : 4;
+    R(fx, top, fw, 1, k); R(fx - 1, top + 1, 1, 1, k); R(fx + fw, top + 1, 1, 1, k); R(fx - 2, top + 2, 1, 12 - top, k); R(fx + fw + 1, top + 2, 1, 12 - top, k);
+    R(fx - 4, 12, 4, 7, k); R(fx - 4, 12, 4, 1, kl); R(fx - 4, 12, 1, 7, kl); R(fx - 3, 14, 2, 3, c[0]);
+    R(fx + fw, 12, 4, 7, k); R(fx + fw, 12, 4, 1, kl); R(fx + fw + 3, 12, 1, 7, kl); R(fx + fw + 1, 14, 2, 3, c[0]);
+    R(fx - 1, 19, 1, 1, k); R(fx, 20, 3, 1, k); R(fx + 3, 20, 1, 1, "#ff3d71");
+  }
+}
+
+// 그림 → data URL (캐시)
+const PF_CACHE = {};
+function portraitURL(look, uni, mood, face) {
+  const key = JSON.stringify([look, uni, mood || "normal", !!face]);
+  if (PF_CACHE[key] !== undefined) return PF_CACHE[key];
+  let url = "";
+  try {
+    const cv = document.createElement("canvas");
+    cv.width = 32; cv.height = 32;
+    const g = cv.getContext && cv.getContext("2d");
+    if (g) {
+      drawPortrait32(g, look, uni, mood || "normal");
+      if (face) { // 얼굴만: 머리~턱 18×18 (표에서 2배 = 36px로 선명하게)
+        const c2 = document.createElement("canvas");
+        c2.width = 18; c2.height = 18;
+        c2.getContext("2d").drawImage(cv, 7, 5, 18, 18, 0, 0, 18, 18);
+        url = c2.toDataURL();
+      } else url = cv.toDataURL();
+    }
+  } catch (e) { url = ""; }
+  PF_CACHE[key] = url;
+  return url;
+}
+function portraitHTMLFrom(look, uni, opts) {
+  opts = opts || {};
+  const url = portraitURL(look, uni, opts.mood, opts.face);
+  if (!url) return "";
+  const size = opts.face ? (opts.size || 36) : 32 * Math.max(1, Math.min(3, opts.scale || 1));
+  const img = '<img class="pf px' + (opts.face ? " pf-face" : "") + '" src="' + url + '" width="' + size + '" height="' + size + '" alt="">';
+  return opts.jump ? '<span class="pf-jump">' + img + "</span>" : img;
+}
+function portraitImg(id, opts) {
+  opts = Object.assign({}, opts);
+  if (id === USER_ID && !opts.mood && !opts.face) opts.mood = myMood();
+  return portraitHTMLFrom(lookOf(id), uniformOfTeam(opts.teamId !== undefined ? opts.teamId : teamIdOfPlayer(id)), opts);
+}
+// 표에 넣는 얼굴 칸
+function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: true, size: 36 }) + "</td>"; }
+
+// ----- 가끔 점프 (크게 보이는 그림만) -----
+(function () {
+  if (typeof setInterval !== "function" || typeof document === "undefined" || !document.querySelectorAll) return;
+  const J = PORTRAIT.jump;
+  setInterval(function () {
+    let list;
+    try { list = document.querySelectorAll(".pf-jump"); } catch (e) { return; }
+    const now = Date.now();
+    Array.prototype.forEach.call(list, function (el) {
+      if (!el._nj) el._nj = now + 600 + Math.random() * (J.maxGap - J.minGap);
+      if (now < el._nj) return;
+      el.style.setProperty("--jh", (J.minPx + Math.floor(Math.random() * (J.maxPx - J.minPx + 1))) + "px");
+      el.classList.remove("jumping"); void el.offsetWidth; el.classList.add("jumping");
+      el._nj = now + J.minGap + Math.random() * (J.maxGap - J.minGap);
+    });
+  }, 250);
+})();
+
+const USER_ID = "USER";
+const M = MATCH;
+M.sets.forEach(function (st) { st.ev = st.ev.filter(function (e) { return e.e.indexOf("auto:") !== 0; }); }); // 세트 뒤 심리 변화는 재생에서 뺌
+M.evDef.solo = M.evDef.solo || { icon: "🗡️", name: "솔로킬", text: "{p}, {v} 솔로킬!", cat: "play", size: "m" }; // 라인 솔로킬 (경기 기록에는 이름만 있음)
+const sideCls = function (s) { return s === 0 ? "a" : "b"; };
+const face = function (id, size) { if (!id || !M.looks[id]) return ""; const tid = null; return portraitHTMLFrom(M.looks[id], idSide(id) === 0 ? M.a.uni : M.b.uni, { face: true, size: size || 18 }); };
+function idSide(id) { for (const s of M.sets) for (const l of s.lanes) { if (l.a === id) return 0; if (l.b === id) return 1; } return 0; }
+const uniHTML = function (u) { return '<span class="uni"><i style="background:' + u[0] + '"></i><i style="background:' + u[1] + '"></i></span>'; };
+// 점수판
+let setIdx = 0, t = 0, playing = false, speed = 1, last = 0, shown = 0;
+const wins = function (upto) { const w = [0, 0]; M.sets.slice(0, upto).forEach(function (s) { w[s.w]++; }); return w; };
+function drawBoard() {
+  const w = wins(setIdx + (t >= cur().min ? 1 : 0));
+  document.getElementById("board").innerHTML =
+    '<div class="tm a"><span class="pf-frame">' + portraitHTMLFrom(M.looks[M.sets[0].lanes[2].a] || randomLook("a"), M.a.uni, { scale: 2 }) + '</span><div><div class="nm">' + uniHTML(M.a.uni) + " " + M.a.name + "</div>" + (M.mineSide === 0 ? '<div class="mine">우리 팀</div>' : "") + "</div></div>" +
+    '<div class="score"><div class="lbl">' + M.label + " · " + M.bo + "판 " + Math.ceil(M.bo / 2) + '선승</div><div class="big">' + w[0] + " : " + w[1] + "</div></div>" +
+    '<div class="tm b"><span class="pf-frame">' + portraitHTMLFrom(M.looks[M.sets[0].lanes[2].b] || randomLook("b"), M.b.uni, { scale: 2 }) + '</span><div><div class="nm">' + M.b.name + " " + uniHTML(M.b.uni) + "</div>" + (M.mineSide === 1 ? '<div class="mine">우리 팀</div>' : "") + "</div></div>";
+}
+function cur() { return M.sets[setIdx]; }
+function drawSetbar() {
+  const s = cur();
+  const k = Math.min(1, t / s.min);
+  const kills = [Math.round(s.kills[0] * k), Math.round(s.kills[1] * k)];
+  const mm = Math.floor(t), ss = Math.floor((t - mm) * 60);
+  document.getElementById("setbar").innerHTML = M.sets.map(function (x, i) {
+    const done = i < setIdx || (i === setIdx && t >= x.min);
+    return '<span class="st' + (i === setIdx ? " on" : "") + '" data-set="' + i + '">' + (i + 1) + "세트" + (done ? " · " + (x.w === 0 ? M.a.name.split(" ")[0] : M.b.name.split(" ")[0]) + " 승" : "") + "</span>";
+  }).join("") + '<span class="clock">⏱ ' + mm + ":" + String(ss).padStart(2, "0") + ' / ' + Math.floor(s.min) + ":" + String(Math.round((s.min % 1) * 60)).padStart(2, "0") + ' · ⚔ <span class="kills">' + kills[0] + " : " + kills[1] + "</span></span>";
+  document.querySelectorAll("[data-set]").forEach(function (el) { el.onclick = function () { gotoSet(Number(el.dataset.set)); }; });
+}
+// 미니맵
+const MAP_SVG = '<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#0f2219"/>' +
+  '<path d="M0 100 L100 0" stroke="#163b55" stroke-width="16" opacity=".55"/>' + // 강
+  '<path d="M10 92 L10 10 L92 10" stroke="#3b4a3a" stroke-width="5" fill="none"/><path d="M8 90 L90 8" stroke="#3b4a3a" stroke-width="5"/><path d="M10 90 L90 90 L90 10" stroke="#3b4a3a" stroke-width="5" fill="none"/>' +
+  '<circle cx="34" cy="31" r="4" fill="#4a2b6b"/><circle cx="67" cy="70" r="4" fill="#5a3a1a"/>' +
+  '<rect x="2" y="84" width="14" height="14" rx="3" fill="#0a3a5a" stroke="#00e0ff"/><rect x="84" y="2" width="14" height="14" rx="3" fill="#5a0a22" stroke="#ff3d71"/>' +
+  [[10, 60], [10, 35], [40, 10], [65, 10], [30, 70], [70, 30], [40, 90], [65, 90], [90, 60], [90, 35]].map(function (p, i) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.8" fill="' + ([0, 1, 4, 6, 7].indexOf(i) !== -1 && i !== 2 && i !== 3 ? "#00e0ff" : "#ff3d71") + '" opacity=".8"/>'; }).join("") +
+  '<text x="34" y="25" font-size="4" fill="#b98bff" text-anchor="middle">바론</text><text x="67" y="78" font-size="4" fill="#ffb26b" text-anchor="middle">용</text></svg>';
+function jit(seed) { const x = Math.sin(seed * 999) * 10000; return x - Math.floor(x); }
+function evPos(e, i) {
+  const id = e.e, j = function (r) { return (jit(i + r) - 0.5) * 12; };
+  if (/dragon|elder|soul/.test(id)) return [67 + j(1) / 3, 70 + j(2) / 3];
+  if (/baron|herald/.test(id)) return [34 + j(1) / 3, 31 + j(2) / 3];
+  const cat = (M.evDef[id] || {}).cat;
+  if (cat === "fight" || cat === "teamfight") return [50 + j(1) * 1.5, 50 + j(2) * 1.5];
+  const pos = e.pp;
+  const push = e.s === 0 ? -1 : 1; // 이긴 쪽이 상대 진영으로
+  if (pos === "top") return [14 + j(1) / 2, 30 + push * -8 + j(2)];
+  if (pos === "mid") return [50 + push * 6 + j(1) / 2, 50 - push * 6 + j(2) / 2];
+  if (pos === "adc" || pos === "support") return [70 + push * 8 + j(1), 86 + j(2) / 2];
+  if (pos === "jungle") return e.s === 0 ? [62 + j(1), 38 + j(2)] : [36 + j(1), 64 + j(2)];
+  return [50 + j(1), 50 + j(2)];
+}
+function evText(e) {
+  const d = M.evDef[e.e] || { text: e.e, icon: "•" };
+  const P = function (id, n) { return n ? '<b' + (id === "USER" ? ' style="color:#00e0ff"' : "") + ">" + n + "</b>" : "누군가"; };
+  return (d.text || d.name).replace(/\{p\}/g, P(e.p, e.pn)).replace(/\{v\}/g, P(e.v, e.vn)).replace(/\{[a-z]+\}/g, "");
+}
+// 라인전
+function drawLanes() {
+  const s = cur(); const rev = t >= 12;
+  const POS = ["탑", "정글", "미드", "원딜", "서폿"];
+  document.getElementById("lanes").innerHTML = '<div class="muted sm" style="margin-bottom:4px">라인전 ' + (rev ? "결과" : "진행 중 (12분에 공개)") + "</div>" + s.lanes.map(function (l, i) {
+    const me = l.a === "USER" || l.b === "USER";
+    return '<div class="lane"><span class="muted">' + POS[i] + "</span>" +
+      '<span class="who">' + face(l.a) + '<span class="' + (l.a === "USER" ? "me" : "") + '">' + (l.an || "-") + "</span></span>" +
+      '<span class="res ' + (rev ? (l.aWon ? "wa" : "wb") : "") + '">' + (rev ? (l.aWon ? "◀" : "▶") + (l.solo ? "💥" : "") : "···") + "</span>" +
+      '<span class="who r">' + face(l.b) + '<span class="' + (l.b === "USER" ? "me" : "") + '">' + (l.bn || "-") + "</span></span></div>";
+  }).join("");
+}
+// 타임라인 표시
+function drawTicks() {
+  const tl = document.getElementById("tl"), s = cur();
+  tl.querySelectorAll(".tick").forEach(function (x) { x.remove(); });
+  s.ev.forEach(function (e) { const d = M.evDef[e.e] || {}; const x = document.createElement("i"); x.className = "tick " + sideCls(e.k === "bad" ? 1 - e.s : e.s) + (d.size === "l" ? " big" : ""); x.style.left = (e.t / s.min * 100) + "%"; tl.appendChild(x); });
+}
+function momentumAt(time) {
+  let v = 0; cur().ev.forEach(function (e) { if (e.t <= time) v += e.s === 0 ? e.x : -e.x; });
+  return v;
+}
+function render() {
+  const s = cur();
+  const done = s.ev.filter(function (e) { return e.t <= t; });
+  // 지도
+  const map = document.getElementById("map");
+  if (shown > done.length) { map.querySelectorAll(".ping").forEach(function (p) { p.remove(); }); document.getElementById("feed").innerHTML = ""; shown = 0; }
+  for (let i = shown; i < done.length; i++) addEvent(done[i], i);
+  shown = done.length;
+  const mv = Math.max(-1, Math.min(1, momentumAt(t) / 120));
+  document.getElementById("mom").style.width = (50 + mv * 50) + "%";
+  document.getElementById("momA").textContent = M.a.name; document.getElementById("momB").textContent = M.b.name;
+  const pct = Math.min(100, t / s.min * 100);
+  document.getElementById("tlfill").style.width = pct + "%"; document.getElementById("tlhead").style.left = pct + "%";
+  drawSetbar(); drawLanes(); drawBoard();
+}
+function addEvent(e, i) {
+  const d = M.evDef[e.e] || { icon: "•" };
+  const side = e.k === "bad" ? 1 - e.s : e.s; // 실수는 상대에게 이득
+  const map = document.getElementById("map");
+  map.querySelectorAll(".ping").forEach(function (p) { p.classList.add("old"); });
+  const old = map.querySelectorAll(".ping"); if (old.length > 6) old[0].remove();
+  const p = evPos(e, i); const el = document.createElement("div");
+  el.className = "ping " + sideCls(side); el.style.left = p[0] + "%"; el.style.top = p[1] + "%";
+  el.innerHTML = '<span class="ring"></span><span class="ic">' + d.icon + "</span>"; map.appendChild(el);
+  const f = document.createElement("div");
+  const mine = e.p === "USER" || e.v === "USER";
+  f.className = "fe " + sideCls(e.s) + (d.size === "l" ? " big" : "") + (mine ? " mine" : "");
+  f.innerHTML = '<span class="t">' + e.t + '분</span><span>' + (face(e.p, 18) || d.icon) + '</span><span><span class="' + (e.k === "bad" ? "k-bad" : e.k === "psych" ? "k-psych" : "") + '">' + d.icon + " " + evText(e) + "</span></span>";
+  const feed = document.getElementById("feed"); feed.insertBefore(f, feed.firstChild);
+}
+// 재생
+function tick(now) {
+  if (!playing) return;
+  const dt = (now - last) / 1000; last = now;
+  t += dt * speed / 0.6; // 1배: 게임 1분 = 0.6초
+  if (t >= cur().min) { t = cur().min; render(); playing = false; setTimeout(endSet, 300); return; }
+  render(); requestAnimationFrame(tick);
+}
+function setPlay(on) { playing = on; document.getElementById("play").textContent = on ? "⏸ 일시정지" : "▶ 재생"; if (on) { last = performance.now(); requestAnimationFrame(tick); } }
+function endSet() {
+  const s = cur(), w = wins(setIdx + 1), need = Math.ceil(M.bo / 2);
+  const winTeam = s.w === 0 ? M.a : M.b;
+  const matchOver = w[0] >= need || w[1] >= need;
+  banner('<div class="muted">' + (setIdx + 1) + "세트 종료</div><div class=\"big\">" + uniHTML(winTeam.uni) + " " + winTeam.name + " 승리</div><div class=\"muted\">세트 " + w[0] + " : " + w[1] + "</div>" +
+    (matchOver ? '<button class="primary" id="bnext">경기 결과 보기 ▶</button>' : '<div class="ctrl"><button class="primary" id="bnext">' + (setIdx + 2) + '세트 시작 ▶</button><button id="bskip">⏭ 결과 바로 보기</button></div>'), "", function () {
+    if (matchOver) finalBanner(); else gotoSet(setIdx + 1, true);
+  });
+  const bs = document.getElementById("bskip"); if (bs) bs.onclick = function () { document.getElementById("skip").onclick(); };
+  drawSetbar();
+}
+function finalBanner() {
+  const w = wins(M.sets.length), mineWon = (w[1] > w[0]) === (M.mineSide === 1);
+  const winTeam = w[0] > w[1] ? M.a : M.b;
+  banner((mineWon ? '<div class="big">승리!</div>' : '<div class="big" style="color:#ff3d71">패배</div>') + '<div style="font-size:20px;font-weight:bold">' + uniHTML(winTeam.uni) + " " + winTeam.name + " " + Math.max(w[0], w[1]) + " : " + Math.min(w[0], w[1]) + "</div>" +
+    '<div class="muted">🏅 POG ' + (M.pog || "") + '</div><button id="bnext">닫기 (대시보드로)</button>', mineWon ? "win" : "", function () { hideBanner(); });
+  if (mineWon) confetti(winTeam.uni);
+}
+function banner(html, cls, onNext) {
+  const b = document.getElementById("banner"); b.className = "banner " + (cls || ""); b.innerHTML = html;
+  const n = document.getElementById("bnext"); if (n) n.onclick = onNext;
+}
+function hideBanner() { document.getElementById("banner").className = "banner hide"; }
+function confetti(u) { const r = document.getElementById("replay"); for (let i = 0; i < 40; i++) { const c = document.createElement("i"); c.className = "confetti"; c.style.left = Math.random() * 100 + "%"; c.style.background = [u[0], u[1], "#ffd23f", "#00e0ff"][i % 4]; c.style.animationDuration = (1.6 + Math.random() * 1.6) + "s"; c.style.animationDelay = Math.random() * .6 + "s"; r.appendChild(c); setTimeout(function () { c.remove(); }, 4000); } }
+function gotoSet(i, autoplay) { setIdx = i; t = 0; shown = 0; document.getElementById("map").innerHTML = MAP_SVG; document.getElementById("feed").innerHTML = ""; hideBanner(); drawTicks(); render(); if (autoplay) setPlay(true); }
+function intro() {
+  banner('<span class="tag">🔥 빅게임·결승 첫 화면 (예시) · ' + M.label + '</span><div class="vs"><span>' + uniHTML(M.a.uni) + " " + M.a.name + '</span><span style="color:#ffd23f">VS</span><span>' + M.b.name + " " + uniHTML(M.b.uni) + '</span></div><div class="muted">' + M.bo + "판 " + Math.ceil(M.bo / 2) + '선승</div><button class="primary" id="bnext">경기 시작 ▶</button>', "", function () { hideBanner(); setPlay(true); });
+}
+document.getElementById("play").onclick = function () { if (t >= cur().min) return; setPlay(!playing); };
+document.querySelectorAll("[data-sp]").forEach(function (b) { b.onclick = function () { speed = Number(b.dataset.sp); document.querySelectorAll("[data-sp]").forEach(function (x) { x.classList.toggle("on", x === b); }); }; });
+document.getElementById("skip").onclick = function () { setPlay(false); setIdx = M.sets.length - 1; t = cur().min; drawTicks(); document.getElementById("map").innerHTML = MAP_SVG; shown = 0; render(); finalBanner(); };
+document.getElementById("tl").onclick = function (e) { const r = this.getBoundingClientRect(); t = Math.max(0, Math.min(cur().min, (e.clientX - r.left) / r.width * cur().min)); render(); };
+let introOn = true;
+document.getElementById("optIntro").onclick = function () { introOn = !introOn; this.classList.toggle("on", introOn); this.textContent = "빅게임·결승 첫 화면 연출 " + (introOn ? "켜짐" : "꺼짐"); gotoSet(0); if (introOn) intro(); };
+gotoSet(0); intro();
+</script>
+</body>
+</html>

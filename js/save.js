@@ -147,6 +147,8 @@ function stateFromSave(save) {
     if (!Array.isArray(L.usedNames)) L.usedNames = [];
   }
   if (s.settings && typeof s.settings.autoSave === "boolean") fresh.settings.autoSave = s.settings.autoSave;
+  if (s.settings && ["all", "big", "off"].indexOf(s.settings.replayAuto) !== -1) fresh.settings.replayAuto = s.settings.replayAuto; // 경기 자동 재생 (js/replay.js)
+  if (s.settings && [1, 2, 3].indexOf(s.settings.replaySpeed) !== -1) fresh.settings.replaySpeed = s.settings.replaySpeed;
 
   if (s.world && typeof s.world === "object" && Array.isArray(s.world.teams)) fresh.world = s.world; // 해외 리그 (js/era.js)
   if (Number.isFinite(s.dormWeeks)) fresh.dormWeeks = s.dormWeeks;

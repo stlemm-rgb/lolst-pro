@@ -334,6 +334,7 @@ pages.settings = function () {
       '<div class="setting-row">' +
         '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
       "</div>" +
+      replaySettingsHTML() + // 경기 자동 재생 (js/replay.js)
       '<div class="setting-row">처음 안내 (📘 대시보드 맨 위) ' +
         (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
       "</div>" +
@@ -515,14 +516,14 @@ function renderTopbar() {
       '<button id="rest-week" class="tip" data-tip="고른 훈련은 그대로 두고 이번 주만 쉬어요 (체력·컨디션 회복)">휴식 주 💤</button>' +
       '<button class="primary" id="next-week">다음 주로 진행 ▶</button>' +
     "</span>";
-  document.getElementById("next-week").onclick = function () { nextWeek(false); };
+  document.getElementById("next-week").onclick = function () { advanceWeek(false); };
   document.getElementById("menu-toggle").onclick = function () { document.getElementById("layout").classList.toggle("menu-open"); };
   document.querySelector(".content").onclick = function (e) { // 휴대폰: 메뉴 밖을 누르면 닫기
     const lay = document.getElementById("layout");
     if (lay.classList.contains("menu-open") && !e.target.closest("#menu-toggle")) lay.classList.remove("menu-open");
   };
   document.getElementById("plan-badge").onclick = function () { selectMenu("training"); };
-  document.getElementById("rest-week").onclick = function () { nextWeek(true); };
+  document.getElementById("rest-week").onclick = function () { advanceWeek(true); };
 }
 
 // 상단바: 지금 고른 훈련 ([다음 주로 진행]을 누르면 할 훈련). 누르면 훈련 화면으로
@@ -593,7 +594,7 @@ function renderPage() {
     };
   });
 
-  if (state.currentMenu === "settings") bindSettings(page);
+  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); }
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
@@ -999,3 +1000,9 @@ function renderAll() {
   renderPage();
 }
 
+// 버튼으로 한 주 진행 (다음 주로 진행·휴식 주·💡 휴식): 진행한 뒤 설정대로 경기 자동 재생 (js/replay.js, 디자인 D3)
+// 측정 도구는 nextWeek만 부르므로 재생 창이 뜨지 않음
+function advanceWeek(rest) {
+  nextWeek(rest);
+  if (typeof afterWeekReplay === "function") afterWeekReplay();
+}
