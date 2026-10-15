@@ -248,7 +248,7 @@ function replayBanner(html, cls, onNext) {
 function hideReplayBanner() { const b = document.getElementById("rp-banner"); if (b) { b.hidden = true; b.innerHTML = ""; } }
 function replayConfetti(u) {
   const box = document.querySelector("#replay-overlay .rp-box");
-  if (!box) return;
+  if (!box || motionOff()) return; // 움직임 끄기면 꽃가루 없음 (디자인 D6)
   for (let i = 0; i < 40; i++) {
     const c = document.createElement("i");
     c.className = "rp-confetti";

@@ -64,3 +64,17 @@ function miniBarHTML(frac, text) {
 function emptyBoxHTML(icon, text) {
   return '<div class="empty-box"><span class="e">' + icon + "</span>" + text + "</div>";
 }
+
+// ===== D6 움직임 켜기·끄기 (180) =====
+// 끄면: 포트레잇 점프, 카드 뒤집기·반짝임, 경기 재생 배너·꽃가루, 신문 팝업 등장 등 모든 CSS 애니메이션 없음 (경기 재생 자체는 그대로)
+function motionOff() { return !!(typeof state !== "undefined" && state && state.settings && state.settings.motion === "off"); }
+function applyMotion() { if (document.documentElement) document.documentElement.classList.toggle("no-motion", motionOff()); }
+function motionSettingHTML() {
+  const off = motionOff();
+  return '<div class="setting-row">움직임 <select id="motion-set"><option value="on"' + (off ? "" : " selected") + '>켜기</option><option value="off"' + (off ? " selected" : "") + ">끄기</option></select>" +
+    ' <span class="muted small">끄면 포트레잇 점프·카드 뒤집기·반짝임·꽃가루 같은 움직임이 없어져요 (느린 기기나 어지러울 때)</span></div>';
+}
+function bindMotionSetting(page) {
+  const sel = page.querySelector("#motion-set");
+  if (sel) sel.onchange = function () { state.settings.motion = sel.value; applyMotion(); showNotice("움직임: " + (sel.value === "off" ? "끄기" : "켜기")); };
+}

@@ -1291,3 +1291,26 @@ table.standings tr.cut td { border-bottom: 1px dashed rgba(var(--gold-rgb), 0.5)
   .clubs-grid { grid-template-columns: 1fr; }
 }
 table.standings th, table.standings td { white-space: nowrap; }
+
+/* ===== 디자인 D6 마무리 (180) ===== */
+/* 움직임 끄기 (설정) */
+.no-motion *, .no-motion *::before, .no-motion *::after { animation: none !important; transition: none !important; }
+/* 가로 넘침: 조합 전략 버튼(좁은 휴대폰), 게임 방법 숙련도 표 */
+.comp-seg button { min-width: 0; white-space: normal; }
+@media (max-width: 760px) { table.mastery-table { display: block; overflow-x: auto; max-width: 100%; } }
+/* 터치 화면: 작은 버튼을 손가락 크기로 (PC는 그대로) */
+@media (pointer: coarse) {
+  #page button, #topbar button, #page select, #replay-overlay button { min-height: 34px; }
+  .small-btn { padding: 6px 12px; }
+}
+/* 경기 재생 창: 태블릿은 미니맵을 화면 높이에 맞추고, 휴대폰은 점수를 위 줄로 */
+@media (max-width: 820px) {
+  .rp-map { max-width: min(100%, 44vh); margin: 0 auto; }
+}
+@media (max-width: 560px) {
+  .rp-board { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 8px; }
+  .rp-score { grid-column: 1 / -1; order: -1; }
+  .rp-close { order: -2; }
+  .rp-tm .pf { width: 32px; height: 32px; }
+  .rp-nm { font-size: 13px; overflow-wrap: anywhere; }
+}

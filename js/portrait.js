@@ -150,6 +150,7 @@ function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: tr
   if (typeof setInterval !== "function" || typeof document === "undefined" || !document.querySelectorAll) return;
   const J = PORTRAIT.jump;
   setInterval(function () {
+    if (typeof motionOff === "function" && motionOff()) return; // 움직임 끄기 (디자인 D6)
     let list;
     try { list = document.querySelectorAll(".pf-jump"); } catch (e) { return; }
     const now = Date.now();

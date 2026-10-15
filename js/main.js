@@ -336,6 +336,7 @@ pages.settings = function () {
         '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
       "</div>" +
       replaySettingsHTML() + // 경기 자동 재생 (js/replay.js)
+      motionSettingHTML() + // 움직임 켜기·끄기 (디자인 D6, js/pagehead.js)
       '<div class="setting-row">처음 안내 (📘 대시보드 맨 위) ' +
         (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
       "</div>" +
@@ -554,6 +555,7 @@ function staminaBadgeHTML() {
 
 // ===== 우측 본문 =====
 function renderPage() {
+  applyMotion(); // 움직임 끄기 설정 (디자인 D6, js/pagehead.js)
   updateTutorial(); // 처음 안내 단계 확인 (js/guide.js)
   renderTopbar(); // 상단바 (고른 훈련·체력이 바뀌었을 수 있어서)
   const page = document.getElementById("page");
@@ -596,7 +598,7 @@ function renderPage() {
     };
   });
 
-  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); }
+  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); bindMotionSetting(page); }
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상

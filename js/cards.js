@@ -19,6 +19,7 @@ function flipCard(el) {
   else if (el.classList.contains("g-A")) setTimeout(function () { cardSparks(el, 10, "#2bff9e"); }, 450);
 }
 function cardSparks(el, n, col) {
+  if (motionOff()) return; // 움직임 끄기 (디자인 D6)
   for (let i = 0; i < n; i++) {
     const s = document.createElement("i");
     s.className = "fc-spark";
