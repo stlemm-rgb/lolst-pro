@@ -239,8 +239,9 @@ pages.collection = function () {
     const me = e.players.find(function (p) { return p.id === USER_ID; });
     return '<div class="card skin-pick"><h2>🎨 ' + e.year + " 월드 우승 스킨 — 챔피언 고르기</h2>" +
       '<p class="muted small">' + escapeHTML(e.team) + " 우승! 결승에서 내가 쓴 챔피언 중 하나를 골라 우승 스킨으로 만들어요. 고른 챔피언은 경기력 +" + Math.round(WORLDS_SKIN.powerBonus * 100) + "%.</p>" +
-      '<div class="skin-list">' + me.choices.map(function (c) {
-        return '<button class="skin-card skin-choice" data-skin-year="' + e.year + '" data-skin-champ="' + escapeHTML(c) + '"><div class="skin-year">' + e.year + '</div><div class="skin-champ">' + escapeHTML(c) + '</div><div class="muted small">' + Math.round(state.mastery[c] || 0) + " 숙련도</div></button>";
+      '<div class="fc-deck fc-skins">' + me.choices.map(function (c) {
+        return flipCardHTML({ flipped: true, grade: "", cls: "fc-skin", name: c, eff: "🏆 " + e.year + " 월드 결승 · 숙련도 " + Math.round(state.mastery[c] || 0), // 카드 (js/cards.js)
+          pick: '<button class="fc-pick" data-skin-year="' + e.year + '" data-skin-champ="' + escapeHTML(c) + '">이 스킨으로</button>' });
       }).join("") + "</div></div>";
   }).join("");
   // 내 우승 스킨

@@ -79,7 +79,8 @@ function messageHTML(m) {
     const text = m.kind === "offer" && m.offer ? offerText(m.offer) : m.text;
     inner += '<div class="msg-text">' + escapeHTML(text) + "</div>";
     if (m.kind === "offer" && m.offer) inner += '<div class="msg-text">' + offerBreakdownHTML(m.offer) + "</div>";
-    if (waiting) {
+    if (waiting && m.kind === "staffPick" && m.staffPick) inner += staffPickDeckHTML(m); // 인사 후보 카드 뒤집기 (js/cards.js)
+    else if (waiting) {
       inner += '<div class="msg-choices">' + m.choices.map(function (c, i) {
         const poor = choiceTooExpensive(m, i);
         const hint = [c.hint, poor ? "자금이 부족해요" : ""].filter(Boolean).join(" · ");

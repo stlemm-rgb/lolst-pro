@@ -1140,3 +1140,52 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
   .rp-nm { font-size: 14px; } .rp-big { font-size: 24px; }
   .rp-feed { height: 220px; }
 }
+
+/* ===== 디자인 D4 뒤집는 카드 (178, js/cards.js) ===== */
+.fc-deck { display: grid; grid-template-columns: repeat(auto-fit, 210px); gap: 18px; justify-content: center; perspective: 1200px; margin: 10px 0; }
+.fc-deck.fc-skins { grid-template-columns: repeat(auto-fill, 150px); justify-content: start; }
+.fcard { position: relative; height: 290px; cursor: pointer; }
+.fc-skins .fcard { height: 190px; }
+.fc-inner { position: absolute; inset: 0; transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); transform-style: preserve-3d; }
+.fcard.flip .fc-inner { transform: rotateY(180deg); }
+.fc-face { position: absolute; inset: 0; border-radius: 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; border: 1px solid var(--border); }
+.fc-back { background: repeating-linear-gradient(45deg, #15152a 0 10px, #1b1b34 10px 20px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+.fc-q { font-size: 54px; font-weight: bold; color: #3a3a66; }
+.fc-lbl { font-size: 12px; color: var(--muted); }
+.fcard:hover .fc-back { border-color: rgba(var(--accent-rgb), 0.6); }
+.fcard.ticket .fc-back { border-color: var(--gold); box-shadow: 0 0 22px rgba(var(--gold-rgb), 0.35), inset 0 0 30px rgba(var(--gold-rgb), 0.12); }
+.fcard.ticket .fc-q { color: var(--gold); }
+.fcard.ticket .fc-back::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 240, 180, 0.35) 48%, transparent 66%); animation: fcSweep 2.2s infinite; }
+.fc-front { transform: rotateY(180deg); background: radial-gradient(circle at 50% 30%, #2a2650, #12121f 70%); display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 12px; text-align: center; }
+.fc-front > * { position: relative; z-index: 1; }
+.fc-grade { position: absolute !important; top: 8px; left: 10px; font-size: 30px; font-weight: 900; line-height: 1; }
+.fc-role { position: absolute !important; top: 12px; right: 12px; font-size: 11px; color: var(--muted); }
+.fc-new { position: absolute !important; top: 10px; right: 10px; font-size: 11px; font-weight: bold; color: #1d1b16; background: var(--gold); border-radius: 99px; padding: 1px 8px; }
+.fc-new ~ .fc-pf { margin-top: 24px; }
+.fc-pf { margin-top: 22px; background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); border-radius: 12px; padding: 4px 4px 0; }
+.fc-nm { font-weight: bold; font-size: 17px; }
+.fc-eff { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.fc-eff b { color: var(--text); }
+.fc-pick { margin-top: auto; width: 100%; font-size: 13px; padding: 7px; }
+.fc-skins .fc-nm { margin-top: 30px; font-size: 18px; }
+.fc-skins .fcard:hover .fc-front { border-color: var(--gold); box-shadow: 0 0 24px rgba(var(--gold-rgb), 0.35); }
+.g-S .fc-front { border-color: var(--gold); box-shadow: 0 0 34px rgba(var(--gold-rgb), 0.45); } .g-S .fc-grade { color: var(--gold); text-shadow: 0 0 12px rgba(var(--gold-rgb), 0.8); }
+.g-A .fc-front { border-color: var(--good); box-shadow: 0 0 24px rgba(var(--good-rgb), 0.3); } .g-A .fc-grade { color: var(--good); }
+.g-B .fc-front { border-color: rgba(var(--accent-rgb), 0.6); } .g-B .fc-grade { color: var(--accent); }
+.g-C .fc-grade { color: #94a3b8; }
+.g-D .fc-front { border-color: rgba(var(--bad-rgb), 0.4); } .g-D .fc-grade { color: var(--bad); }
+.g-S.flip .fc-front::before { content: ""; position: absolute; inset: -40%; z-index: 0; background: conic-gradient(from 0deg, transparent 0 10%, rgba(255, 210, 63, 0.18) 12%, transparent 16% 26%, rgba(255, 210, 63, 0.18) 28%, transparent 32% 42%, rgba(255, 210, 63, 0.18) 44%, transparent 48% 58%, rgba(255, 210, 63, 0.18) 60%, transparent 64% 74%, rgba(255, 210, 63, 0.18) 76%, transparent 80% 90%, rgba(255, 210, 63, 0.18) 92%, transparent 96%); animation: fcSpin 8s linear infinite; }
+.g-S.flip .fc-front::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(110deg, transparent 30%, rgba(255, 240, 180, 0.4) 48%, transparent 66%); animation: fcSweep 1.8s 0.6s 2; transform: translateX(-100%); }
+.fcard.flip.g-S { animation: fcShake 0.5s 0.55s; }
+.fc-spark { position: absolute; left: 50%; top: 40%; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); pointer-events: none; z-index: 5; animation: fcSpark 900ms ease-out forwards; }
+.fc-deal .fcard { animation: fcDeal 0.6s both; }
+.fc-deal .fcard:nth-child(2) { animation-delay: 0.25s; } .fc-deal .fcard:nth-child(3) { animation-delay: 0.5s; } .fc-deal .fcard:nth-child(4) { animation-delay: 0.75s; }
+.fc-ctrl { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 8px; }
+.fc-help { text-align: center; margin-top: 6px; }
+@keyframes fcSweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes fcSpin { to { transform: rotate(360deg); } }
+@keyframes fcShake { 0%, 100% { transform: none; } 25% { transform: translateY(-6px) scale(1.03); } 60% { transform: translateY(2px); } }
+@keyframes fcSpark { from { transform: translate(0, 0) scale(1); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; } }
+@keyframes fcDeal { from { transform: translateY(-40px) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .fc-inner { transition: none; } .fcard.flip.g-S, .fc-deal .fcard { animation: none; } }
+@media (max-width: 760px) { .fc-deck { grid-template-columns: repeat(3, 1fr); gap: 8px; } .fcard { height: 240px; } .fc-nm { font-size: 13px; } .fc-eff { font-size: 10px; } .fc-pick { font-size: 11px; padding: 5px 2px; } .fc-grade { font-size: 22px; } .fc-deck.fc-skins { grid-template-columns: repeat(2, 1fr); } }

@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시안 7 — 뽑기 연출</title>
+<style>
+:root { --bg:#07070d; --panel:#11111c; --panel-2:#181828; --border:#26263d; --text:#f1f1f7; --muted:#8a8aa6; --accent:#00e0ff; --gold:#ffd23f; --good:#2bff9e; --bad:#ff3d71;
+  --r:14px; --r-s:10px; --grad: linear-gradient(90deg,#b44dff,#00e0ff); --grad-btn: linear-gradient(90deg,#8a3dff,#0096c7); }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; background: var(--bg); color: var(--text); }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 60px; }
+h1 { font-size: 24px; margin: 0 0 6px; } h2 { font-size: 18px; margin: 34px 0 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+.lead, .note { color: var(--muted); font-size: 14px; line-height: 1.6; }
+button { font: inherit; color: var(--text); cursor: pointer; border-radius: var(--r-s); border: 1px solid rgba(0,224,255,.35); background: linear-gradient(180deg,#22223a,#1a1a2d); padding: 8px 14px; }
+button.primary, .tabs button.on { background: var(--grad-btn); border-color: transparent; color: #fff; font-weight: bold; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; } .tabs button { border-radius: 999px; font-size: 13px; }
+.ctrl { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; justify-content: center; }
+.msg { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 12px 14px; margin-bottom: 18px; font-size: 14px; }
+.px { image-rendering: pixelated; image-rendering: crisp-edges; } .pf { display: block; }
+.uni-sw { display: inline-flex; gap: 2px; } .uni-sw i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+/* 카드 */
+.deck { display: grid; grid-template-columns: repeat(3, 220px); gap: 22px; justify-content: center; perspective: 1200px; }
+.deck.small { grid-template-columns: repeat(3, 200px); }
+.deck.skins { grid-template-columns: repeat(auto-fill, 150px); }
+.card3 { position: relative; height: 300px; cursor: pointer; }
+.deck.small .card3 { height: 270px; } .deck.skins .card3 { height: 200px; }
+.inner { position: absolute; inset: 0; transition: transform .7s cubic-bezier(.2,.8,.2,1); transform-style: preserve-3d; }
+.card3.flip .inner { transform: rotateY(180deg); }
+.face { position: absolute; inset: 0; border-radius: 16px; backface-visibility: hidden; overflow: hidden; border: 1px solid var(--border); }
+.back { background: repeating-linear-gradient(45deg, #15152a 0 10px, #1b1b34 10px 20px); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; }
+.back .q { font-size: 54px; font-weight: bold; color: #3a3a66; }
+.back .lbl { font-size: 12px; color: var(--muted); }
+.card3:hover .back { border-color: rgba(0,224,255,.6); }
+.card3.ticket .back { border-color: var(--gold); box-shadow: 0 0 22px rgba(255,210,63,.35), inset 0 0 30px rgba(255,210,63,.12); }
+.card3.ticket .back .q { color: var(--gold); }
+.card3.ticket .back::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,240,180,.35) 48%, transparent 66%); animation: sweep 2.2s infinite; }
+.front { transform: rotateY(180deg); background: radial-gradient(circle at 50% 30%, #2a2650, #12121f 70%); display: flex; flex-direction: column; align-items: center; padding: 14px 12px; gap: 6px; text-align: center; }
+.front .grade { position: absolute; top: 8px; left: 10px; font-size: 30px; font-weight: 900; line-height: 1; }
+.front .role { position: absolute; top: 12px; right: 12px; font-size: 11px; color: var(--muted); }
+.front .pfw { margin-top: 22px; background: radial-gradient(circle at 50% 75%, #34305e, #1c1b30); border-radius: 12px; padding: 4px 4px 0; }
+.front .nm { font-weight: bold; font-size: 17px; }
+.front .eff { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.front .pick { margin-top: auto; width: 100%; font-size: 13px; padding: 7px; }
+.g-S .front { border-color: var(--gold); box-shadow: 0 0 34px rgba(255,210,63,.45); } .g-S .grade { color: var(--gold); text-shadow: 0 0 12px rgba(255,210,63,.8); }
+.g-A .front { border-color: var(--good); box-shadow: 0 0 24px rgba(43,255,158,.3); } .g-A .grade { color: var(--good); }
+.g-B .front { border-color: rgba(0,224,255,.6); } .g-B .grade { color: var(--accent); }
+.g-C .grade { color: #94a3b8; } .g-D .front { border-color: rgba(255,61,113,.4); } .g-D .grade { color: var(--bad); }
+.g-S.flip .front::before { content: ""; position: absolute; inset: -40%; background: conic-gradient(from 0deg, transparent 0 10%, rgba(255,210,63,.18) 12%, transparent 16% 26%, rgba(255,210,63,.18) 28%, transparent 32% 42%, rgba(255,210,63,.18) 44%, transparent 48% 58%, rgba(255,210,63,.18) 60%, transparent 64% 74%, rgba(255,210,63,.18) 76%, transparent 80% 90%, rgba(255,210,63,.18) 92%, transparent 96%); animation: spin 8s linear infinite; z-index: 0; }
+.front > * { position: relative; z-index: 1; }
+.g-S.flip .front::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255,240,180,.4) 48%, transparent 66%); animation: sweep 1.8s .6s 2; z-index: 2; pointer-events: none; }
+.card3.flip.g-S { animation: shake .5s .55s; }
+.card3.chosen .front { outline: 3px solid #fff; }
+.card3.dim { opacity: .45; filter: grayscale(.6); }
+.spark { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); pointer-events: none; animation: spark 900ms ease-out forwards; z-index: 5; }
+@keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shake { 0%,100% { transform: none; } 25% { transform: translateY(-6px) scale(1.03); } 60% { transform: translateY(2px); } }
+@keyframes spark { from { transform: translate(0,0) scale(1); opacity: 1; } to { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
+/* 신인 들어오기 */
+.deck.small .card3 { animation: dealIn .6s both; }
+@keyframes dealIn { from { transform: translateY(-40px) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.new { position: absolute; top: 10px; right: 10px; font-size: 11px; font-weight: bold; color: #1d1b16; background: var(--gold); border-radius: 99px; padding: 1px 8px; }
+.skin-nm { font-size: 18px; font-weight: bold; margin-top: 40px; }
+.deck.skins .front { justify-content: center; }
+@media (max-width: 760px) { .deck, .deck.small { grid-template-columns: repeat(3, 1fr); gap: 8px; } .card3 { height: 240px; } .deck.small .card3 { height: 220px; } .front .nm { font-size: 13px; } .front .eff { font-size: 10px; } .front .pick { font-size: 11px; padding: 5px 2px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>디자인 시안 7 — 뽑기 연출 (D4)</h1>
+  <p class="lead">① 인사 추천 때 후보 카드 3장을 뒤집어요. 🎫 스카우트 티켓으로 온 카드는 뒷면부터 금빛으로 반짝여요. 카드를 누르거나 [모두 뒤집기]를 누르세요. 등급마다 빛이 달라요 (S 금빛·A 초록·B 하늘·C 회색·D 붉은빛). ②③은 같은 카드 연출을 다른 곳에 쓴 모습이에요.</p>
+
+  <h2>① 스태프 인사 — 코치 후보 3명</h2>
+  <div class="tabs" id="force"><button data-f="ticket" class="on">🎫 티켓 있음 (1장 A급 이상)</button><button data-f="S">S급 나오는 모습</button><button data-f="normal">티켓 없음</button></div>
+  <div class="msg">👔 <b>감독</b>: "이번 비시즌에 코치를 바꿔 볼까 한다. 지금은 Seed (B급). 네 생각도 듣고 싶다."</div>
+  <div class="deck" id="deck"></div>
+  <div class="ctrl"><button class="primary" id="flipAll">모두 뒤집기</button><button id="reset">다시</button><button id="keep">지금 코치 그대로</button></div>
+  <p class="note" id="pickNote"></p>
+
+  <h2>② 대형 신인 발표 (새 시즌 1주차) — 같은 카드가 차례로 들어오며 뒤집힘</h2>
+  <div class="deck small" id="rookies"></div>
+  <div class="ctrl"><button id="rookieGo">다시 보기</button></div>
+
+  <h2>③ 월드 우승 스킨 고르기 — 결승에서 쓴 챔피언 카드</h2>
+  <div class="deck skins" id="skins"></div>
+  <p class="note">고른 카드가 금빛 테두리로 바뀌고 [컬렉션]에 들어가요.</p>
+</div>
+<script>
+const USER_ID="USER";
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 코드는 js/portrait.js =====
+// 32×32 도트. 내 선수는 캐릭터 만들 때 고른 얼굴(state.player.look), 다른 선수는 선수 id로 정해지는 얼굴 (저장 안 함)
+// 크기: 최대 3배(96px) (사용자 결정), 표에는 얼굴만 잘라서
+const PORTRAIT = {
+  skins: [
+    { name: "아주 밝게", c: "#f6d7c3" }, { name: "밝게", c: "#eec1a0" }, { name: "보통", c: "#d9a27f" },
+    { name: "조금 어둡게", c: "#b97a57" }, { name: "어둡게", c: "#8d5a3b" },
+  ],
+  hairStyles: ["짧은 앞머리", "덮은 머리", "옆으로 넘김", "긴 머리", "뾰족 머리", "대머리", "아프로"],
+  hairColors: [
+    { name: "검정", c: "#1d1a1f" }, { name: "갈색", c: "#6b4226" }, { name: "금발", c: "#c7923e" }, { name: "은발", c: "#e7e1d4" },
+    { name: "파랑", c: "#2f4a8a" }, { name: "빨강", c: "#c8322b" }, { name: "주황", c: "#e8792a" },
+  ],
+  eyes: ["점 눈", "반짝 눈"],
+  faces: ["보통", "갸름", "넓적"],   // 얼굴 너비 12 · 11 · 13 도트
+  headsetChance: 0.55,
+  glassesChance: 0.18,
+  // 움직임: 크게 보이는 그림(.pf-jump)만 가끔 1~5px 점프
+  jump: { minGap: 3000, maxGap: 7000, minPx: 1, maxPx: 5 },
+  tiredStamina: 30, // 내 선수 체력이 이 아래면 지친 표정
+};
+
+// 구단 유니폼 [바탕, 포인트(깃·줄)] — 1부 기업 10곳 고정 (사용자 확인 시안 3)
+const TEAM_UNIFORMS = {
+  "T1": ["#e2012d", "#141414"], "KT": ["#f2f2f2", "#e1251b"], "GEN.G": ["#a98b46", "#1b1b1b"], "Hanwha": ["#ff6a13", "#2a2a2a"],
+  "Dplus": ["#1b1b1b", "#4fd1c5"], "BNK": ["#f5c400", "#1f2a44"], "BRION": ["#1fae5c", "#f2f2f2"], "NS": ["#8e1c2b", "#e8dcc2"],
+  "KW": ["#1e3a8a", "#7cc4ff"], "DN": ["#6b2fbf", "#f2f2f2"],
+};
+// 2부·신생 구단: 기업명으로 정해지는 색 (이 중 하나)
+const UNIFORM_POOL = [
+  ["#3b82f6", "#f2f2f2"], ["#14b8a6", "#111827"], ["#a3e635", "#1f2937"], ["#f472b6", "#1f2937"], ["#64748b", "#f8fafc"], ["#f59e0b", "#7c2d12"],
+  ["#0ea5e9", "#0f172a"], ["#ef4444", "#fde68a"], ["#8b5cf6", "#fde68a"], ["#10b981", "#064e3b"], ["#e11d48", "#f1f5f9"], ["#facc15", "#111111"],
+];
+// 해외 팀: 지역마다 2~3가지 중 팀 id로
+const REGION_UNIFORMS = {
+  na: [["#1d4ed8", "#f8fafc"], ["#0f766e", "#f8fafc"], ["#111827", "#60a5fa"]],
+  eu: [["#f8fafc", "#1e3a8a"], ["#7c3aed", "#f8fafc"], ["#111827", "#f59e0b"]],
+  cn: [["#dc2626", "#facc15"], ["#111827", "#ef4444"], ["#f8fafc", "#dc2626"]],
+};
+const FREE_AGENT_UNIFORM = ["#4b5563", "#9ca3af"]; // 소속 없음
+
+// ===== 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/portrait.js =====
+// portraitImg(id, opts) → <img> HTML (canvas로 그린 그림을 data URL로, 같은 그림은 캐시)
+//   opts: scale 1~3, mood "normal"|"win"|"lose"|"tired", face true = 얼굴만 18×18 잘라서(표용), jump true = 가끔 점프, size(face일 때 px: 18 또는 36)
+// 내 선수 얼굴: state.player.look { skin, hs, hairC, eyes, face, headset, glasses } (캐릭터 만들 때 고름, 예전 세이브는 이름으로 자동)
+
+function pfSeed(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function pfRng(s) {
+  let a = pfSeed(s);
+  return function () { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function randomLook(seed) {
+  const r = seed === undefined ? Math.random : pfRng(seed);
+  const n = function (k) { return Math.floor(r() * k); };
+  const P = PORTRAIT;
+  return { skin: n(P.skins.length), hairC: n(P.hairColors.length), hs: n(P.hairStyles.length), eyes: n(P.eyes.length), face: n(P.faces.length),
+    headset: r() < P.headsetChance, glasses: r() < P.glassesChance };
+}
+function lookOf(id) {
+  if (id === USER_ID && state.player) {
+    if (!state.player.look) state.player.look = randomLook("me:" + state.player.name); // 예전 세이브
+    return state.player.look;
+  }
+  return randomLook(id);
+}
+
+// ----- 유니폼 -----
+function uniformByShort(short) {
+  return TEAM_UNIFORMS[short] || UNIFORM_POOL[pfSeed(short) % UNIFORM_POOL.length];
+}
+function uniformOfTeam(teamId) {
+  if (!teamId) return FREE_AGENT_UNIFORM;
+  const t = findTeam(teamId);
+  if (t) return uniformByShort(t.short);
+  const w = typeof findWorldTeam === "function" ? findWorldTeam(teamId) : null;
+  const reg = w ? w.region : null;
+  const list = REGION_UNIFORMS[reg] || UNIFORM_POOL;
+  return list[pfSeed(teamId) % list.length];
+}
+function teamIdOfPlayer(id) {
+  if (id === USER_ID) { const t = myTeam(); return t ? t.id : null; }
+  const p = state.league && state.league.players[id];
+  if (p) return p.teamId || null;
+  if (state.world && String(id).charAt(0) === "X") {
+    const wt = state.world.teams.find(function (t) { return t.roster.indexOf(id) !== -1; });
+    return wt ? wt.id : null;
+  }
+  return null;
+}
+// 내 선수 표정: 체력이 낮으면 지침, 아니면 지난주 경기 결과 (이긴 경기가 더 많으면 웃음)
+function myMood() {
+  if (state.stamina < PORTRAIT.tiredStamina) return "tired";
+  const L = state.weekReport && state.weekReport.userLines;
+  if (!L || !L.length) return "normal";
+  const w = L.filter(function (l) { return l.won; }).length;
+  return w * 2 > L.length ? "win" : w * 2 < L.length ? "lose" : "normal";
+}
+
+// ----- 그리기 (32×32, 시안 4 그대로) -----
+function drawPortrait32(g, L, c, mood) {
+  const P = PORTRAIT;
+  const R = function (x, y, w, h, col) { g.fillStyle = col; g.fillRect(x, y, w, h); };
+  const sk = P.skins[L.skin].c, H = P.hairColors[L.hairC].c, dark = "#231f2b", M = "#7a3b3b";
+  // 몸·유니폼
+  R(6, 26, 20, 6, c[0]); R(8, 25, 16, 1, c[0]); R(14, 25, 4, 3, c[1]); R(6, 30, 20, 1, c[1]); R(14, 22, 4, 4, sk);
+  // 얼굴
+  const fw = [12, 11, 13][L.face], fx = Math.floor(16 - fw / 2);
+  const face = function () { R(fx, 9, fw, 14, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk); };
+  face();
+  // 머리
+  if (L.hs === 6) { // 아프로: 얼굴 뒤를 감싸고 얼굴을 다시
+    R(fx - 4, 3, fw + 8, 10, H); R(fx - 3, 2, fw + 6, 1, H); R(fx - 5, 5, 1, 10, H); R(fx + fw + 4, 5, 1, 10, H); R(fx - 4, 13, 3, 5, H); R(fx + fw + 1, 13, 3, 5, H);
+    R(fx, 10, fw, 13, sk); R(fx + 1, 9, fw - 2, 1, sk); R(fx + 1, 23, fw - 2, 1, sk); R(fx - 1, 14, 1, 4, sk); R(fx + fw, 14, 1, 4, sk);
+    R(fx - 2, 4, 2, 1, "rgba(255,255,255,.18)"); R(fx + 3, 3, 3, 1, "rgba(255,255,255,.18)");
+  } else [
+    function () { R(fx - 1, 6, fw + 2, 4, H); R(fx - 1, 10, 2, 4, H); R(fx + fw - 1, 10, 2, 4, H); },
+    function () { R(fx - 1, 5, fw + 2, 5, H); R(fx + 2, 10, 4, 2, H); R(fx - 1, 10, 1, 6, H); R(fx + fw, 10, 1, 6, H); },
+    function () { R(fx, 5, fw, 4, H); R(fx - 1, 8, fw + 2, 2, H); R(fx + fw - 4, 10, 4, 1, H); },
+    function () { R(fx - 2, 5, fw + 4, 5, H); R(fx - 2, 10, 2, 10, H); R(fx + fw, 10, 2, 10, H); },
+    function () { R(fx, 6, fw, 3, H); R(fx + 2, 4, 2, 2, H); R(fx + 6, 3, 2, 3, H); R(fx + fw - 3, 4, 2, 2, H); R(fx - 1, 8, fw + 2, 2, H); },
+    function () { R(fx + 1, 7, fw - 2, 2, sk); R(fx + 2, 6, fw - 4, 1, sk); R(fx + 2, 7, 2, 1, "rgba(255,255,255,.55)"); R(fx - 1, 12, 1, 2, H); R(fx + fw, 12, 1, 2, H); },
+  ][L.hs]();
+  // 눈썹·눈
+  const ey = 15, e1 = fx + 2, e2 = fx + fw - 4;
+  if (mood === "lose") { R(e1, 12, 1, 1, H); R(e1 + 1, 13, 1, 1, H); R(e2 + 1, 12, 1, 1, H); R(e2, 13, 1, 1, H); }
+  else { R(e1, 13, 2, 1, H); R(e2, 13, 2, 1, H); }
+  const eye = function (x) {
+    if (mood === "win") { R(x, ey, 1, 1, dark); R(x + 1, ey - 1, 1, 1, dark); }
+    else if (mood === "tired") R(x, ey, 2, 1, dark);
+    else if (L.eyes === 1) { R(x, ey - 1, 2, 2, dark); R(x + 1, ey - 1, 1, 1, "#fff"); }
+    else R(x, ey - 1, 2, 2, dark);
+  };
+  eye(e1); eye(e2);
+  if (L.glasses) { R(e1 - 1, ey - 2, 4, 1, dark); R(e2 - 1, ey - 2, 4, 1, dark); R(e1 + 3, ey - 1, e2 - e1 - 3, 1, dark); }
+  // 입
+  if (mood === "win") { R(14, 19, 4, 1, M); R(15, 20, 2, 1, M); R(fx + 1, 17, 2, 1, "#f29a9a"); R(fx + fw - 3, 17, 2, 1, "#f29a9a"); }
+  else if (mood === "lose") { R(15, 19, 2, 1, M); R(14, 20, 1, 1, M); R(17, 20, 1, 1, M); }
+  else if (mood === "tired") { R(15, 19, 2, 2, M); R(fx + fw + 1, 10, 1, 2, "#7fc8ff"); }
+  else R(15, 20, 2, 1, M);
+  // 헤드셋: 머리띠 + 귀 이어컵(밝은 테두리, 안쪽 팀색) + 마이크
+  if (L.headset) {
+    const k = "#2b2b38", kl = "#6c6c86", top = L.hs === 6 ? 2 : 4;
+    R(fx, top, fw, 1, k); R(fx - 1, top + 1, 1, 1, k); R(fx + fw, top + 1, 1, 1, k); R(fx - 2, top + 2, 1, 12 - top, k); R(fx + fw + 1, top + 2, 1, 12 - top, k);
+    R(fx - 4, 12, 4, 7, k); R(fx - 4, 12, 4, 1, kl); R(fx - 4, 12, 1, 7, kl); R(fx - 3, 14, 2, 3, c[0]);
+    R(fx + fw, 12, 4, 7, k); R(fx + fw, 12, 4, 1, kl); R(fx + fw + 3, 12, 1, 7, kl); R(fx + fw + 1, 14, 2, 3, c[0]);
+    R(fx - 1, 19, 1, 1, k); R(fx, 20, 3, 1, k); R(fx + 3, 20, 1, 1, "#ff3d71");
+  }
+}
+
+// 그림 → data URL (캐시)
+const PF_CACHE = {};
+function portraitURL(look, uni, mood, face) {
+  const key = JSON.stringify([look, uni, mood || "normal", !!face]);
+  if (PF_CACHE[key] !== undefined) return PF_CACHE[key];
+  let url = "";
+  try {
+    const cv = document.createElement("canvas");
+    cv.width = 32; cv.height = 32;
+    const g = cv.getContext && cv.getContext("2d");
+    if (g) {
+      drawPortrait32(g, look, uni, mood || "normal");
+      if (face) { // 얼굴만: 머리~턱 18×18 (표에서 2배 = 36px로 선명하게)
+        const c2 = document.createElement("canvas");
+        c2.width = 18; c2.height = 18;
+        c2.getContext("2d").drawImage(cv, 7, 5, 18, 18, 0, 0, 18, 18);
+        url = c2.toDataURL();
+      } else url = cv.toDataURL();
+    }
+  } catch (e) { url = ""; }
+  PF_CACHE[key] = url;
+  return url;
+}
+function portraitHTMLFrom(look, uni, opts) {
+  opts = opts || {};
+  const url = portraitURL(look, uni, opts.mood, opts.face);
+  if (!url) return "";
+  const size = opts.face ? (opts.size || 36) : 32 * Math.max(1, Math.min(3, opts.scale || 1));
+  const img = '<img class="pf px' + (opts.face ? " pf-face" : "") + '" src="' + url + '" width="' + size + '" height="' + size + '" alt="">';
+  return opts.jump ? '<span class="pf-jump">' + img + "</span>" : img;
+}
+function portraitImg(id, opts) {
+  opts = Object.assign({}, opts);
+  if (id === USER_ID && !opts.mood && !opts.face) opts.mood = myMood();
+  return portraitHTMLFrom(lookOf(id), uniformOfTeam(opts.teamId !== undefined ? opts.teamId : teamIdOfPlayer(id)), opts);
+}
+// 표에 넣는 얼굴 칸
+function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: true, size: 36 }) + "</td>"; }
+
+// ----- 가끔 점프 (크게 보이는 그림만) -----
+(function () {
+  if (typeof setInterval !== "function" || typeof document === "undefined" || !document.querySelectorAll) return;
+  const J = PORTRAIT.jump;
+  setInterval(function () {
+    let list;
+    try { list = document.querySelectorAll(".pf-jump"); } catch (e) { return; }
+    const now = Date.now();
+    Array.prototype.forEach.call(list, function (el) {
+      if (!el._nj) el._nj = now + 600 + Math.random() * (J.maxGap - J.minGap);
+      if (now < el._nj) return;
+      el.style.setProperty("--jh", (J.minPx + Math.floor(Math.random() * (J.maxPx - J.minPx + 1))) + "px");
+      el.classList.remove("jumping"); void el.offsetWidth; el.classList.add("jumping");
+      el._nj = now + J.minGap + Math.random() * (J.maxGap - J.minGap);
+    });
+  }, 250);
+})();
+
+const EFF = { S: "선수 성장 +12% · 내 훈련 +5%", A: "선수 성장 +6% · 내 훈련 +2.5%", B: "선수 성장 ±0%", C: "선수 성장 −5% · 내 훈련 −2.5%", D: "선수 성장 −10% · 내 훈련 −5%" };
+const UNI = TEAM_UNIFORMS["BNK"];
+let mode = "ticket";
+function cardHTML(c, opts) {
+  opts = opts || {};
+  return '<div class="card3 g-' + c.g + (c.ticket ? " ticket" : "") + '" data-i="' + c.i + '"><div class="inner">' +
+    '<div class="face back"><div class="q">' + (c.ticket ? "🎫" : "?") + '</div><div class="lbl">' + (c.ticket ? "스카우트 티켓 후보" : opts.backLbl || "코치 후보") + "</div></div>" +
+    '<div class="face front"><span class="grade">' + c.g + '</span><span class="role">' + (opts.role || "코치") + "</span>" + (opts.isNew ? '<span class="new">NEW</span>' : "") +
+      '<div class="pfw">' + portraitHTMLFrom(randomLook(c.name), opts.uni || ["#3b3b55", "#8a8aa6"], { scale: 3 }) + '</div><div class="nm">' + c.name + '</div><div class="eff">' + (opts.eff || EFF[c.g]) + "</div>" +
+      (opts.noPick ? "" : '<button class="pick">이 사람으로</button>') + "</div></div></div>";
+}
+function deal() {
+  const cands = mode === "S" ? [{ name: "Sand", g: "S", ticket: true }, { name: "Tech", g: "A" }, { name: "Ice", g: "C" }]
+    : mode === "ticket" ? [{ name: "Halo", g: "A", ticket: true }, { name: "Rune", g: "B" }, { name: "Mist", g: "C" }]
+    : [{ name: "Rune", g: "B" }, { name: "Mist", g: "C" }, { name: "Dusk", g: "D" }];
+  cands.forEach(function (c, i) { c.i = i; });
+  document.getElementById("deck").innerHTML = cands.map(function (c) { return cardHTML(c); }).join("");
+  document.getElementById("pickNote").textContent = "";
+  document.querySelectorAll("#deck .card3").forEach(function (el) {
+    el.onclick = function (e) {
+      if (!el.classList.contains("flip")) { flip(el); return; }
+      if (e.target.classList.contains("pick")) {
+        document.querySelectorAll("#deck .card3").forEach(function (x) { x.classList.toggle("chosen", x === el); x.classList.toggle("dim", x !== el); });
+        document.getElementById("pickNote").textContent = "감독: \"좋아, " + el.querySelector(".nm").textContent + "(" + el.querySelector(".grade").textContent + "급)을 데려오지.\" → 구단 스태프에 반영";
+      }
+    };
+  });
+}
+function flip(el) {
+  if (el.classList.contains("flip")) return;
+  el.classList.add("flip");
+  if (el.classList.contains("g-S")) setTimeout(function () { sparks(el, 26); }, 450);
+  else if (el.classList.contains("g-A")) setTimeout(function () { sparks(el, 10, "#2bff9e"); }, 450);
+}
+function sparks(el, n, col) {
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement("i"); s.className = "spark"; s.style.left = "50%"; s.style.top = "40%";
+    if (col) s.style.background = col;
+    const a = Math.random() * Math.PI * 2, d = 60 + Math.random() * 90;
+    s.style.setProperty("--dx", Math.cos(a) * d + "px"); s.style.setProperty("--dy", Math.sin(a) * d + "px");
+    el.appendChild(s); setTimeout(function () { s.remove(); }, 1000);
+  }
+}
+document.getElementById("flipAll").onclick = function () { document.querySelectorAll("#deck .card3").forEach(function (el, i) { setTimeout(function () { flip(el); }, i * 350); }); };
+document.getElementById("reset").onclick = deal;
+document.getElementById("keep").onclick = function () { document.getElementById("pickNote").textContent = "감독: \"알겠다. 지금 체제로 간다.\""; };
+document.getElementById("force").onclick = function (e) { const b = e.target.closest("button"); if (!b) return; mode = b.dataset.f; this.querySelectorAll("button").forEach(function (x) { x.classList.toggle("on", x === b); }); deal(); };
+deal();
+// ② 신인
+function rookies() {
+  const R = [{ name: "Nova", g: "S", pos: "미드", sc: 72.4, team: "QX STORM", uni: UNIFORM_POOL[3] }, { name: "Pike", g: "A", pos: "원딜", sc: 70.1, team: "LM PULSE", uni: UNIFORM_POOL[7] }, { name: "Echo", g: "A", pos: "정글", sc: 69.8, team: "T1 ZEPHYR · 1부 직행", uni: TEAM_UNIFORMS.T1 }];
+  R.forEach(function (c, i) { c.i = i; });
+  const box = document.getElementById("rookies");
+  box.innerHTML = R.map(function (c) { return cardHTML(c, { role: c.pos, isNew: true, backLbl: "🌟 대형 신인", uni: c.uni, eff: "종합 능력 <b style='color:#fff'>" + c.sc + "</b> · 18세<br>" + c.team, noPick: true }); }).join("");
+  box.querySelectorAll(".card3").forEach(function (el, i) { el.style.animationDelay = (i * 0.25) + "s"; setTimeout(function () { flip(el); }, 900 + i * 450); });
+}
+document.getElementById("rookieGo").onclick = rookies;
+rookies();
+// ③ 스킨
+const SK = ["아우렐리온 솔", "워윅", "징크스", "티모", "쓰레쉬"];
+document.getElementById("skins").innerHTML = SK.map(function (n, i) {
+  return '<div class="card3 flip g-' + (i === 0 ? "S" : "B") + '" data-s="' + i + '"><div class="inner"><div class="face back"></div><div class="face front"><span class="grade" style="font-size:16px">🏆</span><div class="skin-nm">' + n + '</div><div class="eff">결승 ' + (i % 3 + 1) + "세트 픽</div>" + '<button class="pick">이 스킨으로</button></div></div></div>';
+}).join("");
+document.querySelectorAll("#skins .card3").forEach(function (el) { el.onclick = function () { document.querySelectorAll("#skins .card3").forEach(function (x) { x.classList.remove("g-S"); x.classList.add("g-B"); }); el.classList.remove("g-B"); el.classList.add("g-S"); sparks(el, 20); }; });
+</script>
+</body>
+</html>

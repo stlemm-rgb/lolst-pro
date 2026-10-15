@@ -534,6 +534,7 @@ function addBigRookies() {
   const t1 = shuffled(tierTeams(1).filter(function (t) { return !mine || t.id !== mine.id; }));
   for (let k = 0; k < (R.tier1Count || 0) && t1.length; k++) teams.unshift(t1[k]);
   const news = [];
+  state.league.rookieCards = { year: state.year, ids: [], avg: avg, seen: false }; // 대시보드 대형 신인 카드 (js/cards.js)
   const count = randInt(R.count[0], R.count[1]);
   for (let i = 0; i < count && i < teams.length; i++) {
     const team = teams[i];
@@ -555,6 +556,7 @@ function addBigRookies() {
     p.contractEnd = state.year - 1 + randInt(R.contractYears[0], R.contractYears[1]);
     const out2 = surplusPlayer(team.id, p.id); // 후보 구성 규칙 (js/contracts.js)
     if (out2) releaseToFA(out2);
+    state.league.rookieCards.ids.push(p.id);
     news.push("🌟 대형 신인 " + p.name + "(" + findPosition(pos).name + ", " + p.age + "세, 종합 능력 " + Math.round(playerScore(p.id)) + ") " + team.name + (team.tier === 1 ? " 입단 — 1부 직행!" : " 입단") +
       (out2 ? " · " + playerName(out2) + " 자유 계약" : ""));
   }

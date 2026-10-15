@@ -240,7 +240,7 @@ function postStaffPick() {
   for (let i = 0; i < R.pickCount; i++) {
     let g = Math.max(0, Math.min(4, cur.g - pick(R.candShift)));
     if (ticket && i === 0) g = Math.random() < R.ticket.sChance ? 0 : 1;
-    cands.push({ name: staffName(), g: g });
+    cands.push({ name: staffName(), g: g, ticket: ticket && i === 0 }); // 티켓 카드는 뒷면부터 금빛 (js/cards.js)
   }
   cands.sort(function (a, b) { return a.g - b.g; });
   const rr = staffRole(role);

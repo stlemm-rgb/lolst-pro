@@ -134,6 +134,7 @@ pages.dashboard = function () {
     '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/trophies.js)
     tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 내 선수 카드, 💡 추천은 '이번 주' 카드 안
     heroCardHTML() + // 맨 위 내 선수 카드 (디자인 D2, js/dashboard.js)
+    rookieCardsHTML() + // 새 시즌 대형 신인 카드 (디자인 D4, js/cards.js)
     '<div class="dash">' +
       '<div class="dash-main">' +
         thisWeekHTML() +
@@ -599,6 +600,7 @@ function renderPage() {
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
   bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
+  bindFlipCards(page); // 뒤집는 카드 (js/cards.js)
   bindCompPlan(page); // 조합 전략 (js/comps.js)
   bindShop(page); // 상점 (js/shop.js)
   bindGuide(page); // 이번 주 추천·처음 안내 (js/guide.js)
