@@ -1,0 +1,49 @@
+# 공개 사이트 올리기 (R7, 2026-10-15)
+# master에 push하면 GitHub가 자동으로: 게임 스크립트 83개를 game.js 하나로 묶어(tools/bundle.py) 공개 사이트에 올림.
+# 공개 사이트에는 게임에 필요한 파일(index.html · game.js · css)만 올라감 (시안·문서·도구는 저장소에만).
+# 처음 한 번: 저장소 Settings → Pages → Build and deployment → Source를 "GitHub Actions"로 바꿔야 함.
+name: 공개 사이트 올리기
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 저장소 받기
+        uses: actions/checkout@v6
+      - name: Pages 준비
+        uses: actions/configure-pages@v5
+      - name: 스크립트 묶기 (tools/bundle.py)
+        run: python3 tools/bundle.py _site
+      - name: 묶은 파일 문법 검사
+        run: node --check _site/game.js
+      - name: 묶은 사이트 올리기
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 공개 사이트에 반영
+        id: deployment
+        uses: actions/deploy-pages@v4

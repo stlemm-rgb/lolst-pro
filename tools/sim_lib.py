@@ -12,7 +12,9 @@
 import json
 from pathlib import Path
 
-GAME = (Path(__file__).resolve().parent.parent / "index.html").as_uri()
+# GAME_INDEX=폴더/index.html 로 다른 index를 열 수 있음 (R7: 공개 사이트용 묶음 _site/index.html 검사)
+import os
+GAME = (Path(os.environ["GAME_INDEX"]).resolve() if os.environ.get("GAME_INDEX") else Path(__file__).resolve().parent.parent / "index.html").as_uri()
 
 
 def parse_sets(items):
