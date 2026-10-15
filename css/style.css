@@ -1189,3 +1189,105 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 @keyframes fcDeal { from { transform: translateY(-40px) rotate(-8deg); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .fc-inner { transition: none; } .fcard.flip.g-S, .fc-deal .fcard { animation: none; } }
 @media (max-width: 760px) { .fc-deck { grid-template-columns: repeat(3, 1fr); gap: 8px; } .fcard { height: 240px; } .fc-nm { font-size: 13px; } .fc-eff { font-size: 10px; } .fc-pick { font-size: 11px; padding: 5px 2px; } .fc-grade { font-size: 22px; } .fc-deck.fc-skins { grid-template-columns: repeat(2, 1fr); } }
+
+/* ===== 디자인 D5: 나머지 화면 통일 (179) ===== */
+/* 페이지 머리 (A안 카드형) */
+.pgh { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: var(--r); margin-bottom: 14px;
+  background: linear-gradient(120deg, rgba(var(--accent2-rgb, 180, 77, 255), 0.16), rgba(var(--accent-rgb), 0.08) 60%, transparent), var(--panel); border: 1px solid var(--border); }
+.pgh-ic { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; flex: none; background: rgba(var(--accent-rgb), 0.1); border: 1px solid rgba(var(--accent-rgb), 0.3); }
+.pgh-t { min-width: 0; }
+.page .pgh h1 { margin: 0; font-size: 20px; }
+.pgh p { margin: 2px 0 0; color: var(--muted); font-size: 12.5px; }
+.pgh-side { margin-left: auto; text-align: right; font-size: 12px; color: var(--muted); white-space: nowrap; }
+.pgh-side b { display: block; font-size: 18px; color: var(--text); }
+.pgh + .subtabs { margin-top: 0; }
+/* 팀 배지 · 순위 메달 · 최근 승패 · 작은 막대 · 빈 칸 */
+.tmark { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.tmark i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; flex: none; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18); }
+.rk { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 4px; border-radius: 8px; font-weight: bold; font-size: 12px; background: var(--panel-2); color: var(--muted); }
+.rk.g1 { background: linear-gradient(135deg, #ffe27a, #c99a12); color: #2a1d00; }
+.rk.g2 { background: linear-gradient(135deg, #eef2f7, #9aa4b2); color: #1a1f27; }
+.rk.g3 { background: linear-gradient(135deg, #f0b27a, #a0582a); color: #2b1407; }
+.rk.hi { color: var(--accent); box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.35); }
+.wl5 { display: inline-flex; gap: 2px; }
+.wl5 i { width: 16px; height: 16px; border-radius: 4px; font-size: 9.5px; font-style: normal; display: grid; place-items: center; font-weight: bold; }
+.wl5 .w { background: rgba(var(--good-rgb), 0.18); color: var(--good); }
+.wl5 .l { background: rgba(var(--bad-rgb), 0.18); color: var(--bad); }
+.pwbar { display: inline-flex; align-items: center; gap: 6px; }
+.pwbar-in { width: 64px; height: 6px; border-radius: 99px; background: #23233a; overflow: hidden; display: inline-block; }
+.pwbar-in span { display: block; height: 100%; border-radius: 99px; background: var(--grad); }
+.pwbar small { color: var(--muted); }
+.empty-box { text-align: center; padding: 18px 10px; color: var(--muted); font-size: 13px; border: 1px dashed var(--border); border-radius: var(--r-s); }
+.empty-box .e { font-size: 24px; display: block; margin-bottom: 4px; opacity: 0.8; }
+table.standings td { vertical-align: middle; }
+table.standings tr.me td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
+table.standings tr.cut td { border-bottom: 1px dashed rgba(var(--gold-rgb), 0.5); }
+.chip.gold { border-color: rgba(var(--gold-rgb), 0.5); color: var(--gold); }
+/* 구단 탐색 카드 */
+.clubs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 8px; }
+.clubs-grid .club { margin: 0; padding: 0 0 10px; overflow: hidden; border-radius: var(--r); background: var(--panel-2); }
+.clubs-grid .club.open { grid-column: 1 / -1; }
+.clubs-grid .club.mine { box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.25), 0 0 24px rgba(var(--accent-rgb), 0.08); }
+.club-stripe { height: 6px; }
+.clubs-grid .club-head { padding: 10px 14px 0; gap: 8px; flex-wrap: nowrap; }
+.clubs-grid .club-name { min-width: 0; }
+.clubs-grid .club > :not(.club-stripe):not(.club-head) { margin-left: 14px; margin-right: 14px; }
+.club-faces { display: flex; gap: 4px; margin-top: 10px; margin-bottom: 8px; }
+.club-faces .cf { width: 54px; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.club-faces .cf img { border-radius: 8px; background: #23233a; margin-bottom: 2px; }
+.club-faces .cf b { font-weight: normal; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.club-faces .cf small { color: var(--muted); font-size: 10px; }
+.club-kv { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+.club-kv .pwbar { flex: 1; } .club-kv .pwbar-in { width: 100%; }
+.club-kv b { color: var(--text); font-weight: normal; white-space: nowrap; }
+.club-foot { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.club-foot .chip { font-size: 11.5px; padding: 1px 8px; cursor: default; }
+/* 상점: 거주지 카드 · 장비 단계 */
+.homes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.home { display: flex; align-items: center; gap: 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-s); padding: 8px 10px; }
+.home-em { font-size: 22px; width: 30px; text-align: center; flex: none; }
+.home-t { flex: 1; min-width: 0; } .home-t b { font-size: 14px; }
+.home-eff { font-size: 12px; color: var(--muted); }
+.home-pr { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex: none; text-align: right; }
+.home-price { font-size: 13px; color: var(--gold); font-weight: bold; }
+.home.cur { border-color: var(--good); background: linear-gradient(90deg, rgba(var(--good-rgb), 0.1), transparent 70%), var(--panel-2); }
+.home.lock { opacity: 0.55; }
+.pips { display: inline-flex; gap: 3px; } .pips i { width: 14px; height: 6px; border-radius: 3px; background: #2a2a40; } .pips i.on { background: var(--grad); }
+/* SNS: 아이콘 + 미리보기 */
+.msg-av { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 18px; background: #23233a; flex: none; overflow: hidden; }
+.msg-tt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.msg-tt .msg-title { flex: none; }
+.msg-pre { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-when { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; white-space: nowrap; }
+.msg.unread { border-color: rgba(var(--accent-rgb), 0.45); }
+.msg-title .dot { display: inline-block; margin-right: 6px; vertical-align: middle; }
+.post.has-face { position: relative; padding-left: 50px; min-height: 46px; }
+.post-face { position: absolute; left: 4px; top: 10px; }
+.post-face img { border-radius: 8px; background: #23233a; }
+/* 기록실: 수상 카드 */
+.awards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.aw { display: flex; gap: 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-s); padding: 10px; }
+.aw img, .ap img { border-radius: 8px; background: #23233a; flex: none; }
+.aw-t { font-size: 11.5px; color: var(--muted); }
+.aw b { display: block; font-size: 14px; }
+.aw-v { color: var(--accent); }
+.aw.big { grid-column: span 2; border-color: rgba(var(--gold-rgb), 0.45); background: linear-gradient(120deg, rgba(var(--gold-rgb), 0.12), transparent 60%), var(--panel-2); }
+.aw.big .aw-t { color: var(--gold); } .aw.big b { font-size: 18px; }
+.aw.me, .ap.me { box-shadow: inset 0 0 0 1px var(--accent); }
+.aw-sub { margin: 12px 0 6px; font-size: 13px; font-weight: bold; }
+.allpro { display: flex; gap: 8px; flex-wrap: wrap; }
+.ap { width: 72px; text-align: center; font-size: 12px; display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border-radius: var(--r-s); }
+.ap small { color: var(--muted); font-size: 10.5px; }
+/* 이적 시장: 내 계약 */
+.ct-top { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.ct-money { font-size: 24px; font-weight: bold; margin-top: 2px; }
+.ct-money small { font-size: 12px; color: var(--muted); font-weight: normal; }
+.ct-expect { margin-top: 10px; padding: 8px 10px; background: var(--panel-2); border-radius: var(--r-xs); }
+@media (max-width: 760px) {
+  .homes { grid-template-columns: 1fr; }
+  .aw.big { grid-column: auto; }
+  .pgh-ic { width: 36px; height: 36px; font-size: 18px; }
+  .pgh p { display: none; }
+  .clubs-grid { grid-template-columns: 1fr; }
+}
+table.standings th, table.standings td { white-space: nowrap; }

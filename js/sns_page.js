@@ -25,7 +25,8 @@ pages.sns = function () {
       const fresh = m.mention && !m.read;
       const proId = m.proId || byName[m.title];
       const pro = proId && state.league.players[proId];
-      return '<div class="post' + (m.mention ? " mention" : "") + (fresh ? " unread" : "") + '">' +
+      return '<div class="post' + (m.mention ? " mention" : "") + (fresh ? " unread" : "") + (pro ? " has-face" : "") + '">' +
+        (pro ? '<span class="post-face">' + portraitImg(proId, { face: true, size: 36 }) + "</span>" : "") +
         (fresh ? '<span class="dot"></span>' : "") +
         '<span class="post-author' + (pro ? " pro" : "") + '">' + escapeHTML(m.title) + "</span>" +
         (pro ? ' <span class="pro-tag">🎮 선수</span> <span class="muted small">' + escapeHTML(proTeamText(pro)) + "</span>" : "") +
@@ -96,15 +97,27 @@ function messageHTML(m) {
     if (m.notes && m.notes.length) inner += '<div class="msg-notes">' + m.notes.map(escapeHTML).join("<br>") + "</div>";
   }
 
+  // 디자인 D5: 왼쪽 아이콘(제목 앞 그림 글자 또는 선수 얼굴) + 제목 + 첫 줄 미리보기
+  const av = msgAvatar(m);
+  const preview = open ? "" : String(m.kind === "offer" && m.offer ? offerText(m.offer) : m.text || "").split("\n")[0];
   return (
     '<div class="msg' + (unread ? " unread" : " read") + (open ? " open" : "") + '">' +
       '<div class="msg-head" data-msg="' + m.id + '">' +
-        (unread ? '<span class="dot"></span>' : "") +
-        '<span class="msg-title">' + escapeHTML(m.title) + "</span>" +
-        '<span class="muted small">' + m.year + "년 " + m.week + "주차</span>" + status +
+        '<span class="msg-av">' + av.icon + "</span>" +
+        '<span class="msg-tt"><span class="msg-title">' + (unread ? '<span class="dot"></span>' : "") + escapeHTML(av.title) + "</span>" +
+          (preview ? '<span class="msg-pre">' + escapeHTML(preview) + "</span>" : "") + "</span>" +
+        '<span class="msg-when"><span class="muted small">' + m.year + "년 " + m.week + "주차</span>" + status + "</span>" +
       "</div>" + inner +
     "</div>"
   );
+}
+
+// 메시지 아이콘: 선수 글이면 얼굴, 제목이 그림 글자로 시작하면 그 글자 (제목에서는 뺌)
+function msgAvatar(m) {
+  if (m.proId && state.league.players[m.proId]) return { icon: portraitImg(m.proId, { face: true, size: 36 }), title: m.title };
+  const hit = /^(\p{Extended_Pictographic}[\uFE0F\u200D\p{Extended_Pictographic}]*)\s*/u.exec(m.title || "");
+  if (hit) return { icon: hit[1], title: m.title.slice(hit[0].length) };
+  return { icon: m.kind === "offer" ? "📩" : m.tab === "news" ? "📰" : "✉️", title: m.title };
 }
 
 // SNS 화면 버튼 연결 (main.js의 renderPage에서 부름)

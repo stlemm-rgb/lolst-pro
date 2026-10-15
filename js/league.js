@@ -412,7 +412,7 @@ function strengthOf(id) {
 function standings(comps, teamIds) {
   const list = Array.isArray(comps) ? comps : [comps];
   const rows = {};
-  teamIds.forEach(function (id) { rows[id] = { id: id, w: 0, l: 0, sw: 0, sl: 0 }; });
+  teamIds.forEach(function (id) { rows[id] = { id: id, w: 0, l: 0, sw: 0, sl: 0, recent: [] }; });
   state.league.season.matches.forEach(function (m) {
     if (list.indexOf(m.comp) === -1 || !m.winner) return;
     [[m.a, 0], [m.b, 1]].forEach(function (pair) {
@@ -421,6 +421,7 @@ function standings(comps, teamIds) {
       const mine = m.score[pair[1]], theirs = m.score[1 - pair[1]];
       if (m.winner === pair[0]) r.w++; else r.l++;
       r.sw += mine; r.sl += theirs;
+      r.recent.push(m.winner === pair[0] ? "w" : "l"); // 최근 승패 (리그 순위 화면, 디자인 D5)
     });
   });
   return Object.keys(rows).map(function (id) { return rows[id]; }).sort(function (a, b) {

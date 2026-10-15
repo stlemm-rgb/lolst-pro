@@ -196,7 +196,8 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 - D1 끝 (PROGRESS 175: data/portrait.js·js/portrait.js, portraitImg/faceTd로 어디서나 얼굴).
 - D2 끝 (PROGRESS 176, 사용자 선택 A안 + 퀘스트 1줄 2칸): heroCardHTML·matchCardHTML·questCardsHTML, 휴대폰 ☰ 메뉴 (남은 숙제였던 휴대폰 가로 넘침 해결). 
 - D3 끝 (PROGRESS 177): js/replay.js. **'다' 안(자동 재생 + 설정 끄기)으로 시작, 유저 반응을 보고 '가' 안(다시 보기만)으로 바꿀 수 있게 남겨 둠** → REPLAY_RULES.defaultAuto = "off" 한 줄. 
-- D4 끝 (PROGRESS 178): js/cards.js 뒤집는 카드 (인사 후보·대형 신인·우승 스킨). 다음 D5 나머지 화면 통일 — 시안부터.
+- D4 끝 (PROGRESS 178): js/cards.js 뒤집는 카드 (인사 후보·대형 신인·우승 스킨).
+- D5 끝 (PROGRESS 179, 시안 8): 페이지 머리 A안 카드형(data/pagehead.js·js/pagehead.js) + 팀 배지·순위 메달·최근 5경기·구단 카드·거주지 2줄 카드·SNS 아이콘·수상 카드·계약 카드. 새 화면을 만들 때도 teamMarkHTML·rankBadgeHTML·emptyBoxHTML 쓰기. 다음 D6 마무리 (휴대폰·태블릿, 애니메이션 끄기 설정, 속도, 브라우저 확인).
 
 - **ver 1.2 해외 진출(아래)은 디자인 리뉴얼 뒤로.**
 - **ver 1.2: ④ 내 선수 해외 진출** — 비시즌 해외 구단 제안 → 수락 시 해외 리그에서 뜀. 필요한 것: 해외 리그 정규 시즌 경기 실제 진행(지금은 지역 순위를 전력+운으로만 정함), 내 계약·연봉, 내 언어 실력(훈련·상점 어학·이벤트), 국내 복귀, 119의 '해외 구단 러브콜' 연작과 연결. 시작 전에 선택지로 물을 것.

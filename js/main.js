@@ -571,6 +571,7 @@ function renderPage() {
     lastMenuTab[parent.id] = state.currentMenu;
     html = subTabsHTML(parent) + html.replace(/^\s*<h1>[\s\S]*?<\/h1>/, "");
   }
+  html = applyPageHead(html, parent ? parent.id : state.currentMenu); // 맨 위 제목 → 페이지 머리 카드 (디자인 D5, js/pagehead.js)
   if (state.notice) {
     html = '<div class="notice">' + state.notice + "</div>" + html;
   }

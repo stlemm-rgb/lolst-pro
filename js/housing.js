@@ -107,19 +107,23 @@ function housingCardHTML() {
     if (e.popularityGain) parts.push("인기도 상승 +" + Math.round(e.popularityGain * 100) + "%");
     return parts.join(" · ");
   };
-  const dormRow = "<tr" + (!home ? ' class="me"' : "") + "><td>🛏️ <b>팀 합숙소</b></td><td>모든 훈련 효과 +" + Math.round(dormRate() * 100) + "% · 컨디션 상한 " + HOUSING.dormConditionCap +
-    ' <span class="muted small">(경기력 −' + Math.round((1 - TEAM_MATCH.conditionBase - HOUSING.dormConditionCap / TEAM_MATCH.conditionDiv) * 100) + '% · 합숙 ' + dormYears() + '년째, 1년마다 훈련 보너스 −' + Math.round(HOUSING.dormFatiguePerYear * 100) + '%p, 최소 +' + Math.round(HOUSING.dormTrainingMin * 100) + '%)</span></td><td class="r">무료</td><td>' +
-    (!home ? '<span class="up small">지금 여기</span>' : '<button class="small-btn" data-home="">합숙으로 돌아가기</button>' + (refund ? ' <span class="muted small">매각 +' + moneyText(refund) + "</span>" : "")) + "</td></tr>";
+  // 디자인 D5: 2줄 작은 카드 (지금 사는 곳 초록, 못 사는 곳 흐리게)
+  const card = function (cls, icon, name, eff, price, action, tip) {
+    return '<div class="home ' + cls + (tip ? ' tip" tabindex="0" data-tip="' + escapeHTML(tip) : "") + '"><span class="home-em">' + icon + '</span><div class="home-t"><b>' + name + '</b><div class="home-eff">' + eff + "</div></div>" +
+      '<div class="home-pr"><div class="home-price">' + price + "</div>" + action + "</div></div>";
+  };
+  const dormTip = "경기력 −" + Math.round((1 - TEAM_MATCH.conditionBase - HOUSING.dormConditionCap / TEAM_MATCH.conditionDiv) * 100) + "% · 합숙 " + dormYears() + "년째, 1년마다 훈련 보너스 −" + Math.round(HOUSING.dormFatiguePerYear * 100) + "%p, 최소 +" + Math.round(HOUSING.dormTrainingMin * 100) + "%";
+  const dormRow = card(!home ? "cur" : "", "🛏️", "팀 합숙소", '훈련 효과 <span class="up">+' + Math.round(dormRate() * 100) + "%</span> · 컨디션 상한 " + HOUSING.dormConditionCap, "무료",
+    !home ? '<span class="chip good">지금 여기</span>' : '<button class="small-btn" data-home="">들어가기</button>' + (refund ? '<span class="muted small">매각 +' + moneyText(refund) + "</span>" : ""), dormTip);
   const rows = SHOP_HOUSING.map(function (h) {
     const here = home && home.id === h.id;
     const price = h.rent ? "주 " + moneyText(h.rent) : moneyText(h.price);
     const need = h.price ? h.price - refund : h.rent;
-    const why = state.money < need ? "자금이 부족해요" : "";
-    return "<tr" + (here ? ' class="me"' : "") + "><td>" + h.icon + " <b>" + h.name + '</b><div class="muted small">' + h.desc + "</div></td><td>" + fxText(h) + '</td><td class="r">' + price + "</td><td>" +
-      (here ? '<span class="up small">지금 여기</span>' : '<button class="small-btn" data-home="' + h.id + '"' + (why ? " disabled" : "") + ">" + (h.rent ? "월세 계약" : "구매") + "</button>" +
-        (why ? ' <span class="muted small">' + why + "</span>" : "")) + "</td></tr>";
+    const why = state.money < need;
+    return card(here ? "cur" : why ? "lock" : "", h.icon, h.name, fxText(h), price,
+      here ? '<span class="chip good">지금 여기</span>' : '<button class="small-btn' + (why ? "" : " primary") + '" data-home="' + h.id + '"' + (why ? " disabled" : "") + ">" + (why ? "🔒 자금 부족" : h.rent ? "월세 계약" : "구매") + "</button>", h.desc);
   }).join("");
   return '<div class="card"><h2>🏠 거주지 <span class="muted small">집이 없으면 팀 합숙 · 훈련은 잘 되지만 컨디션이 ' + HOUSING.dormConditionCap + "을 못 넘어요</span></h2>" +
-    '<table class="roster shop-table">' + dormRow + rows + "</table>" +
+    '<div class="homes">' + dormRow + rows + "</div>" +
     '<p class="muted small">컨디션 100이면 경기력 +10%, 50이면 ±0, 40이면 −2%. 월세는 매주 나가고 모자라면 합숙으로 돌아가요. 아파트는 옮기거나 합숙으로 돌아가면 산 값의 ' + Math.round(HOUSING.resale * 100) + "%를 돌려받아요. 2부 선수들은 모두 합숙이라 조금 더 빨리 크지만 경기력은 조금 떨어져요.</p></div>";
 }

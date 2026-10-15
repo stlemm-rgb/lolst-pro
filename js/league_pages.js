@@ -80,30 +80,37 @@ function strengthRankHTML(tier) {
   const mine = myTeam();
   const list = tierTeams(tier).slice().sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); });
   return '<table class="mini">' + list.map(function (t, i) {
-    return '<tr class="' + (t.id === mine.id ? "me" : "") + '"><td>' + (i + 1) + "</td><td>" + escapeHTML(t.name) + '</td><td class="r">' + teamStrength(t.id).toFixed(1) + "</td></tr>";
+    return '<tr class="' + (t.id === mine.id ? "me" : "") + '"><td>' + rankBadgeHTML(i + 1) + "</td><td>" + teamMarkHTML(t.id) + '</td><td class="r">' + teamStrength(t.id).toFixed(1) + "</td></tr>";
   }).join("") + "</table>";
 }
 
 // ----- 리그 순위 -----
 let standingsTab = "tier1";
 
+// 디자인 D5: 순위 메달 · 팀 배지 · 최근 5경기 · 전력 막대 · 진출선(점선)
 function standingsTableHTML(rows, notes) {
   const mine = myTeam();
+  const pw = rows.map(function (r) { return strengthOf(r.id); });
+  const lo = Math.min.apply(null, pw) - 3, hi = Math.max.apply(null, pw);
   return (
-    '<table class="standings"><tr><th>순위</th><th>팀</th><th class="r">승</th><th class="r">패</th><th class="r">세트 득실</th><th class="r">전력</th><th></th></tr>' +
+    '<div class="table-wrap"><table class="standings"><tr><th>순위</th><th>팀</th><th class="r">승</th><th class="r">패</th><th class="r">세트 득실</th><th>최근 5</th><th>전력</th><th></th></tr>' +
     rows.map(function (r, i) {
       const diff = r.sw - r.sl;
+      const note = (notes && notes[i]) || "";
+      const cut = notes && i < rows.length - 1 && note !== ((notes[i + 1]) || ""); // 표시가 바뀌는 줄 = 진출선
+      const me = mine && r.id === mine.id;
       return (
-        '<tr class="' + (mine && r.id === mine.id ? "me" : "") + '">' +
-          "<td>" + (i + 1) + "</td>" +
-          "<td>" + escapeHTML(teamName(r.id)) + "</td>" +
+        '<tr class="' + (me ? "me" : "") + (cut ? " cut" : "") + '">' +
+          "<td>" + rankBadgeHTML(i + 1, !!notes && note === notes[0]) + "</td>" +
+          "<td>" + teamMarkHTML(r.id) + (me ? ' <span class="now-tag">우리 팀</span>' : "") + "</td>" +
           '<td class="r">' + r.w + '</td><td class="r">' + r.l + "</td>" +
-          '<td class="r">' + (diff > 0 ? "+" : "") + diff + "</td>" +
-          '<td class="r muted">' + strengthOf(r.id).toFixed(1) + "</td>" +
-          '<td class="muted small">' + ((notes && notes[i]) || "") + "</td>" +
+          '<td class="r ' + (diff > 0 ? "up" : diff < 0 ? "down" : "") + '">' + (diff > 0 ? "+" : "") + diff + "</td>" +
+          "<td>" + recentWLHTML(r.recent) + "</td>" +
+          "<td>" + miniBarHTML(hi > lo ? (pw[i] - lo) / (hi - lo) : 1, pw[i].toFixed(1)) + "</td>" +
+          '<td class="muted small">' + note + "</td>" +
         "</tr>"
       );
-    }).join("") + "</table>"
+    }).join("") + "</table></div>"
   );
 }
 

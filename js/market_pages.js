@@ -166,28 +166,36 @@ function champLineHTML(id) {
 // ----- 구단 탐색 -----
 pages.clubs = function () {
   const mine = myTeam();
+  // 디자인 D5: 구단 카드 (유니폼 색 줄 + 주전 얼굴 5명 + 스태프 등급). 누르면 카드가 넓어지며 선수단이 나와요
   const cards = [1, 2].map(function (tier) {
     const list = tierTeams(tier).slice().sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); });
-    return '<h2 class="sub">' + tierName(tier) + " 리그</h2>" + list.map(function (t, i) {
+    return '<h2 class="sub">' + tierName(tier) + ' 리그</h2><div class="clubs-grid">' + list.map(function (t, i) {
       const s = starters(t.id);
-      const lineup = POSITION_IDS.map(function (pos) {
-        return s[pos] ? findPosition(pos).name + " " + escapeHTML(playerName(s[pos])) : "";
-      }).join(" · ");
+      const u = uniformOfTeam(t.id);
+      const faces = POSITION_IDS.map(function (pos) {
+        return s[pos] ? '<span class="cf">' + portraitImg(s[pos], { face: true, size: 36, teamId: t.id }) + "<b>" + escapeHTML(playerName(s[pos])) + "</b><small>" + findPosition(pos).name + "</small></span>" : "";
+      }).join("");
       const open = openClubId === t.id;
+      const pay = teamPayroll(t.id), budget = teamBudgetOf(t.tier);
+      const st = teamStaff(t.id);
+      const staffChips = st ? STAFF_ROLES.map(function (r) { return '<span class="chip">' + r.name.replace("전략 ", "") + gradeTag(st[r.id].g) + "</span>"; }).join("") : "";
+      const vs = clubVsMineText(t.id);
       return (
-        '<div class="club' + (t.id === mine.id ? " mine" : "") + '">' +
+        '<div class="club' + (t.id === mine.id ? " mine" : "") + (open ? " open" : "") + '">' +
+          '<div class="club-stripe" style="background:linear-gradient(90deg,' + u[0] + " 70%," + u[1] + ' 70%)"></div>' +
           '<div class="club-head" data-club="' + t.id + '">' +
-            '<span class="club-rank">' + (i + 1) + "</span>" +
-            '<span class="club-name">' + escapeHTML(t.name) + (t.id === mine.id ? ' <span class="now-tag">내 팀</span>' : "") + "</span>" +
-            '<span class="muted small">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b> · 연봉 " + moneyText(teamPayroll(t.id)) + " / 예산 " + moneyText(teamBudgetOf(t.tier)) + " · " + clubMoneyText(t.id) + (clubVsMineText(t.id) ? " · ⚔️ " + clubVsMineText(t.id) : "") + "</span>" +
+            rankBadgeHTML(i + 1) +
+            '<span class="club-name">' + teamMarkHTML(t.id) + (t.id === mine.id ? ' <span class="now-tag">내 팀</span>' : "") + "</span>" +
+            '<span class="chip">전력 <b>' + teamStrength(t.id).toFixed(1) + "</b></span>" +
           "</div>" +
-          '<div class="muted small club-lineup">' + lineup + "</div>" +
-          '<div class="muted small club-lineup">🧑‍💼 스태프 ' + staffLineText(t.id) + "</div>" +
-          (clubIncomeText(t.id) ? '<div class="muted small club-lineup">💰 ' + clubIncomeText(t.id) + "</div>" : "") +
+          '<div class="club-faces">' + faces + "</div>" +
+          '<div class="club-kv"><span>연봉 / 예산</span>' + miniBarHTML(budget ? pay / budget : 0) + "<b>" + moneyText(pay) + " / " + moneyText(budget) + "</b></div>" +
+          '<div class="muted small club-lineup">' + clubMoneyText(t.id) + (clubIncomeText(t.id) ? ' · <span class="tip" tabindex="0" data-tip="' + escapeHTML(clubIncomeText(t.id).replace(/<[^>]*>/g, "")) + '">💰 수입</span>' : "") + "</div>" +
+          '<div class="club-foot">' + staffChips + (vs ? '<span class="chip ' + (/상대 0승/.test(vs) ? "bad" : "") + '">⚔️ ' + vs + "</span>" : "") + "</div>" +
           (open ? clubRosterHTML(t.id) + staffCardHTML(t.id) + clubH2HHTML(t.id) : "") +
         "</div>"
       );
-    }).join("");
+    }).join("") + "</div>";
   }).join("");
   return "<h1>구단 탐색</h1>" + '<div class="card"><p class="muted small">구단을 누르면 선수단이 나와요. 순서는 리그 안 전력 순위예요.</p>' + cards + "</div>";
 };
@@ -256,17 +264,21 @@ pages.transfer = function () {
     ? "시즌 " + c.guarantee + "경기 (" + Math.min(state.career.seasonGames, c.guarantee) + "/" + c.guarantee + (state.career.seasonGames >= c.guarantee ? " 달성" : "") + ")"
     : "없음";
 
+  // 디자인 D5: 큰 연봉 숫자 + 예상 연봉
+  const expect = userSalaryFor(nextTier(team.id));
+  const gap = expect - c.salary;
   const contractCard =
-    '<div class="card"><h2>내 계약</h2>' +
+    '<div class="card"><h2>📄 내 계약' + (c.endYear <= state.year ? ' <span class="chip bad">이번 시즌 만료</span>' : "") + "</h2>" +
+      '<div class="ct-top">' + portraitImg(USER_ID, { scale: 2 }) + "<div>" + teamMarkHTML(team.id, "<b>" + escapeHTML(team.name) + "</b>") + ' <span class="chip">' + tierName(team.tier) + "</span> · " + role +
+        '<div class="ct-money">' + moneyText(c.salary) + ' <small>/ 년 · 매주 ' + moneyText(Math.round(c.salary / CREATION.weeksPerSeason)) + "</small></div></div></div>" +
       '<table class="mini">' +
-        "<tr><td>소속</td><td><b>" + escapeHTML(team.name) + "</b> (" + tierName(team.tier) + ") · " + role + "</td></tr>" +
-        "<tr><td>연봉</td><td>" + moneyText(c.salary) + ' <span class="muted small">(매주 ' + moneyText(Math.round(c.salary / CREATION.weeksPerSeason)) + ")</span></td></tr>" +
-        "<tr><td>계약 만료</td><td>" + contractEndText(c) + (c.endYear <= state.year ? ' <span class="down">(이번 시즌)</span>' : "") + "</td></tr>" +
+        "<tr><td>계약 만료</td><td>" + contractEndText(c) + "</td></tr>" +
         "<tr><td>출전 보장</td><td>" + guaranteeText + "</td></tr>" +
         "<tr><td>이번 시즌 출전</td><td>" + state.career.seasonGames + "경기</td></tr>" +
-        "<tr><td>지금 기준 예상 연봉</td><td>" + moneyText(userSalaryFor(nextTier(team.id))) + ' <span class="muted small">(재계약·제안 때 기준, 시즌 성적에 따라 바뀜)</span>' +
-          '<div class="salary-breakdown muted small">' + escapeHTML(salaryBreakdownText(salaryBreakdown(nextTier(team.id)), 0)) + "</div></td></tr>" +
       "</table>" +
+      '<div class="ct-expect"><span class="muted small">📈 지금 기준 예상 연봉 (재계약·제안 때 기준, 시즌 성적에 따라 바뀜)</span>' +
+        '<div class="ct-money ' + (gap >= 0 ? "up" : "down") + '">' + moneyText(expect) + " <small>(" + (gap >= 0 ? "+" : "−") + moneyText(Math.abs(gap)) + ")</small></div>" +
+        '<div class="salary-breakdown muted small">' + escapeHTML(salaryBreakdownText(salaryBreakdown(nextTier(team.id)), 0)) + "</div></div>" +
       (state.pendingMove ? '<div class="notice">' + (state.pendingMove.loan ? "임대 확정" : "이적 확정") + ": " + (state.pendingMove.summer ? "후반기(" + SUMMER_MARKET.applyWeek + "주)부터" : "새 시즌부터") + " <b>" + escapeHTML(findTeam(state.pendingMove.teamId).name) + "</b> (연봉 " + moneyText(state.pendingMove.salary) + ", " + state.pendingMove.endYear + "년까지)</div>" : "") +
       (state.loan ? '<div class="notice">🤝 임대 중: 이번 시즌이 끝나면 <b>' + escapeHTML(findTeam(state.loan.from) ? findTeam(state.loan.from).name : "원래 팀") + "</b>(으)로 돌아가요.</div>" : "") +
     "</div>";
@@ -288,7 +300,7 @@ pages.transfer = function () {
       const stScore = st ? playerScore(st) : 0;
       const why = canRequestTransfer(t.id);
       return (
-        "<tr><td>" + escapeHTML(t.name) + ' <span class="muted small">' + tierName(t.tier) + "</span></td>" +
+        "<tr><td>" + teamMarkHTML(t.id) + ' <span class="muted small">' + tierName(t.tier) + "</span></td>" +
           '<td class="r">' + teamStrength(t.id).toFixed(1) + "</td>" +
           "<td>" + (st ? escapeHTML(playerName(st)) : "-") + "</td>" +
           '<td class="r ' + (me >= stScore ? "up" : "down") + '">' + stScore.toFixed(1) + "</td>" +

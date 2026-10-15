@@ -96,11 +96,11 @@ pages.awards = function () {
   });
   const race = function (title, list, valueFn, fmt, note) {
     const rows = list.slice(0, 5).map(function (id, i) {
-      return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + (i + 1) + "</td><td>" + escapeHTML(playerName(id)) +
+      return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + rankBadgeHTML(i + 1) + "</td>" + faceTd(id) + "<td>" + escapeHTML(playerName(id)) +
         ' <span class="muted small">' + findPosition(playerPos(id)).name + " · " + escapeHTML(teamName(stats[id].team)) + '</span></td><td class="r"><b>' + fmt(valueFn(id)) + "</b></td></tr>";
     }).join("");
     return '<div class="card"><h2>' + title + ' <span class="muted small">' + note + "</span></h2>" +
-      (rows ? '<table class="mini">' + rows + "</table>" : '<p class="muted">아직 기록이 없어요.</p>') + "</div>";
+      (rows ? '<table class="mini">' + rows + "</table>" : emptyBoxHTML("🌱", "아직 기록이 없어요.")) + "</div>";
   };
   const minMvp = RECORDS.minSets.mvp;
   const mvpList = ids.filter(function (id) { return stats[id].rg >= minMvp; }).sort(function (a, b) { return mvpScore(b) - mvpScore(a); });
@@ -122,12 +122,28 @@ pages.awards = function () {
   const all = (state.league.awards || []).slice().reverse();
   const byYear = {};
   all.forEach(function (a) { (byYear[a.year] = byYear[a.year] || []).push(a); });
+  // 디자인 D5: 큰 상(월드·MSI 결승 MVP, 정규 시즌 MVP)은 금색 넓은 카드, 올프로는 얼굴 5명 한 줄
+  const BIG_AWARDS = ["worldsfmvp", "msifmvp", "mvp"];
+  const face = function (a, size) { const tid = teamIdByName(a.team); return portraitHTMLFrom(lookOf(a.id), tid ? uniformOfTeam(tid) : FREE_AGENT_UNIFORM, { face: true, size: size }); };
   const history = Object.keys(byYear).sort(function (a, b) { return b - a; }).map(function (y) {
-    return '<h2 class="sub">' + y + "년</h2><table class=\"mini\">" + byYear[y].map(function (a) {
-      return '<tr class="' + (a.id === USER_ID ? "me" : "") + '"><td>' + escapeHTML(a.title) + "</td><td>" + escapeHTML(a.name) +
-        ' <span class="muted small">' + findPosition(a.pos).name + " · " + escapeHTML(a.team) + '</span></td><td class="r">' + (a.value ? a.value.toFixed(2) : "") + "</td></tr>";
-    }).join("") + "</table>";
-  }).join("") || '<p class="muted">아직 시상 기록이 없어요. 정규 시즌 상은 리그 결승(38주차)이 끝나면 발표돼요.</p>';
+    const list = byYear[y];
+    const allpro = list.filter(function (a) { return a.key === "allpro"; }).sort(function (a, b) { return POSITION_IDS.indexOf(a.pos) - POSITION_IDS.indexOf(b.pos); });
+    const others = list.filter(function (a) { return a.key !== "allpro"; }).sort(function (a, b) {
+      const ia = BIG_AWARDS.indexOf(a.key), ib = BIG_AWARDS.indexOf(b.key);
+      return (ia === -1 ? 9 : ia) - (ib === -1 ? 9 : ib);
+    });
+    const cards = others.map(function (a) {
+      const big = BIG_AWARDS.indexOf(a.key) !== -1;
+      const tid = teamIdByName(a.team);
+      return '<div class="aw' + (big ? " big" : "") + (a.id === USER_ID ? " me" : "") + '">' + face(a, big ? 54 : 40) +
+        '<div><div class="aw-t">' + (big ? "🏆 " : "") + escapeHTML(a.title) + "</div><b>" + escapeHTML(a.name) + ' <small class="muted">' + findPosition(a.pos).name + "</small></b>" +
+        '<div class="small">' + (tid ? teamMarkHTML(tid, escapeHTML(a.team)) : '<span class="muted">' + escapeHTML(a.team) + "</span>") + (a.value ? ' <span class="aw-v">평점 ' + a.value.toFixed(2) + "</span>" : "") + "</div></div></div>";
+    }).join("");
+    const ap = allpro.length ? '<div class="aw-sub">⭐ 올프로 퍼스트 팀</div><div class="allpro">' + allpro.map(function (a) {
+      return '<div class="ap' + (a.id === USER_ID ? " me" : "") + '">' + face(a, 44) + "<b>" + escapeHTML(a.name) + "</b><small>" + findPosition(a.pos).name + (a.value ? " · " + a.value.toFixed(2) : "") + "</small></div>";
+    }).join("") + "</div>" : "";
+    return '<h2 class="sub">' + y + '년</h2><div class="awards">' + cards + "</div>" + ap;
+  }).join("") || emptyBoxHTML("🏅", "아직 시상 기록이 없어요. 정규 시즌 상은 리그 결승(38주차)이 끝나면 발표돼요.");
 
   return (
     "<h1>개인 시상</h1>" +

@@ -188,14 +188,14 @@ pages.shop = function () {
     const lv = s.gear[g.id] || 0;
     const now = lv > 0 ? shopEffectText(g.levels[lv - 1].effects) : '<span class="muted">없음</span>';
     let action;
-    if (lv >= g.levels.length) action = '<span class="up small">최고 단계</span>';
+    if (lv >= g.levels.length) action = '<span class="chip gold">최고 단계</span>';
     else {
       const next = g.levels[lv];
       action = btn(' data-buygear="' + g.id + '"', "Lv" + (lv + 1) + " 구매 " + moneyText(next.price), state.money < next.price ? "자금이 부족해요" : "") +
         '<div class="muted small">→ ' + shopEffectText(next.effects) + "</div>";
     }
     return "<tr><td>" + g.icon + " <b>" + g.name + '</b><div class="muted small">' + g.what + "</div></td>" +
-      '<td class="c">' + (lv > 0 ? "Lv" + lv : "-") + "</td><td>" + now + "</td><td>" + action + "</td></tr>";
+      '<td class="c"><span class="pips tip" tabindex="0" data-tip="' + (lv > 0 ? "Lv" + lv : "아직 없음") + " / 최고 Lv" + g.levels.length + '">' + g.levels.map(function (x, i) { return "<i" + (i < lv ? ' class="on"' : "") + "></i>"; }).join("") + "</span></td><td>" + now + "</td><td>" + action + "</td></tr>";
   }).join("");
 
   const staffRows = SHOP_STAFF.map(function (st) {
