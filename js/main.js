@@ -314,6 +314,7 @@ pages.settings = function () {
       "</div>" +
       replaySettingsHTML() + // 경기 자동 재생 (js/replay.js)
       weekSummarySettingHTML() + // 이번 주 요약 창 켜기·끄기 (196, js/dash_plus.js)
+      shortcutSettingHTML() + // 단축키 켜기·끄기·목록 (198, js/shortcuts.js)
       motionSettingHTML() + // 움직임 켜기·끄기 (디자인 D6, js/ui.js)
       '<div class="setting-row">처음 안내 (📘 대시보드 맨 위) ' +
         (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
@@ -495,8 +496,8 @@ function renderTopbar() {
       planBadgeHTML() +
       staminaBadgeHTML() +
       fireBadgeHTML() + // 불타는 손: 2주 연속 대성공 (js/great.js)
-      '<button id="rest-week" class="tip" data-tip="고른 훈련은 그대로 두고 이번 주만 쉬어요 (체력·컨디션 회복)">휴식 주 💤</button>' +
-      '<button class="primary" id="next-week">다음 주로 진행 ▶</button>' +
+      '<button id="rest-week" class="tip" data-tip="고른 훈련은 그대로 두고 이번 주만 쉬어요 (체력·컨디션 회복)' + (shortcutKeyOf("rest") ? " · 단축키 " + shortcutKeyOf("rest") : "") + '">휴식 주 💤</button>' +
+      '<button class="primary" id="next-week"' + (shortcutKeyOf("next") ? ' title="단축키 ' + shortcutKeyOf("next") + ' · 목록은 /"' : "") + '>다음 주로 진행 ▶' + (shortcutKeyOf("next") ? ' <kbd class="kbd-hint">' + shortcutKeyOf("next") + "</kbd>" : "") + "</button>" +
     "</span>";
   document.getElementById("next-week").onclick = function () { advanceWeek(false); };
   document.getElementById("menu-toggle").onclick = function () { document.getElementById("layout").classList.toggle("menu-open"); };
@@ -580,7 +581,7 @@ function renderPage() {
     };
   });
 
-  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); bindMotionSetting(page); bindWeekSummarySetting(page); }
+  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); bindMotionSetting(page); bindWeekSummarySetting(page); bindShortcutSetting(page); }
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상

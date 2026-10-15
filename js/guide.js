@@ -248,5 +248,6 @@ pages.howto = function () {
     '<div class="card"><p>처음이라면 대시보드의 📘 처음이라면 안내를 따라가 보세요. ' +
       (t.on ? '<span class="up small">(지금 켜져 있어요)</span>' : '<button class="small-btn" data-tutorial="on">처음 안내 다시 켜기</button>') + "</p></div>" +
     '<div class="grid">' + cards + "</div>" +
+    '<div class="card"><h2>⌨️ 단축키 <span class="muted small">PC 키보드 · [설정]에서 끌 수 있어요 · 게임 중 / 를 누르면 이 목록</span></h2>' + shortcutTableHTML() + "</div>" + // 198 (js/shortcuts.js)
     masteryGuideHTML();
 };

@@ -15,7 +15,7 @@ function renderMobileNav() {
   }
   const layout = document.getElementById("layout");
   el.hidden = !state.player || state.retired || !layout || layout.hidden;
-  document.body.classList.toggle("has-mnav", !el.hidden); // 휴대폰: 아래 탭 높이만큼 본문 아래 여백 (css)
+  if (document.body.classList) document.body.classList.toggle("has-mnav", !el.hidden); // (노드 검사용 가짜 화면에는 classList가 없음) // 휴대폰: 아래 탭 높이만큼 본문 아래 여백 (css)
   if (el.hidden) return;
   const week = state.week, total = CREATION.weeksPerSeason;
   const mine = myTeam();

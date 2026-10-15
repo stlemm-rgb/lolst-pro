@@ -166,6 +166,7 @@ function stateFromSave(save) {
   if (s.settings && [1, 2, 3].indexOf(s.settings.replaySpeed) !== -1) fresh.settings.replaySpeed = s.settings.replaySpeed;
   if (s.settings && ["on", "off"].indexOf(s.settings.motion) !== -1) fresh.settings.motion = s.settings.motion; // 움직임 (디자인 D6)
   if (s.settings && typeof s.settings.weekSummary === "boolean") fresh.settings.weekSummary = s.settings.weekSummary; // 이번 주 요약 창 (196)
+  if (s.settings && typeof s.settings.shortcuts === "boolean") fresh.settings.shortcuts = s.settings.shortcuts; // 단축키 (198)
 
   if (s.world && typeof s.world === "object" && Array.isArray(s.world.teams)) fresh.world = s.world; // 해외 리그 (js/era.js)
   if (Number.isFinite(s.dormWeeks)) fresh.dormWeeks = s.dormWeeks;

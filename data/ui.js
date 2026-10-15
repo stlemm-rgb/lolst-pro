@@ -69,7 +69,7 @@ const PAGE_HEADS = {
 // 화면만 바꿈 (게임 결과·밸런스 그대로). 코드는 js/dash_plus.js
 const WEEK_SUMMARY = {
   maxMatches: 4,                    // 요약 창에 보이는 경기 줄 최대
-  closeHint: "바깥을 누르거나 Esc로 닫혀요 · 자세히는 대시보드 '지난주 결과'",
+  closeHint: "A(ㅁ)·Enter·Esc 또는 바깥을 누르면 닫혀요 · 자세히는 대시보드 '지난주 결과'",
   replayBtn: "경기 재생 보기 ▶",
   okBtn: "확인",
   settingText: "진행 직후 '이번 주 요약' 창",
@@ -108,3 +108,20 @@ const MSG_DECK = {
   pastTitle: "지난 연락",
   later: "◀ ▶로 넘겨 보고, 지금 안 답해도 돼요",
 };
+
+// ━━━━━ 단축키 (198) ━━━━━ 코드는 js/shortcuts.js
+// code = 키보드 자리 이름 (한글 자판이어도 같은 자리면 됨). 글자 입력 칸에 있을 때·창이 열려 있을 때는 안 먹음
+const SHORTCUTS = [   // 199: 사용자가 정한 키
+  { code: "Space",  key: "Space", act: "next",  name: "다음 주로 진행" },
+  { code: "KeyF",   key: "F",     act: "rest",  name: "휴식 주로 진행" },
+  { code: "KeyD",   key: "D",     act: "go:dashboard", name: "대시보드" },
+  { code: "KeyS",   key: "S",     act: "go:sns",       name: "SNS" },
+  { code: "KeyT",   key: "T",     act: "go:training",  name: "훈련" },
+  { code: "Slash",  key: "/",     act: "help",  name: "단축키 목록" },
+];
+// 창 안에서 쓰는 키 (따로 처리): 이번 주 요약 창 = A(한글 ㅁ)·Enter·Esc 로 확인, 경기 재생·신문·대성공 카드 = Esc
+const SUMMARY_OK_CODES = ["KeyA", "Enter", "NumpadEnter", "Escape"];
+const SHORTCUT_POPUP_KEYS = [
+  { key: "A (ㅁ)", name: "'○주차 정리' 창 확인 (다음은 경기 재생) · Enter·Esc도 됨" },
+  { key: "Esc",    name: "열린 창 닫기 (경기 재생·신문·대성공·목록)" },
+];

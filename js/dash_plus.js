@@ -22,7 +22,7 @@ function showWeekSummary(done) {
     document.removeEventListener("keydown", onKey);
     if (done) done();
   };
-  const onKey = function (e) { if (e.key === "Escape" || e.key === "Enter") { e.preventDefault(); close(); } };
+  const onKey = function (e) { if (SUMMARY_OK_CODES.indexOf(e.code) !== -1 || e.key === "Escape" || e.key === "Enter") { e.preventDefault(); close(); } }; // A(ㅁ)·Enter·Esc = 확인 (단축키 199, data/ui.js SUMMARY_OK_CODES)
   el.onclick = function (e) { if (e.target === el || (e.target.closest && e.target.closest("[data-ws-close]"))) close(); };
   document.addEventListener("keydown", onKey);
 }

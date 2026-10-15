@@ -23,6 +23,7 @@
  *  21. 내 캐릭터 얼굴 바꾸기 (184, js/look_edit.js)
  *  22. 대시보드·진행 개선 (196, js/dash_plus.js, 시안 10): 요약 창 · 다음 목표 · 성장 그래프 · 칭호
  *  23. 휴대폰 아래 탭·진행 막대 (197, js/mobile_nav.js, 시안 12 A1) · 받은 연락 카드 (197, js/sns_page.js, 시안 13 P1)
+ *  24. 단축키 (198, js/shortcuts.js)
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
  */
@@ -1499,3 +1500,14 @@ table.standings th, table.standings td { white-space: nowrap; }
   #mnav button, #mnav button:hover:not(:disabled) { box-shadow: none; transform: none; }
   .mnav-go:hover:not(:disabled), .mnav-tab:hover:not(:disabled) { background: none; border-color: transparent; }
 }
+
+/* ===== 24. 단축키 (198, js/shortcuts.js) ===== */
+#sc-help { position: fixed; inset: 0; z-index: 1300; display: grid; place-items: center; background: rgba(0, 0, 0, 0.6); padding: 16px; }
+#sc-help[hidden] { display: none; }
+.sc-box { width: min(440px, 100%); max-height: 90vh; overflow-y: auto; background: var(--panel); border: 1px solid rgba(var(--accent-rgb), 0.4); border-radius: var(--r); padding: 18px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+.sc-box h2 { margin-top: 0; }
+.sc-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.sc-table td { padding: 5px 6px; border-bottom: 1px solid var(--border); }
+.sc-table td:first-child { width: 120px; white-space: nowrap; }
+kbd { display: inline-block; min-width: 22px; text-align: center; font-family: inherit; font-weight: 700; font-size: 12px; line-height: 1.6; padding: 0 6px; border-radius: var(--r-xs); border: 1px solid var(--border); border-bottom-width: 2px; background: var(--panel-2); color: var(--text); }
+.kbd-hint { margin: -2px 0 -2px 6px; min-width: 16px; padding: 0 4px; font-size: 10.5px; line-height: 1.3; border-bottom-width: 1px; vertical-align: 1px; background: rgba(0, 0, 0, 0.25); border-color: rgba(255, 255, 255, 0.35); color: #fff; }
