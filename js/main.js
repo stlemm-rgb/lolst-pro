@@ -341,6 +341,7 @@ pages.settings = function () {
         (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
       "</div>" +
     "</div>" +
+    '<div class="card"><h2>🧑 내 캐릭터 얼굴</h2><div id="look-settings">' + lookEditorHTML(false) + "</div></div>" + // 얼굴 바꾸기 (js/look_edit.js)
     '<div class="card"><h2>새 게임</h2>' +
       '<p class="placeholder">캐릭터 생성부터 다시 시작합니다. 커리어를 시작하기 전까지는 기존 저장이 남아 있어요.</p>' +
       '<button class="danger" data-action="new-game">새 게임 시작</button>' +

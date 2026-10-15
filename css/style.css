@@ -1365,3 +1365,16 @@ table.standings th, table.standings td { white-space: nowrap; }
 .gsc-bar i { display: block; height: 100%; background: linear-gradient(90deg, #ffd23f, #ff9f1c); }
 .tc-great { margin: 4px 0 2px; }
 .gs-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 12px; }
+
+/* ===== 내 캐릭터 얼굴 바꾸기 (184, js/look_edit.js) ===== */
+.hero-pf { position: relative; }
+.pf-edit { position: absolute; right: -6px; bottom: -6px; width: 28px; height: 28px; padding: 0; border-radius: 50%; font-size: 13px; display: grid; place-items: center; background: var(--panel-2); border: 1px solid rgba(var(--accent-rgb), 0.5); opacity: 0.85; }
+.pf-edit:hover { opacity: 1; border-color: var(--accent); }
+.look-edit { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+.look-edit-pf { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: none; }
+.look-edit-r { flex: 1; min-width: 240px; }
+.look-edit .buttons { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+#look-overlay { position: fixed; inset: 0; z-index: 1150; display: grid; place-items: center; background: rgba(0, 0, 0, 0.7); padding: 16px; overflow-y: auto; }
+#look-overlay[hidden] { display: none; }
+.look-box { width: min(640px, 100%); background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+.look-box h2 { margin-top: 0; }

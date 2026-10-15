@@ -581,7 +581,7 @@ function heroCardHTML() {
     (sr.lastSeason ? sr.lastSeason.rank + "위/" + sr.lastSeason.total + "명" : "기록 없음") + " · 이번 패치 최고 " + (sr.patchPeak || sr.points).toLocaleString() + " · 역대 최고 " + sr.peak.toLocaleString();
   return (
     '<div class="card hero">' +
-      '<span class="pf-frame hero-pf">' + portraitImg(USER_ID, { scale: 3, jump: true }) + "</span>" + // 도트 포트레잇 (js/portrait.js)
+      '<span class="pf-frame hero-pf">' + portraitImg(USER_ID, { scale: 3, jump: true }) + '<button class="pf-edit tip" data-elookopen="1" data-tip="얼굴 바꾸기">✏️</button></span>' + // 얼굴 바꾸기 (js/look_edit.js) // 도트 포트레잇 (js/portrait.js)
       '<div class="hero-info">' +
         '<div class="hero-name">' + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.position).name + " · " + p.age + "세 · " + findArchetype(p.archetype).name + "</span></div>" +
         '<div class="hero-team small"><span class="uni-sw"><i style="background:' + uni[0] + '"></i><i style="background:' + uni[1] + '"></i></span>' + teamLinkHTML(team.id) + " " +

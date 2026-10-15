@@ -49,6 +49,8 @@ function stateFromSave(save) {
     traits: Array.isArray(p.traits) ? p.traits.filter(function (id) { return !!findTrait(id); }) : [],
   };
 
+  const look = cleanLook(p.look); // 내 캐릭터 얼굴 (184: 예전엔 불러올 때 빠져서 얼굴이 바뀌었음)
+  if (look) fresh.player.look = look;
   if (Number.isFinite(p.startTraitUntil)) fresh.player.startTraitUntil = p.startTraitUntil; // 유망주 특성 끝나는 해 (예전엔 저장이 안 됐음)
   if (typeof s.team === "string") fresh.team = s.team;
   if (Number.isFinite(s.money)) fresh.money = s.money;
