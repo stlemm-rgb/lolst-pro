@@ -2,8 +2,19 @@
 
 const POSITION_IDS = ["top", "jungle", "mid", "adc", "support"];
 
+// 이름 → 챔피언 (R6: 매번 173명을 처음부터 찾지 않게 한 번 만든 목록으로. 같은 이름이면 앞의 것)
+let CHAMP_BY_NAME = null;
 function findChampion(name) {
-  return CHAMPIONS.find(function (c) { return c.name === name; });
+  if (!CHAMP_BY_NAME) { CHAMP_BY_NAME = new Map(); CHAMPIONS.forEach(function (c) { if (!CHAMP_BY_NAME.has(c.name)) CHAMP_BY_NAME.set(c.name, c); }); }
+  return CHAMP_BY_NAME.get(name);
+}
+
+// 값이 큰 순서로 정렬 (R6): 비교할 때마다 값을 다시 계산하지 않고 한 번씩만 계산해 둠
+//   → 순서는 예전(비교마다 계산)과 똑같음 (같은 값 · 같은 정렬 방식)
+function sortDescBy(list, valueOf) {
+  const v = new Map();
+  list.forEach(function (n) { v.set(n, valueOf(n)); });
+  return list.sort(function (a, b) { return v.get(b) - v.get(a); });
 }
 
 // 그 해 그 주차의 마지막 날 ("2012-01-07" 같은 글자). 1주차 = 1월 1일 ~ 7일
@@ -120,11 +131,12 @@ function metaTagHTML(name, pos) {
 // 내 포지션 챔피언 (출시된 것만), 메타 → 숙련도 높은 순
 function myPositionChampions() {
   const pos = state.player.position;
-  return Object.keys(state.mastery)
-    .filter(function (name) { const c = findChampion(name); return c && c.positions.indexOf(pos) !== -1; })
-    .sort(function (a, b) {
-      const rank = function (n) { const t = metaTier(n); return t === "S" ? 2 : t === "A" ? 1 : 0; };
-      const ma = rank(a), mb = rank(b);
+  const list = Object.keys(state.mastery)
+    .filter(function (name) { const c = findChampion(name); return c && c.positions.indexOf(pos) !== -1; });
+  const rank = new Map();
+  list.forEach(function (n) { const t = metaTier(n); rank.set(n, t === "S" ? 2 : t === "A" ? 1 : 0); }); // R6: 한 번씩만 계산
+  return list.sort(function (a, b) {
+      const ma = rank.get(a), mb = rank.get(b);
       if (ma !== mb) return mb - ma;
       return state.mastery[b] - state.mastery[a];
     });
@@ -248,8 +260,8 @@ function myJokers() {
     .sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, MATCH.jokerSlots);
 }
 // 내 챔피언 조커 배율 (조커 칸 안에 들어간 챔피언만)
-function myJokerFactor(name) {
-  return myJokers().indexOf(name) !== -1 ? jokerFactor(state.mastery[name], isMeta(name)) : 0;
+function myJokerFactor(name, jokers) {
+  return (jokers || myJokers()).indexOf(name) !== -1 ? jokerFactor(state.mastery[name], isMeta(name)) : 0;
 }
 
 // 시그니처 픽 보너스 (js/collection.js) — 메타와 상관없이
@@ -258,10 +270,10 @@ function sigPickBonus(name) { return state.signature && name === state.signature
 function sigPowerBonus(name) { return state.signature && name === state.signature ? sigValue("powerBonus") : 0; }
 
 // 내가 고를 때 가치 = 밴 가치 + 조커픽 보너스 (+ 우리 팀이 노리는 조합 성향이면 보너스)
-function myPickValue(name, target) {
+function myPickValue(name, target, jokers) {
   const c = findChampion(name);
   const mine = !!c && c.positions.indexOf(state.player.position) !== -1;
-  return pickValue(name) + (mine ? MATCH.jokerPickBonus * myJokerFactor(name) + sigPickBonus(name) : 0) +
+  return pickValue(name) + (mine ? MATCH.jokerPickBonus * myJokerFactor(name, jokers) + sigPickBonus(name) : 0) +
     (target && champComps(name).indexOf(target) !== -1 ? COMP_RULES.myPickBonus : 0);
 }
 
@@ -301,8 +313,7 @@ function metaPenaltyInfo() {
 // exclude: 이번 경기 앞 세트에서 이미 나온 챔피언 (피어리스: 다시 못 나오니 밴할 필요도 없음)
 function rollBans(exclude) {
   exclude = exclude || [];
-  const ranked = myPositionChampions().filter(function (n) { return exclude.indexOf(n) === -1; })
-    .sort(function (a, b) { return banValue(b) - banValue(a); });
+  const ranked = sortDescBy(myPositionChampions().filter(function (n) { return exclude.indexOf(n) === -1; }), banValue);
   const topMeta = ranked.filter(function (n) { return isMeta(n); }).sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
   const banned = rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0);
   // 시그니처 픽: 메타와 상관없이 일정 확률로 먼저 밴 (밴 수는 최대 3)
@@ -348,11 +359,12 @@ function rollBanList(ranked, topMeta, topMastery) {
 // exclude: 이번 경기 앞 세트에서 이미 나온 챔피언 (다시 고를 수 없음)
 function matchPower(bans, target, exclude) {
   exclude = exclude || [];
-  const ranked = myPositionChampions().slice().sort(function (a, b) { return banValue(b) - banValue(a); });
+  const ranked = sortDescBy(myPositionChampions().slice(), banValue);
   const banned = Array.isArray(bans) ? bans : ranked.filter(function (n) { return exclude.indexOf(n) === -1; }).slice(0, bans === undefined ? MATCH.bansAgainstMe : bans);
   // 남은 챔피언 중 내 가치(조커픽 보너스 포함)가 가장 높은 챔피언
   const left = ranked.filter(function (n) { return banned.indexOf(n) === -1 && exclude.indexOf(n) === -1; });
-  const pick = left.slice().sort(function (a, b) { return myPickValue(b, target) - myPickValue(a, target); })[0] || ranked[0];
+  const jokers = myJokers(); // R6: 조커 칸은 한 번만 계산 (myPickValue 안에서 매번 계산하던 것)
+  const pick = sortDescBy(left.slice(), function (n) { return myPickValue(n, target, jokers); })[0] || ranked[0];
   const joker = isJoker(pick);
   const score = statScore();
   const tier = metaTier(pick);

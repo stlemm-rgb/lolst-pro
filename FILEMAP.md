@@ -38,7 +38,7 @@
 | `data/standing.js` | 3 | 팀 내 입지 (126) — 엔진 js/standing.js |  |
 | `data/romance.js` | 51 | 연애: 규칙·대상 | romance_rules.js, romance.js |
 | `js/player.js` | 9 | 선수 관련 계산 |  |
-| `js/champions.js` | 17 | 챔피언 · 숙련도 · 메타(패치) |  |
+| `js/champions.js` | 18 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 31 | 캐릭터 생성 |  |
 | `js/save.js` | 22 | 저장 / 불러오기 |  |
 | `js/league.js` | 26 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |

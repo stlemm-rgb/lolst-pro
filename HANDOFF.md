@@ -209,7 +209,7 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 | R3 세이브 호환 한곳에 | 처리 지도(js/save.js 맨 위) + ensureStateReady() + 예전 세이브 4가지 테스트 tools/test_oldsaves.py | ✅ 189 |
 | R4 CSS 정리 | 목차, 같은 선택자 10개 합침, 색 58곳 변수로, tools/test_css.cjs (휴대폰 설정은 순서 때문에 각 부분에 그대로) | ✅ 190 |
 | R5 세이브 다이어트 | 저장할 때만 압축(LZ1|) 10시즌 0.72MB → 0.13MB, 게임 상태·결과는 그대로, saveGameSoon, tools/test_savepack.cjs | ✅ 191 |
-| R6 속도 | 한 주 89ms(11시즌째) → −30% 목표 | |
+| R6 속도 | 밴픽 정렬 값 한 번만 계산(sortDescBy)·조커 칸 한 번·findChampion 목록 → 한 주 169ms → 약 50ms (−70%), tools/profile_week.py | ✅ 192 |
 | R7 배포 정리 | 시안·문서·도구 → _dev, GitHub Actions로 공개 사이트만 game.js 1개로 묶기 (C안), CLAUDE.md '빌드 도구 없음' 규칙에 예외 적어 두기 | |
 | R8 문서 정리 | PROGRESS 오래된 항목 따로 보관, HANDOFF·GAME_PLAN 최신화 | |
 | R9 마무리 | 전체 검사, 휴대폰, ver 1.2.1 태그 | |

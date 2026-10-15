@@ -20,6 +20,7 @@
 | `python3 tools/golden.py make` / `check` | 시나리오 5개 × 10시즌의 세이브 전체 해시 + 결과 요약을 `tools/golden/golden.json`과 비교. 세이브 모양을 일부러 바꾸는 단계(R5)는 `check --loose`(결과 요약만) | 약 2분 |
 | `python3 tools/shots.py take <폴더>` · `diff <A> <B>` | 23화면 × 폭 3가지 + 겹창 5가지(경기 재생·대성공·얼굴 바꾸기·휴대폰 메뉴·신문) × 폭 2가지 = 79장을 찍고 비교 (40×40 이하나 0.005% 미만 작은 차이는 무시: 저장 시각 등). 스크린샷은 저장소에 안 넣음 → 정리 전 코드로 한 번, 정리 후 코드로 한 번 | 약 1분 |
 | `python3 tools/test_oldsaves.py` | 지금 세이브를 '예전 버전 모양'(ver 1.0·리그 없음·값 망가짐)으로 깎아서 실제로 불러오고 1시즌 진행 → 오류·빠진 칸 확인 (R3) | 약 1분 |
+| `python3 tools/profile_week.py [ui\|fast]` | 10시즌 게임에서 한 주 진행 시간과 오래 걸리는 함수 순위 (R6) | 약 1분 |
 | `node tools/test_savepack.cjs` | 세이브 압축(js/save.js lzPack·lzUnpack)이 어떤 글자든 그대로 되돌리는지 (R5) | 1초 |
 | `node tools/test_css.cjs` | css/style.css에서 같은 폭 조건(@media) 안에 같은 선택자가 두 번 나오면 실패 (R4) | 1초 |
 | `node tools/test_names.cjs` | js·data 맨 바깥 이름(function·const·let·var)이 겹치면 실패 (183 막대 깨짐 같은 사고 막기) | 1초 |

@@ -23,10 +23,12 @@ function npcMasteryInit(p) {
 function ensureNpcMastery() {
   if (!state.league || !state.year) return;
   const released = releasedChampions(state.year, state.week);
+  const byPos = {}; // R6: 포지션별로 미리 나눠 둠 (선수마다 챔피언 전체를 보지 않게, 넣는 순서는 그대로)
+  POSITION_IDS.forEach(function (pos) { byPos[pos] = released.filter(function (c) { return c.positions.indexOf(pos) !== -1; }); });
   Object.keys(state.league.players).map(function (id) { return state.league.players[id]; }).concat(worldPlayersList()).forEach(function (p) { // 해외 선수도 (v1.1)
     if (!p.mastery) { npcMasteryInit(p); return; }
-    released.forEach(function (c) {
-      if (c.positions.indexOf(p.pos) !== -1 && p.mastery[c.name] === undefined) p.mastery[c.name] = MASTERY.min;
+    (byPos[p.pos] || released.filter(function (c) { return c.positions.indexOf(p.pos) !== -1; })).forEach(function (c) {
+      if (p.mastery[c.name] === undefined) p.mastery[c.name] = MASTERY.min;
     });
   });
 }
@@ -83,8 +85,7 @@ function npcPickValue(p, name, target) {
 
 // 밴 당하기: 내 선수와 같은 규칙 (견제 밴 + 0~3명, 상대가 경계하는 상위 5명 중에서)
 function npcBans(p, exclude) {
-  const ranked = Object.keys(p.mastery).filter(function (n) { return exclude.indexOf(n) === -1; })
-    .sort(function (a, b) { return npcBanValue(p, b) - npcBanValue(p, a); });
+  const ranked = sortDescBy(Object.keys(p.mastery).filter(function (n) { return exclude.indexOf(n) === -1; }), function (n) { return npcBanValue(p, n); });
   const topMeta = ranked.filter(function (n) { return isMeta(n, p.pos); }).sort(function (a, b) { return p.mastery[b] - p.mastery[a]; })[0];
   return rollBanList(ranked, topMeta, topMeta ? p.mastery[topMeta] : 0); // 견제 밴 포함 (js/champions.js)
 }
@@ -102,8 +103,7 @@ function npcPickChamp(p, target, used) {
   const cand = Object.keys(p.mastery).filter(function (n) { return used.indexOf(n) === -1 && banned.indexOf(n) === -1; });
   if (!cand.length) return null;
   const themed = cand.filter(function (n) { return champComps(n).indexOf(target) !== -1; });
-  const pool = (themed.length && Math.random() < COMP_RULES.followPlan ? themed : cand)
-    .sort(function (a, b) { return npcPickValue(p, b, target) - npcPickValue(p, a, target); });
+  const pool = sortDescBy(themed.length && Math.random() < COMP_RULES.followPlan ? themed : cand, function (n) { return npcPickValue(p, n, target); });
   const weights = NPC_MASTERY.pickWeights.slice(0, pool.length);
   return pool[weightedIndex(weights)];
 }
@@ -159,7 +159,7 @@ function npcPowerFactor() {
     POSITION_IDS.forEach(function (pos) {
       const p = s[pos] && s[pos] !== USER_ID ? findPlayer(s[pos]) : null;
       if (!p || !p.mastery || p.pos !== pos) return;
-      const top = Object.keys(p.mastery).sort(function (a, b) { return npcPickValue(p, b) - npcPickValue(p, a); }).slice(0, 3);
+      const top = sortDescBy(Object.keys(p.mastery), function (n) { return npcPickValue(p, n); }).slice(0, 3);
       if (!top.length) return;
       list.push(average(top.map(function (n) { return npcChampMult(p, n); })) - npcMetaPenalty(p) / playerScore(p.id));
     });
