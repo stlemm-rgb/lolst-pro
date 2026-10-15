@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시안 10 · 대시보드·진행 개선</title>
+<style>
+:root{
+  --bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;
+  --accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--good:#2bff9e;--bad:#ff3d71;
+  --accent-rgb:0,224,255;--accent2-rgb:180,77,255;--good-rgb:43,255,158;--bad-rgb:255,61,113;--gold-rgb:255,210,63;
+  --grad:linear-gradient(90deg,#b44dff,#00e0ff);--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7);
+  --grad-hero:linear-gradient(120deg,#1a0f2e 0%,#0d1a2b 60%,#07070d 100%);
+  --r:14px;--r-s:10px;--r-xs:6px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;font-size:14px;line-height:1.5}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:24px;margin:0 0 6px}
+h2{font-size:19px;margin:44px 0 6px;padding-top:20px;border-top:1px solid var(--border)}
+.lead{color:var(--muted);margin:0 0 14px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:820px){.pair{grid-template-columns:1fr}}
+.opt{background:#0b0b14;border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.opt-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tag{font-weight:700;border-radius:var(--r-xs);padding:1px 8px;font-size:12px;background:rgba(var(--accent2-rgb),.2);color:#d9b3ff}
+.tag.rec{background:rgba(var(--gold-rgb),.18);color:var(--gold)}
+.opt-desc{color:var(--muted);font-size:12.5px;margin:10px 0 0}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:14px}
+.muted{color:var(--muted)}.good{color:var(--good)}.bad{color:var(--bad)}.gold{color:var(--gold)}.acc{color:var(--accent)}
+.btn{display:inline-block;white-space:nowrap;border:0;border-radius:var(--r-s);padding:9px 16px;font-weight:700;color:#fff;background:var(--grad-btn);cursor:pointer;font-size:14px}
+.btn.ghost{background:var(--panel-2);border:1px solid var(--border);color:var(--text)}
+.chip{display:inline-block;border:1px solid var(--border);border-radius:999px;padding:1px 9px;font-size:12px;color:var(--muted)}
+/* 가짜 화면 틀 */
+.screen{position:relative;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;min-height:430px}
+.screen .dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.ghost-lines{padding:14px}
+.ghost-lines div{height:12px;border-radius:6px;background:var(--panel-2);margin:10px 0}
+/* ① 요약 시트 A */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#161628,#11111c);border-top:1px solid rgba(var(--accent-rgb),.35);border-radius:18px 18px 0 0;padding:10px 16px 16px;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+.grip{width:44px;height:4px;border-radius:4px;background:var(--border);margin:0 auto 10px}
+.sheet-top{display:flex;justify-content:space-between;align-items:baseline}
+.sheet-top b{font-size:18px}
+.res-row{display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-s);padding:8px 10px;margin:8px 0}
+.wl{font-weight:800;border-radius:6px;padding:2px 8px;font-size:12px}
+.wl.l{background:rgba(var(--bad-rgb),.18);color:var(--bad)}.wl.w{background:rgba(var(--good-rgb),.15);color:var(--good)}
+.kv{display:grid;grid-template-columns:1fr auto;border:1px solid var(--border);border-radius:var(--r-s);overflow:hidden;margin:8px 0 12px}
+.kv div{padding:7px 10px;border-bottom:1px solid var(--border);font-size:13px}
+.kv div:nth-last-child(-n+2){border-bottom:0}
+.kv div:nth-child(even){text-align:right;font-weight:700}
+.full{display:block;width:100%;text-align:center;padding:11px}
+/* ① 요약 카드 B */
+.center-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:88%;max-width:400px;background:var(--panel);border:1px solid rgba(var(--accent-rgb),.45);border-radius:18px;padding:16px;box-shadow:0 0 40px rgba(var(--accent-rgb),.15)}
+.big-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.tile{background:var(--panel-2);border:1px solid var(--border);border-radius:var(--r-s);padding:8px;text-align:center}
+.tile .n{font-size:20px;font-weight:800}
+.tile .l{font-size:11.5px;color:var(--muted)}
+.lines{font-size:13px;margin:6px 0 12px}
+.lines div{padding:4px 0;border-bottom:1px dashed var(--border)}
+/* ② 목표 띠 A */
+.goals{display:grid;grid-template-columns:1fr;gap:8px}
+.goal{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.goal.main{border-color:rgba(var(--gold-rgb),.5);background:linear-gradient(120deg,#221c08,#11111c)}
+.goal .t{font-size:12px;color:var(--muted)}
+.goal .name{font-weight:700}
+.goal .num{font-size:30px;font-weight:900;font-style:italic;line-height:1}
+.goal.main .num{font-size:40px;color:var(--gold);text-shadow:0 0 18px rgba(var(--gold-rgb),.4)}
+.goal .num small{font-size:13px;font-style:normal;margin-left:2px;color:var(--muted)}
+.goal.warn .num{color:var(--bad)}
+@media(max-width:600px){.goals{grid-template-columns:1fr}}
+/* ② 목표 B: 히어로 안 */
+.hero{background:var(--grad-hero);border:1px solid var(--border);border-radius:var(--r);padding:14px;display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:center}
+.face{width:72px;height:72px;border-radius:12px;background:#2a2a40;display:grid;place-items:center;font-size:34px}
+.hero .nm{font-size:20px;font-weight:800}
+.hero .sub{font-size:12.5px;color:var(--muted)}
+.ovr{text-align:center}
+.ovr .n{font-size:40px;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.1}
+.ovr .l{font-size:11.5px;color:var(--muted)}
+.dlist{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+.dl{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12.5px}
+.dl b{color:var(--gold)}
+.dl.warn b{color:var(--bad)}
+/* ③ 그래프 */
+.spark2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sp{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px}
+.sp .t{font-size:12px;color:var(--muted)}
+.sp .v{font-size:22px;font-weight:800}
+.sp svg{display:block;width:100%;height:46px;margin-top:4px}
+.mini-axis{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)}
+/* ④ 칭호 */
+.title-badge{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:700;color:var(--gold);background:rgba(var(--gold-rgb),.1);border:1px solid rgba(var(--gold-rgb),.4);border-radius:999px;padding:1px 10px;margin-top:4px}
+.toast{flex-wrap:wrap;background:linear-gradient(120deg,#231d08,#141420);border:1px solid rgba(var(--gold-rgb),.55);border-radius:var(--r);padding:12px 14px;box-shadow:0 0 30px rgba(var(--gold-rgb),.15);display:flex;gap:12px;align-items:center;margin-top:12px}
+.toast .ic{font-size:30px}
+.toast .k{font-size:11px;letter-spacing:.2em;color:var(--gold)}
+.picker{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.picker span{border:1px solid var(--border);border-radius:999px;padding:3px 10px;font-size:12.5px;color:var(--muted)}
+.picker span.on{border-color:var(--gold);color:var(--gold);background:rgba(var(--gold-rgb),.1)}
+.picker span.lock{opacity:.4}
+.note{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r-s);padding:10px 14px;margin-top:28px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>시안 10 · 대시보드·진행 개선</h1>
+<p class="lead">「풋볼 에이전시」에서 가져온 4가지입니다. 번호마다 A·B 중 하나를 골라 주세요. 게임 결과는 바뀌지 않고 화면만 바뀝니다. 숫자는 2017년 21주차 실제 플레이 화면 값입니다.</p>
+
+<!-- ① -->
+<h2>① 진행 직후 '이번 주 요약' 창</h2>
+<p class="lead">[다음 주로 진행]을 누르면 바로 뜹니다. 순서: (대성공 카드) → <b>요약 창</b> → 경기 재생. 지금은 대시보드 아래쪽 '지난주 결과'까지 내려가 읽어야 합니다.</p>
+<div class="pair">
+  <div class="opt">
+    <div class="opt-head"><span class="tag rec">A 추천</span><b>아래에서 올라오는 창</b></div>
+    <div class="screen">
+      <div class="ghost-lines"><div style="width:60%"></div><div></div><div style="width:80%"></div><div></div><div style="width:40%"></div></div>
+      <div class="dim"></div>
+      <div class="sheet">
+        <div class="grip"></div>
+        <div class="sheet-top"><b>20주차 정리</b><span class="muted">2017 · 정규 시즌</span></div>
+        <div class="res-row"><span class="wl l">패</span><span>vs <b>T1 ABYSS</b> 0:2</span><span class="muted" style="margin-left:auto">평점 2.8</span></div>
+        <div class="res-row"><span class="wl l">패</span><span>vs <b>BRION HORIZON</b> 1:2</span><span class="muted" style="margin-left:auto">평점 1.8</span></div>
+        <div class="kv">
+          <div>종합 능력</div><div class="good">47.8 → 47.9 ▲0.1</div>
+          <div>체력 · 컨디션</div><div>41 · 44</div>
+          <div>돈</div><div class="good">+29만</div>
+          <div>새 연락 · 퀘스트</div><div>2개 · 컨디션 관리 1/2</div>
+        </div>
+        <span class="btn full">경기 재생 보기 ▶</span>
+      </div>
+    </div>
+    <p class="opt-desc">휴대폰에서 자연스럽고 그 게임과 같은 방식. 바깥을 누르거나 아래로 끌면 닫힘. 경기가 없는 주는 경기 줄 대신 훈련 결과 한 줄.</p>
+  </div>
+  <div class="opt">
+    <div class="opt-head"><span class="tag">B</span><b>가운데 카드 (큰 숫자 3칸)</b></div>
+    <div class="screen">
+      <div class="ghost-lines"><div style="width:60%"></div><div></div><div style="width:80%"></div><div></div><div style="width:40%"></div></div>
+      <div class="dim"></div>
+      <div class="center-card">
+        <div class="sheet-top"><b>20주차 정리</b><span class="muted">2017</span></div>
+        <div class="big-tiles">
+          <div class="tile"><div class="n bad">0승 2패</div><div class="l">이번 주 경기</div></div>
+          <div class="tile"><div class="n good">+0.1</div><div class="l">종합 능력 47.9</div></div>
+          <div class="tile"><div class="n">2</div><div class="l">새 연락</div></div>
+        </div>
+        <div class="lines">
+          <div><span class="wl l">패</span> T1 ABYSS 0:2 · 라인전 0/2</div>
+          <div><span class="wl l">패</span> BRION HORIZON 1:2 · 솔로킬 허용 3</div>
+          <div>휴식 · 체력 <span class="good">+35</span>, 컨디션 <span class="good">+5</span></div>
+        </div>
+        <div style="display:flex;gap:8px"><span class="btn ghost" style="flex:1;text-align:center">대시보드로</span><span class="btn" style="flex:1;text-align:center">경기 재생 ▶</span></div>
+      </div>
+    </div>
+    <p class="opt-desc">대성공 카드와 같은 모양이라 통일감이 있음. 한눈에 읽기 쉽지만 PC에서 화면 가운데를 가림.</p>
+  </div>
+</div>
+
+<!-- ② -->
+<h2>② '다음 목표' 카운트다운</h2>
+<p class="lead">가장 가까운 일정을 큰 금색 숫자로 보여 줍니다. 계약 만료처럼 급한 일은 빨간색입니다.</p>
+<div class="pair">
+  <div class="opt">
+    <div class="opt-head"><span class="tag rec">A 추천</span><b>대시보드 맨 위 띠 3칸</b></div>
+    <div class="goals">
+      <div class="goal main"><div><div class="t">다음 대회</div><div class="name">Road to MSI</div></div><div class="num">2<small>주</small></div></div>
+      <div class="goal warn"><div><div class="t">내 계약 만료</div><div class="name">BNK KINETIC</div></div><div class="num">7<small>주</small></div></div>
+      <div class="goal"><div><div class="t">후반기 개막</div><div class="name">정규 시즌</div></div><div class="num">9<small>주</small></div></div>
+    </div>
+    <p class="opt-desc">'처음이라면' 띠 바로 아래. 실제 대시보드(넓은 화면)에서는 3칸이 가로 한 줄, 휴대폰에서는 이 그림처럼 세로로 쌓임. 누르면 [일정]·[이적 시장]으로 이동.</p>
+  </div>
+  <div class="opt">
+    <div class="opt-head"><span class="tag">B</span><b>내 선수 카드 안에 작은 알약</b></div>
+    <div class="hero">
+      <div class="face">🧑</div>
+      <div><div class="nm">테스트 <span class="muted" style="font-size:12.5px;font-weight:400">미드 · 17세</span></div>
+        <div class="sub">BNK KINETIC 1부 · 1군(주전) · 팀 순위 8위</div>
+        <div class="dlist"><span class="dl">Road to MSI <b>2주</b></span><span class="dl warn">계약 만료 <b>7주</b></span><span class="dl">후반기 <b>9주</b></span></div>
+      </div>
+      <div class="ovr"><div class="n">47.9</div><div class="l">종합 능력</div></div>
+    </div>
+    <p class="opt-desc">자리를 더 쓰지 않음. 대신 눈에 덜 띔.</p>
+  </div>
+</div>
+
+<!-- ③ -->
+<h2>③ 성장 추이 미니 그래프</h2>
+<p class="lead">시즌마다 기록해 둔 값으로 그립니다. 첫 시즌에는 주 단위로 그립니다.</p>
+<div class="pair">
+  <div class="opt">
+    <div class="opt-head"><span class="tag rec">A 추천</span><b>[선수 정보] 머리에 2칸</b></div>
+    <div class="spark2">
+      <div class="sp"><div class="t">종합 능력 · 이번 시즌</div><div class="v">47.9 <span class="good" style="font-size:13px">▲4.1</span></div>
+        <svg viewBox="0 0 200 46" preserveAspectRatio="none"><defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#b44dff"/><stop offset="1" stop-color="#00e0ff"/></linearGradient></defs>
+        <polyline fill="none" stroke="url(#g1)" stroke-width="2.5" points="0,40 20,38 40,36 60,33 80,34 100,28 120,24 140,22 160,15 180,12 200,10"/><circle cx="200" cy="10" r="3.5" fill="#00e0ff"/></svg>
+        <div class="mini-axis"><span>1주</span><span>21주</span></div></div>
+      <div class="sp"><div class="t">인기도 · 이번 시즌</div><div class="v">16 <span class="bad" style="font-size:13px">▼2</span></div>
+        <svg viewBox="0 0 200 46" preserveAspectRatio="none"><polyline fill="none" stroke="#ffd23f" stroke-width="2.5" points="0,30 20,26 40,22 60,20 80,24 100,18 120,16 140,20 160,24 180,26 200,28"/><circle cx="200" cy="28" r="3.5" fill="#ffd23f"/></svg>
+        <div class="mini-axis"><span>1주</span><span>21주</span></div></div>
+    </div>
+    <p class="opt-desc">두 번째 칸은 인기도·연봉·솔랭 점수 중 고를 수 있음. 마우스를 올리면 그 주의 값.</p>
+  </div>
+  <div class="opt">
+    <div class="opt-head"><span class="tag">B</span><b>대시보드 종합 능력 숫자 아래</b></div>
+    <div class="hero" style="grid-template-columns:72px 1fr 170px">
+      <div class="face">🧑</div>
+      <div><div class="nm">테스트</div><div class="sub">BNK KINETIC 1부 · 1군(주전)</div></div>
+      <div class="ovr"><div class="n">47.9</div><div class="l">종합 능력 · 리그 미드 19위</div>
+        <svg viewBox="0 0 170 30" style="width:170px;height:30px;margin-top:4px"><polyline fill="none" stroke="#00e0ff" stroke-width="2" points="0,27 17,26 34,24 51,22 68,23 85,18 102,15 119,14 136,9 153,7 170,5"/></svg>
+        <div class="l">이번 시즌 <span class="good">▲4.1</span></div></div>
+    </div>
+    <p class="opt-desc">매주 보는 화면이라 성장이 바로 보임. 대신 히어로 카드가 조금 더 빽빽해짐.</p>
+  </div>
+</div>
+
+<!-- ④ -->
+<h2>④ 업적 칭호</h2>
+<p class="lead">업적에 보상은 없으니(규칙 유지), 이름 아래 붙는 '자랑거리'로 씁니다.</p>
+<div class="pair">
+  <div class="opt">
+    <div class="opt-head"><span class="tag rec">A 추천</span><b>최근 딴 업적이 자동으로 칭호</b></div>
+    <div class="hero" style="grid-template-columns:72px 1fr">
+      <div class="face">🧑</div>
+      <div><div class="nm">테스트 <span class="muted" style="font-size:12.5px;font-weight:400">미드 · 17세</span></div>
+        <div class="title-badge">🏅 「4:5의 기적」</div></div>
+    </div>
+    <div class="toast"><div class="ic">🏅</div><div><div class="k">ACHIEVEMENT</div><b>업적 달성 · 「4:5의 기적」</b><div class="muted" style="font-size:12.5px">수적 열세 한타를 뒤집었어요 · 새 칭호가 이름 아래 붙었어요</div></div><span class="btn ghost" style="margin-left:auto">좋아요</span></div>
+    <p class="opt-desc">업적을 따는 주의 요약 창(①)에 금색 토스트. 등급(금>은>동)이 높은 칭호가 낮은 칭호에 덮이지 않음.</p>
+  </div>
+  <div class="opt">
+    <div class="opt-head"><span class="tag">B</span><b>[업적 도감]에서 직접 고르기</b></div>
+    <div class="card">
+      <b>칭호 고르기</b> <span class="muted" style="font-size:12.5px">딴 업적 4 / 50</span>
+      <div class="picker">
+        <span class="on">「4:5의 기적」</span><span>「라이벌전 첫 승」</span><span>「승리의 맛」</span><span>「프로 데뷔」</span><span class="lock">🔒 「더비의 주인」</span><span class="lock">🔒 「월드 챔피언」</span>
+      </div>
+    </div>
+    <p class="opt-desc">좋아하는 칭호를 계속 달 수 있음. A처럼 자동으로 붙이고, B로 바꿀 수도 있게 둘 다 넣을 수도 있음.</p>
+  </div>
+</div>
+
+<div class="note"><b class="acc">추천 조합:</b> ① A · ② A · ③ A · ④ A+B (자동으로 붙고 바꿀 수도 있게). 휴대폰(390px)에서도 같은 모양으로 확인한 뒤 적용합니다.</div>
+</div>
+</body>
+</html>

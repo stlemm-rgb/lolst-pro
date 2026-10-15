@@ -133,6 +133,7 @@ pages.dashboard = function () {
   return (
     '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/history_pages.js)
     tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 내 선수 카드, 💡 추천은 '이번 주' 카드 안
+    dashGoalsHTML() + // 다음 목표 3칸: 다음 일정 · 계약 만료 · 다음 패치 (196, js/dash_plus.js)
     heroCardHTML() + // 맨 위 내 선수 카드 (디자인 D2, js/dashboard.js)
     rookieCardsHTML() + // 새 시즌 대형 신인 카드 (디자인 D4, js/ui.js)
     '<div class="dash">' +
@@ -312,6 +313,7 @@ pages.settings = function () {
         '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
       "</div>" +
       replaySettingsHTML() + // 경기 자동 재생 (js/replay.js)
+      weekSummarySettingHTML() + // 이번 주 요약 창 켜기·끄기 (196, js/dash_plus.js)
       motionSettingHTML() + // 움직임 켜기·끄기 (디자인 D6, js/ui.js)
       '<div class="setting-row">처음 안내 (📘 대시보드 맨 위) ' +
         (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
@@ -577,7 +579,7 @@ function renderPage() {
     };
   });
 
-  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); bindMotionSetting(page); }
+  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); bindMotionSetting(page); bindWeekSummarySetting(page); }
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
@@ -657,7 +659,7 @@ function nextWeek(restWeek) {
 
   resetWeekCtx(); // 이번 주에 일어난 일 기록 시작 (이벤트 조건용)
   // 대시보드 종합 능력 칸 '이번 주 변화': 진행 전 스탯·특성 (js/dashboard.js weekGrowthHTML)
-  const growthBase = { stats: Object.assign({}, state.stats), traits: state.player.traits.slice(), score: playerScore(USER_ID) };
+  const growthBase = { stats: Object.assign({}, state.stats), traits: state.player.traits.slice(), score: playerScore(USER_ID), money: state.money, pop: state.popularity }; // money·pop: 이번 주 요약 창 (js/dash_plus.js)
 
   // 훈련 효과 적용 (이벤트로 "쉰다"를 골랐으면 이번 주는 휴식)
   const training = (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
@@ -984,6 +986,6 @@ function renderAll() {
 // 측정 도구는 nextWeek만 부르므로 재생 창이 뜨지 않음
 function advanceWeek(rest) {
   nextWeek(rest);
-  // 훈련 대성공이면 연출을 먼저 보고, 닫으면 경기 자동 재생 (js/great.js, js/replay.js)
-  showGreat(afterWeekReplay);
+  // 훈련 대성공이면 연출을 먼저 보고 → 이번 주 요약 창 → 닫으면 경기 자동 재생 (js/great.js, js/dash_plus.js, js/replay.js)
+  showGreat(function () { showWeekSummary(afterWeekReplay); });
 }

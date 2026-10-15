@@ -64,3 +64,27 @@ const PAGE_HEADS = {
   howto:        { icon: "❓", desc: "게임 규칙과 화면 설명" },
   settings:     { icon: "⚙️", desc: "저장·불러오기와 게임 설정" },
 };
+
+// ━━━━━ 대시보드·진행 개선 (196, 시안 10: ① 요약 창 · ② 다음 목표 · ③ 성장 그래프 · ④ 칭호) ━━━━━
+// 화면만 바꿈 (게임 결과·밸런스 그대로). 코드는 js/dash_plus.js
+const WEEK_SUMMARY = {
+  maxMatches: 4,                    // 요약 창에 보이는 경기 줄 최대
+  closeHint: "바깥을 누르거나 Esc로 닫혀요 · 자세히는 대시보드 '지난주 결과'",
+  replayBtn: "경기 재생 보기 ▶",
+  okBtn: "확인",
+  settingText: "진행 직후 '이번 주 요약' 창",
+};
+const DASH_GOALS = {
+  // 다음 일정으로 보여 줄 일정 id (data/schedule.js SCHEDULE). 준비·휴식 주는 뺌
+  scheduleIds: ["cup", "first_stand", "split1", "road_to_msi", "msi", "split2", "playin", "playoffs", "promotion", "worlds", "offseason"],
+  startWords: { offseason: "이적 시장 열림" }, // 기본: '○○ 개막'
+  contractWarn: 8,                  // 계약 만료가 이 주 이하로 남으면 빨간색
+  patchText: "메타가 바뀌어요",
+};
+const TITLE_RULES = {
+  gradeRank: { g: 3, s: 2, b: 1 },  // 자동 칭호: 등급이 높은 것 → 같은 등급이면 최근에 딴 것
+  autoName: "자동 (가장 높은 등급 · 최근)",
+};
+const TREND_RULES = {
+  minPoints: 2,                     // 이만큼 쌓여야 그래프를 그림
+};

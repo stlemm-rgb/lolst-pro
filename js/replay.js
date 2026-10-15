@@ -11,12 +11,16 @@ function isReplayBig(m) {
 }
 
 function afterWeekReplay() {
+  const list = replayQueue();
+  if (list.length) openReplay(list);
+}
+// 진행 직후 자동으로 재생할 경기 (이번 주 요약 창 버튼 글자도 이걸로, js/dash_plus.js)
+function replayQueue() {
   const mode = replayAutoSetting();
   const r = state.weekReport;
-  if (mode === "off" || !r) return;
+  if (mode === "off" || !r) return [];
   const keys = (r.userLines || []).concat(r.teamLines || []).map(function (l) { return l.matchKey; }).filter(function (k, i, a) { return k && a.indexOf(k) === i; });
-  const list = keys.filter(function (k) { const m = findMatchByKey(k); return m && m.detail && (mode === "all" || isReplayBig(m)); });
-  if (list.length) openReplay(list);
+  return keys.filter(function (k) { const m = findMatchByKey(k); return m && m.detail && (mode === "all" || isReplayBig(m)); });
 }
 
 // ----- 창 열기·닫기 -----

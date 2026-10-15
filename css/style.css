@@ -21,6 +21,7 @@
  *  19. 디자인 D6 마무리 (180)
  *  20. 훈련 대성공 (182, js/great.js, 시안 9)
  *  21. 내 캐릭터 얼굴 바꾸기 (184, js/look_edit.js)
+ *  22. 대시보드·진행 개선 (196, js/dash_plus.js, 시안 10): 요약 창 · 다음 목표 · 성장 그래프 · 칭호
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
  */
@@ -1395,3 +1396,57 @@ table.standings th, table.standings td { white-space: nowrap; }
 #look-overlay[hidden] { display: none; }
 .look-box { width: min(640px, 100%); background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
 .look-box h2 { margin-top: 0; }
+
+/* ===== 22. 대시보드·진행 개선 (196, js/dash_plus.js, 시안 10) ===== */
+/* ① 이번 주 요약 창: 아래에서 올라옴 (뉴스 1000 < 요약 1050 < 경기 재생 1100) */
+#ws-overlay { position: fixed; inset: 0; z-index: 1050; background: rgba(0, 0, 0, 0.55); display: flex; align-items: flex-end; justify-content: center; }
+#ws-overlay[hidden] { display: none; }
+.ws-sheet { width: min(520px, 100%); max-height: 88vh; overflow-y: auto; background: linear-gradient(180deg, var(--panel-2), var(--panel)); border: 1px solid rgba(var(--accent-rgb), 0.35); border-bottom: 0; border-radius: 18px 18px 0 0; padding: 10px 16px 14px; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5); animation: ws-up 0.25s ease-out; }
+@keyframes ws-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.ws-grip { width: 44px; height: 4px; border-radius: 4px; background: var(--border); margin: 0 auto 10px; }
+.ws-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.ws-top b { font-size: 18px; }
+.ws-match { display: flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-s); padding: 7px 10px; margin: 6px 0; font-size: 13px; }
+.ws-match .muted.small { margin-left: auto; }
+.ws-great { margin: 6px 0; padding: 6px 10px; border-radius: var(--r-s); border: 1px solid rgba(var(--gold-rgb), 0.45); color: var(--gold); font-weight: 700; font-size: 13px; }
+.ws-kv { display: grid; grid-template-columns: 1fr auto; border: 1px solid var(--border); border-radius: var(--r-s); overflow: hidden; margin: 8px 0 10px; }
+.ws-kv div { padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+.ws-kv div:nth-last-child(-n+2) { border-bottom: 0; }
+.ws-kv div:nth-child(even) { text-align: right; font-weight: 700; }
+.ws-achv { display: flex; gap: 10px; align-items: center; margin: 0 0 10px; padding: 10px 12px; border-radius: var(--r-s); border: 1px solid rgba(var(--gold-rgb), 0.55); background: linear-gradient(120deg, rgba(var(--gold-rgb), 0.12), transparent); }
+.ws-achv-ic { font-size: 26px; }
+.ws-k { font-size: 10.5px; letter-spacing: 0.2em; color: var(--gold); }
+.ws-btn { display: block; width: 100%; padding: 11px; font-size: 15px; }
+.ws-hint { text-align: center; margin-top: 6px; }
+/* ② 다음 목표 3칸 */
+.dgoals { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.dgoal { min-width: 0; white-space: normal; display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 14px; color: var(--text); cursor: pointer; font: inherit; }
+.dgoal:hover { border-color: rgba(var(--accent-rgb), 0.5); }
+.dgoal.main { border-color: rgba(var(--gold-rgb), 0.5); background: linear-gradient(120deg, rgba(var(--gold-rgb), 0.1), var(--panel)); }
+.dg-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.dg-t { font-size: 12px; color: var(--muted); }
+.dg-name { font-weight: 700; overflow-wrap: anywhere; }
+.dg-num { flex-shrink: 0; font-size: 30px; font-weight: 900; font-style: italic; line-height: 1; white-space: nowrap; }
+.dg-num small { font-size: 13px; font-style: normal; margin-left: 2px; color: var(--muted); }
+.dgoal.main .dg-num { font-size: 40px; color: var(--gold); text-shadow: 0 0 18px rgba(var(--gold-rgb), 0.4); }
+.dgoal.warn .dg-num { color: var(--bad); }
+@media (max-width: 1100px) { .dgoal { padding: 8px 12px; } .dg-num { font-size: 24px; } .dgoal.main .dg-num { font-size: 30px; } }
+@media (max-width: 760px) { .dgoals { grid-template-columns: 1fr; gap: 6px; } .dgoal { padding: 6px 12px; } .dg-num { font-size: 24px; } .dgoal.main .dg-num { font-size: 30px; } }
+/* ③ 성장 그래프 ([선수 정보] 머리) */
+.ptrend { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.ptr-card { background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-s); padding: 8px 12px; min-width: 0; }
+.ptr-val { font-size: 22px; font-weight: 800; }
+.ptr-svg { display: block; width: 100%; height: 46px; margin-top: 2px; overflow: visible; }
+.ptr-svg polyline { fill: none; stroke: var(--accent); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.ptr-card.gold .ptr-svg polyline { stroke: var(--gold); }
+.ptr-end { fill: var(--accent); }
+.ptr-card.gold .ptr-end { fill: var(--gold); }
+.ptr-hit { fill: transparent; }
+.ptr-axis { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); }
+.ptr-empty { padding: 14px 0; }
+@media (max-width: 760px) { .ptrend { grid-template-columns: 1fr; } }
+/* ④ 칭호 */
+.ttl-badge { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; vertical-align: middle; font-size: 12.5px; font-weight: 700; color: var(--gold); background: rgba(var(--gold-rgb), 0.1); border: 1px solid rgba(var(--gold-rgb), 0.4); border-radius: 999px; padding: 1px 10px; }
+.ttl-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.ttl-chip { border: 1px solid var(--border); background: var(--panel-2); color: var(--muted); border-radius: 999px; padding: 3px 12px; font-size: 13px; cursor: pointer; }
+.ttl-chip.on { border-color: var(--gold); color: var(--gold); background: rgba(var(--gold-rgb), 0.1); }

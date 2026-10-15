@@ -25,7 +25,7 @@
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
 | `data/news.js` | 43 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
-| `data/ui.js` | 4 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
+| `data/ui.js` | 5 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/replay.js` | 1 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
@@ -56,7 +56,7 @@
 | `js/market_pages.js` | 26 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
 | `js/links.js` | 4 | 선수·구단 이름 링크: 어느 화면이든 이름을 누르면 [선수 검색] / [구단 탐색]의 그 선수·구단으로 |  |
 | `js/news.js` | 17 | 뉴스: 소식·신문 팝업·월즈 특집·역사 뉴스 | news.js, news_popup.js, worlds_news.js, historical_news.js |
-| `js/dashboard.js` | 39 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
+| `js/dashboard.js` | 40 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
 | `js/records.js` | 10 | 기록: 세트 평점, POG, 시즌 기록, 시상, 커리어 시즌 기록 |  |
 | `js/quests.js` | 18 | 퀘스트: 코치·감독 과제 |  |
 | `js/shop.js` | 21 | 상점·거주지 | shop.js, housing.js |
@@ -86,6 +86,7 @@
 | `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
+| `js/dash_plus.js` | 12 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
 | `js/start.js` | 0 | 게임 시작 |  |
 
 - 데이터(숫자·문구)는 `data/`, 규칙·화면 코드는 `js/` (CLAUDE.md 규칙)

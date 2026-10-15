@@ -570,7 +570,7 @@ function heroCardHTML() {
     '<div class="card hero">' +
       '<span class="pf-frame hero-pf">' + portraitImg(USER_ID, { scale: 3, jump: true }) + '<button class="pf-edit tip" data-elookopen="1" data-tip="얼굴 바꾸기">✏️</button></span>' + // 얼굴 바꾸기 (js/look_edit.js) // 도트 포트레잇 (js/portrait.js)
       '<div class="hero-info">' +
-        '<div class="hero-name">' + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.position).name + " · " + p.age + "세 · " + findArchetype(p.archetype).name + "</span></div>" +
+        '<div class="hero-name">' + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.position).name + " · " + p.age + "세 · " + findArchetype(p.archetype).name + "</span>" + titleBadgeHTML() + "</div>" + // 칭호 (196, js/dash_plus.js)
         '<div class="hero-team small"><span class="uni-sw"><i style="background:' + uni[0] + '"></i><i style="background:' + uni[1] + '"></i></span>' + teamLinkHTML(team.id) + " " +
           tierName(team.tier) + " · " + (state.benched ? '<span class="down">2군 (후보)</span>' : '<span class="up">1군 (주전)</span>') + " · 팀 순위 <b>" + leagueRank + "위</b>" +
           '<span class="muted"> · ' + (c ? "연봉 " + moneyText(c.salary) + " · 계약 " + contractEndText(c) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : "계약 없음") + "</span></div>" +

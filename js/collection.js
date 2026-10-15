@@ -219,6 +219,7 @@ function checkAchievements() {
   const fresh = ACHIEVEMENTS.filter(function (a) { return !state.achievements[a.id] && achValue(a, x) >= a.goal; });
   if (!fresh.length) return;
   fresh.forEach(function (a) { state.achievements[a.id] = { y: state.year, w: state.week }; });
+  if (state.weekReport) state.weekReport.achv = (state.weekReport.achv || []).concat(fresh.map(function (a) { return a.id; })); // 이번 주 요약 창 알림 (196, js/dash_plus.js)
   const title = fresh.length === 1 ? "🏅 업적 달성: " + fresh[0].name : "🏅 업적 " + fresh.length + "개 달성";
   postMessage("news", title, fresh.map(function (a) { return a.icon + " " + a.name + " — " + a.desc; }).join("\n"), {
     notes: ["[수집] → 업적 도감 (" + achDoneCount() + "/" + ACHIEVEMENTS.length + ")"],
@@ -253,6 +254,7 @@ pages.achievements = function () {
     '<div class="card"><h2>달성 ' + done + " / " + total + ' <span class="muted small">(' + pct + "%)</span></h2>" +
       '<div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div>' +
       '<p class="muted small">매주 자동으로 확인해요. 동 · 은 · 금은 난이도예요 (보상은 없어요).</p></div>' +
+    titlePickerHTML() + // 칭호 고르기 (196, js/dash_plus.js)
     '<div class="grid">' + cards + "</div>";
 };
 // 큰 숫자는 돈으로

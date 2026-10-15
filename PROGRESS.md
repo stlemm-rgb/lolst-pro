@@ -1,7 +1,7 @@
 # PROGRESS.md — 진행 상황
 
-> 큰 작업이 하나 끝날 때마다 맨 아래에 번호를 이어 적습니다. **다음 번호 196.**
-> 마지막 업데이트: 2026-10-15
+> 큰 작업이 하나 끝날 때마다 맨 아래에 번호를 이어 적습니다. **다음 번호 197.**
+> 마지막 업데이트: 2026-10-16
 
 ## 한눈에 보기
 
@@ -83,6 +83,7 @@
 193. [정리 R7 배포 정리] C안: .github/workflows/pages.yml — master에 push하면 GitHub Actions가 tools/bundle.py로 스크립트 83개를 game.js 하나로 이어 붙이고(순서 그대로, 파일마다 끝에 ;), index.html의 <script> 줄들을 game.js?v=해시 한 줄로, css도 ?v=해시(새 버전을 올리면 브라우저가 바로 새 파일), node --check 문법 검사 후 공개 사이트에 올림. 공개 사이트에는 index.html·game.js·css만 → 시안·문서·도구·updates를 _dev로 옮길 필요가 없어짐(저장소에는 그대로, 사이트에서만 빠짐). 공개 크기 6.3MB → 1.6MB, 요청 84개 → 3개, game.js 압축 전송 약 461KB. 처음 한 번 사용자가 GitHub 저장소 Settings → Pages → Source를 'GitHub Actions'로 바꿔야 함. tools/sim_lib.py: GAME_INDEX 환경 변수로 다른 index를 열 수 있게 → 묶음 사이트로 정답지·79장·예전 세이브 4가지 모두 같음/통과. CLAUDE.md '빌드 도구 없음' 규칙에 이 예외 적음. .gitignore에 _site/
 194. [정리 R8 문서 정리] PROGRESS.md 147KB 중 1~133번(ver 1.0)과 초기 기획 메모·옛 파일 구성 목록을 docs/PROGRESS_1-133.md로 옮김(내용 그대로) → PROGRESS는 134번부터. 다른 AI 검증 요청문 AI_REVIEW_HANDOFF.md(뉴스 개편, 끝난 일)는 docs/로. HANDOFF.md 새로 씀(지금 상태·작업 방식·코드 규칙·검사 도구·클라우드 작업 순서·로드맵, 옛 경로 C:\Project\Game\Game → C:\project\Game, 옛 파일 이름 고침). GAME_PLAN.md: 겹치던 절 번호 5개 고침(4-7-10~14), '아직 정하지 않은 것' → '7. 그 뒤에 정한 것', 맨 위에 최신 문서 안내·웹 공개 반영, ver 1.1~1.2 요약 8장 추가. tools/README.md 옛 파일 이름 고침. 게임 파일은 안 건드림
 195. [정리 R9 마무리 · ver 1.2.1] 전체 검사: tools/check_all.py 모두 통과(자동 검사·예전 세이브 4가지·정답지 5시나리오 × 10시즌 같음), 화면 79장 R4 기준과 모두 같음, 공개 사이트 묶음(game.js)으로도 정답지 같음·node --check 통과. 휴대폰 확인: 70주 진행 후 저장·새로고침한 게임으로 메뉴 22개 × 폭 360·390·768·1400 = 88화면 가로 넘침 0, 오류 0 (원본·묶음 둘 다). 화면 왼쪽 위 ver 1.2 → ver 1.2.1 (index.html 한 곳). 코드 정리 R0~R9 끝: 파일 111 → 83, 한 주 169ms → 약 50ms, 10시즌 세이브 0.72MB → 0.13MB, 공개 사이트 6.3MB → 1.6MB, 게임 결과는 처음과 똑같음. 다음은 ver 1.2 내 선수 해외 진출
+196. [대시보드·진행 개선 · 시안 10] 웹게임 「풋볼 에이전시」를 1분 플레이하고 참고할 UI 10가지 → 사용자 선택: ①~④ 추천 조합 (시안 Claude outputs/design_mockup_10.html). 새 js/dash_plus.js + data/ui.js(WEEK_SUMMARY·DASH_GOALS·TITLE_RULES·TREND_RULES) + css 22부분. ① 이번 주 요약 창: [다음 주로 진행] → (대성공 카드) → 아래에서 올라오는 창(경기 줄·종합 능력 전→후·체력/컨디션·돈·인기도·새 연락/퀘스트·대성공·이번 주 업적 알림) → 버튼/바깥/Esc로 닫으면 경기 재생 (main.js advanceWeek, replay.js replayQueue 분리). 설정에 켜기·끄기(state.settings.weekSummary). 진행 전 돈·인기도는 weekReport.growthBase.money/pop, 이번 주 업적은 weekReport.achv ② 다음 목표 3칸: 대시보드 맨 위 — 다음 일정(금색 큰 숫자, 준비·휴식 주 빼고 올해 없는 대회 빼고) · 내 계약 만료(8주 이하 빨강, 1년 넘으면 n년) · 다음 패치. 누르면 일정·이적 시장·훈련 ③ [선수 정보] 머리에 성장 그래프 2칸: 종합 능력·인기도 이번 시즌 매주(state.career.trend {y, pts[[주, 종합, 인기도]]}, recordStatSnapshot에서 기록, 2주부터 그림, 점에 마우스를 올리면 값) ④ 업적 칭호: 이름 옆 금색 칭호(대시보드·선수 정보), 자동 = 등급 높은 것 → 최근, [업적 도감] 맨 위 '칭호' 카드에서 고르기(state.career.titlePick). 보상 없음 규칙 유지. 게임 결과 그대로: 새 칸(trend·growthBase.money/pop·achv)만 빼고 비교하면 정답지(세이브 전체 해시) 5시나리오×10시즌 같음 → 정답지 새로 만듦, 묶음 사이트도 같음. 화면 79장 중 바뀐 곳은 대시보드·선수 정보·업적 도감·설정(+그 위 겹창)뿐, 390·768·1400 가로 넘침 0, 예전 세이브 4가지·노드 검사 통과, 오류 0
 
 ## 다음 할 일
 

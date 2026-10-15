@@ -35,6 +35,7 @@ function recordStatSnapshot() {
   if (!c.seasonStart || c.seasonStart.year !== state.year) {
     c.seasonStart = { year: state.year, stats: JSON.parse(JSON.stringify(state.stats)), score: playerScore(USER_ID) };
   }
+  recordTrend(); // 성장 그래프용 매주 기록 (196, js/dash_plus.js)
 }
 
 // 내 선수가 주인공인 경기 흐름 장면 세기 (세트 뒤 심리 변화는 뺌)
@@ -69,7 +70,7 @@ function playerHeaderHTML() {
     '<div class="card phead">' +
       '<div class="phead-main"><div class="phead-top"><span class="pf-frame">' + portraitImg(USER_ID, { scale: 3, jump: true }) + "</span><div>" + // 도트 포트레잇 (js/portrait.js)
         '<div class="phead-name">' + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.position).name + " · " + p.age + "세 · " +
-          findArchetype(p.archetype).name + " · 프로 " + careerYears() + "년차 (" + state.career.debut.year + "년 데뷔)</span></div>" +
+          findArchetype(p.archetype).name + " · 프로 " + careerYears() + "년차 (" + state.career.debut.year + "년 데뷔)</span>" + titleBadgeHTML() + "</div>" + // 칭호 (196, js/dash_plus.js)
         '<div class="chips">' + (p.traits.length ? p.traits.map(traitChipHTML).join("") : '<span class="muted small">특성 없음</span>') + "</div></div></div>" +
         '<div class="small phead-line">' + teamLinkHTML(team.id) + " " + tierName(team.tier) + " · " + (state.benched ? '<span class="down">2군 (후보)</span>' : '<span class="up">1군 (주전)</span>') +
           (c ? " · 연봉 " + moneyText(c.salary) + " · " + contractEndText(c) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : " · 계약 없음") + "</div>" +
@@ -89,6 +90,7 @@ function playerHeaderHTML() {
           (state.reputation > 0 ? "+" : "") + state.reputation + "</span></div>" +
         fameLineHTML() +
       "</div>" +
+      trendCardsHTML() + // 성장 그래프 2칸: 종합 능력·인기도 이번 시즌 (196, js/dash_plus.js)
     "</div>"
   );
 }

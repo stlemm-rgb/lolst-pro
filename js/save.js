@@ -109,6 +109,8 @@ function stateFromSave(save) {
     fresh.career.challenger = s.career.challenger === true;
     if (s.career.rec && typeof s.career.rec === "object") fresh.career.rec = s.career.rec;
     if (Number.isFinite(s.career.benchedYear)) fresh.career.benchedYear = s.career.benchedYear;
+    if (s.career.trend && Array.isArray(s.career.trend.pts)) fresh.career.trend = { y: Number(s.career.trend.y) || 0, pts: s.career.trend.pts.filter(Array.isArray).slice(-60) }; // 성장 그래프 (196)
+    if (typeof s.career.titlePick === "string") fresh.career.titlePick = s.career.titlePick; // 고른 칭호 (196)
   }
   fresh.skipTraining = s.skipTraining === true;
   // 계약
@@ -163,6 +165,7 @@ function stateFromSave(save) {
   if (s.settings && ["all", "big", "off"].indexOf(s.settings.replayAuto) !== -1) fresh.settings.replayAuto = s.settings.replayAuto; // 경기 자동 재생 (js/replay.js)
   if (s.settings && [1, 2, 3].indexOf(s.settings.replaySpeed) !== -1) fresh.settings.replaySpeed = s.settings.replaySpeed;
   if (s.settings && ["on", "off"].indexOf(s.settings.motion) !== -1) fresh.settings.motion = s.settings.motion; // 움직임 (디자인 D6)
+  if (s.settings && typeof s.settings.weekSummary === "boolean") fresh.settings.weekSummary = s.settings.weekSummary; // 이번 주 요약 창 (196)
 
   if (s.world && typeof s.world === "object" && Array.isArray(s.world.teams)) fresh.world = s.world; // 해외 리그 (js/era.js)
   if (Number.isFinite(s.dormWeeks)) fresh.dormWeeks = s.dormWeeks;
