@@ -22,7 +22,7 @@ function lookEditorHTML(inModal) {
   }).join("");
   const uni = uniformOfTeam(teamIdOfPlayer(USER_ID));
   return '<div class="look-edit">' +
-    '<div class="look-edit-pf"><span class="pf-frame">' + portraitHTMLFrom(L, uni, { scale: 3, mood: "win" }) + "</span>" +
+    '<div class="look-edit-pf"><span class="pf-frame">' + portraitHTMLFrom(L, uni, { scale: 3, mood: "normal" }) + "</span>" + // 웃는 표정이면 눈 모양이 안 보여서 보통 표정으로
       '<span class="muted small">' + (changed ? "바꾼 얼굴 미리보기" : "지금 얼굴") + "</span></div>" +
     '<div class="look-edit-r"><div class="look-rows">' + rows + "</div>" +
       '<div class="buttons"><button data-elookrand="1">🎲 무작위</button>' +

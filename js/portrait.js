@@ -81,8 +81,9 @@ function drawPortrait32(g, L, c, mood) {
   ][L.hs]();
   // 눈썹·눈
   const ey = 15, e1 = fx + 2, e2 = fx + fw - 4;
-  if (mood === "lose") { R(e1, 12, 1, 1, H); R(e1 + 1, 13, 1, 1, H); R(e2 + 1, 12, 1, 1, H); R(e2, 13, 1, 1, H); }
-  else { R(e1, 13, 2, 1, H); R(e2, 13, 2, 1, H); }
+  const by = L.glasses ? 12 : 13; // 안경테(13줄)에 눈썹이 가려서 머리색이 안 보이던 문제 → 안경이면 눈썹을 한 줄 위로 (184)
+  if (mood === "lose") { R(e1, by - 1, 1, 1, H); R(e1 + 1, by, 1, 1, H); R(e2 + 1, by - 1, 1, 1, H); R(e2, by, 1, 1, H); }
+  else { R(e1, by, 2, 1, H); R(e2, by, 2, 1, H); }
   const eye = function (x) {
     if (mood === "win") { R(x, ey, 1, 1, dark); R(x + 1, ey - 1, 1, 1, dark); }
     else if (mood === "tired") R(x, ey, 2, 1, dark);
