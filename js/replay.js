@@ -79,7 +79,10 @@ function replayShellHTML(m) {
       '<div class="rp-mom"><div class="rp-mom-bar"><i id="rp-mom"></i><b></b></div><div class="rp-mom-lbl"><span>' + escapeHTML(teamShort(m.a)) + '</span><span>경기 흐름</span><span>' + escapeHTML(teamShort(m.b)) + "</span></div></div>" +
       '<div class="rp-tl" id="rp-tl"><div class="rp-fill" id="rp-fill"></div><div class="rp-head" id="rp-head"></div></div>' +
       '<div class="rp-ctrl"><button class="primary" data-rpplay="1" id="rp-play">▶ 재생</button>' + speeds + '<button data-rpskip="1">⏭ 결과 보기</button></div>' +
-    '</div><div class="rp-side"><div class="rp-lanes" id="rp-lanes"></div><div class="rp-feed" id="rp-feed"></div></div></div>' +
+      '<div class="rp-endbar" id="rp-endbar" hidden></div>' + // 200: 세트·경기 끝 안내 (화면을 가리지 않음)
+    '</div><div class="rp-side"><div class="rp-lanes" id="rp-lanes"></div>' +
+      '<div class="rp-feedwrap"><div class="rp-feedhd"><span class="muted small">경기 기록 · 새 장면이 위로</span>' + (rpUserPlays(m) ? '<label class="small"><input type="checkbox" id="rp-onlyme"' + (RP.onlyMe ? " checked" : "") + "> " + REPLAY_TEXTS.onlyMe + ' <b id="rp-mecount">0</b></label>' : "") + "</div>" +
+      '<div class="rp-feed' + (RP.onlyMe && rpUserPlays(m) ? " only-me" : "") + '" id="rp-feed" data-empty="' + REPLAY_TEXTS.noMine + '"></div></div></div></div>' +
     '<div class="rp-hint muted small">' + escapeHTML(REPLAY_TEXTS.hint) + "</div>" +
     '<div class="rp-banner" id="rp-banner" hidden></div>' +
   "</div>";
@@ -118,19 +121,20 @@ function drawReplay(reset) {
   if (reset) {
     document.getElementById("rp-map").innerHTML = REPLAY_MAP_SVG;
     document.getElementById("rp-feed").innerHTML = "";
+    rpResetMeCount();
     RP.shown = 0;
     const tl = document.getElementById("rp-tl");
     tl.querySelectorAll(".rp-tick").forEach(function (x) { x.remove(); });
     rpEvents(s).forEach(function (e) {
       const info = matchEventInfo(e) || {};
       const x = document.createElement("i");
-      x.className = "rp-tick " + ((e.k === "bad" ? 1 - e.s : e.s) ? "b" : "a") + (info.size === "l" ? " big" : "");
+      x.className = "rp-tick " + ((e.k === "bad" ? 1 - e.s : e.s) ? "b" : "a") + (info.size === "l" ? " big" : "") + (e.p === USER_ID || e.v === USER_ID ? " me" : ""); // 200: 내 장면은 금색 눈금
       x.style.left = Math.min(100, e.t / min * 100) + "%";
       tl.appendChild(x);
     });
   }
   const evs = rpEvents(s), done = evs.filter(function (e) { return e.t <= RP.t; });
-  if (RP.shown > done.length) { document.getElementById("rp-map").innerHTML = REPLAY_MAP_SVG; document.getElementById("rp-feed").innerHTML = ""; RP.shown = 0; }
+  if (RP.shown > done.length) { document.getElementById("rp-map").innerHTML = REPLAY_MAP_SVG; document.getElementById("rp-feed").innerHTML = ""; rpResetMeCount(); RP.shown = 0; }
   for (let i = RP.shown; i < done.length; i++) rpAddEvent(m, done[i], i);
   RP.shown = done.length;
   let mom = 0;
@@ -147,7 +151,7 @@ function drawReplay(reset) {
     const fin = i < RP.setIdx || (i === RP.setIdx && RP.t >= x.box.min);
     return '<span class="rp-st' + (i === RP.setIdx ? " on" : "") + '" data-rpset="' + i + '">' + (i + 1) + "세트" + (fin ? " · " + escapeHTML(teamShort(x.w === 0 ? m.a : m.b)) + " 승" : "") + "</span>";
   }).join("") + '<span class="rp-clock">⏱ ' + mm + ":" + String(ss).padStart(2, "0") + " / " + tm + ":" + String(ts).padStart(2, "0") + ' · ⚔ <b>' + kills[0] + " : " + kills[1] + "</b></span>";
-  document.querySelectorAll("[data-rpset]").forEach(function (el) { el.onclick = function () { replayPlay(false); RP.setIdx = Number(el.getAttribute("data-rpset")); RP.t = 0; hideReplayBanner(); drawReplay(true); }; });
+  document.querySelectorAll("[data-rpset]").forEach(function (el) { el.onclick = function () { replayPlay(false); RP.setIdx = Number(el.getAttribute("data-rpset")); RP.t = 0; hideReplayBanner(); hideReplayEndBar(); drawReplay(true); }; });
   drawReplayLanes(m, s);
 }
 function drawReplayLanes(m, s) {
@@ -175,18 +179,28 @@ function rpAddEvent(m, e, i) {
   el.style.left = p[0] + "%"; el.style.top = p[1] + "%";
   el.innerHTML = '<span class="ring"></span><span class="ic">' + (info.icon || "•") + "</span>";
   map.appendChild(el);
-  const mine = e.p === USER_ID || e.v === USER_ID;
+  const mine = e.p === USER_ID || e.v === USER_ID; // 내 선수가 주인공이거나 당한 장면 (200: 더 눈에 띄게)
+  if (mine) {
+    el.classList.add("me");
+    const mc = document.getElementById("rp-mecount");
+    if (mc) mc.textContent = Number(mc.textContent) + 1;
+  }
   const f = document.createElement("div");
   f.className = "rp-fe " + (e.s ? "b" : "a") + (info.size === "l" ? " big" : "") + (mine ? " mine" : "");
-  f.innerHTML = '<span class="t">' + e.t + "분</span><span>" + (e.p ? portraitImg(e.p, { face: true, size: 18 }) : "") + '</span><span class="' + (e.k === "bad" ? "down" : e.k === "psych" ? "rp-psych" : "") + '">' +
-    (info.icon || "") + " " + matchEventText(e, rpName(m)) + "</span>";
+  f.innerHTML = '<span class="t">' + e.t + "분</span><span>" + (e.p ? portraitImg(e.p, { face: true, size: mine ? 24 : 18 }) : "") + '</span><span class="' + (e.k === "bad" ? "down" : e.k === "psych" ? "rp-psych" : "") + '">' +
+    (mine ? '<span class="rp-me">' + REPLAY_TEXTS.meTag + "</span> " : "") + (info.icon || "") + " " + matchEventText(e, rpName(m)) + "</span>";
   const feed = document.getElementById("rp-feed");
   feed.insertBefore(f, feed.firstChild);
 }
 
+// 내 선수가 이 경기에 나왔나 (세트 라인 중 하나라도)
+function rpUserPlays(m) { return (m.detail.sets || []).some(function (s) { return (s.lanes || []).some(function (l) { return l.a === USER_ID || l.b === USER_ID; }); }); }
+function rpResetMeCount() { const mc = document.getElementById("rp-mecount"); if (mc) mc.textContent = "0"; }
+
 // ----- 재생 -----
 function replayPlay(on) {
   if (!RP) return;
+  if (on) hideReplayEndBar(); // 다시 재생하면 끝 안내는 접기 (200)
   RP.playing = on;
   const b = document.getElementById("rp-play");
   if (b) b.textContent = on ? "⏸ 일시정지" : "▶ 재생";
@@ -198,7 +212,7 @@ function replayTick(now) {
   RP.last = now;
   RP.t += dt * RP.speed / REPLAY_RULES.secPerMinute;
   const min = rpSet().box.min;
-  if (RP.t >= min) { RP.t = min; drawReplay(); replayPlay(false); setTimeout(replaySetEnd, 300); return; }
+  if (RP.t >= min) { RP.t = min; drawReplay(); replayPlay(false); replaySetEnd(); return; } // 200: 화면을 가리는 창 대신 아래 안내 (천천히 다시 보기)
   drawReplay();
   requestAnimationFrame(replayTick);
 }
@@ -207,9 +221,9 @@ function replaySetEnd() {
   const m = rpMatch(), s = rpSet(), w = rpWins(RP.setIdx + 1), need = Math.ceil(m.bo / 2);
   const winId = s.w === 0 ? m.a : m.b;
   const over = w[0] >= need || w[1] >= need || RP.setIdx >= m.detail.sets.length - 1;
-  replayBanner('<div class="muted">' + (RP.setIdx + 1) + '세트 종료</div><div class="rp-bbig">' + rpUni(uniformOfTeam(winId)) + " " + escapeHTML(teamName(winId)) + ' 승리</div><div class="muted">세트 ' + w[0] + " : " + w[1] + "</div>" +
-    (over ? '<button class="primary" data-rpnext="1">경기 결과 보기 ▶</button>' : '<div class="rp-ctrl"><button class="primary" data-rpnext="1">' + (RP.setIdx + 2) + '세트 시작 ▶</button><button data-rpskip="1">⏭ 결과 바로 보기</button></div>'), "",
-    function () { if (over) replayFinal(); else { RP.setIdx++; RP.t = 0; hideReplayBanner(); drawReplay(true); replayPlay(true); } });
+  replayEndBar('<div><b>' + (RP.setIdx + 1) + "세트 종료</b> · " + rpUni(uniformOfTeam(winId)) + " " + escapeHTML(teamName(winId)) + " 승리 · 세트 " + w[0] + " : " + w[1] + "</div>" +
+    '<div class="rp-ctrl">' + (over ? '<button class="primary" data-rpnext="1">경기 결과 보기 ▶</button>' : '<button class="primary" data-rpnext="1">' + (RP.setIdx + 2) + '세트 시작 ▶</button><button data-rpskip="1">⏭ 결과 바로 보기</button>') + "</div>", "",
+    function () { if (over) replayFinal(); else { RP.setIdx++; RP.t = 0; hideReplayEndBar(); drawReplay(true); replayPlay(true); } });
 }
 function replaySkip() {
   if (!RP) return;
@@ -226,9 +240,8 @@ function replayFinal() {
   const won = mineIn && m.winner === mine.id;
   const more = RP.qi < RP.queue.length - 1;
   const hi = Math.max(m.score[0], m.score[1]), lo = Math.min(m.score[0], m.score[1]);
-  replayBanner((mineIn ? (won ? '<div class="rp-bbig win">승리!</div>' : '<div class="rp-bbig down">패배</div>') : '<div class="rp-bbig">경기 종료</div>') +
-    '<div class="rp-bmid">' + rpUni(uniformOfTeam(m.winner)) + " " + escapeHTML(teamName(m.winner)) + " " + hi + " : " + lo + "</div>" +
-    (m.pogName ? '<div class="muted">🏅 POG ' + escapeHTML(m.pogName) + "</div>" : "") +
+  replayEndBar('<div class="rp-endres">' + (mineIn ? (won ? '<b class="up">승리!</b>' : '<b class="down">패배</b>') : "<b>경기 종료</b>") + " · " + rpUni(uniformOfTeam(m.winner)) + " " + escapeHTML(teamName(m.winner)) + " " + hi + " : " + lo +
+    (m.pogName ? ' <span class="muted">· 🏅 POG ' + escapeHTML(m.pogName) + "</span>" : "") + "</div>" +
     '<div class="rp-ctrl">' + (more ? '<button class="primary" data-rpnext="1">다음 경기 ▶</button>' : "") + '<button data-rpclose="1">닫기</button></div>', won ? "win" : "",
     function () { RP.qi++; startReplayMatch(); });
   if (won) replayConfetti(uniformOfTeam(m.winner));
@@ -249,6 +262,21 @@ function replayBanner(html, cls, onNext) {
   b.querySelectorAll("[data-rpskip]").forEach(function (x) { x.onclick = replaySkip; });
   b.querySelectorAll("[data-rpclose]").forEach(function (x) { x.onclick = closeReplay; });
 }
+// 200: 세트·경기 끝 안내 — 미니맵·기록을 가리지 않고 재생 버튼 아래에. 그대로 두고 타임라인·기록을 천천히 다시 볼 수 있음
+function replayEndBar(html, cls, onNext) {
+  const b = document.getElementById("rp-endbar");
+  if (!b) return;
+  b.className = "rp-endbar " + (cls || "");
+  b.innerHTML = html + '<div class="muted small">' + REPLAY_TEXTS.endHint + "</div>";
+  b.hidden = false;
+  RP.onNext = onNext;
+  b.querySelectorAll("[data-rpnext]").forEach(function (x) { x.onclick = function () { const f = RP.onNext; if (f) f(); }; });
+  b.querySelectorAll("[data-rpskip]").forEach(function (x) { x.onclick = replaySkip; });
+  b.querySelectorAll("[data-rpclose]").forEach(function (x) { x.onclick = closeReplay; });
+  const pb = document.getElementById("rp-play");
+  if (pb) pb.textContent = "↺ 다시 보기";
+}
+function hideReplayEndBar() { const b = document.getElementById("rp-endbar"); if (b) { b.hidden = true; b.innerHTML = ""; } }
 function hideReplayBanner() { const b = document.getElementById("rp-banner"); if (b) { b.hidden = true; b.innerHTML = ""; } }
 function replayConfetti(u) {
   const box = document.querySelector("#replay-overlay .rp-box");
@@ -267,7 +295,12 @@ function replayConfetti(u) {
 function bindReplay() {
   const el = document.getElementById("replay-overlay");
   el.querySelectorAll("[data-rpclose]").forEach(function (b) { b.onclick = closeReplay; });
-  el.querySelector("[data-rpplay]").onclick = function () { if (RP.t >= rpSet().box.min) return; replayPlay(!RP.playing); };
+  el.querySelector("[data-rpplay]").onclick = function () {
+    if (RP.t >= rpSet().box.min) { RP.t = 0; drawReplay(true); replayPlay(true); return; } // 끝까지 봤으면 이 세트를 처음부터 다시 (200)
+    replayPlay(!RP.playing);
+  };
+  const onlyMe = el.querySelector("#rp-onlyme");
+  if (onlyMe) onlyMe.onchange = function () { RP.onlyMe = this.checked; document.getElementById("rp-feed").classList.toggle("only-me", this.checked); };
   el.querySelectorAll("[data-rpsp]").forEach(function (b) {
     b.onclick = function () {
       RP.speed = Number(b.getAttribute("data-rpsp"));

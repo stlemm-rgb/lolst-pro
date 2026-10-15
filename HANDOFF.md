@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-16 갱신 (PROGRESS 199까지, 대시보드·휴대폰 조작·단축키, ver 1.2.1)
+# 다음 세션 이어가기 — 2026-10-16 갱신 (PROGRESS 200까지, 대시보드·휴대폰 조작·단축키, ver 1.2.1)
 
 새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → CLAUDE.md → FILEMAP.md(파일 위치) → PROGRESS.md 최근 항목 → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태(`git status --short`, `git log --oneline -10`)를 확인한다.
 예전 기록: ver 1.0(1~133번)은 [docs/PROGRESS_1-133.md](docs/PROGRESS_1-133.md), 뉴스 개편 검증 요청문(끝난 일)은 [docs/AI_REVIEW_HANDOFF.md](docs/AI_REVIEW_HANDOFF.md), 뉴스 검증 결과는 [tools/NEWS_VALIDATION.md](tools/NEWS_VALIDATION.md).
@@ -90,7 +90,7 @@ git push
 ### 경기
 - 리그 대진: js/matchsim.js PRE_WEEK_EVENTS + prepareWeek. 토너먼트: WEEK_EVENTS + koPreview/intlPreview.
 - 세트 점수 = 선수 경기력 평균 + 라인전 + 운영·한타(+언어 소통 −) + 조합 + **경기 흐름 사건** + 운. 승패는 대부분 사건이 정함 → 사건 주인공 가중치 js/match_events.js evActorWeight.
-- 경기 재생(js/replay.js)은 경기 흐름 기록을 다시 보여 주기만 함. 자동 재생 기본값 REPLAY_RULES.defaultAuto.
+- 경기 재생(js/replay.js)은 경기 흐름 기록을 다시 보여 주기만 함. 자동 재생 기본값 REPLAY_RULES.defaultAuto. 200: 세트·경기 끝은 화면을 가리지 않는 아래 안내(replayEndBar), 내 장면 금색·내 장면만 보기, 빠르기 1배 = 경기 1분 1.2초.
 
 ### 이적 시장
 - 비시즌 contractsNewSeason 순서: 내 이동 → dynastyNewSeason → langNewSeason → returnHomeMoves → foreignReturnMoves → 계약 만료 → importMoves → offseasonRebuild → fillRosters → faAbroadMoves → FA 정리.
@@ -180,4 +180,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 1. `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
 2. 새 사용자 요청 우선. 없으면 7장의 해외 진출 (선택지로 묻기부터).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 200**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 201**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

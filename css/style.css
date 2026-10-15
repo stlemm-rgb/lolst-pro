@@ -1137,7 +1137,22 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .rp-fe { display: grid; grid-template-columns: 34px 22px 1fr; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; animation: rpSlide 0.3s ease-out; }
 .rp-fe .t { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .rp-fe.a { box-shadow: inset 3px 0 0 var(--accent); } .rp-fe.b { box-shadow: inset 3px 0 0 var(--bad); }
-.rp-fe.big { background: rgba(var(--gold-rgb), 0.07); } .rp-fe.mine { background: rgba(var(--accent-rgb), 0.08); }
+.rp-fe.big { background: rgba(var(--gold-rgb), 0.07); }
+.rp-fe.mine { background: linear-gradient(90deg, rgba(var(--gold-rgb), 0.2), rgba(var(--gold-rgb), 0.05)); box-shadow: inset 4px 0 0 var(--gold); font-weight: 700; font-size: 14px; border-radius: var(--r-xs); padding: 8px 6px; } /* 200: 내 장면 금색 */
+.rp-me { display: inline-block; font-size: 11px; font-weight: 800; color: var(--on-gold); background: var(--gold); border-radius: 999px; padding: 0 7px; margin-right: 2px; }
+.rp-feed.only-me .rp-fe:not(.mine) { display: none; }
+.rp-feed.only-me:not(:has(.mine))::before { content: attr(data-empty); display: block; padding: 12px 4px; color: var(--muted); font-size: 13px; }
+.rp-feedhd { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+.rp-feedhd label { display: flex; align-items: center; gap: 4px; color: var(--gold); cursor: pointer; }
+.rp-tick.me { background: var(--gold); width: 4px; box-shadow: 0 0 6px rgba(var(--gold-rgb), 0.8); z-index: 1; }
+.rp-ping.me { color: var(--gold); font-size: 22px; z-index: 2; }
+.rp-ping.me .ring { width: 16px; height: 16px; margin: -8px 0 0 -8px; border-width: 3px; }
+.rp-ping.me.old { opacity: 0.6; }
+.rp-endbar { margin-top: 12px; padding: 10px 12px; border-radius: var(--r-s); border: 1px solid rgba(var(--accent-rgb), 0.45); background: rgba(var(--accent-rgb), 0.07); display: grid; gap: 6px; animation: rpFade 0.3s; }
+.rp-endbar[hidden] { display: none; }
+.rp-endbar.win { border-color: rgba(var(--gold-rgb), 0.6); background: rgba(var(--gold-rgb), 0.08); }
+.rp-endbar .rp-ctrl { margin-top: 0; }
+.rp-endres { font-size: 16px; }
 .rp-psych { color: #d6a6ff; }
 @keyframes rpSlide { from { transform: translateY(-6px); opacity: 0; } to { transform: none; opacity: 1; } }
 .rp-hint { padding: 0 18px 14px; }
