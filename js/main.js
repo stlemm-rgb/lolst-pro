@@ -723,7 +723,7 @@ function nextWeek(restWeek) {
     } else if (state.stats[id] !== undefined) {
       // 실력 스탯: 오를 때만 보너스(가산점·유형·특성)를 붙임
       if (amount > 0) {
-        let boosted = amount * (1 + trainingBonusFor(id)) * growthMultiplier(state.stats[id], state.player.traits, id) * agingTrainingMultiplier(id); // 높은 스탯일수록 덜 오름, 노화하면 손 스탯 덜 오름
+        let boosted = amount * (1 + trainingBonusFor(id)) * growthMultiplier(state.stats[id], state.player.traits, id) * agingTrainingMultiplier(id) * USER_TRAINING_SCALE; // 높은 스탯일수록 덜 오름, 노화하면 손 스탯 덜 오름, 내 선수 훈련 배율 (201)
         if (tired) boosted *= 0.5;
         if (great) boosted *= GREAT_RULES.mult; // 훈련 대성공 (js/great.js)
         amount = roundRandom(Math.max(0, boosted));

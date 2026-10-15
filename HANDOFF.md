@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-16 갱신 (PROGRESS 200까지, 대시보드·휴대폰 조작·단축키, ver 1.2.1)
+# 다음 세션 이어가기 — 2026-10-16 갱신 (PROGRESS 201까지, 대시보드·휴대폰 조작·단축키, ver 1.2.1)
 
 새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → CLAUDE.md → FILEMAP.md(파일 위치) → PROGRESS.md 최근 항목 → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태(`git status --short`, `git log --oneline -10`)를 확인한다.
 예전 기록: ver 1.0(1~133번)은 [docs/PROGRESS_1-133.md](docs/PROGRESS_1-133.md), 뉴스 개편 검증 요청문(끝난 일)은 [docs/AI_REVIEW_HANDOFF.md](docs/AI_REVIEW_HANDOFF.md), 뉴스 검증 결과는 [tools/NEWS_VALIDATION.md](tools/NEWS_VALIDATION.md).
@@ -169,6 +169,8 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 ## 8. 밸런스 메모
 
+- 내 선수 성장(201): 훈련 스탯 ×0.5 (USER_TRAINING_SCALE), 유망주 +15%. 목표 = 유망주 80은 20~21세, 90은 23~25세. 성장 측정은 /tmp 스크립트 방식(유망주 2부 2012 × 씨앗 3, 가장 높은 스탯 3개 평균).
+
 - 1부 평균 전력 2013 약 64.8 → 2026 약 74.4 (사용자 수용).
 - 국제대회: 169 뒤 세트 70.0%, 월드 국내 우승 80%, 같은 해외 팀 연속 우승 0/18 (목표 70~80%). 너무 국내 쪽이라는 피드백이 오면 지역 수준 0.93 또는 OVERSEAS_DYNASTY.moves 1을 먼저 측정.
 - 숙련도 20→100 = 세트 승률 +19.7%p, 메타 위주 vs 비메타 +8.9%p. 조절은 data/match.js CHAMP_EV.pow·metaPowerBonus·metaPenaltyDiv·jokerPowerBonus.
@@ -180,4 +182,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 1. `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
 2. 새 사용자 요청 우선. 없으면 7장의 해외 진출 (선택지로 묻기부터).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 201**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 202**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

@@ -351,14 +351,14 @@ function playerGrowthHTML() {
     const sum = a + t + pos + shop + dorm;
     const gm = growthMultiplier(state.stats[s.id], tr, s.id);
     const ag = agingTrainingMultiplier(s.id);
-    const real = Math.max(0, 1 + sum) * gm * ag;
+    const real = Math.max(0, 1 + sum) * gm * ag * USER_TRAINING_SCALE; // 기본 훈련 배율 (201)
     return "<tr><td" + (isBonusStat(s.id) ? ' class="bonus"' : "") + ">" + (isBonusStat(s.id) ? "★ " : "") + s.name + "</td>" +
       pctCell(a) + pctCell(t) + pctCell(pos) + pctCell(shop) + pctCell(dorm) + pctCell(sum, true) +
       '<td class="r muted">×' + gm.toFixed(2) + "</td>" + '<td class="r ' + (ag < 1 ? "down" : "muted") + '">×' + ag.toFixed(2) + "</td>" +
       '<td class="r"><b>×' + real.toFixed(2) + "</b></td></tr>";
   }).join("");
   const trainCard =
-    '<div class="card"><h2>훈련 효과 <span class="muted small">스탯이 오를 때 곱해지는 값 · 실제 배율 = (1 + 보너스 합계) × 높은 스탯 감소(한계 특성 포함) × 노화</span></h2>' +
+    '<div class="card"><h2>훈련 효과 <span class="muted small">스탯이 오를 때 곱해지는 값 · 실제 배율 = (1 + 보너스 합계) × 높은 스탯 감소(한계 특성 포함) × 노화 × 기본 ' + USER_TRAINING_SCALE + '</span></h2>' +
       '<div class="table-wrap"><table class="roster growth-table"><tr><th>스탯</th><th class="r">시작 유형</th><th class="r">특성</th><th class="r">포지션★</th><th class="r">장비·고용</th><th class="r">합숙</th><th class="r">보너스 합계</th>' +
         '<th class="r">높은 스탯 감소</th><th class="r">노화</th><th class="r">실제 배율</th></tr>' + rows + "</table></div>" +
       '<p class="muted small">높은 스탯 감소: 스탯이 높을수록 덜 올라요. 노화: ' + agingStartAge() + "세부터 반응속도·입력 정확도만 덜 올라요. 체력이 20 아래면 이 값이 다시 절반이 돼요.</p>" +

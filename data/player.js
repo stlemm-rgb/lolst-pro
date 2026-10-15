@@ -81,6 +81,10 @@ const REWARD_CURVE = [
   { from: 90, mult: 0.3 },
 ];
 
+// 내 선수 훈련 배율 (201, 사용자 결정 B): 훈련으로 오르는 스탯 × 0.5 (내 선수만, 챔피언 숙련도·퀘스트·연락 보상은 그대로)
+//   측정(유망주 17세 2부·2012): 80 도달 19세 → 21세, 90 도달 20~21세 → 23세. 다른 선수(NPC) 성장은 그대로
+const USER_TRAINING_SCALE = 0.5;
+
 // 스탯 상한선: 모든 스탯 100 (나와 다른 선수 모두). (2026-10-07: 90 → 100으로 통일)
 // 높은 숫자는 위 성장 곡선으로만 느려져요.
 const STAT_CAP = 100;
@@ -126,7 +130,7 @@ const ARCHETYPES = [
     age: 17, statAvg: 30, statBonus: {}, staminaMax: 80,
     trainingBonus: 0, goodTraits: 3, masteryGrowth: 1,
     startTrait: "rookie_bloom", startTraitSeasons: 2,
-    strength: "좋은 특성 3개 + 전용 특성 🌱 유망주(2시즌 동안 훈련·숙련도 +30%), 가장 긴 커리어",
+    strength: "좋은 특성 3개 + 전용 특성 🌱 유망주(2시즌 동안 훈련·숙련도 +15%), 가장 긴 커리어",
     weakness: "시작 스탯이 낮음",
   },
   {
