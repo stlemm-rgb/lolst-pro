@@ -14,6 +14,17 @@ PAGES = ["dashboard", "training", "sns", "friends", "career", "shop", "team", "r
          "standings", "world", "achievements", "collection", "transfer", "search", "clubs", "awards", "history",
          "ecosystem", "howto", "settings"]
 WIDTHS = [1400, 768, 390]
+# 겹창·특별 화면: 경기 재생(멈춘 채)·대성공 카드·얼굴 바꾸기 창·휴대폰 메뉴·신문 팝업
+EXTRAS = [
+    ("replay", "() => { const m = state.league.season.matches.filter(x => x.detail && x.detail.sets).pop(); openReplay(matchKey(m)); replayPlay(false); }"),
+    ("great", "() => { state.weekReport.great = { streak: 2 }; showGreat(); }"),
+    ("look", "() => { openLookEditor(); }"),
+    ("menu", "() => { document.getElementById('layout').classList.add('menu-open'); }"),
+    ("news", "() => { if (state.weekReport) { state.weekReport.headlinesSeen = false; state.weekReport.headlines = (state.newsState.articles || []).slice(-2); } showNewsPopup(); }"),
+]
+UNDO = """() => { try { closeReplay(); } catch (e) {} const g = document.getElementById('gs-overlay'); if (g) { g.hidden = true; g.innerHTML = ''; }
+  try { closeLookEditor(); } catch (e) {} document.getElementById('layout').classList.remove('menu-open');
+  const n = document.getElementById('news-popup'); if (n) n.remove(); if (state.weekReport) { state.weekReport.headlines = []; state.weekReport.headlinesSeen = true; delete state.weekReport.great; } }"""
 CLEAN = """() => { const n = document.getElementById('news-popup'); if (n) n.remove();
   if (state.weekReport) state.weekReport.headlinesSeen = true; }"""
 
@@ -39,6 +50,17 @@ def take(out):
                 page.evaluate(CLEAN)
                 page.wait_for_timeout(60)
                 page.screenshot(path=str(out / f"{p}_{w}.png"), full_page=True)
+        # 겹창·특별 화면 (R4: CSS 정리 확인용) — 폭 1400·390
+        for w in (1400, 390):
+            page.set_viewport_size({"width": w, "height": 900})
+            for name, js in EXTRAS:
+                page.evaluate(CLEAN)
+                page.evaluate("() => { state.currentMenu = 'dashboard'; renderAll(); window.scrollTo(0, 0); }")
+                page.evaluate(CLEAN)
+                page.evaluate(js)
+                page.wait_for_timeout(150)
+                page.screenshot(path=str(out / f"x_{name}_{w}.png"))
+                page.evaluate(UNDO)
         b.close()
     print(f"찍음: {out} ({len(list(out.glob('*.png')))}장)" + (f" · 브라우저 오류 {errors[:2]}" if errors else ""))
     return 1 if errors else 0
@@ -59,7 +81,7 @@ def diff(a, b):
         if box:
             d = ImageChops.difference(x, y).convert("L").point(lambda v: 255 if v > 8 else 0)
             pct = d.histogram()[255] / (x.size[0] * x.size[1]) * 100
-            if (box[2] - box[0]) * (box[3] - box[1]) <= 40 * 40:
+            if (box[2] - box[0]) * (box[3] - box[1]) <= 40 * 40 or pct < 0.005:
                 print(f"· {n}: 아주 작은 차이 무시 (영역 {box}, 저장 시각·포커스 테두리 같은 것)"); continue
             print(f"✗ {n}: 다른 픽셀 {pct:.2f}% (영역 {box})"); bad += 1
     print(f"결과: {len(names)}장 중 " + ("✅ 모두 같음" if not bad else f"❌ {bad}장 다름"))
