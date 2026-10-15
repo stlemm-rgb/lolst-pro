@@ -1,6 +1,17 @@
 // ===== 저장 / 불러오기 =====
 // 세이브는 브라우저 저장소(localStorage)에 글자(JSON)로 저장됩니다.
 // 세이브 모양: { game, version, savedAt, state: { ...게임 상태... } }
+//
+// ----- 예전 세이브 처리 지도 (R3, 2026-10-15) -----
+// 예전 버전 세이브를 불러와도 멈추지 않게 하는 곳은 세 군데뿐:
+//   ① stateFromSave (이 파일)  : 불러올 때 한 번. 새 게임 기본값(createNewState) 위에 검사한 값만 옮김.
+//                                 이상하거나 없는 값은 기본값 → 버전 번호로 나누지 않아도 됨
+//   ② ensureStateReady (이 파일 아래): 화면을 그리기 전에 매번. 빠진 칸 채우기 + 이번 주 준비 (아래 목록)
+//   ③ 그 기능의 '…State()/ensure…()' 함수 : 처음 쓸 때 빈 칸을 만듦 (shopState·greatState·ensureStanding·
+//      ensureShakeup·ensureMoments(js/retire.js)·repairQuests(js/quests.js)·trimRivalTitles(js/straits.js)·
+//      titleStreak(js/records.js)·deepRunPoints(js/standing.js)·isBestFriend(js/friends.js) 등)
+// 새 저장 칸을 만들 때: SAVED_FIELDS에 넣고, ①에서 옮기고(검사), 처음 쓸 때 ③처럼 만들 것.
+// 예전 세이브 테스트: python3 tools/test_oldsaves.py (예전 모양 세이브 4가지를 불러와 1시즌 진행)
 
 const SAVE_KEY = "progamer-career-save";
 const SAVE_GAME_ID = "progamer-career";
@@ -253,4 +264,21 @@ function importSave(file, onDone) {
   };
   reader.onerror = function () { onDone(null, "파일을 열 수 없습니다."); };
   reader.readAsText(file);
+}
+
+// ===== 화면을 그리기 전에 매번: 빠진 칸 채우기·이번 주 준비 (R3, renderAll에서 옮김) =====
+// 순서 그대로 둘 것 (바꾸면 무작위 순서가 달라져 게임 결과가 바뀜 → python3 tools/golden.py check)
+// '예전 세이브'라고 적힌 것은 새 게임에서는 아무것도 안 하고 지나감
+function ensureStateReady() {
+  if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
+  ensureNpcTraits(); // 예전 세이브·새로 들어온 선수: 다른 선수 특성 (js/league.js)
+  ensureWorld(); // 해외 리그 (새 게임·예전 세이브, js/era.js)
+  ensureWorldV11(); // 예전 세이브: 해외 선수 숙련도·지역 3단계 수준 (js/era.js)
+  ensureStaff(); staffReports(); // 구단 스태프(신생 구단 포함)·이번 주 분석 리포트 (js/staff.js)
+  if (state.league && state.league.season) { prepareWeek(state.week); prepareWeek(state.week + 1); } // 이번 주·다음 주 경기 일정 (새 게임 1주차: 2주차 LCK 컵 대진도 미리)
+  ensureNpcStyles(); // 예전 세이브·새로 들어온 선수: 플레이 스타일 (js/league.js)
+  ensureNpcMastery(); // 예전 세이브·새로 들어온 선수: 챔피언 숙련도 (js/npc_mastery.js)
+  enforceConditionCap(); // 거주지 컨디션 상한 (집이 없으면 합숙, js/shop.js)
+  if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦 (js/contracts.js)
+  ensureCareerRecords(); // 데뷔 기록 등 (js/records.js)
 }

@@ -1,6 +1,7 @@
 # 정리(R0~R9) 단계마다 한 번에 돌리는 검사: python tools/check_all.py [--loose] [--no-golden]
 #   1) 노드 검사 tools/test_*.cjs 전부 (이름 겹침 검사 포함)
-#   2) 정답지 비교 tools/golden.py check (약 2분)
+#   2) 예전 세이브 4가지 불러오기 tools/test_oldsaves.py (약 1분)
+#   3) 정답지 비교 tools/golden.py check (약 2분)
 import subprocess, sys
 from pathlib import Path
 T = Path(__file__).resolve().parent
@@ -10,6 +11,10 @@ for f in sorted(T.glob("test_*.cjs")):
     print(("✅ " if r.returncode == 0 else "❌ ") + f.name)
     if r.returncode:
         bad += 1; print(r.stdout[-600:], r.stderr[-600:])
+r = subprocess.run([sys.executable, str(T / "test_oldsaves.py")], capture_output=True, text=True)
+print(("✅ " if r.returncode == 0 else "❌ ") + "test_oldsaves.py (예전 세이브 4가지)")
+if r.returncode:
+    bad += 1; print(r.stdout[-800:], r.stderr[-600:])
 if "--no-golden" not in sys.argv:
     args = [sys.executable, str(T / "golden.py"), "check"] + (["--loose"] if "--loose" in sys.argv else [])
     r = subprocess.run(args)

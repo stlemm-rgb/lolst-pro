@@ -19,6 +19,7 @@
 | `python3 tools/check_all.py` | 노드 검사 전부 + 정답지 비교. **정리 단계마다 이것 하나** | 약 2분 |
 | `python3 tools/golden.py make` / `check` | 시나리오 5개 × 10시즌의 세이브 전체 해시 + 결과 요약을 `tools/golden/golden.json`과 비교. 세이브 모양을 일부러 바꾸는 단계(R5)는 `check --loose`(결과 요약만) | 약 2분 |
 | `python3 tools/shots.py take <폴더>` · `diff <A> <B>` | 23화면 × 폭 3가지 스크린샷을 찍고 비교 (40×40 이하 작은 차이는 무시: 저장 시각 등). 스크린샷은 저장소에 안 넣음 → 정리 전 코드로 한 번, 정리 후 코드로 한 번 | 약 1분 |
+| `python3 tools/test_oldsaves.py` | 지금 세이브를 '예전 버전 모양'(ver 1.0·리그 없음·값 망가짐)으로 깎아서 실제로 불러오고 1시즌 진행 → 오류·빠진 칸 확인 (R3) | 약 1분 |
 | `node tools/test_names.cjs` | js·data 맨 바깥 이름(function·const·let·var)이 겹치면 실패 (183 막대 깨짐 같은 사고 막기) | 1초 |
 
 - 같은 씨앗 = 같은 결과가 되도록 화면 연출(포트레잇 점프·카드 반짝임·꽃가루·대성공 금가루)은 `fxRandom()`(js/portrait.js)을 쓴다. **연출에 `Math.random`을 쓰지 말 것** — 연출 타이머가 게임 결과용 무작위 순서를 흔들어서 정답지가 매번 달라짐 (R0에서 발견).

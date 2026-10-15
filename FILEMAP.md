@@ -40,13 +40,13 @@
 | `js/player.js` | 9 | 선수 관련 계산 |  |
 | `js/champions.js` | 17 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 31 | 캐릭터 생성 |  |
-| `js/save.js` | 15 | 저장 / 불러오기 |  |
+| `js/save.js` | 17 | 저장 / 불러오기 |  |
 | `js/league.js` | 26 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
 | `js/matchsim.js` | 43 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 11 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 54 | 게임 상태 |  |
+| `js/main.js` | 53 | 게임 상태 |  |
 | `js/training_page.js` | 20 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 19 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 36 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |

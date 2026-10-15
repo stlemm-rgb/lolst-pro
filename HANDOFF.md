@@ -206,7 +206,7 @@ git commit -m "ver 1.1: 이번 변경을 설명하는 한국어 메시지"
 | R0 안전망 | 정답지·스크린샷 비교·이름 겹침 검사, 연출 무작위 fxRandom 분리 | ✅ 186 |
 | R1 안 쓰는 것 지우기 | 안 쓰는 함수 7개(profileCardHTML·reputationBarHTML·champOptionsHTML·contractSummaryHTML·matchLine·careerRecordHTML·staffLineText), 안 쓰는 CSS 약 10개, 필요 없는 `typeof … === "function"` 약 42개, starsText 겹침, anti-slop 쓸 만한 것(shape 이름 2개) | ✅ 187 |
 | R2 파일 합치기 | 3KB 미만 19개 등 주제별로 묶기 111 → 83, 파일 지도 FILEMAP.md | ✅ 188 |
-| R3 세이브 호환 한곳에 | '예전' 처리 86곳 → migrateSave() + 버전별 단계, 예전 세이브 샘플 테스트 | |
+| R3 세이브 호환 한곳에 | 처리 지도(js/save.js 맨 위) + ensureStateReady() + 예전 세이브 4가지 테스트 tools/test_oldsaves.py | ✅ 189 |
 | R4 CSS 정리 | 섹션 목차, 휴대폰 설정 모으기, 색 변수, 덮어쓰기 합치기 | |
 | R5 세이브 다이어트 | 10시즌 0.72MB(해외 0.30·리그 0.23·뉴스 0.12) → 0.45MB 이하, `golden.py check --loose` | |
 | R6 속도 | 한 주 89ms(11시즌째) → −30% 목표 | |
