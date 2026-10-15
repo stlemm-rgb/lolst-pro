@@ -189,7 +189,7 @@ button.primary:hover:not(:disabled) { background: var(--grad-btn-hover); border-
 .stat-label { cursor: help; }
 .stat-value { text-align: right; font-weight: bold; }
 .bar { height: 10px; background: var(--border); border-radius: var(--r-xs); overflow: hidden; }
-.bar-fill { height: 100%; background: var(--grad); }
+.bar-fill { display: block; height: 100%; background: var(--grad); } /* span으로 써도 채워지게 (퀘스트 카드 게이지) */
 
 /* 훈련 카드 */
 .training.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.25); }
