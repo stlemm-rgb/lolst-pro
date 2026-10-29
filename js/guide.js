@@ -126,7 +126,7 @@ function weekAdvice(noQuest) {
   // 5) 메타 챔피언 숙련도가 낮음
   const meta = state.meta.champs[state.player.position];
   const avg = meta.reduce(function (a, n) { return a + (state.mastery[n] || 0); }, 0) / meta.length;
-  if (avg < MATCH.metaPenaltyBase && state.plan !== "champion" && state.plan !== "champ_focus") {
+  if (!noQuest && avg < MATCH.metaPenaltyBase && state.plan !== "champion" && state.plan !== "champ_focus") {
     list.push({ text: "이번 패치 메타 챔피언 숙련도 평균 " + Math.round(avg) + " → 경기력이 깎여요 (" + MATCH.metaPenaltyBase + " 이상이면 괜찮아요).", label: "챔피언 연습으로 선택", act: { plan: "champion" } });
   }
   // 6) 컨디션
@@ -163,6 +163,9 @@ function adviceRowsHTML(noQuest) {
 }
 
 function bindGuide(page) {
+  page.querySelectorAll("[data-meta-practice]").forEach(function (b) { // 대시보드 챔피언 카드 (203)
+    b.onclick = function () { state.plan = "champion"; state.practiceChamp = ""; state.notice = "이번 주 훈련을 <b>" + findTraining("champion").name + "</b>(으)로 골랐어요."; renderPage(); };
+  });
   page.querySelectorAll("[data-advice]").forEach(function (b) {
     b.onclick = function () {
       const a = adviceActions[Number(b.getAttribute("data-advice"))];

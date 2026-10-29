@@ -173,16 +173,13 @@ function compPlanHTML() {
     return '<button data-compplan="' + p.id + '"' + (cls ? ' class="' + cls.trim() + '"' : "") + ' title="' + escapeHTML(p.desc) + '">' + p.name +
       (rec === p.id ? '<span class="rec-tag">📊 추천</span>' : "") + "</button>";
   }).join("");
-  const mine = myPositionChampions().filter(function (n) { return champComps(n).indexOf(meta.id) !== -1; })
-    .sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 3);
   return (
     '<h2 class="sub">조합 전략</h2>' +
     '<p class="small">이번 패치 메타 조합 ' + compChipHTML(meta.id) + " · 메타를 이기는 성향 " + counters + "</p>" +
     '<div class="comp-seg">' + buttons + "</div>" +
     '<p class="muted small">' + escapeHTML(COMP_PLANS.find(function (p) { return p.id === plan; }).desc) +
       " 같은 성향 3명 이상이면 시너지, 주력 성향 상성에서 이기면 팀 점수 +" + COMP_RULES.matchup + ". " +
-      "📊 경기 줄 아래 분석 리포트에서 상대가 노리는 조합과 추천 전략을 볼 수 있어요. " +
-      (mine.length ? "내 " + meta.name + " 챔피언: " + mine.map(function (n) { return n + "(" + state.mastery[n] + ")"; }).join(", ") : "") + "</p>"
+      "📊 경기 줄 아래 분석 리포트에서 상대가 노리는 조합과 추천 전략을 볼 수 있어요.</p>" // 203: 내 챔피언 숙련도는 챔피언 카드 '숙련도 상위 5'에
   );
 }
 

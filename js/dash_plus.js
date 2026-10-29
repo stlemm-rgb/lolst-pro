@@ -117,9 +117,9 @@ function contractGoal() {
   const endWeek = c.endWeek || SCHEDULE.find(function (x) { return x.id === "offseason"; }).from;
   const weeks = (c.endYear - state.year) * CREATION.weeksPerSeason + endWeek - state.week;
   if (weeks < 0) return null;
-  const team = myTeam();
-  if (weeks > CREATION.weeksPerSeason) return { label: "내 계약 만료", name: team ? teamName(team.id) : "", num: c.endYear - state.year, unit: "년", go: "transfer" };
-  return { label: "내 계약 만료", name: team ? teamName(team.id) : "", num: weeks, unit: "주", go: "transfer", warn: weeks <= DASH_GOALS.contractWarn };
+  const name = c.endWeek ? c.endYear + "년 " + c.endWeek + "주차 · 단기" : c.endYear + "년 시즌 끝"; // 203: 팀 이름 대신 계약 끝 (팀은 선수 카드에)
+  if (weeks > CREATION.weeksPerSeason) return { label: "내 계약 만료", name: name, num: c.endYear - state.year, unit: "년", go: "transfer" };
+  return { label: "내 계약 만료", name: name, num: weeks, unit: "주", go: "transfer", warn: weeks <= DASH_GOALS.contractWarn };
 }
 
 function patchGoal() {

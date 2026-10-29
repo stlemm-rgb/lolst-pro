@@ -488,8 +488,7 @@ function renderTopbar() {
   document.getElementById("topbar").innerHTML =
     '<button class="menu-toggle" id="menu-toggle" title="메뉴">☰</button>' + // 휴대폰: 메뉴 열기 (디자인 D2)
     '<span class="item"><b>' + state.year + "</b>년 <b>" + state.week + "</b>주차 · " + scheduleOfWeek(state.week).name + "</span>" +
-    '<span class="item"><b>' + escapeHTML(state.player.name) + "</b> (" + findPosition(state.player.position).name + ")</span>" +
-    '<span class="item"><b>' + escapeHTML(myTeam().name) + "</b> (" + tierName(myTeam().tier) + ")</span>" +
+    // 203: 내 이름·소속팀은 대시보드 선수 카드에만 (위쪽 막대는 날짜·돈·체력·진행)
     '<span class="item tip" tabindex="0" data-tip="자금 ' + state.money.toLocaleString() + '원">💰 <b>' + moneyText(state.money) + "</b></span>" +
     '<span class="spacer"></span>' +
     '<span class="topbar-actions">' +
