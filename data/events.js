@@ -687,7 +687,7 @@ const EVENTS = [
     title: "{player} 선수의 고민",
     text: "같은 팀 {player} 선수가 요즘 '{trait}' 때문에 힘들어한다. 팀 성적에도 영향이 있는 것 같다.",
     choices: [
-      { label: "따로 시간을 내서 돕는다", effects: { cureOther: 0.4, stamina: -10, reputation: 3, relation: 20 }, result: "새벽까지 이야기를 들어 줬다. {player}: \"고맙다, 진짜.\"" },
+      { label: "따로 시간을 내서 돕는다", effects: { cureOther: 0.4, stamina: -10, reputation: 3, relation: 20 }, result: "연습이 끝난 뒤 따로 시간을 내 이야기를 들어 줬다. {player}: \"고맙다, 진짜.\"" },
       { label: "감독님께 이야기한다", effects: { cureOther: 0.2, relation: 5 }, result: "감독님이 따로 면담을 잡았다." },
       { label: "내 연습에 집중한다", effects: { relation: -5 } },
     ],
@@ -700,7 +700,7 @@ const EVENTS = [
       { label: "말린다", check: { stat: "shotcall", diff: 50 },
         success: { effects: { reputation: 4, relation: 15 }, result: "휴대폰을 뺏어 들고 라면을 끓여 줬다. 다음 날 {player}: \"어제 고마웠다...\"" },
         fail: { effects: { relation: -10, otherRisk: { trait: "scandal", chance: 0.4 } }, result: "\"네가 뭔데?\" 말리다 오히려 싸움이 됐다." } },
-      { label: "같이 어울린다", effects: { condition: 5, relation: 10, otherRisk: { trait: "scandal", chance: 0.6 } }, risk: { trait: "scandal", chance: 0.04 }, result: "그날 밤은 즐거웠다. 아침이 오기 전까지는." },
+      { label: "같이 어울린다", effects: { condition: 5, relation: 10, otherRisk: { trait: "scandal", chance: 0.6 } }, risk: { trait: "scandal", chance: 0.04 }, result: "술자리는 즐거웠다. 다음 날 방송 다시 보기가 퍼지기 전까지는." },
       { label: "모른 척한다", effects: { otherRisk: { trait: "scandal", chance: 0.5 } } },
     ],
   },

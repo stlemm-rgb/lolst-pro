@@ -122,11 +122,11 @@ EVENTS.push(
   {
     id: "friend_advice", tab: "inbox", trigger: "random", who: "friend", need: { minWeek: 13 },
     title: "💬 {player}의 진지한 고민",
-    text: "새벽, 친한 동료 {player}가 방문을 두드렸다. \"나... 요즘 그만둘까 생각 중이야. 너한테 처음 말하는 거야.\"",
+    text: "연습이 끝난 뒤, 친한 동료 {player}가 숙소 옥상으로 불러냈다. \"나... 요즘 그만둘까 생각 중이야. 너한테 처음 말하는 거야.\"",
     choices: [
-      { label: "밤새 이야기를 들어 준다", check: { stat: "mental", diff: 50 },
-        success: { effects: { relation: 20, teamRelation: 2, stamina: -6 }, result: "해가 뜰 무렵 {player}가 말했다. \"한 시즌만 더 해 볼게. 너랑.\"" },
-        fail: { effects: { relation: 10, stamina: -8, condition: -3 }, result: "어떤 말을 해 줘야 할지 몰랐다. 그래도 끝까지 옆에 있었다." } },
+      { label: "끝까지 이야기를 들어 준다", check: { stat: "mental", diff: 50 },
+        success: { effects: { relation: 20, teamRelation: 2, stamina: -6 }, result: "이야기가 끝날 무렵 {player}가 말했다. \"한 시즌만 더 해 볼게. 우승 한 번은 해 봐야지.\"" },
+        fail: { effects: { relation: 10, stamina: -8, condition: -3 }, result: "어떤 말을 해 줘야 할지 몰랐다. 그래도 끝까지 자리를 지켰다." } },
       { label: "감독님께 상담을 권한다", effects: { relation: 4 }, result: "{player}: \"...그래, 그게 맞겠다.\" 조금 서운한 눈치였다." },
     ],
   },

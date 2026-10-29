@@ -104,6 +104,7 @@ git push
 
 ### 기타
 - **인기도는 꼭 addPopularity(v)** (팬 수 같이 움직임).
+- 친구·동료 글(204): 남자 선수끼리 연애·성적 비유로 읽힐 말투 금지 (밤·잠자리·몸 접촉·눈 맞춤, 살살·끼우기 같은 이중 의미, '곁에 두고 싶다'류). 친구 말투 = 단톡방·내기·놀리기.
 - 업적 보상 없음 (다시 넣지 말 것). 받은 연락: data/events*.js + js/events.js·js/friends.js, 새 트리거는 queueTrigger + QUEUE_TRIGGERS.
 - 구단 스태프: team.staff[role].g (0=S ~ 4=D). 분석 리포트의 상대 계획은 m.scout → playMatch가 그대로 씀.
 - 빅게임: bigGameOf(x, y), 쌍 추가는 data/club.js BIG_GAMES 한 줄.
@@ -182,4 +183,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 1. `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
 2. 새 사용자 요청 우선. 없으면 7장의 해외 진출 (선택지로 묻기부터).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 204**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 205**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
