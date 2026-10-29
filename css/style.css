@@ -1559,8 +1559,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .npt-art.mine h3::before, .npt-brief.mine::before { content: "★ "; color: #b45309; }
 .npt-cols { columns: 2; column-gap: 32px; }
 .npt-sec { break-inside: avoid; margin-bottom: 18px; }
-.npt-sec h4 { margin: 0 0 6px; font-size: 16px; border-top: 2px solid var(--ink); padding-top: 6px; display: flex; justify-content: space-between; }
-.npt-sec h4 small { font-size: 14px; font-weight: 600; color: #3d382e; }
+.npt-sec h4 { margin: 0 0 6px; font-size: 16px; border-top: 2px solid var(--ink); padding-top: 6px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; } /* 208: 이름 링크가 낀 제목은 한 덩어리(span)로 */
+.npt-sec h4 small { flex: none; font-size: 14px; font-weight: 600; color: #3d382e; }
 .npt-brief { font-size: 16px; line-height: 1.6; padding: 6px 0; border-bottom: 1px dotted #b9ae95; }
 .npt-brief:last-child { border-bottom: none; }
 .npt-brief .d { display: block; font-size: 14px; color: #3d382e; white-space: pre-line; margin-top: 2px; }

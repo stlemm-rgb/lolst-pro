@@ -386,14 +386,14 @@ function newsPaperHTML(list) {
   const show = NEWS_PAPER.briefShow;
   let secs = "";
   if (mine.length) {
-    secs += '<div class="npt-sec"><h4>' + NEWS_PAPER.mineTitle + " <small>" + mine.length + "건</small></h4>" + mine.map(function (m) {
+    secs += '<div class="npt-sec"><h4><span>' + NEWS_PAPER.mineTitle + "</span><small>" + mine.length + "건</small></h4>" + mine.map(function (m) {
       return '<div class="npt-brief' + (m.read ? "" : " new") + '"><b>' + escapeHTML(m.title) + '</b><span class="d">' + escapeHTML(m.text) + "</span>" + newsChangesHTML(m) + "</div>";
     }).join("") + "</div>";
   }
   secs += groups.map(function (g) {
     const head = g.items.slice(0, show).map(brief).join("");
     const rest = g.items.slice(show);
-    return '<div class="npt-sec"><h4>' + escapeHTML(newsCatName(g.cat)) + " <small>" + g.items.length + "건</small></h4>" + head +
+    return '<div class="npt-sec"><h4><span>' + escapeHTML(newsCatName(g.cat)) + "</span><small>" + g.items.length + "건</small></h4>" + head +
       (rest.length ? '<details class="npt-more"><summary>' + rest.length + "건 더 보기</summary>" + rest.map(brief).join("") + "</details>" : "") + "</div>";
   }).join("");
   const unreadKeys = {};
