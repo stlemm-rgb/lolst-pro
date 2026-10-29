@@ -41,7 +41,7 @@ pages.sns = function () {
     // 197 (시안 13 P1): 답장 대기 연락은 맨 위 카드로, 나머지는 '지난 연락' 목록
     const deck = deckMessages();
     const rest = list.filter(function (m) { return deck.indexOf(m) === -1; });
-    body = msgDeckHTML(deck) + (deck.length && rest.length ? '<div class="deck-past muted small">' + MSG_DECK.pastTitle + "</div>" : "") + rest.map(messageHTML).join("");
+    body = '<div class="inbox-split">' + msgDeckHTML(deck) + inboxListHTML(rest) + "</div>"; // 209: 휴대폰 + 지난 연락
   } else if (snsTab === "news") {
     body = newsPaperHTML(list); // 206: 주간 신문 (js/news.js) — 신문 기사 보관함도 이 안으로
   } else {
@@ -55,7 +55,7 @@ pages.sns = function () {
     "<h1>SNS</h1>" +
     '<div class="card"><div class="buttons sns-tabs">' + tabHTML + readAll + "</div>" +
       '<p class="muted small">' +
-        (snsTab === "inbox" ? (deckMessages().length ? "" : "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요.") // 205: 답장 대기 카드가 있으면 안내는 카드 ⓘ에
+        (snsTab === "inbox" ? "" // 209: 안내는 휴대폰 머리의 ⓘ
           : snsTab === "news" ? "한 주에 신문 한 부. 위 날짜를 눌러 지난 호를 볼 수 있어요."
           : "선수와 팬들의 글이에요. 🎮 선수 = 리그 프로 선수의 글, 📣 = 내 선수를 언급한 글 (보면 읽음 처리).") +
       "</p>" +
@@ -101,7 +101,8 @@ function messageHTML(m) {
 
   // 디자인 D5: 왼쪽 아이콘(제목 앞 그림 글자 또는 선수 얼굴) + 제목 + 첫 줄 미리보기
   const av = msgAvatar(m);
-  const preview = open ? "" : String(m.kind === "offer" && m.offer ? offerText(m.offer) : m.text || "").split("\n")[0];
+  const answeredLabel = m.choices && typeof m.answered === "number" && m.choices[m.answered] ? "↳ " + m.choices[m.answered].label : ""; // 209: 답한 연락은 고른 답을 미리보기로
+  const preview = open ? "" : answeredLabel || String(m.kind === "offer" && m.offer ? offerText(m.offer) : m.text || "").split("\n")[0];
   return (
     '<div class="msg' + (unread ? " unread" : " read") + (open ? " open" : "") + '">' +
       '<div class="msg-head" data-msg="' + m.id + '">' +
@@ -121,30 +122,60 @@ function deckMessages() {
   }).sort(function (a, b) { return a.id - b.id; }); // 오래된(곧 지나가는) 연락부터
 }
 
+// 209 (시안 16 A안): 왼쪽 '내 휴대폰' = 답장 대기 연락을 대화처럼 하나씩, 오른쪽 = 끝난 연락 한 줄 목록
 function msgDeckHTML(deck) {
   const last = deckLastId !== null ? state.inbox.find(function (m) { return m.id === deckLastId; }) : null;
   const lastHTML = last && last.choices && last.answered !== null && last.answered !== "ignored"
-    ? '<div class="deck-last"><span class="rep-tag msg">방금 답함</span><b>' + escapeHTML(msgAvatar(last).title) + "</b> · " + escapeHTML(last.choices[last.answered].label) +
-      (last.result ? '<div class="msg-result">' + escapeHTML(last.result) + "</div>" : "") + (changesText(last.changes) ? '<div class="log-changes">' + changesText(last.changes) + "</div>" : "") + "</div>"
+    ? '<div class="ph-me">' + escapeHTML(last.choices[last.answered].label) + "</div>" +
+      (last.result || changesText(last.changes) ? '<div class="ph-bub res">' + (last.result ? escapeHTML(last.result) : "") + (changesText(last.changes) ? '<div class="log-changes">' + changesText(last.changes) + "</div>" : "") + "</div>" : "")
     : "";
-  if (!deck.length) return lastHTML;
-  if (deckIdx >= deck.length) deckIdx = deck.length - 1;
+  if (deckIdx >= deck.length) deckIdx = Math.max(0, deck.length - 1);
   if (deckIdx < 0) deckIdx = 0;
   const m = deck[deckIdx];
-  m.read = true;
-  const av = msgAvatar(m);
-  const age = (state.year - m.year) * CREATION.weeksPerSeason + state.week - m.week;
-  const left = Math.max(0, EVENT_RULES.ignoreAfterWeeks - age);
-  const nav = deck.length > 1 ? '<span class="deck-nav"><button data-deck="-1"' + (deckIdx === 0 ? " disabled" : "") + '>◀</button><button data-deck="1"' + (deckIdx === deck.length - 1 ? " disabled" : "") + ">▶</button></span>" : "";
-  // 205 (시안 14 A안): 한 장 카드 — 질문 위, 선택지 줄이 아래. 빈 그림 칸 없음, 안내는 ⓘ
+  const nav = deck.length > 1 ? '<button data-deck="-1"' + (deckIdx === 0 ? " disabled" : "") + '>◀</button><span>' + (deckIdx + 1) + " / " + deck.length + '</span><button data-deck="1"' + (deckIdx === deck.length - 1 ? " disabled" : "") + ">▶</button>" : (deck.length ? "<span>1 / 1</span>" : "");
   const tipText = MSG_DECK.later + " · " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. " + MSG_DECK.legend;
-  return lastHTML +
-    '<div class="deck">' +
-      '<div class="deck-head"><b>📩 ' + MSG_DECK.title + " " + (deckIdx + 1) + " / " + deck.length + '</b> <span class="tip muted small" tabindex="0" data-tip="' + escapeHTML(tipText) + '">ⓘ</span>' + nav + "</div>" +
-      '<div class="deck-q"><span class="deck-ic">' + av.icon + '</span><div class="deck-qt"><div class="deck-title">' + escapeHTML(av.title) + '</div><div class="deck-text">' + escapeHTML(m.text) + "</div></div>" +
-        '<div class="deck-left' + (left <= 1 ? " last" : "") + '">⏳ ' + (left ? left + "주 안에 답하기" : "이번 주가 마지막") + '<div class="muted small">' + m.year + "년 " + m.week + "주차</div></div></div>" +
-      '<div class="deck-choices">' + choiceButtonsHTML(m) + "</div>" +
-    "</div>";
+  let chat;
+  if (m) {
+    m.read = true;
+    const av = msgAvatar(m);
+    const age = (state.year - m.year) * CREATION.weeksPerSeason + state.week - m.week;
+    const left = Math.max(0, EVENT_RULES.ignoreAfterWeeks - age);
+    chat = lastHTML +
+      '<div class="ph-bub"><div class="ph-bt"><span class="ph-ic">' + av.icon + "</span><b>" + escapeHTML(av.title) + "</b></div>" + escapeHTML(m.text) + "</div>" + // 아이콘은 말풍선 제목 줄 안 (왼쪽 빈 칸 없음)
+      '<div class="ph-time' + (left <= 1 ? " last" : "") + '">⏳ ' + (left ? left + "주 안에 답하기" : "이번 주가 마지막") + "</div>" +
+      '<div class="deck-choices">' + choiceButtonsHTML(m) + "</div>";
+  } else {
+    chat = lastHTML + '<div class="ph-empty"><b>📭</b>' + MSG_DECK.empty + "</div>";
+  }
+  const dots = deck.length > 1 ? '<div class="ph-dots">' + deck.map(function (x, i) { return "<i" + (i === deckIdx ? ' class="on"' : "") + "></i>"; }).join("") + "</div>" : "";
+  return '<div class="phone"><div class="ph-scr">' +
+    '<div class="ph-bar"><span>' + state.year + "년 " + state.week + "주차</span><span>📶 🔋</span></div>" +
+    '<div class="ph-hd">💬 <b>' + MSG_DECK.phoneTitle + '</b> <span class="tip" tabindex="0" data-tip="' + escapeHTML(tipText) + '">ⓘ</span><span class="ph-nav">' + nav + "</span></div>" +
+    '<div class="ph-chat deck">' + chat + "</div>" + dots + '<div class="ph-home"></div>' +
+  "</div></div>";
+}
+
+// 오른쪽 지난 연락: 거르기 + 한 줄 목록 (계약 제안처럼 휴대폰에 안 나오는 답장 대기 연락은 맨 위)
+let inboxFilter = "all";
+function inboxListHTML(rest) {
+  const isQuest = function (m) { return /새 퀘스트|퀘스트/.test(m.title || ""); };
+  const F = {
+    all: function () { return true; },
+    done: function (m) { return m.choices && m.answered !== null && m.answered !== "ignored"; },
+    quest: isQuest,
+    missed: function (m) { return m.answered === "ignored"; },
+  };
+  const waitN = rest.filter(function (m) { return m.choices && m.answered === null; }).length;
+  const shown = rest.filter(F[inboxFilter] || F.all).sort(function (a, b) {
+    return ((b.choices && b.answered === null) - (a.choices && a.answered === null)) || b.id - a.id;
+  });
+  const chips = MSG_DECK.filters.map(function (f) {
+    const n = rest.filter(F[f[0]]).length;
+    return '<button class="ib-f' + (inboxFilter === f[0] ? " on" : "") + '" data-ibf="' + f[0] + '">' + f[1] + " " + n + "</button>";
+  }).join("");
+  return '<div class="inbox-list"><div class="ib-hd"><b>📂 ' + MSG_DECK.pastTitle + '</b> <span class="muted small">' + rest.length + "개" + (waitN ? ' · <span class="up">답장 대기 ' + waitN + "</span>" : "") + "</span></div>" +
+    '<div class="ib-filters">' + chips + "</div>" +
+    (shown.length ? shown.map(messageHTML).join("") : '<p class="muted">해당하는 연락이 없어요.</p>') + "</div>";
 }
 
 // 선택 버튼 (카드·목록 같이 씀): 버튼 + 아래 작은 글씨(🎲 확률 · ⚠️ 위험 · 💚 극복 · 자금 부족)
@@ -199,6 +230,9 @@ function bindSns(page) {
   });
   page.querySelectorAll("[data-snstab]").forEach(function (btn) {
     btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; deckLastId = null; selectMenu("sns"); };
+  });
+  page.querySelectorAll("[data-ibf]").forEach(function (btn) {
+    btn.onclick = function () { inboxFilter = btn.getAttribute("data-ibf"); renderPage(); };
   });
   page.querySelectorAll("[data-deck]").forEach(function (btn) {
     btn.onclick = function () { deckIdx += Number(btn.getAttribute("data-deck")); deckLastId = null; renderPage(); };
