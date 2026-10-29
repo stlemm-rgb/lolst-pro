@@ -272,7 +272,7 @@ function worldsNewsForWeek(saveAfter) {
   if (state.week === 41 && !feature.previewSent) {
     publishHeadline({ key: "worlds_preview", headline: feature.headline, body: feature.body, mine: feature.mine, priority: feature.mine ? 100 : 60 },
       { id: "worlds_preview:" + state.year });
-    addNews("월즈 개막 예고", feature.headline + " — 주제곡·뮤직비디오·지역 MVP 소개는 신문 기사 보관함에서 확인할 수 있다.");
+    addNews("월즈 개막 예고", feature.headline + " — 주제곡·뮤직비디오·지역 MVP 소개는 이번 주 신문 1면에 실렸다.");
     feature.previewSent = true;
     changed = true;
   }
@@ -314,7 +314,7 @@ function historicalNewsForWeek(saveAfter) {
   const title = state.year + "년 " + (state.week === 1 ? "시즌 시대 소식" : state.week === 29 ? "중간 역사 소식" : "연말 역사 소식");
   const a = publishHeadline({ key: "historical", headline: title, body: lines.join("\n\n"), mine: false },
     { id: "historical:" + state.year + ":" + state.week });
-  if (a) addNews("시대 소식", title + " — SNS 소식의 신문 기사 보관함에서 전문을 읽을 수 있다.");
+  if (a) addNews("시대 소식", title + " — 전문은 이번 주 신문 1면에 실렸다.");
   if (saveAfter && state.settings.autoSave) saveGame();
 }
 
