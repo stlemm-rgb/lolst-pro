@@ -51,7 +51,7 @@ const result=run(function(){
  check(f2.body.includes(h.champions.worlds)&&f2.body.includes(h.worldsRecap.scenes[0]),'2013 우승팀 리스펙·전년도 실제 장면');
  check(!f2.body.includes('undefined')&&!f2.body.includes('null')&&!/\{\w+\}/.test(f2.body),'기사 빈칸 없음');
  const before=JSON.stringify({money:state.money,popularity:state.popularity,fans:state.fame.fans,stats:state.stats});
- worldsNewsForWeek();newsArchiveHTML();
+ worldsNewsForWeek();(newsEdition=null,newsPaperHTML(state.inbox.filter(m=>m.tab==='news')));
  check(before===JSON.stringify({money:state.money,popularity:state.popularity,fans:state.fame.fans,stats:state.stats}),'뉴스 열람 경제·능력치 영향 없음');
  return {checks,example:f2.body};
 });

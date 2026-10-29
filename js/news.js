@@ -54,12 +54,6 @@ function migrateCurrentNews() {
   N.articles = N.articles.slice(-NEWS_KEEP);
 }
 function newsDate(a) { return a.year && a.week ? a.year + '년 ' + a.week + '주차' : a.when || ''; }
-function newsArchiveHTML() {
-  migrateCurrentNews();
-  const list = ensureNewsState().articles.slice().reverse();
-  return '<details class="card"><summary>📰 신문 기사 보관함 (' + list.length + '건)</summary><p class="muted small">최근 ' + NEWS_KEEP + '개 기사 · 날짜는 기사 발생 시점이에요.</p>' +
-    list.map(function (a) { return '<details class="card"><summary>' + escapeHTML(a.headline) + '</summary><p class="muted small">' + escapeHTML(newsDate(a)) + '</p><div class="msg-text">' + escapeHTML(a.body) + '</div></details>'; }).join('') + '</details>';
-}
 // 새 소식 때문에 답장 대기 중인 연락이 잘리지 않게 한다. 일반 메시지는 기존 수만 보관.
 function trimMessages(messages) {
   let kept = 0;
@@ -322,4 +316,112 @@ function historicalNewsForWeek(saveAfter) {
     { id: "historical:" + state.year + ":" + state.week });
   if (a) addNews("시대 소식", title + " — SNS 소식의 신문 기사 보관함에서 전문을 읽을 수 있다.");
   if (saveAfter && state.settings.autoSave) saveGame();
+}
+
+// ━━━━━ 206: SNS 소식 탭 = 주간 신문 (시안 15 A안) ━━━━━
+// 한 주 = 신문 한 부: 위 1면 기사(신문 기사·내 소식), 아래 분야별 단신(2단). 같은 문장은 한 번만, ' — ' 뒤는 작은 설명.
+// 단신 = "[분야] 글" 소식(publishNotice), 내 소식 = 그 밖의 news 메시지(퀘스트·업적·특성·수상 …)
+let newsEdition = null; // 보고 있는 호 "연도-주" (null = 가장 최근)
+function newsWeekKey(y, w) { return y + "-" + w; }
+function articleWeekKey(a) {
+  if (a.year && a.week) return newsWeekKey(a.year, a.week);
+  const x = /(\d+)년 (\d+)주/.exec(a.when || "");
+  return x ? newsWeekKey(Number(x[1]), Number(x[2])) : null;
+}
+function newsEditions(list) {
+  const keys = [];
+  const add = function (k) { if (k && keys.indexOf(k) === -1) keys.push(k); };
+  list.forEach(function (m) { add(newsWeekKey(m.year, m.week)); });
+  ensureNewsState().articles.forEach(function (a) { add(articleWeekKey(a)); });
+  return keys.sort(function (a, b) { const p = a.split("-").map(Number), q = b.split("-").map(Number); return q[0] - p[0] || q[1] - p[1]; });
+}
+function newsAboutMe(text) {
+  const team = myTeam();
+  return String(text).indexOf(state.player.name) !== -1 || (team && String(text).indexOf(team.name) !== -1);
+}
+// "앞 — 뒤" → [앞, 뒤]
+function newsSplit(text) {
+  const t = String(text || ""), i = t.indexOf(" — ");
+  return i === -1 ? [t, ""] : [t.slice(0, i), t.slice(i + 3)];
+}
+function newsPaperHTML(list) {
+  const eds = newsEditions(list);
+  if (!eds.length) return '<p class="muted">아직 소식이 없어요. 주를 진행하면 기사와 소식이 와요.</p>';
+  if (!newsEdition || eds.indexOf(newsEdition) === -1) newsEdition = eds[0];
+  const key = newsEdition, kp = key.split("-").map(Number);
+  const msgs = list.filter(function (m) { return newsWeekKey(m.year, m.week) === key; });
+  const arts = ensureNewsState().articles.filter(function (a) { return articleWeekKey(a) === key; }).sort(function (a, b) { return newsPriority(b) - newsPriority(a); });
+  const notices = [], mine = [];
+  msgs.forEach(function (m) {
+    const x = /^\[([^\]]+)\] /.exec(m.title || "");
+    if (x && m.newsId !== undefined || x && m.text && m.title.slice(x[0].length) === m.text) notices.push({ m: m, cat: x[1] });
+    else mine.push(m);
+  });
+  // 1면: 신문 기사 → 없으면 내 소식 첫 번째
+  let lead = "";
+  if (arts.length) {
+    lead = arts.map(function (a, i) {
+      return '<article class="npt-art' + (i === 0 ? " lead" : "") + (a.mine ? " mine" : "") + '"><h3>' + escapeHTML(a.headline) + "</h3><p>" + escapeHTML(a.body) + "</p></article>";
+    }).join("");
+  } else if (mine.length) {
+    const m = mine.shift();
+    lead = '<article class="npt-art lead mine' + (m.read ? "" : " new") + '"><h3>' + escapeHTML(m.title) + "</h3><p>" + escapeHTML(m.text) + "</p>" + newsChangesHTML(m) + "</article>";
+  }
+  // 단신: 분야별 (나·우리 팀 이야기가 있는 분야 먼저)
+  const groups = [];
+  notices.forEach(function (n) {
+    let g = groups.find(function (x) { return x.cat === n.cat; });
+    if (!g) { g = { cat: n.cat, items: [] }; groups.push(g); }
+    g.items.push(n.m);
+  });
+  groups.forEach(function (g) {
+    g.items.sort(function (a, b) { return newsAboutMe(b.text) - newsAboutMe(a.text); });
+    g.me = g.items.some(function (m) { return newsAboutMe(m.text); });
+  });
+  groups.sort(function (a, b) { return b.me - a.me || b.items.length - a.items.length; });
+  const brief = function (m) {
+    const s = newsSplit(m.text), me = newsAboutMe(m.text);
+    return '<div class="npt-brief' + (m.read ? "" : " new") + (me ? " mine" : "") + '">' + escapeHTML(s[0]) + (s[1] ? '<span class="d">' + escapeHTML(s[1]) + "</span>" : "") + "</div>";
+  };
+  const show = NEWS_PAPER.briefShow;
+  let secs = "";
+  if (mine.length) {
+    secs += '<div class="npt-sec"><h4>' + NEWS_PAPER.mineTitle + " <small>" + mine.length + "건</small></h4>" + mine.map(function (m) {
+      return '<div class="npt-brief' + (m.read ? "" : " new") + '"><b>' + escapeHTML(m.title) + '</b><span class="d">' + escapeHTML(m.text) + "</span>" + newsChangesHTML(m) + "</div>";
+    }).join("") + "</div>";
+  }
+  secs += groups.map(function (g) {
+    const head = g.items.slice(0, show).map(brief).join("");
+    const rest = g.items.slice(show);
+    return '<div class="npt-sec"><h4>' + escapeHTML(newsCatName(g.cat)) + " <small>" + g.items.length + "건</small></h4>" + head +
+      (rest.length ? '<details class="npt-more"><summary>' + rest.length + "건 더 보기</summary>" + rest.map(brief).join("") + "</details>" : "") + "</div>";
+  }).join("");
+  const unreadKeys = {};
+  list.forEach(function (m) { if (!m.read) unreadKeys[newsWeekKey(m.year, m.week)] = true; });
+  const chips = eds.map(function (k) {
+    const p = k.split("-");
+    return '<button class="npt-ed' + (k === key ? " on" : "") + (unreadKeys[k] ? " new" : "") + '" data-edition="' + k + '">' + (Number(p[0]) !== state.year ? p[0] + "년 " : "") + p[1] + "주차</button>";
+  }).join("");
+  const sch = kp[0] === state.year ? " · " + escapeHTML(scheduleOfWeek(kp[1]).name) : "";
+  return '<div class="npt-paper">' +
+    '<div class="npt-mast"><b>' + NEWS_PAPER.title + "</b><span>" + kp[0] + "년 " + kp[1] + "주차" + sch + "</span></div>" +
+    '<div class="npt-eds">' + chips + "</div>" +
+    (lead ? '<div class="npt-lead">' + lead + "</div>" : "") +
+    (secs ? '<div class="npt-cols">' + secs + "</div>" : '<p class="npt-empty">이 주에는 단신이 없어요.</p>') +
+  "</div>";
+}
+function newsCatName(cat) {
+  const icon = NEWS_PAPER.icons[cat];
+  return (icon ? icon + " " : "") + cat;
+}
+function newsChangesHTML(m) {
+  const c = changesText(m.changes);
+  return (c ? '<span class="d log-changes">' + c + "</span>" : "") + (m.notes && m.notes.length ? '<span class="d">' + m.notes.map(escapeHTML).join(" · ") + "</span>" : "");
+}
+// 보고 있는 호의 소식은 읽음 처리 (선수 SNS 탭처럼 보면 읽음)
+function markEditionRead() {
+  if (!newsEdition) return false;
+  let changed = false;
+  state.inbox.forEach(function (m) { if (m.tab === "news" && !m.read && newsWeekKey(m.year, m.week) === newsEdition) { m.read = true; changed = true; } });
+  return changed;
 }

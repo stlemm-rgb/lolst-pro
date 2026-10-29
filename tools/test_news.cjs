@@ -24,7 +24,7 @@ const testBody = function () {
   const ev={id:'news_test',tab:'news',title:'효과 검증',text:'효과',effects:{condition:-5}};
   const before=state.condition;fireEvent(ev,{});
   check(state.condition===before-5,'소식 생성 효과 보존');
-  const after=state.condition;newsArchiveHTML();newsOverlayHTML(state.weekReport.headlines);
+  const after=state.condition;(newsEdition=null,newsPaperHTML(state.inbox.filter(m=>m.tab==='news')));newsOverlayHTML(state.weekReport.headlines);
   check(state.condition===after,'재열기 효과 없음');
   const t=myTeam(),other=state.league.teams.find(t2=>t2.id!==t.id);
   state.league.titleStreaks={cup:{id:t.id,n:2,year:2011}};
@@ -38,7 +38,7 @@ const testBody = function () {
   const loaded=stateFromSave(JSON.parse(JSON.stringify(makeSaveData())));state=loaded;migrateCurrentNews();
   check(state.newsState.articles.length===count,'뉴스 저장 왕복');
   nextWeek();
-  check(newsArchiveHTML().includes(art.headline),'다음 주 원문 보관');
+  check((newsEdition=articleWeekKey(art),newsPaperHTML([])).includes(art.headline),'다음 주 원문 보관');
   const legacy=JSON.parse(JSON.stringify(makeSaveData()));delete legacy.state.newsState;
   legacy.state.weekReport.headlines=[{key:'old',headline:'과거 기사',body:'원문',mine:false}];
   legacy.state.weekReport.when='2012년 2주차';
@@ -52,7 +52,7 @@ const testBody = function () {
   queueFinalNews('cup','LCK 컵',f2,titleStreak('cup',f2));
   check(state.weekReport.headlines[0].body.includes('First Stand'),'2025 이후 출전권 문구 유지');
   snsTab='news';state.currentMenu='sns';renderAll();
-  check(pages.sns().includes('신문 기사 보관함'),'SNS 기사 보관함 표시');
+  check(pages.sns().includes('npt-paper')&&pages.sns().includes(state.weekReport.headlines[0].headline.slice(0,8)),'SNS 소식 탭 주간 신문 표시 (206)');
   return checks;
 };
 const result=vm.runInContext('('+testBody.toString()+')()',c);

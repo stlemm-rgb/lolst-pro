@@ -17,7 +17,7 @@ pages.sns = function () {
 
   const list = state.inbox.filter(function (m) { return m.tab === snsTab; });
   let body;
-  if (!list.length) {
+  if (!list.length && snsTab !== "news") {
     body = '<p class="muted">아직 메시지가 없어요. 주를 진행하면 연락과 소식이 와요.</p>';
   } else if (snsTab === "social") {
     // 예전 글(선수 id 없이 저장됨)은 이름으로 선수인지 찾기
@@ -42,11 +42,11 @@ pages.sns = function () {
     const deck = deckMessages();
     const rest = list.filter(function (m) { return deck.indexOf(m) === -1; });
     body = msgDeckHTML(deck) + (deck.length && rest.length ? '<div class="deck-past muted small">' + MSG_DECK.pastTitle + "</div>" : "") + rest.map(messageHTML).join("");
+  } else if (snsTab === "news") {
+    body = newsPaperHTML(list); // 206: 주간 신문 (js/news.js) — 신문 기사 보관함도 이 안으로
   } else {
     body = list.map(messageHTML).join("");
   }
-
-  if (snsTab === "news") body = newsArchiveHTML() + body;
 
   const readAll = snsTab === "news" && unreadCount("news")
     ? '<button data-readall="news">모두 읽음</button>' : "";
@@ -56,7 +56,7 @@ pages.sns = function () {
     '<div class="card"><div class="buttons sns-tabs">' + tabHTML + readAll + "</div>" +
       '<p class="muted small">' +
         (snsTab === "inbox" ? (deckMessages().length ? "" : "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요.") // 205: 답장 대기 카드가 있으면 안내는 카드 ⓘ에
-          : snsTab === "news" ? "기사와 커뮤니티 소식이에요. 읽기만 하면 돼요."
+          : snsTab === "news" ? "한 주에 신문 한 부. 위 날짜를 눌러 지난 호를 볼 수 있어요."
           : "선수와 팬들의 글이에요. 🎮 선수 = 리그 프로 선수의 글, 📣 = 내 선수를 언급한 글 (보면 읽음 처리).") +
       "</p>" +
       '<div class="messages">' + body + "</div>" +
@@ -193,6 +193,10 @@ function bindSns(page) {
     state.inbox.forEach(function (m) { if (m.tab === "social") m.read = true; });
     renderMenu();
   }
+  if (snsTab === "news" && markEditionRead()) renderMenu(); // 206: 보고 있는 호는 읽음 (화면의 새 소식 점은 그대로)
+  page.querySelectorAll("[data-edition]").forEach(function (btn) {
+    btn.onclick = function () { newsEdition = btn.getAttribute("data-edition"); renderPage(); };
+  });
   page.querySelectorAll("[data-snstab]").forEach(function (btn) {
     btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; deckLastId = null; selectMenu("sns"); };
   });
