@@ -2,7 +2,7 @@
 # 필요: python3 + playwright (클라우드 작업 환경에는 이미 있음)
 #
 # 핵심 기능
-#   open_game(pw, overrides)  : index.html을 열고, 숫자 바꿔 끼우기(overrides)를 적용
+#   open_game(pw, overrides)  : Challenger_Road.html을 열고, 숫자 바꿔 끼우기(overrides)를 적용
 #   new_career(page, ...)     : 새 게임 시작 (포지션·시작 연도·유형·1부 팀·스탯 보정·씨앗)
 #   play_weeks(page, n, ...)  : 훈련 자동 선택 + 연락 자동 답장으로 n주 진행
 #
@@ -14,7 +14,7 @@ from pathlib import Path
 
 # GAME_INDEX=폴더/index.html 로 다른 index를 열 수 있음 (R7: 공개 사이트용 묶음 _site/index.html 검사)
 import os
-GAME = (Path(os.environ["GAME_INDEX"]).resolve() if os.environ.get("GAME_INDEX") else Path(__file__).resolve().parent.parent / "index.html").as_uri()
+GAME = (Path(os.environ["GAME_INDEX"]).resolve() if os.environ.get("GAME_INDEX") else Path(__file__).resolve().parent.parent / "Challenger_Road.html").as_uri()
 
 
 def parse_sets(items):

@@ -1112,6 +1112,11 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .rp-ping .ring { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; border: 2px solid currentColor; animation: rpRing 1.1s ease-out forwards; }
 .rp-ping .ic { position: relative; display: block; animation: rpPop 0.35s ease-out; }
 .rp-ping.old { opacity: 0.35; } .rp-ping.old .ring { display: none; }
+.rp-focus { position: absolute; transform: translate(-50%, -50%); pointer-events: none; width: 0; height: 0; z-index: 2; }
+.rp-focus.a { color: var(--accent); } .rp-focus.b { color: var(--bad); }
+.rp-focus .ring { position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; border-radius: 50%; border: 3px solid currentColor; box-shadow: 0 0 12px currentColor; animation: rpFocus 1.2s ease-out infinite; }
+.rp-focus .ring.r2 { animation-delay: 0.6s; }
+@keyframes rpFocus { from { transform: scale(0.6); opacity: 1; } to { transform: scale(2.2); opacity: 0; } }
 @keyframes rpRing { from { transform: scale(1); opacity: 1; } to { transform: scale(6); opacity: 0; } }
 @keyframes rpPop { 0% { transform: scale(0.3); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
 .rp-mom { margin-top: 12px; }
@@ -1134,7 +1139,9 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .rp-res { text-align: center; font-weight: bold; font-size: 11px; color: var(--muted); }
 .rp-res.wa { color: var(--accent); } .rp-res.wb { color: var(--bad); }
 .rp-feed { height: 300px; overflow-y: auto; }
-.rp-fe { display: grid; grid-template-columns: 34px 22px 1fr; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; animation: rpSlide 0.3s ease-out; }
+.rp-fe { display: grid; grid-template-columns: 34px 22px 1fr; gap: 8px; align-items: center; padding: 6px 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; animation: rpSlide 0.3s ease-out; cursor: pointer; }
+.rp-fe:hover { background: rgba(255, 255, 255, 0.06); }
+.rp-fe.picked { background: rgba(0, 224, 255, 0.14); outline: 1px solid var(--accent); }
 .rp-fe .t { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .rp-fe.a { box-shadow: inset 3px 0 0 var(--accent); } .rp-fe.b { box-shadow: inset 3px 0 0 var(--bad); }
 .rp-fe.big { background: rgba(var(--gold-rgb), 0.07); }

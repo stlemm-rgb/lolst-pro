@@ -187,10 +187,33 @@ function rpAddEvent(m, e, i) {
   }
   const f = document.createElement("div");
   f.className = "rp-fe " + (e.s ? "b" : "a") + (info.size === "l" ? " big" : "") + (mine ? " mine" : "");
+  f.setAttribute("data-rpi", i);
   f.innerHTML = '<span class="t">' + e.t + "분</span><span>" + (e.p ? portraitImg(e.p, { face: true, size: mine ? 24 : 18 }) : "") + '</span><span class="' + (e.k === "bad" ? "down" : e.k === "psych" ? "rp-psych" : "") + '">' +
     (mine ? '<span class="rp-me">' + REPLAY_TEXTS.meTag + "</span> " : "") + (info.icon || "") + " " + matchEventText(e, rpName(m)) + "</span>";
+  f.title = REPLAY_TEXTS.jumpTip;
+  f.onclick = function () { replayJumpTo(e, i); }; // 기록 한 줄을 누르면 그 시간으로 + 장소 강조
   const feed = document.getElementById("rp-feed");
   feed.insertBefore(f, feed.firstChild);
+}
+// 기록에서 고른 장면으로: 재생을 멈추고 그 시간으로 돌아가 미니맵에 강조 고리 + 기록 줄 강조
+function replayJumpTo(e, i) {
+  if (!RP) return;
+  replayPlay(false);
+  hideReplayBanner();
+  RP.t = e.t;
+  drawReplay();
+  const pb = document.getElementById("rp-play");
+  if (pb) pb.textContent = "▶ 재생";
+  const map = document.getElementById("rp-map");
+  map.querySelectorAll(".rp-focus").forEach(function (x) { x.remove(); });
+  const p = rpPos(e, i), side = e.k === "bad" ? 1 - e.s : e.s, el = document.createElement("div");
+  el.className = "rp-focus " + (side ? "b" : "a");
+  el.style.left = p[0] + "%"; el.style.top = p[1] + "%";
+  el.innerHTML = '<span class="ring"></span><span class="ring r2"></span>';
+  map.appendChild(el);
+  document.querySelectorAll("#rp-feed .rp-fe.picked").forEach(function (x) { x.classList.remove("picked"); });
+  const row = document.querySelector('#rp-feed .rp-fe[data-rpi="' + i + '"]');
+  if (row) row.classList.add("picked");
 }
 
 // 내 선수가 이 경기에 나왔나 (세트 라인 중 하나라도)
@@ -200,6 +223,7 @@ function rpResetMeCount() { const mc = document.getElementById("rp-mecount"); if
 // ----- 재생 -----
 function replayPlay(on) {
   if (!RP) return;
+  if (on) document.querySelectorAll("#rp-map .rp-focus, #rp-feed .rp-fe.picked").forEach(function (x) { x.classList.contains("rp-focus") ? x.remove() : x.classList.remove("picked"); });
   if (on) hideReplayEndBar(); // 다시 재생하면 끝 안내는 접기 (200)
   RP.playing = on;
   const b = document.getElementById("rp-play");
@@ -261,6 +285,7 @@ function replayBanner(html, cls, onNext) {
   b.querySelectorAll("[data-rpnext]").forEach(function (x) { x.onclick = function () { const f = RP.onNext; if (f) f(); }; });
   b.querySelectorAll("[data-rpskip]").forEach(function (x) { x.onclick = replaySkip; });
   b.querySelectorAll("[data-rpclose]").forEach(function (x) { x.onclick = closeReplay; });
+  b.onclick = function (ev) { if (ev.target === b) hideReplayBanner(); }; // 가운데 안내 밖 아무 데나 누르면 접고 화면을 둘러보기 (재생 버튼으로 시작)
 }
 // 200: 세트·경기 끝 안내 — 미니맵·기록을 가리지 않고 재생 버튼 아래에. 그대로 두고 타임라인·기록을 천천히 다시 볼 수 있음
 function replayEndBar(html, cls, onNext) {

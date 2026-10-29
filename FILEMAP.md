@@ -1,13 +1,13 @@
 # 파일 지도
 
-`python3 tools/filemap.py`로 다시 만들 수 있어요. 순서 = index.html이 읽는 순서 (data → js, 뒤 파일이 앞 파일 것을 쓸 수 있음).
+`python3 tools/filemap.py`로 다시 만들 수 있어요. 순서 = Challenger_Road.html이 읽는 순서 (data → js, 뒤 파일이 앞 파일 것을 쓸 수 있음).
 
 | 파일 | KB | 하는 일 | 합쳐진 예전 파일 |
 |---|---|---|---|
 | `data/menus.js` | 2 | 좌측 메뉴 (2026-10-06 정리: 묶음 4개 + 맨 아래 설정) |  |
 | `data/shop.js` | 8 | 상점 ([상점] 메뉴) — 모은 돈을 쓰는 곳 |  |
 | `data/guide.js` | 21 | 초보자 도움 (js/guide.js) |  |
-| `data/player.js` | 15 | 내 선수 기본 규칙: 스탯·성장 곡선·포지션·유형·커리어 | stats.js, growth.js, positions.js, archetypes.js, career.js |
+| `data/player.js` | 16 | 내 선수 기본 규칙: 스탯·성장 곡선·포지션·유형·커리어 | stats.js, growth.js, positions.js, archetypes.js, career.js |
 | `data/traits.js` | 28 | 특성 목록 |  |
 | `data/champions.js` | 9 | 챔피언 목록 (리그 오브 레전드 실제 챔피언, 2026년 6월 기준 173명) |  |
 | `data/match.js` | 9 | 경기력 계산 규칙 (밴픽 + 메타 페널티) |  |
@@ -27,7 +27,7 @@
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
 | `data/ui.js` | 8 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
-| `data/replay.js` | 1 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
+| `data/replay.js` | 2 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
 | `data/boxscore.js` | 1 | 경기 기록(박스 스코어) 만들기 규칙 |  |
 | `data/comps.js` | 7 | 챔피언 조합 성향 (밴픽 상성·시너지) |  |
@@ -82,13 +82,13 @@
 | `js/rivals.js` | 17 | 맞대결 전적·구단별 빅게임 | h2h.js, biggame.js |
 | `js/staff.js` | 17 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
 | `js/portrait.js` | 9 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
-| `js/replay.js` | 19 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
+| `js/replay.js` | 23 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
 | `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
 | `js/dash_plus.js` | 12 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
-| `js/shortcuts.js` | 3 | 단축키 (198) |  |
+| `js/shortcuts.js` | 4 | 단축키 (198) |  |
 | `js/start.js` | 0 | 게임 시작 |  |
 
 - 데이터(숫자·문구)는 `data/`, 규칙·화면 코드는 `js/` (CLAUDE.md 규칙)

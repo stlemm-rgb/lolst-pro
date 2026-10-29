@@ -8,14 +8,14 @@
 | 항목 | 상태 |
 |---|---|
 | 저장소 폴더 | **`C:\project\Game`** (명령 안내도 이 경로. 예전 `C:\Project\Game\Game`은 틀림) |
-| 출시 | ver 1.2.1 (태그 v1.2.1) 공개 중. 화면 왼쪽 위 `ver 1.2.1` (index.html 로고) |
+| 출시 | ver 1.2.1 (태그 v1.2.1) 공개 중. 화면 왼쪽 위 `ver 1.2.1` (Challenger_Road.html 로고) |
 | 지금 작업 | 대시보드·진행 개선 ①~④ (196, js/dash_plus.js) + 휴대폰 아래 탭·진행 막대 ⑤·받은 연락 카드 ⑥ (197, js/mobile_nav.js·sns_page.js) + 단축키 (198, js/shortcuts.js) 끝 |
 | 그다음 | **ver 1.2 내 선수 해외 진출** (시작 전에 측정 → 표 → 선택지로 묻기, 7장) |
 | 알려진 위험 | js/links.js의 lookbehind 정규식이 iOS 16.3 이하 Safari에서 오류 (사용자가 이번엔 안 고치기로) |
 
 ## 1. 사용자와 작업 방식
 
-- 게임: 오프라인 텍스트 시뮬레이션 「프로게이머 커리어」. `index.html`을 더블클릭해 실행. 친구들은 웹 주소로 플레이.
+- 게임: 오프라인 텍스트 시뮬레이션 「챌린저 로드」(옛 이름 프로게이머 커리어). `Challenger_Road.html`을 더블클릭해 실행. 친구들은 웹 주소로 플레이.
 - 사용자(Shane)는 코딩 초보. **항상 짧고 쉬운 한국어 + 표** (영어로 답하면 "한글로"라고 함).
 - **커밋·push는 사용자가 직접.** 답변 끝에 이 형식으로 준다 (CLAUDE.md의 자동 커밋 규칙보다 우선):
 
@@ -53,13 +53,13 @@ git push
 
 - 저장소: https://github.com/stlemm-rgb/lolst-pro (공개, 브랜치 **master**, remote `origin`).
 - 웹 주소: **https://stlemm-rgb.github.io/lolst-pro/**
-- **배포 (R7)**: push하면 GitHub Actions(`.github/workflows/pages.yml`)가 `tools/bundle.py`로 스크립트 83개를 `game.js` 하나로 묶어 올림 (공개 사이트에는 index.html·game.js·css만, 1.6MB). 저장소 Settings → Pages → Source = **GitHub Actions** (설정 끝남). 실패하면 Actions 탭 → '공개 사이트 올리기' → Run workflow.
+- **배포 (R7)**: push하면 GitHub Actions(`.github/workflows/pages.yml`)가 `tools/bundle.py`로 스크립트 83개를 `game.js` 하나로 묶어 올림 (공개 사이트에는 Challenger_Road.html·game.js·css만, 1.6MB). 저장소 Settings → Pages → Source = **GitHub Actions** (설정 끝남). 실패하면 Actions 탭 → '공개 사이트 올리기' → Run workflow.
 - 새 버전을 올리면 `?v=해시`가 바뀌어 브라우저가 바로 새 파일을 받음. 친구 세이브는 주소가 같으면 유지.
 - `.github/` 폴더는 클라우드 세션의 device_commit_files로 못 씀(보호 파일) → device_bash로 써야 함.
 
 ## 3. 파일 구조 (R2 이후)
 
-- **어느 파일에 무엇이 있는지는 FILEMAP.md** (`python3 tools/filemap.py`로 다시 만들기). 새 파일을 만들면 index.html에 넣고 지도도 다시 만들 것.
+- **어느 파일에 무엇이 있는지는 FILEMAP.md** (`python3 tools/filemap.py`로 다시 만들기). 새 파일을 만들면 Challenger_Road.html에 넣고 지도도 다시 만들 것.
 - 스크립트 83개 (data 33 · js 50). R2에서 작은 파일을 주제별로 합침 — 파일 안 `━━━━━ (예전 파일 이름) ━━━━━` 머리로 구분. 옛 문서의 `data/stats.js`·`js/trophies.js` 같은 이름은 지금 없음 → FILEMAP에서 찾기.
 - 문서: CLAUDE.md(규칙) · HANDOFF.md(이 파일) · PROGRESS.md(134번부터) · GAME_PLAN.md(기획) · FILEMAP.md · tools/README.md(도구) · tools/BALANCE.md(밸런스 값·측정) · docs/(예전 기록).
 
@@ -67,7 +67,7 @@ git push
 
 ### 공통
 - 순수 HTML/CSS/JS. 외부 라이브러리·CDN 금지. `file://` 실행 → fetch·ES module 금지. 차트·그림은 SVG·캔버스 직접. 빌드 도구는 공개 사이트 배포(R7)만 예외.
-- 데이터는 data/*.js 상수, 로직은 js/*.js. index.html script 순서 유지, 새 js는 start.js 앞에. `pages.x = ...`를 하는 파일은 main.js 뒤.
+- 데이터는 data/*.js 상수, 로직은 js/*.js. Challenger_Road.html script 순서 유지, 새 js는 start.js 앞에. `pages.x = ...`를 하는 파일은 main.js 뒤.
 - **전역 함수 이름이 겹치면 뒤 파일이 앞 파일을 덮음** (D5 때 miniBarHTML·pctText 겹침으로 화면 깨짐) → `node tools/test_names.cjs`로 확인.
 - **confirm()/alert()/prompt() 금지** (웹에서 막힘) → js/main.js `askConfirm(문장, 예일때함수, "예 버튼 글자")`.
 - 화면 안 버튼은 renderPage의 `querySelectorAll("[data-…]")` 묶음에 추가.
@@ -182,4 +182,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 1. `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
 2. 새 사용자 요청 우선. 없으면 7장의 해외 진출 (선택지로 묻기부터).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 202**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 203**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

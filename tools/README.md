@@ -1,6 +1,6 @@
 # tools/ — 밸런스 측정 도구 (게임과 상관없음)
 
-게임(`index.html`)은 이 폴더를 읽지 않는다. AI가 밸런스를 잴 때 매번 스크립트를 새로 쓰지 않으려고 둔 것.
+게임(`Challenger_Road.html`)은 이 폴더를 읽지 않는다. AI가 밸런스를 잴 때 매번 스크립트를 새로 쓰지 않으려고 둔 것.
 
 - 필요: `python3` + `playwright` (Claude 클라우드 작업 환경에는 있음. PC에서 쓰려면 `pip install playwright` 후 `playwright install chromium`)
 - 조절 값 위치: **`tools/BALANCE.md`**

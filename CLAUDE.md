@@ -1,6 +1,6 @@
 # Project Rules
 
-A text career simulation game. Double-clicking `index.html` in the browser runs it, with no internet connection (offline, local only).
+A text career simulation game. Double-clicking `Challenger_Road.html` in the browser runs it, with no internet connection (offline, local only).
 
 ## Working Rules
 
@@ -10,16 +10,16 @@ A text career simulation game. Double-clicking `index.html` in the browser runs 
 
 ## 파일 찾기
 
-- 어느 파일에 무엇이 있는지: **`FILEMAP.md`** (`python3 tools/filemap.py`로 다시 만들기). 새 파일을 만들면 index.html에 넣고 지도도 다시 만들 것.
+- 어느 파일에 무엇이 있는지: **`FILEMAP.md`** (`python3 tools/filemap.py`로 다시 만들기). 새 파일을 만들면 Challenger_Road.html에 넣고 지도도 다시 만들 것.
 
 ## Technical Constraints
 
-- Opening `index.html` directly (`file://`) must work, so `fetch()` cannot load JSON files.
+- Opening `Challenger_Road.html` directly (`file://`) must work, so `fetch()` cannot load JSON files.
   → Write data files as `.js` files such as `data/events.js` (e.g., `const EVENTS = [...]`) and load them with a `<script>` tag.
 - No `<script type="module">` / `import` either (also blocked on `file://`). Load files in order with plain `<script src>`.
 - No external libraries, CDNs, or web fonts (no internet use).
 - No build tools (npm, etc.). Plain HTML, CSS, and JavaScript only.
-  - 예외 하나 (R7, 사용자 결정 C안): 공개 사이트에 올릴 때만 GitHub Actions(.github/workflows/pages.yml)가 `tools/bundle.py`(파이썬, 패키지 없음)로 스크립트를 game.js 하나로 묶는다. 개발·로컬 플레이는 지금처럼 파일 그대로, 새 스크립트는 index.html에만 넣으면 묶음에도 자동으로 들어감. 묶음 확인: `python3 tools/bundle.py /tmp/site` 후 `GAME_INDEX=/tmp/site/index.html python3 tools/golden.py check`
+  - 예외 하나 (R7, 사용자 결정 C안): 공개 사이트에 올릴 때만 GitHub Actions(.github/workflows/pages.yml)가 `tools/bundle.py`(파이썬, 패키지 없음)로 스크립트를 game.js 하나로 묶는다. 개발·로컬 플레이는 지금처럼 파일 그대로, 새 스크립트는 Challenger_Road.html에만 넣으면 묶음에도 자동으로 들어감. 묶음 확인: `python3 tools/bundle.py /tmp/site` 후 `GAME_INDEX=/tmp/site/index.html python3 tools/golden.py check`
 
 ## "작업완료" 리마인드 (사용자 요청)
 
