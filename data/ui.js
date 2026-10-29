@@ -116,7 +116,9 @@ const MSG_DECK = {
   skipKinds: ["offer", "staffPick", "retire"],      // 카드로 안 보여 주는 연락 (계약 제안·인사 카드·은퇴는 지금처럼 목록에서)
   title: "답장 대기",
   pastTitle: "지난 연락",
-  phoneTitle: "받은 연락",   // 209: 휴대폰 화면 머리
+  phoneTitle: "받은 연락",
+  okLabel: "✓ 확인",           // 210: 선택지 없는 연락
+  okAllLabel: "모두 확인",   // 209: 휴대폰 화면 머리
   empty: "새 연락이 없어요. 주를 진행하면 연락이 와요.",
   filters: [["all", "전체"], ["done", "✅ 답함"], ["quest", "📋 퀘스트"], ["missed", "💤 지나감"]],
   later: "◀ ▶로 넘겨 보고, 지금 안 답해도 돼요",

@@ -1491,6 +1491,8 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ph-bt { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; white-space: normal; } .ph-bt b { font-size: 15px; }
 .ph-ic { font-size: 20px; line-height: 1; flex: none; } .ph-ic img { width: 28px; height: 28px; border-radius: 6px; }
 .ph-me { align-self: flex-end; max-width: 85%; background: var(--grad-btn); border-radius: 16px 16px 4px 16px; padding: 8px 12px; font-size: 14px; }
+.ph-ok { padding: 10px; font-size: 15px; } .ph-okall { font-size: 13px; }
+.ph-bub .log-changes, .ph-bub .msg-notes { margin-top: 6px; padding: 0; font-size: 13px; }
 .ph-time { font-size: 12px; color: var(--gold); text-align: right; } .ph-time.last { color: var(--bad); }
 .ph-empty { flex: 1; display: grid; place-items: center; align-content: center; text-align: center; color: #b9b9cc; font-size: 14px; padding: 24px 10px; } .ph-empty b { display: block; font-size: 40px; margin-bottom: 8px; }
 .ph-dots { display: flex; justify-content: center; gap: 6px; padding: 8px 0 4px; } .ph-dots i { width: 7px; height: 7px; border-radius: 50%; background: #33334d; } .ph-dots i.on { background: var(--accent); }

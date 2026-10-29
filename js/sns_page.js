@@ -118,7 +118,9 @@ function messageHTML(m) {
 // ----- 받은 연락 카드 (197, 시안 13 P1: PC = 카드 왼쪽·버튼 오른쪽, 휴대폰 = 카드 아래 세로 버튼) -----
 function deckMessages() {
   return state.inbox.filter(function (m) {
-    return m.tab === "inbox" && m.choices && m.answered === null && MSG_DECK.skipKinds.indexOf(m.kind) === -1;
+    if (m.tab !== "inbox") return false;
+    if (!m.choices) return !m.read; // 210: 선택지 없는 연락도 안 읽었으면 휴대폰으로 → [확인]하면 지난 연락으로
+    return m.answered === null && MSG_DECK.skipKinds.indexOf(m.kind) === -1;
   }).sort(function (a, b) { return a.id - b.id; }); // 오래된(곧 지나가는) 연락부터
 }
 
@@ -135,7 +137,16 @@ function msgDeckHTML(deck) {
   const nav = deck.length > 1 ? '<button data-deck="-1"' + (deckIdx === 0 ? " disabled" : "") + '>◀</button><span>' + (deckIdx + 1) + " / " + deck.length + '</span><button data-deck="1"' + (deckIdx === deck.length - 1 ? " disabled" : "") + ">▶</button>" : (deck.length ? "<span>1 / 1</span>" : "");
   const tipText = MSG_DECK.later + " · " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. " + MSG_DECK.legend;
   let chat;
-  if (m) {
+  if (m && !m.choices) { // 210: 일반 연락 — 읽고 [확인]
+    const av = msgAvatar(m);
+    const plain = deck.filter(function (x) { return !x.choices; }).length;
+    const ch = changesText(m.changes);
+    chat = lastHTML +
+      '<div class="ph-bub"><div class="ph-bt"><span class="ph-ic">' + av.icon + "</span><b>" + escapeHTML(av.title) + "</b></div>" + escapeHTML(m.text) +
+        (ch ? '<div class="log-changes">' + ch + "</div>" : "") + (m.notes && m.notes.length ? '<div class="msg-notes">' + m.notes.map(escapeHTML).join("<br>") + "</div>" : "") + "</div>" +
+      '<div class="deck-choices"><button class="primary ph-ok" data-msgok="' + m.id + '">' + MSG_DECK.okLabel + "</button>" +
+        (plain > 1 ? '<button class="ph-okall" data-msgok="all">' + MSG_DECK.okAllLabel + " (" + plain + ")</button>" : "") + "</div>";
+  } else if (m) {
     m.read = true;
     const av = msgAvatar(m);
     const age = (state.year - m.year) * CREATION.weeksPerSeason + state.week - m.week;
@@ -226,10 +237,19 @@ function bindSns(page) {
   }
   if (snsTab === "news" && markEditionRead()) renderMenu(); // 206: 보고 있는 호는 읽음 (화면의 새 소식 점은 그대로)
   page.querySelectorAll("[data-edition]").forEach(function (btn) {
-    btn.onclick = function () { newsEdition = btn.getAttribute("data-edition"); renderPage(); };
+    btn.onclick = function () { newsEdition = btn.getAttribute("data-edition"); newsEditionAt = state.year + "-" + state.week; renderPage(); };
   });
   page.querySelectorAll("[data-snstab]").forEach(function (btn) {
-    btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; deckLastId = null; selectMenu("sns"); };
+    btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; deckLastId = null; newsEdition = null; selectMenu("sns"); }; // 210: 소식 탭은 늘 최신 호부터
+  });
+  page.querySelectorAll("[data-msgok]").forEach(function (btn) { // 210: 일반 연락 확인 → 지난 연락으로
+    btn.onclick = function () {
+      const v = btn.getAttribute("data-msgok");
+      state.inbox.forEach(function (m) { if (m.tab === "inbox" && !m.choices && (v === "all" || m.id === Number(v))) m.read = true; });
+      deckLastId = null;
+      if (state.settings.autoSave) saveGame();
+      renderAll();
+    };
   });
   page.querySelectorAll("[data-ibf]").forEach(function (btn) {
     btn.onclick = function () { inboxFilter = btn.getAttribute("data-ibf"); renderPage(); };

@@ -322,6 +322,7 @@ function historicalNewsForWeek(saveAfter) {
 // 한 주 = 신문 한 부: 위 1면 기사(신문 기사·내 소식), 아래 분야별 단신(2단). 같은 문장은 한 번만, ' — ' 뒤는 작은 설명.
 // 단신 = "[분야] 글" 소식(publishNotice), 내 소식 = 그 밖의 news 메시지(퀘스트·업적·특성·수상 …)
 let newsEdition = null; // 보고 있는 호 "연도-주" (null = 가장 최근)
+let newsEditionAt = null; // 210: 지난 호를 고른 주. 주가 넘어가면 다시 최신 호부터
 function newsWeekKey(y, w) { return y + "-" + w; }
 function articleWeekKey(a) {
   if (a.year && a.week) return newsWeekKey(a.year, a.week);
@@ -347,6 +348,7 @@ function newsSplit(text) {
 function newsPaperHTML(list) {
   const eds = newsEditions(list);
   if (!eds.length) return '<p class="muted">아직 소식이 없어요. 주를 진행하면 기사와 소식이 와요.</p>';
+  if (newsEditionAt !== state.year + "-" + state.week) newsEdition = null;
   if (!newsEdition || eds.indexOf(newsEdition) === -1) newsEdition = eds[0];
   const key = newsEdition, kp = key.split("-").map(Number);
   const msgs = list.filter(function (m) { return newsWeekKey(m.year, m.week) === key; });
