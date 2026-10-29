@@ -55,7 +55,7 @@ pages.sns = function () {
     "<h1>SNS</h1>" +
     '<div class="card"><div class="buttons sns-tabs">' + tabHTML + readAll + "</div>" +
       '<p class="muted small">' +
-        (snsTab === "inbox" ? "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. ⚠️는 낮은 확률로 나쁜 특성, 💚는 나쁜 특성 극복, 🎲는 능력치로 성공·실패가 갈리는 선택이에요."
+        (snsTab === "inbox" ? (deckMessages().length ? "" : "선택지가 있는 연락이에요. " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요.") // 205: 답장 대기 카드가 있으면 안내는 카드 ⓘ에
           : snsTab === "news" ? "기사와 커뮤니티 소식이에요. 읽기만 하면 돼요."
           : "선수와 팬들의 글이에요. 🎮 선수 = 리그 프로 선수의 글, 📣 = 내 선수를 언급한 글 (보면 읽음 처리).") +
       "</p>" +
@@ -136,25 +136,46 @@ function msgDeckHTML(deck) {
   const age = (state.year - m.year) * CREATION.weeksPerSeason + state.week - m.week;
   const left = Math.max(0, EVENT_RULES.ignoreAfterWeeks - age);
   const nav = deck.length > 1 ? '<span class="deck-nav"><button data-deck="-1"' + (deckIdx === 0 ? " disabled" : "") + '>◀</button><button data-deck="1"' + (deckIdx === deck.length - 1 ? " disabled" : "") + ">▶</button></span>" : "";
+  // 205 (시안 14 A안): 한 장 카드 — 질문 위, 선택지 줄이 아래. 빈 그림 칸 없음, 안내는 ⓘ
+  const tipText = MSG_DECK.later + " · " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. " + MSG_DECK.legend;
   return lastHTML +
-    '<div class="deck-head"><span>📩 <b>' + MSG_DECK.title + " " + (deckIdx + 1) + " / " + deck.length + '</b> <span class="muted small">· ' + MSG_DECK.later + "</span></span>" + nav + "</div>" +
     '<div class="deck">' +
-      '<div class="deck-card"><div class="deck-top"><span>' + m.year + "년 " + m.week + "주차</span><span>" + (left ? left + "주 안에 답하기" : "이번 주가 마지막") + "</span></div>" +
-        '<div class="deck-pic">' + av.icon + "</div>" +
-        '<div class="deck-title">' + escapeHTML(av.title) + "</div>" +
-        '<div class="deck-text">' + escapeHTML(m.text) + "</div></div>" +
+      '<div class="deck-head"><b>📩 ' + MSG_DECK.title + " " + (deckIdx + 1) + " / " + deck.length + '</b> <span class="tip muted small" tabindex="0" data-tip="' + escapeHTML(tipText) + '">ⓘ</span>' + nav + "</div>" +
+      '<div class="deck-q"><span class="deck-ic">' + av.icon + '</span><div class="deck-qt"><div class="deck-title">' + escapeHTML(av.title) + '</div><div class="deck-text">' + escapeHTML(m.text) + "</div></div>" +
+        '<div class="deck-left' + (left <= 1 ? " last" : "") + '">⏳ ' + (left ? left + "주 안에 답하기" : "이번 주가 마지막") + '<div class="muted small">' + m.year + "년 " + m.week + "주차</div></div></div>" +
       '<div class="deck-choices">' + choiceButtonsHTML(m) + "</div>" +
     "</div>";
 }
 
 // 선택 버튼 (카드·목록 같이 씀): 버튼 + 아래 작은 글씨(🎲 확률 · ⚠️ 위험 · 💚 극복 · 자금 부족)
+// 205 (시안 14 A안): 한 줄 = [얼굴] 선택 글 + 설명 줄 + 오른쪽 색 칩 (관계·확률·돈·위험), 전부 버튼 안
 function choiceButtonsHTML(m) {
   return m.choices.map(function (c, i) {
     const poor = choiceTooExpensive(m, i);
-    const hint = [c.hint, poor ? "자금이 부족해요" : ""].filter(Boolean).join(" · ");
-    return '<button data-answer="' + m.id + ":" + i + '"' + (poor ? " disabled" : "") + ">" + escapeHTML(c.label) + "</button>" +
-      (hint ? '<div class="hint">' + escapeHTML(hint) + "</div>" : "");
+    const h = choiceHintParts([c.hint, poor ? "자금이 부족해요" : ""].filter(Boolean).join(" · "));
+    const o = m.kind === "friend" && m.friend && m.friend.opts && m.friend.opts[i];
+    const face = o && o.pid && state.league.players[o.pid] ? portraitImg(o.pid, { face: true, size: 40 }) : "";
+    return '<button class="ch-row' + (face ? " has-face" : "") + '" data-answer="' + m.id + ":" + i + '"' + (poor ? " disabled" : "") + ">" +
+      (face ? '<span class="ch-face">' + face + "</span>" : "") +
+      '<span class="ch-main"><b>' + escapeHTML(c.label) + "</b>" + (h.sub.length ? '<span class="ch-sub">' + escapeHTML(h.sub.join(" · ")) + "</span>" : "") + "</span>" +
+      (h.chips.length ? '<span class="ch-chips">' + h.chips.join("") + "</span>" : "") + "</button>";
   }).join("");
+}
+// 설명 글(예: "팀 동료 · T1 원딜 · 지금 관계 56 (절친) · 관계 +10 · 🎲 성공 확률 95% (체력)")을 설명 줄과 칩으로 나눔. 예전 세이브의 글도 그대로 읽음
+function choiceHintParts(hint) {
+  const sub = [], chips = [];
+  const chip = function (cls, text) { chips.push('<span class="ch-chip ' + cls + '">' + escapeHTML(text) + "</span>"); };
+  String(hint || "").split(" · ").forEach(function (p) {
+    let x;
+    if (!p) return;
+    if ((x = /^지금 관계 (-?\d+) \((.+)\)$/.exec(p))) chip(x[2] === "절친" ? "best" : "", x[2] + " " + x[1]);
+    else if (/^관계 \+/.test(p) || /^자금 \+/.test(p) || /^(💚|✨|성공하면 ✨)/.test(p) || /회복$/.test(p)) chip("up", p);
+    else if (/^관계 [−-]/.test(p) || /^자금 [−-]/.test(p) || p === "자금이 부족해요" || /^(⚠️|실패하면 ⚠️)/.test(p)) chip("down", p.replace(/^자금 /, ""));
+    else if ((x = /^🎲 성공 확률 (\d+%) \((.+)\)$/.exec(p))) chip("dice", "🎲 " + x[1] + " (" + x[2] + ")");
+    else if (/^실패하면 /.test(p)) chip("", p.replace(/^실패하면 /, "실패 시 "));
+    else sub.push(p);
+  });
+  return { sub: sub, chips: chips };
 }
 
 // 메시지 아이콘: 선수 글이면 얼굴, 제목이 그림 글자로 시작하면 그 글자 (제목에서는 뺌)
