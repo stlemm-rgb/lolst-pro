@@ -9,9 +9,11 @@
 // ----- ① 이번 주 요약 창 -----
 function weekSummaryOn() { return !state.settings || state.settings.weekSummary !== false; }
 
+let wsBusy = false; // 211: 진행 직후 요약 창이 뜰 차례면 신문 팝업은 요약 창을 닫은 뒤에 (겹쳐 뜨지 않게)
 function showWeekSummary(done) {
   const r = state.weekReport;
-  if (!weekSummaryOn() || !r || !r.growthBase || r.summarySeen || state.retired) { if (done) done(); return; }
+  const finish = function () { wsBusy = false; maybeShowNews(); if (done) done(); };
+  if (!weekSummaryOn() || !r || !r.growthBase || r.summarySeen || state.retired) { finish(); return; }
   r.summarySeen = true;
   let el = document.getElementById("ws-overlay");
   if (!el) { el = document.createElement("div"); el.id = "ws-overlay"; document.body.appendChild(el); }
@@ -20,7 +22,7 @@ function showWeekSummary(done) {
   const close = function () {
     el.hidden = true;
     document.removeEventListener("keydown", onKey);
-    if (done) done();
+    finish();
   };
   const onKey = function (e) { if (SUMMARY_OK_CODES.indexOf(e.code) !== -1 || e.key === "Escape" || e.key === "Enter") { e.preventDefault(); close(); } }; // A(ㅁ)·Enter·Esc = 확인 (단축키 199, data/ui.js SUMMARY_OK_CODES)
   el.onclick = function (e) { if (e.target === el || (e.target.closest && e.target.closest("[data-ws-close]"))) close(); };
@@ -51,7 +53,7 @@ function weekSummaryHTML(r) {
   }
   const msgs = state.inbox.filter(function (m) { return m.id > r.msgFrom && m.tab === "inbox"; }).length;
   const quest = (r.questLines || [])[0];
-  kv.push(["새 연락" + (quest ? " · 퀘스트" : ""), msgs + "개" + (quest ? " · " + quest : ""), ""]);
+  kv.push(["새 연락" + (quest ? " · 퀘스트" : ""), msgs + "개" + (quest ? " · " + quest.split(" → ")[0] : ""), ""]); // 211: 퀘스트는 제목만 (보상은 지난주 결과)
   const kvHTML = kv.map(function (x) { return "<div>" + x[0] + '</div><div class="' + x[2] + '">' + escapeHTML(x[1]) + "</div>"; }).join("");
   const great = r.great ? '<div class="ws-great">🔥 훈련 대성공 · 오른 스탯 ×2</div>' : "";
   const achv = (r.achv || []).map(function (id) {

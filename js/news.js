@@ -171,7 +171,7 @@ function hideNewsPopup(e) {
 // 화면을 그린 뒤 (main.js renderPage): 아직 안 본 뉴스가 있으면 대시보드에서 띄움
 function maybeShowNews() {
   const r = state.weekReport;
-  if (r && r.headlines && r.headlines.length && !r.headlinesSeen && state.currentMenu === "dashboard") showNewsPopup();
+  if (r && r.headlines && r.headlines.length && !r.headlinesSeen && state.currentMenu === "dashboard" && !wsBusy) showNewsPopup();
 }
 
 // [📰 NEWS] 버튼 (지난주 결과 오른쪽 위)

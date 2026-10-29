@@ -986,6 +986,7 @@ function renderAll() {
 // 버튼으로 한 주 진행 (다음 주로 진행·휴식 주·💡 휴식): 진행한 뒤 설정대로 경기 자동 재생 (js/replay.js, 디자인 D3)
 // 측정 도구는 nextWeek만 부르므로 재생 창이 뜨지 않음
 function advanceWeek(rest) {
+  wsBusy = true; // 211: 요약 창 먼저, 신문은 그 뒤 (js/dash_plus.js)
   nextWeek(rest);
   // 훈련 대성공이면 연출을 먼저 보고 → 이번 주 요약 창 → 닫으면 경기 자동 재생 (js/great.js, js/dash_plus.js, js/replay.js)
   showGreat(function () { showWeekSummary(afterWeekReplay); });

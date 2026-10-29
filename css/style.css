@@ -1433,10 +1433,11 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ws-match { display: flex; align-items: center; gap: 8px; background: var(--panel-2); border: 1px solid var(--border); border-radius: var(--r-s); padding: 7px 10px; margin: 6px 0; font-size: 13px; }
 .ws-match .muted.small { margin-left: auto; }
 .ws-great { margin: 6px 0; padding: 6px 10px; border-radius: var(--r-s); border: 1px solid rgba(var(--gold-rgb), 0.45); color: var(--gold); font-weight: 700; font-size: 13px; }
-.ws-kv { display: grid; grid-template-columns: 1fr auto; border: 1px solid var(--border); border-radius: var(--r-s); overflow: hidden; margin: 8px 0 10px; }
+.ws-kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); /* 211: 이름 칸이 글자 한 개 폭으로 찌그러지던 버그 */ border: 1px solid var(--border); border-radius: var(--r-s); overflow: hidden; margin: 8px 0 10px; }
 .ws-kv div { padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
 .ws-kv div:nth-last-child(-n+2) { border-bottom: 0; }
-.ws-kv div:nth-child(even) { text-align: right; font-weight: 700; }
+.ws-kv div:nth-child(odd) { white-space: nowrap; }
+.ws-kv div:nth-child(even) { text-align: right; font-weight: 700; overflow-wrap: anywhere; }
 .ws-achv { display: flex; gap: 10px; align-items: center; margin: 0 0 10px; padding: 10px 12px; border-radius: var(--r-s); border: 1px solid rgba(var(--gold-rgb), 0.55); background: linear-gradient(120deg, rgba(var(--gold-rgb), 0.12), transparent); }
 .ws-achv-ic { font-size: 26px; }
 .ws-k { font-size: 10.5px; letter-spacing: 0.2em; color: var(--gold); }
