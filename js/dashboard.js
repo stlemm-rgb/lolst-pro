@@ -188,7 +188,7 @@ function weekReportHTML() {
   const msgs = state.inbox.filter(function (m) { return m.id > r.msgFrom && m.tab === "inbox"; });
   if (msgs.length) {
     html += '<div class="rep-row"><span class="rep-tag msg">연락</span>새 연락 ' + msgs.length + "건: " +
-      msgs.map(function (m) { return escapeHTML(m.title); }).join(", ") + ' <button class="small-btn" data-go-sns="1">SNS 열기</button></div>';
+      msgs.map(function (m) { return escapeHTML(m.title); }).join(", ") + ' <button class="small-btn" data-go-sns="1">📱 휴대폰 열기</button></div>';
   }
   if (r.news.length) html += reportNewsHTML(r.news);
 

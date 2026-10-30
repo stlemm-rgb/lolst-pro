@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>캐릭터 생성 시안 (19)</title>
+<style>
+:root{
+  --bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;
+  --accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--bad:#ff3d71;--good:#2bff9e;
+  --grad-btn:linear-gradient(90deg,#8a3dff,#0096c7);
+  --sans:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif;
+  --serif:"Batang","AppleMyungjo","Noto Serif CJK KR",serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--text);font-family:var(--sans);padding:24px 16px 60px}
+.wrap{max-width:1180px;margin:0 auto}
+.doc h1{font-size:22px;margin:0 0 6px}
+.doc p{font-size:14px;color:#b9b9cc;line-height:1.7;margin:0 0 6px;max-width:74ch}
+.doc p b{color:var(--text)}
+.doc h2{font-size:19px;margin:48px 0 4px}
+.doc h2 small{font-size:12px;background:var(--gold);color:#000;border-radius:6px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start;margin-top:14px}
+@media(max-width:1000px){.row{grid-template-columns:1fr}}
+.lbl{font-size:12px;color:var(--muted);margin:0 0 6px}
+.pc{border:1px solid #33334d;border-radius:12px;overflow:hidden;height:620px;position:relative;background:var(--bg)}
+.mob{width:340px;max-width:100%;margin:0 auto;border-radius:36px;padding:10px;background:linear-gradient(160deg,#2a2a40,#0d0d16);box-shadow:0 0 0 2px #33334d}
+.mob .scr{border-radius:28px;height:660px;position:relative;background:var(--bg);overflow-x:hidden;overflow-y:auto}
+img.px{image-rendering:pixelated;display:block}
+table.cmp{border-collapse:collapse;margin-top:14px;font-size:14px;width:100%;max-width:960px}
+table.cmp th,table.cmp td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}
+table.cmp th{background:var(--panel-2)}
+button{font-family:var(--sans)}
+
+/* ----- 등록증 (공통) ----- */
+.reg{position:relative;border-radius:14px;padding:18px 18px 18px 34px;background:linear-gradient(160deg,var(--panel-2),var(--panel));
+  border:1px solid var(--border);box-shadow:0 18px 40px rgba(0,0,0,.5);font-family:var(--serif)}
+.reg::before{content:"";position:absolute;left:0;top:0;bottom:0;width:13px;border-radius:14px 0 0 14px;
+  background:linear-gradient(180deg,var(--accent2),var(--accent) 45%,var(--gold) 80%,var(--accent2))}
+.reg h3{margin:0;font-size:14px}
+.reg .yr{font-size:12px;color:var(--muted)}
+.reg .body{display:grid;grid-template-columns:84px minmax(0,1fr);gap:16px;margin-top:14px}
+.slot{width:84px;height:96px;border-radius:8px;background:var(--bg);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center}
+.flds{display:grid;gap:7px;align-content:start}
+.fld{display:grid;grid-template-columns:46px minmax(0,1fr);align-items:end;font-size:12px;color:var(--muted)}
+.fld span{border-bottom:1px solid var(--border);min-height:20px;padding-left:4px;font:700 14px var(--sans);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fld span.empty{color:#4a4a66;font-weight:400}
+.stamp{position:absolute;right:14px;top:12px;width:64px;height:64px;border-radius:50%;border:3px solid var(--gold);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font:900 13px var(--serif);transform:rotate(-12deg);opacity:.85;
+  box-shadow:inset 0 0 0 3px var(--bg),inset 0 0 0 5px var(--gold)}
+.score{margin-top:14px;font-family:var(--sans)}
+.score .n{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--muted)}
+.score .n b{font-size:24px;color:var(--text)}
+.score .n i{font-style:normal;color:var(--accent)}
+.gauge{position:relative;height:8px;border-radius:4px;background:#23233a;margin-top:6px}
+.gauge i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.gauge u{position:absolute;top:-3px;width:2px;height:14px;background:var(--gold)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;font-family:var(--sans)}
+.chip{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--border);color:var(--text)}
+.chip.dim{color:var(--muted);border-style:dashed}
+.chip.g{border-color:var(--gold);color:var(--gold)}
+
+.btn{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;padding:10px 16px;font-size:14px;cursor:pointer}
+.btn.pri{border:0;background:var(--grad-btn);color:#fff;font-weight:700}
+.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.opt{border:1px solid var(--border);background:var(--panel);border-radius:12px;padding:14px 16px;text-align:left;color:var(--text);cursor:pointer;width:100%}
+.opt b{font-size:16px}
+.opt p{margin:4px 0 0;font-size:13px;color:var(--muted);line-height:1.5}
+.opt .star{font-size:12px;color:var(--gold);margin-top:6px}
+.opt.on{border-color:var(--accent);background:rgba(0,224,255,.07);box-shadow:inset 0 0 0 1px var(--accent)}
+
+/* ----- 가. 단계별 서류 ----- */
+.ga{position:absolute;inset:0;display:grid;grid-template-columns:170px minmax(0,1fr) 300px;gap:28px;padding:30px 28px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:2px;align-content:start;counter-reset:s}
+.steps li{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;font-size:14px;color:var(--muted)}
+.steps li::before{counter-increment:s;content:counter(s);width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;border:1px solid var(--border)}
+.steps li.done{color:var(--text)}
+.steps li.done::before{content:"✓";background:var(--good);border-color:var(--good);color:#04130b}
+.steps li.cur{background:var(--panel-2);color:var(--text);font-weight:700}
+.steps li.cur::before{border-color:var(--accent);color:var(--accent)}
+.ga .main{display:flex;flex-direction:column;min-width:0}
+.ga h2{margin:0;font-size:24px}
+.ga .hint{font-size:14px;color:var(--muted);margin:6px 0 18px;line-height:1.6}
+.ga .opts{display:grid;gap:8px}
+.ga .nav{margin-top:auto;display:flex;gap:10px;justify-content:space-between;padding-top:16px}
+.ga .side{align-self:start}
+.ga.m{position:static;display:block;padding:18px 16px 110px}
+.mprog{display:flex;gap:4px;margin-bottom:12px}
+.mprog i{flex:1;height:5px;border-radius:3px;background:#23233a}
+.mprog i.done{background:var(--good)} .mprog i.cur{background:var(--accent)}
+.ga.m .stepname{font-size:12px;color:var(--muted)}
+.ga.m h2{font-size:20px;margin-top:2px}
+.ga.m .opt{padding:11px 13px}
+.ga.m .opt p{font-size:12px}
+.minicard{position:absolute;left:10px;right:10px;bottom:10px;border-radius:14px;background:var(--panel-2);border:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;padding:8px 10px;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+.minicard div{flex:1;min-width:0;font-size:12px;color:var(--muted)}
+.minicard b{display:block;font-size:14px;color:var(--text)}
+
+/* ----- 나. 등록증이 곧 편집기 ----- */
+.na{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:0}
+.na .stage{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(ellipse 60% 55% at 50% 50%,rgba(180,77,255,.10),transparent 70%)}
+.bigreg{width:470px;max-width:100%;padding:22px 22px 20px 40px}
+.bigreg::before{width:16px}
+.bigreg .body{grid-template-columns:120px minmax(0,1fr);gap:20px}
+.bigreg .slot{width:120px;height:140px;position:relative}
+.arrows{display:grid;grid-template-columns:28px 1fr 28px;gap:4px;margin-top:6px;font-family:var(--sans)}
+.arrows button{height:26px;border-radius:7px;border:1px solid var(--border);background:var(--panel);color:var(--text);font-size:12px;cursor:pointer}
+.efld{display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;font-size:12px;color:var(--muted)}
+.efld .v{display:flex;justify-content:space-between;align-items:center;gap:6px;border:1px solid transparent;border-bottom-color:var(--border);
+  border-radius:6px 6px 0 0;padding:4px 6px;font:700 14px var(--sans);color:var(--text);cursor:pointer;text-align:left;background:none;width:100%}
+.efld .v:hover{border-color:var(--border);background:rgba(255,255,255,.02)}
+.efld .v em{font-style:normal;font-weight:400;font-size:11px;color:var(--accent)}
+.efld.open .v{border-color:var(--accent);background:rgba(0,224,255,.06)}
+.na .under{display:flex;gap:10px;margin-top:22px;width:470px;max-width:100%}
+.na .under .btn{flex:1}
+.drawer{border-left:1px solid var(--border);background:var(--panel);padding:22px 20px;overflow:hidden}
+.drawer h3,.sheet h3{margin:0;font-size:18px}
+.drawer .sub,.sheet .sub{font-size:13px;color:var(--muted);margin:4px 0 14px;line-height:1.5}
+.srow{display:grid;grid-template-columns:76px minmax(0,1fr) 28px 54px;gap:8px;align-items:center;font-size:13px;padding:5px 0}
+.srow .bar{height:7px;border-radius:4px;background:#23233a;position:relative}
+.srow .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.srow.st .bar i{background:var(--gold)}
+.srow.st span:first-child{color:var(--gold)}
+.srow b{text-align:right}
+.pm{display:flex;gap:3px}
+.pm button{width:25px;height:24px;border-radius:6px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);cursor:pointer}
+.left{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--panel-2);font-size:13px}
+.left b{font-size:18px;color:var(--gold)}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.presets button{font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--panel-2);color:var(--text);cursor:pointer}
+.na.m{position:static;display:block;padding:16px 12px 30px}
+.na.m .stage{padding:6px 0 0;background:none}
+.na.m .bigreg{padding:14px 12px 14px 26px}
+.na.m .bigreg::before{width:11px}
+.na.m .bigreg .body{grid-template-columns:76px minmax(0,1fr);gap:10px}
+.na.m .bigreg .slot{width:76px;height:88px}
+.na.m .efld{grid-template-columns:40px minmax(0,1fr)}
+.na.m .efld .v{font-size:13px;padding:3px 4px}
+.na.m .stamp{width:48px;height:48px;font-size:11px;right:8px;top:8px}
+.na.m .arrows{grid-template-columns:22px 1fr 22px;gap:2px}
+.na.m .arrows button{font-size:11px;padding:0}
+.sheet{margin-top:14px;border-radius:16px 16px 0 0;background:var(--panel);border:1px solid var(--border);padding:14px 14px 10px}
+.sheet .grab{width:40px;height:4px;border-radius:2px;background:#3a3a55;margin:0 auto 10px}
+.na.m .srow{grid-template-columns:66px minmax(0,1fr) 24px 52px;font-size:12px}
+
+/* ----- 다. 입단 면접 ----- */
+.da{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:32px;padding:28px 32px}
+.talk{display:flex;flex-direction:column;gap:14px;min-width:0}
+.msg{display:flex;gap:12px;align-items:flex-start;max-width:600px}
+.msg .who{flex:none;width:64px;height:64px;border-radius:12px;background:var(--panel-2);display:flex;align-items:center;justify-content:center}
+.bub{background:var(--panel-2);border:1px solid var(--border);border-radius:4px 14px 14px 14px;padding:11px 14px;font-size:15px;line-height:1.55}
+.bub small{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .bub{background:rgba(0,224,255,.08);border-color:rgba(0,224,255,.35);border-radius:14px 4px 14px 14px}
+.msg.old{opacity:.55}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-left:76px;max-width:560px}
+.answers .opt{padding:11px 14px}
+.answers .opt b{font-size:15px}
+.skip{margin-left:76px;font-size:13px;color:var(--muted)}
+.skip a{color:var(--accent)}
+.da.m{position:static;display:block;padding:16px 12px 120px}
+.da.m .msg .who{width:44px;height:44px}
+.da.m .bub{font-size:14px}
+.da.m .answers{grid-template-columns:1fr;margin-left:0;margin-top:10px}
+.da.m .skip{margin-left:0;margin-top:10px}
+.da.m .talk{gap:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="doc">
+  <h1>캐릭터 생성 시안 (19) · 시작 화면 '선수 등록증'과 이어지게</h1>
+  <p>지금 화면은 7칸(이름·얼굴, 시작 연도, 포지션, 시작 유형, 특성, 스탯, 소속팀)이 한 페이지에 길게 이어져서, 특성 카드 수십 개와 스탯 12줄을 지나야 [커리어 시작]이 나와요. 세 안 모두 <b>시작 화면의 등록증이 그대로 이어져서</b> 고를 때마다 등록증이 채워지고, 다 채우면 도장이 '등록 완료'로 바뀌어요.</p>
+  <p>고를 수 있는 것과 게임 결과는 지금과 똑같아요. 바뀌는 건 보여 주는 순서와 모양뿐이에요. 화면은 '미드 · 유망주 · 2012년'을 고르는 중인 모습이에요.</p>
+</div>
+
+<div class="doc"><h2>가. 한 단계씩 서류 작성 <small>추천</small></h2>
+<p>왼쪽에 7단계, 가운데에는 <b>지금 단계 하나만</b>, 오른쪽 등록증이 바로바로 채워져요. [다음]으로 넘어가고, 왼쪽 단계를 눌러 언제든 되돌아갈 수 있어요. 처음 하는 친구도 길을 잃지 않아요. 휴대폰은 위에 진행 막대, 아래에 작은 등록증이 붙어 있어요.</p></div>
+<div class="row"><div><p class="lbl">PC (3단계 포지션을 고르는 중)</p><div class="pc" id="a-pc"></div></div><div><p class="lbl">휴대폰</p><div class="mob"><div class="scr" id="a-m"></div></div></div></div>
+
+<div class="doc"><h2>나. 등록증을 바로 고치기</h2>
+<p>가운데 큰 등록증의 칸을 누르면 그 자리에서 고쳐요. 얼굴은 사진 칸 아래 화살표로 바꾸고, 특성·스탯처럼 긴 것은 오른쪽 서랍에서 고쳐요. 모든 칸이 한 화면에 보여서 빨라요. 휴대폰은 서랍이 아래에서 올라와요.</p></div>
+<div class="row"><div><p class="lbl">PC (스탯 칸을 연 모습)</p><div class="pc" id="b-pc"></div></div><div><p class="lbl">휴대폰</p><div class="mob"><div class="scr" id="b-m"></div></div></div></div>
+
+<div class="doc"><h2>다. 입단 면접</h2>
+<p>구단 코치(도트 얼굴)가 한 번에 하나씩 물어보고, 큰 버튼으로 답해요. 스탯은 '자신 있는 플레이'로 고르면 보너스 포인트가 알아서 나뉘고, 세세하게 정하고 싶으면 '직접 정하기'를 눌러요. 이야기 느낌이 가장 강하지만 다시 고치려면 조금 돌아가야 해요.</p></div>
+<div class="row"><div><p class="lbl">PC (포지션을 묻는 중)</p><div class="pc" id="c-pc"></div></div><div><p class="lbl">휴대폰</p><div class="mob"><div class="scr" id="c-m"></div></div></div></div>
+
+<div class="doc"><h2>한눈에 비교</h2></div>
+<table class="cmp">
+  <tr><th></th><th>가. 한 단계씩 서류</th><th>나. 등록증 바로 고치기</th><th>다. 입단 면접</th></tr>
+  <tr><td>한 화면에 보이는 것</td><td>지금 단계 하나</td><td>전부 (긴 것은 서랍)</td><td>질문 하나</td></tr>
+  <tr><td>처음 하는 사람</td><td>가장 쉬움</td><td>보통</td><td>쉬움, 재밌음</td></tr>
+  <tr><td>여러 번 해 본 사람</td><td>단계를 눌러 바로 이동</td><td>가장 빠름</td><td>느림 ('직접 정하기' 필요)</td></tr>
+  <tr><td>[전부 무작위]</td><td>왼쪽 단계 목록 아래</td><td>등록증 아래</td><td>"알아서 해 주세요" 답</td></tr>
+  <tr><td>고치는 양</td><td>중간</td><td>많음</td><td>많음 (질문 문장 새로)</td></tr>
+</table>
+<div class="doc"><p style="margin-top:16px">섞어도 돼요. 예: "가인데 6단계 스탯만 나의 서랍처럼", "가인데 단계마다 다의 코치 한마디".</p></div>
+</div>
+
+<script>function motionOff() { return false; }</script>
+<script src="../data/ui.js"></script>
+<script src="../js/portrait.js"></script>
+<script>
+var SEED = Math.floor(Math.random() * 100000);
+var ME = (typeof randomLook === "function") ? randomLook("me" + SEED) : null;
+var FA = (typeof FREE_AGENT_UNIFORM !== "undefined") ? FREE_AGENT_UNIFORM : null;
+function meFace(scale, mood) { try { return portraitHTMLFrom(ME, FA, { scale: scale, mood: mood }); } catch (e) { return "🧑"; } }
+function npc(i, scale) { try { return portraitHTMLFrom(randomLook("coach" + SEED + i), UNIFORM_POOL[(SEED + i) % UNIFORM_POOL.length], { scale: scale }); } catch (e) { return "🧑"; } }
+
+var POS = [["탑", "외딴 라인에서 버티며 1:1을 이겨내는 포지션", "라인전, 멘탈"], ["정글", "맵 전체를 돌며 판을 설계하는 포지션", "운영, 시야"],
+  ["미드", "맵 한가운데에서 가장 많은 챔피언을 다루는 포지션", "반응속도, 챔피언 폭"], ["원딜", "뒤에서 꾸준히 피해를 넣는 팀의 주포", "입력 정확도, 거리 조절"],
+  ["서포트", "시야를 밝히고 팀을 이끄는 포지션", "오더, 한타"]];
+var STEPS = ["이름과 얼굴", "시작 연도", "포지션", "시작 유형", "특성", "스탯", "소속팀"];
+
+function regCard(opts) {
+  opts = opts || {};
+  var f = function (k, v) { return '<div class="fld">' + k + '<span' + (v ? "" : ' class="empty"') + ">" + (v || "") + "</span></div>"; };
+  return '<div class="reg"><h3>e스포츠 선수 등록증</h3><div class="yr">2012 시즌</div>' +
+    '<div class="body"><div class="slot">' + meFace(opts.m ? 2 : 2.5) + '</div><div class="flds">' +
+    f("선수명", "김챌린") + f("포지션", "미드") + f("유형", "유망주, 17세") + f("소속", "") + "</div></div>" +
+    '<div class="stamp">작성 중</div>' +
+    '<div class="score"><div class="n">스탯 점수 <b>31.1</b> <i>2부 유망주</i></div><div class="gauge"><i style="width:31%"></i><u style="left:46%"></u><u style="left:62%"></u></div></div>' +
+    '<div class="chips"><span class="chip g">유망주</span><span class="chip dim">특성 3칸 남음</span></div></div>';
+}
+
+/* 가 */
+function A(m) {
+  var opts = POS.map(function (p, i) {
+    return '<button class="opt' + (i === 2 ? " on" : "") + '"><b>' + p[0] + '</b><p>' + p[1] + '</p><div class="star">가산점: ' + p[2] + "</div></button>";
+  }).join("");
+  if (m) {
+    var prog = STEPS.map(function (s, i) { return '<i class="' + (i < 2 ? "done" : i === 2 ? "cur" : "") + '"></i>'; }).join("");
+    return '<div class="ga m"><div class="mprog">' + prog + '</div><div class="stepname">3 / 7 단계</div><h2>포지션</h2>' +
+      '<p class="hint">가산점 스탯은 시작값 +8, 훈련 효과 +20%, 경기에서 1.5배로 계산돼요.</p><div class="opts">' + opts + "</div>" +
+      '<div class="nav"><button class="btn">이전</button><button class="btn pri">다음: 시작 유형</button></div>' +
+      '<div class="minicard">' + meFace(1) + '<div><b>김챌린</b>미드, 유망주, 2012년</div><span class="chip" style="color:var(--gold);border-color:var(--gold)">작성 중</span></div></div>';
+  }
+  var steps = STEPS.map(function (s, i) { return '<li class="' + (i < 2 ? "done" : i === 2 ? "cur" : "") + '">' + s + "</li>"; }).join("");
+  return '<div class="ga"><div><ol class="steps">' + steps + '</ol><button class="btn" style="margin-top:16px;width:100%;font-size:13px">전부 무작위로</button></div>' +
+    '<div class="main"><h2>포지션</h2><p class="hint">어떤 자리에서 뛸까요? 가산점 스탯은 시작값 +8, 훈련 효과 +20%, 경기에서 1.5배로 계산돼요.</p>' +
+    '<div class="opts">' + opts + '</div><div class="nav"><button class="btn">이전: 시작 연도</button><button class="btn pri">다음: 시작 유형</button></div></div>' +
+    '<div class="side">' + regCard() + "</div></div>";
+}
+
+/* 나 */
+var ST = [["입력 정확도", 26, 0], ["라인전", 27, 0], ["한타", 27, 0], ["운영", 27, 0], ["시야", 26, 0], ["오더", 30, 0],
+  ["챔피언 폭", 39, 5, 1], ["반응속도", 41, 5, 1], ["멘탈", 30, 0], ["거리 조절", 27, 0], ["적응력", 25, 0], ["집중력", 30, 0]];
+function stats(m) {
+  return ST.map(function (s) {
+    return '<div class="srow' + (s[3] ? " st" : "") + '"><span>' + (s[3] ? "★" : "") + s[0] + '</span><span class="bar"><i style="width:' + s[1] + '%"></i></span><b>' + s[1] +
+      '</b><span class="pm"><button>−</button><button>+</button></span></div>';
+  }).join("");
+}
+function bigReg(m) {
+  var e = function (k, v, open) { return '<div class="efld' + (open ? " open" : "") + '">' + k + '<button class="v">' + v + "<em>" + (open ? "여는 중" : "바꾸기") + "</em></button></div>"; };
+  return '<div class="reg bigreg"><h3>e스포츠 선수 등록증</h3><div class="yr">2012 시즌</div>' +
+    '<div class="body"><div><div class="slot">' + meFace(m ? 2 : 3) + '</div><div class="arrows"><button>◀</button><button>🎲</button><button>▶</button></div></div><div class="flds">' +
+    e("선수명", "김챌린") + e("데뷔", "2012년") + e("포지션", "미드") + e("유형", "유망주, 17세") + e("특성", "2 / 3개") + e("스탯", "31.1점", true) + e("소속", "무작위") +
+    '</div></div><div class="stamp">작성 중</div></div>';
+}
+function B(m) {
+  var drawer = '<h3>스탯</h3><p class="sub">보너스 포인트를 나눠요. ★ = 포지션 가산점 스탯.</p><div class="presets"><button>포지션 맞춤</button><button>라인전</button><button>운영</button><button>고르게</button><button>다시 굴리기</button></div>' +
+    stats(m) + '<div class="left"><span>남은 포인트</span><b>10</b></div>';
+  if (m) return '<div class="na m"><div class="stage">' + bigReg(true) + '</div><div class="sheet"><div class="grab"></div>' + drawer + "</div></div>";
+  return '<div class="na"><div class="stage">' + bigReg(false) + '<div class="under"><button class="btn">전부 무작위</button><button class="btn pri">등록하고 커리어 시작</button></div></div>' +
+    '<div class="drawer">' + drawer + "</div></div>";
+}
+
+/* 다 */
+function C(m) {
+  var coach = '<div class="who">' + npc(1, m ? 1 : 1.5) + "</div>";
+  var mine = '<div class="who">' + meFace(m ? 1 : 1.5) + "</div>";
+  var ans = POS.map(function (p, i) { return '<button class="opt' + (i === 2 ? " on" : "") + '"><b>' + p[0] + '</b><p>' + p[1] + "</p></button>"; }).join("");
+  var talk =
+    '<div class="msg old">' + coach + '<div class="bub"><small>한빛 코치</small>등록 서류 확인했어요. 김챌린 선수, 언제부터 뛸 생각이에요?</div></div>' +
+    '<div class="msg me old">' + mine + '<div class="bub">2012년, 리그 원년부터요.</div></div>' +
+    '<div class="msg">' + coach + '<div class="bub"><small>한빛 코치</small>좋아요. 그럼 어느 자리에서 뛰고 싶어요?</div></div>' +
+    '<div class="answers">' + ans + '</div><div class="skip">고민되면 <a href="#">알아서 해 주세요</a> (전부 무작위)</div>';
+  if (m) return '<div class="da m"><div class="talk">' + talk + "</div>" +
+    '<div class="minicard">' + meFace(1) + '<div><b>김챌린</b>2012년, 포지션 고르는 중</div><span class="chip" style="color:var(--gold);border-color:var(--gold)">3 / 7</span></div></div>';
+  return '<div class="da"><div class="talk">' + talk + '</div><div>' + regCard() + "</div></div>";
+}
+
+document.getElementById("a-pc").innerHTML = A(false);
+document.getElementById("a-m").innerHTML = A(true);
+document.getElementById("b-pc").innerHTML = B(false);
+document.getElementById("b-m").innerHTML = B(true);
+document.getElementById("c-pc").innerHTML = C(false);
+document.getElementById("c-m").innerHTML = C(true);
+</script>
+</body>
+</html>

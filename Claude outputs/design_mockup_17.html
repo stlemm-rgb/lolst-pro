@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>시작 페이지 시안 (17)</title>
+<style>
+:root{--bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;--accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--good:#2bff9e;--bad:#ff3d71;
+  --grad:linear-gradient(90deg,#b44dff,#00e0ff);--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7)}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--text);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;padding:24px 16px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+h2.t{font-size:19px;margin:44px 0 4px}
+.why{font-size:14px;color:#b9b9cc;margin:0 0 14px;line-height:1.6}.why b{color:var(--text)}
+.rec{display:inline-block;font-size:11px;background:var(--gold);color:#000;border-radius:6px;padding:1px 6px;font-weight:800;margin-left:6px;vertical-align:middle}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:22px;align-items:start}
+@media(max-width:1000px){.row{grid-template-columns:1fr}}
+.lbl{font-size:12px;color:var(--muted);margin:0 0 6px}
+.pc{border:1px solid #33334d;border-radius:12px;overflow:hidden;height:600px;position:relative;background:var(--bg)}
+.mob{width:340px;max-width:100%;margin:0 auto;border-radius:36px;padding:10px;background:linear-gradient(160deg,#2a2a40,#0d0d16);box-shadow:0 0 0 2px #33334d,0 20px 50px rgba(0,0,0,.6)}
+.mob .scr{border-radius:28px;overflow:hidden;height:640px;position:relative;background:var(--bg);overflow-y:auto}
+.px{image-rendering:pixelated;image-rendering:crisp-edges}
+.note{font-size:11px;color:var(--gold);margin-top:2px}
+
+/* 공통 부품 */
+.logo{font-weight:900;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1.05}
+.tag{color:#c9c9dc}
+.btn{display:block;width:100%;border:0;border-radius:12px;font:inherit;font-weight:800;color:#fff;cursor:pointer;text-align:left}
+.btn-new{background:var(--grad-btn);padding:14px 18px;font-size:17px;box-shadow:0 0 24px rgba(0,224,255,.25)}
+.btn-new small,.btn-go small{display:block;font-weight:400;font-size:12px;opacity:.85;margin-top:2px}
+.btn-go{background:var(--panel-2);border:1px solid rgba(0,224,255,.45);padding:10px 14px;font-size:15px;display:flex;align-items:center;gap:10px}
+.btn-go .pf{flex:none;border-radius:8px;background:#0b0b14}
+.ver{font-size:11px;color:var(--muted)}
+.feat{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.feat li{font-size:14px;line-height:1.5;color:#d6d6e6}
+
+/* ===== A: 네온 타이틀 (가운데 정렬) ===== */
+.A{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;
+  background:radial-gradient(ellipse at 50% 30%,rgba(180,77,255,.22),transparent 60%),radial-gradient(ellipse at 50% 100%,rgba(0,224,255,.15),transparent 55%),var(--bg)}
+.A .five{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.A .five img{filter:drop-shadow(0 0 8px rgba(0,224,255,.35))}
+.A .logo{font-size:56px}
+.A .tag{font-size:16px;margin:8px 0 22px}
+.A .btns{width:min(360px,100%);display:grid;gap:10px}
+.A .btn{text-align:center}.A .btn-go{justify-content:center}
+.A .feat{grid-template-columns:repeat(4,1fr);gap:10px;margin-top:26px;width:min(860px,100%)}
+.A .feat li{background:rgba(17,17,28,.8);border:1px solid var(--border);border-radius:12px;padding:10px;font-size:13px}
+.A .feat li b{display:block;font-size:22px;margin-bottom:4px}
+.A .ver{position:absolute;right:14px;bottom:10px}
+.mob .A{justify-content:flex-start;padding:34px 18px 20px}
+.mob .A .logo{font-size:40px}
+.mob .A .feat{grid-template-columns:1fr 1fr;gap:8px}
+.mob .A .feat li{font-size:12px;text-align:left}
+
+/* ===== B: 챌린저 로드 (길 따라 오르기) ===== */
+.B{height:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);background:linear-gradient(120deg,#1a0f2e 0%,#0d1a2b 60%,#07070d 100%)}
+.B .l{padding:48px 40px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.B .logo{font-size:50px}
+.B .tag{font-size:15px;margin-top:-4px}
+.B .feat{margin:6px 0 10px}
+.B .btns{display:grid;gap:10px;max-width:380px}
+.B .r{position:relative;display:flex;align-items:center;justify-content:center}
+.road{position:relative;width:300px;height:470px}
+.road svg{position:absolute;inset:0}
+.stop{position:absolute;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;white-space:nowrap}
+.stop i{width:14px;height:14px;border-radius:50%;background:var(--panel-2);border:2px solid var(--accent);box-shadow:0 0 10px rgba(0,224,255,.6);flex:none}
+.stop.top i{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px rgba(255,210,63,.8)}
+.stop.top{color:var(--gold)}
+.road .me{position:absolute;left:-58px;bottom:0}
+.road .me span{display:block;text-align:center;font-size:11px;color:var(--accent);font-weight:700}
+.B .ver{position:absolute;left:40px;bottom:12px}
+.mob .B{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+.mob .B .l{padding:26px 18px 10px;gap:10px}
+.mob .B .logo{font-size:38px}
+.mob .B .r{order:-1;padding:22px 12px 0}
+.steps{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 3px;font-size:12px;font-weight:700}
+.steps .st{display:inline-flex;align-items:center;gap:3px;border:1px solid rgba(0,224,255,.5);border-radius:999px;padding:3px 8px;background:rgba(0,224,255,.06)}
+.steps .st.top{color:var(--gold);border-color:var(--gold)}
+.steps .me2{padding:0 8px 0 0}.steps .me2 img{width:26px;height:26px}
+.steps .ar{color:var(--accent2)}
+.mob .B .ver{left:auto;right:14px;bottom:8px}
+.mob .B .feat li{font-size:13px}
+
+/* ===== C: 방송 무대 (e스포츠 중계 화면) ===== */
+.C{height:100%;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+.C .live{display:flex;align-items:center;gap:10px;background:#0b0b14;border-bottom:1px solid var(--border);padding:7px 14px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.C .live b{background:var(--bad);color:#fff;border-radius:4px;padding:1px 6px;font-size:11px}
+.C .tick{display:inline-block;animation:tick 22s linear infinite}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.C .stage{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;
+  background:linear-gradient(180deg,transparent 55%,rgba(0,224,255,.08)),repeating-linear-gradient(90deg,transparent 0 59px,rgba(255,255,255,.025) 59px 60px)}
+.C .sides{position:absolute;left:0;right:0;top:40px;display:flex;justify-content:space-between;padding:0 26px;opacity:.9}
+.C .side{display:grid;gap:4px}
+.C .side.bl img{filter:drop-shadow(0 0 6px rgba(0,224,255,.5))}
+.C .side.rd img{filter:drop-shadow(0 0 6px rgba(255,61,113,.5));transform:scaleX(-1)}
+.C .vs{font-weight:900;font-size:14px;color:var(--muted);letter-spacing:.3em;margin-bottom:6px}
+.C .logo{font-size:60px;text-align:center}
+.C .tag{font-size:15px;margin:8px 0 20px;text-align:center}
+.C .btns{width:min(340px,100%);display:grid;gap:10px}
+.C .btn{text-align:center}.C .btn-go{justify-content:center}
+.C .bottom{border-top:1px solid var(--border);background:#0b0b14;display:grid;grid-template-columns:repeat(4,1fr)}
+.C .bottom div{padding:10px 12px;font-size:12.5px;line-height:1.45;color:#d6d6e6;border-right:1px solid var(--border)}
+.C .bottom div:last-child{border-right:0}
+.C .bottom b{color:var(--accent);display:block;font-size:11px;letter-spacing:.12em;margin-bottom:2px}
+.C .ver{position:absolute;right:12px;bottom:8px}
+.mob .C .sides{top:14px;padding:0 10px}
+.mob .C .side{gap:2px}
+.mob .C .logo{font-size:40px;margin-top:150px}
+.mob .C .bottom{grid-template-columns:1fr 1fr}
+.mob .C .bottom div:nth-child(2){border-right:0}
+.mob .C .bottom div{border-bottom:1px solid var(--border)}
+</style></head>
+<body><div class="wrap">
+<h1>🏁 시작 페이지 시안 (17) — 처음 접속할 때 보는 화면</h1>
+<p class="why">들어가는 것: <b>게임 이름 · 한 줄 소개 · 게임 특징 4줄 · [새 게임] · [이어하기](저장 있을 때만) · 버전</b>.<br>
+저장이 있는 사람은 지금처럼 바로 게임으로 가요. 이 화면은 <b>처음 접속할 때</b>와 <b>설정 → 새 게임</b>에서만 보여요.<br>
+얼굴은 게임에 있는 진짜 도트 얼굴이에요 (새로고침하면 바뀌어요). 왼쪽은 PC 화면, 오른쪽은 휴대폰 화면이에요.</p>
+
+<h2 class="t">A. 네온 타이틀 <span class="rec">추천</span></h2>
+<p class="why">게임 타이틀 화면의 정석. 가운데 큰 로고, 그 위에 선수 5명(탑~서폿), 아래 버튼과 특징 카드 4칸. <b>깔끔하고 첫눈에 무슨 게임인지 보여요.</b></p>
+<div class="row"><div><div class="lbl">PC</div><div class="pc" id="pcA"></div></div><div><div class="lbl">휴대폰</div><div class="mob"><div class="scr" id="mobA"></div></div></div></div>
+
+<h2 class="t">B. 챌린저 로드 (오르는 길)</h2>
+<p class="why">게임 이름 그대로 <b>'길'</b>을 그림으로. 오른쪽에 내 선수가 <b>주전 → 1부 승격 → 리그 우승 → 월드 우승 → 전설</b>로 올라가는 길(게임 안 '다음 목표' 단계와 같아요). 이야기 느낌이 강해요.</p>
+<div class="row"><div><div class="lbl">PC</div><div class="pc" id="pcB"></div></div><div><div class="lbl">휴대폰</div><div class="mob"><div class="scr" id="mobB"></div></div></div></div>
+
+<h2 class="t">C. 방송 무대 (e스포츠 중계)</h2>
+<p class="why">경기 중계 화면처럼. 위에 빨간 <b>LIVE</b> 소식 줄이 흘러가고, 양쪽에 두 팀 5명씩 마주 보고, 아래 특징 4칸. <b>가장 화려하고 e스포츠 느낌이 강해요.</b></p>
+<div class="row"><div><div class="lbl">PC</div><div class="pc" id="pcC"></div></div><div><div class="lbl">휴대폰</div><div class="mob"><div class="scr" id="mobC"></div></div></div></div>
+
+<p class="why" style="margin-top:36px">고르실 때 섞어도 돼요. 예: "A인데 C의 LIVE 줄 넣기", "B의 길을 A 아래에".</p>
+</div>
+
+<!-- 진짜 게임의 도트 얼굴 그리기 (data/ui.js PORTRAIT · js/portrait.js) -->
+<script src="../data/ui.js"></script>
+<script src="../js/portrait.js"></script>
+<script>
+var SEED = Math.floor(Math.random() * 100000);
+function face(i, scale, uni, mood) {
+  try { return portraitHTMLFrom(randomLook("start" + SEED + "_" + i), uni || UNIFORM_POOL[(SEED + i) % UNIFORM_POOL.length], { scale: scale, mood: mood }); }
+  catch (e) { return '<span style="font-size:' + 20 * scale + 'px">🧑</span>'; }
+}
+function meFace(scale, mood) { return face(0, scale, UNIFORM_POOL[SEED % UNIFORM_POOL.length], mood); }
+
+var TAG = "무명 신인에서 전설까지, 한 주씩";
+var FEAT = [
+  ["🎮", "무명 신인으로 시작해 월드 챔피언, 그리고 전설까지"],
+  ["📅", "한 주씩 훈련을 고르고, 경기를 뛰고, 팬·동료의 연락에 답해요"],
+  ["🏆", "2012년부터 이어지는 리그 역사 속에서 1부 승격·이적·우승에 도전"],
+  ["🌏", "해외 리그 선수들과 국제대회에서 맞붙어요"],
+];
+function btns() {
+  return '<div class="btns">' +
+    '<button class="btn btn-new">▶ 새 게임<small>내 선수를 만들고 커리어 시작</small></button>' +
+    '<button class="btn btn-go"><span class="pf">' + meFace(1) + '</span><span>이어하기<small>김챌린 · 미드 · 2014년 23주차</small></span></button>' +
+    '</div><div class="note">↑ [이어하기]는 저장이 있을 때만 보여요</div>';
+}
+var VER = '<div class="ver">ver 1.2.1</div>';
+
+function A(mobile) {
+  var five = ""; for (var i = 1; i <= 5; i++) five += face(i, mobile ? 1.5 : 2, UNIFORM_POOL[SEED % UNIFORM_POOL.length]);
+  return '<div class="A"><div class="five">' + five + '</div><div class="logo">챌린저 로드</div><div class="tag">' + TAG + "</div>" + btns() +
+    '<ul class="feat">' + FEAT.map(function (f) { return "<li><b>" + f[0] + "</b>" + f[1] + "</li>"; }).join("") + "</ul>" + VER + "</div>";
+}
+function B(mobile) {
+  var stops = [["주전", 30, 400], ["1부 승격", 120, 315], ["리그 우승", 60, 225], ["월드 우승", 150, 135], ["전설", 90, 40]];
+  var pts = [[30, 440]].concat(stops.map(function (s) { return [s[1] + 7, s[2] + 7]; }));
+  var d = "M" + pts.map(function (p) { return p.join(" "); }).join(" L");
+  var road = '<div class="road"><svg viewBox="0 0 300 470"><defs><linearGradient id="g" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#00e0ff"/><stop offset=".75" stop-color="#b44dff"/><stop offset="1" stop-color="#ffd23f"/></linearGradient></defs>' +
+    '<path d="' + d + '" fill="none" stroke="url(#g)" stroke-width="4" stroke-linejoin="round" stroke-dasharray="10 7" opacity=".9"/></svg>' +
+    stops.map(function (s, i) { return '<div class="stop' + (i === 4 ? " top" : "") + '" style="left:' + s[1] + "px;top:" + s[2] + 'px"><i></i>' + (i === 4 ? "👑 " : "") + s[0] + "</div>"; }).join("") +
+    '<div class="me">' + meFace(2) + "<span>나</span></div></div>";
+  if (mobile) road = '<div class="steps"><span class="st me2">' + meFace(1) + '나</span>' + stops.map(function (s, i) { return '<span class="ar">›</span><span class="st' + (i === 4 ? " top" : "") + '">' + (i === 4 ? "👑 " : "") + s[0] + "</span>"; }).join("") + "</div>";
+  return '<div class="B"><div class="l"><div class="logo">챌린저<br>로드</div><div class="tag">' + TAG + '</div><ul class="feat">' +
+    FEAT.map(function (f) { return "<li>" + f[0] + " " + f[1] + "</li>"; }).join("") + "</ul>" + btns() + '</div><div class="r">' + road + "</div>" + VER + "</div>";
+}
+function C(mobile) {
+  var bl = "", rd = "", n = mobile ? 3 : 5, sc = mobile ? 1 : 2;
+  for (var i = 1; i <= n; i++) { bl += face(i, sc, UNIFORM_POOL[SEED % 12]); rd += face(i + 10, sc, UNIFORM_POOL[(SEED + 5) % 12]); }
+  var news = "📰 2012 시즌 개막 · 신인 드래프트 마감 임박 · 2부 리그 연습생 모집 중 · 월드 챔피언십 42주차 개막 · 해외 리그 러브콜 소문 · ";
+  return '<div class="C"><div class="live"><b>LIVE</b><span class="tick">' + news + news + "</span></div>" +
+    '<div class="stage"><div class="sides"><div class="side bl">' + bl + '</div><div class="side rd">' + rd + "</div></div>" +
+    '<div class="vs">PRO GAMER CAREER</div><div class="logo">챌린저 로드</div><div class="tag">' + TAG + "</div>" + btns() + VER + "</div>" +
+    '<div class="bottom">' + FEAT.map(function (f, i) { return "<div><b>" + ["START", "WEEKLY", "HISTORY", "WORLD"][i] + "</b>" + f[0] + " " + f[1] + "</div>"; }).join("") + "</div></div>";
+}
+document.getElementById("pcA").innerHTML = A();  document.getElementById("mobA").innerHTML = A(true);
+document.getElementById("pcB").innerHTML = B();  document.getElementById("mobB").innerHTML = B(true);
+document.getElementById("pcC").innerHTML = C(false); document.getElementById("mobC").innerHTML = C(true);
+</script>
+</body></html>

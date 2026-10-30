@@ -287,7 +287,7 @@ pages.transfer = function () {
   const offerCard =
     '<div class="card"><h2>받은 제안</h2>' +
       (offers.length
-        ? offers.map(function (m) { return "<p>📩 " + escapeHTML(m.title) + "</p>"; }).join("") + '<button class="primary" data-go-sns="1">SNS에서 답하기</button>'
+        ? offers.map(function (m) { return "<p>📩 " + escapeHTML(m.title) + "</p>"; }).join("") + '<button class="primary" data-go-sns="1">📱 휴대폰에서 답하기</button>'
         : '<p class="muted">' + (open ? "답하지 않은 제안이 없어요." : "제안은 여름(" + SUMMER_MARKET.start + "주차, 0~1개)과 비시즌(" + CONTRACT.windowStart + "주차)에 SNS로 와요.") + "</p>") +
     "</div>";
 
@@ -368,6 +368,5 @@ function bindMarket(page) {
       }, "이적 요청");
     };
   });
-  const go = page.querySelector("[data-go-sns]");
-  if (go) go.onclick = function () { snsTab = "inbox"; selectMenu("sns"); };
+  page.querySelectorAll("[data-go-sns]").forEach(function (go) { go.onclick = openPhone; }); // 221: 휴대폰 창 (대시보드 지난주 결과·이적 시장)
 }

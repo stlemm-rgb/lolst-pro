@@ -113,7 +113,8 @@ const NEWS_PAPER = {
 };
 
 const MSG_DECK = {
-  skipKinds: ["offer", "staffPick", "retire"],      // 카드로 안 보여 주는 연락 (계약 제안·인사 카드·은퇴는 지금처럼 목록에서)
+  skipKinds: ["staffPick"],      // 휴대폰에 안 보여 주는 연락 (인사 카드 뒤집기는 오른쪽 목록에서). 220: 계약 제안·은퇴도 휴대폰으로
+  staffNote: "🧑‍💼 인사 후보 카드가 와 있어요. 오른쪽 목록에서 골라요.",
   title: "답장 대기",
   pastTitle: "지난 연락",
   phoneTitle: "받은 연락",
@@ -141,3 +142,18 @@ const SHORTCUT_POPUP_KEYS = [
   { key: "A (ㅁ)", name: "'○주차 정리' 창 확인 (다음은 경기 재생) · Enter·Esc도 됨" },
   { key: "Esc",    name: "열린 창 닫기 (경기 재생·신문·대성공·목록)" },
 ];
+
+// ━━━━━ 캐릭터 생성 단계 (213, js/creation.js, 시안 19 가) ━━━━━
+// 순서 = 화면 순서. hint = 단계 제목 아래 안내 (pos·trait·stat은 앞에 숫자를 붙여서 씀)
+const CREATION_STEPS = [
+  { id: "name",  name: "이름과 얼굴", hint: "닉네임과 얼굴을 정해요. 이름은 나중에 설정에서 바꿀 수 있어요." },
+  { id: "year",  name: "시작 연도",   hint: "늦게 시작할수록 훈련할 시간이 짧아서 시작 스탯에 보정을 받아요. 한 시즌은 52주예요." },
+  { id: "pos",   name: "포지션",      hint: "" },
+  { id: "arch",  name: "시작 유형",   hint: "나이, 시작 스탯, 체력, 특성 개수가 달라요." },
+  { id: "trait", name: "특성",        hint: "눌러서 고르고, 다시 누르면 빠져요. 덜 고르고 시작하면 남은 칸은 무작위로 채워져요. 나쁜 특성은 게임 중 이벤트로만 생겨요." },
+  { id: "stat",  name: "스탯",        hint: "프리셋은 그 스탯들에 고르게 나눠요. ★ = 포지션 가산점 스탯. 스탯 이름에 마우스를 올리면 설명이 나와요." },
+  { id: "team",  name: "소속팀",      hint: "뛰고 싶은 팀을 고르세요. 내 선수는 그 팀의 주전이 돼요. ★ = 예상 전력 (팀원 수준, 같은 리그 안에서 비교)." },
+];
+
+// 등록 완료 도장 연출 (214, js/creation.js playRegisterStamp): 도장이 닿는 때·전체 길이(ms)
+const REGISTER_FX = { stampText: "등록 완료", hitMs: 700, totalMs: 1650 };

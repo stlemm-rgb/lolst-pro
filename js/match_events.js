@@ -336,12 +336,16 @@ function matchEventInfo(e) {
 }
 
 // 사건 문장 (이름은 nameOf(id, 팀쪽, 포지션)으로 바꿈 → 화면마다 다르게)
+// 219: 우리 팀이 오른쪽(b)인 경기면 색을 바꾸는 class (우리 팀 = 늘 하늘색)
+function sideSwapClass(m) { const t = myTeam(); return t && m && m.b === t.id ? " side-swap" : ""; }
+
 function matchEventText(e, nameOf) {
   const info = matchEventInfo(e);
   if (!info) return "";
   return escapeHTML(info.text)
-    .replace(/\{p\}/g, function () { return e.pp ? nameOf(e.p, e.s, e.pp) : "?"; })
-    .replace(/\{v\}/g, function () { return e.vp ? nameOf(e.v, 1 - e.s, e.vp) : "상대"; });
+    // 219: 이름을 그 선수 팀 색으로 (우리 팀 = 하늘, 상대 = 분홍 — css 27부분 --side-a/--side-b, 우리 팀이 b면 sideSwapClass로 바꿈)
+    .replace(/\{p\}/g, function () { return '<span class="ev-n s' + e.s + '">' + (e.pp ? nameOf(e.p, e.s, e.pp) : "?") + "</span>"; })
+    .replace(/\{v\}/g, function () { return e.vp ? '<span class="ev-n s' + (1 - e.s) + '">' + nameOf(e.v, 1 - e.s, e.vp) + "</span>" : "상대"; });
 }
 
 // 내 선수 하이라이트 (지난주 결과 한 줄용): 좋은 사건·실수 이름

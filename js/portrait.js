@@ -150,6 +150,42 @@ function portraitImg(id, opts) {
 // 표에 넣는 얼굴 칸
 function faceTd(id) { return '<td class="pf-cell">' + portraitImg(id, { face: true, size: 36 }) + "</td>"; }
 
+// ----- 도트 글자 로고 (212, 시작 화면) -----
+// 작은 캔버스에 글자를 그린 뒤 0/1로 잘라서 크게 키움 → 얼굴과 같은 도트 느낌 (글꼴 파일 없이, 오프라인 OK)
+// cell = 도트 한 칸 크기(px), opts.size = 원본 글자 크기, opts.from/to = 위→아래 색
+const PX_LOGO_CACHE = {};
+function pixelLogoHTML(text, cell, opts) {
+  opts = opts || {};
+  const key = text + "|" + cell + "|" + (opts.size || 22) + "|" + opts.from + "|" + opts.to;
+  if (PX_LOGO_CACHE[key]) return PX_LOGO_CACHE[key];
+  let html = '<span class="px-logo-text">' + text + "</span>";
+  try {
+    const fs = opts.size || 22, font = "900 " + fs + 'px "Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif';
+    const c = document.createElement("canvas"), x = c.getContext("2d");
+    x.font = font;
+    const w = Math.ceil(x.measureText(text).width) + 2, h = Math.ceil(fs * 1.25) + 2;
+    c.width = w; c.height = h; x.font = font; x.textBaseline = "middle"; x.fillStyle = "#fff"; x.fillText(text, 1, h / 2 + 1);
+    const d = x.getImageData(0, 0, w, h).data, on = [];
+    let top = h, bot = 0;
+    for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) if (d[(yy * w + xx) * 4 + 3] > 110) { on.push([xx, yy]); top = Math.min(top, yy); bot = Math.max(bot, yy); }
+    if (!on.length) throw new Error("no pixels");
+    const hex = function (v) { return [parseInt(v.substr(1, 2), 16), parseInt(v.substr(3, 2), 16), parseInt(v.substr(5, 2), 16)]; };
+    const a = hex(opts.from || "#00e0ff"), b = hex(opts.to || "#b44dff");
+    const o = document.createElement("canvas"); o.width = w + 1; o.height = bot - top + 2;
+    const ox = o.getContext("2d");
+    ox.fillStyle = "rgba(0,0,0,0.9)";
+    on.forEach(function (p) { ox.fillRect(p[0] + 1, p[1] - top + 1, 1, 1); }); // 그림자
+    on.forEach(function (p) {
+      const t = (p[1] - top) / Math.max(1, bot - top);
+      ox.fillStyle = "rgb(" + [0, 1, 2].map(function (k) { return Math.round(a[k] + (b[k] - a[k]) * t); }).join(",") + ")";
+      ox.fillRect(p[0], p[1] - top, 1, 1);
+    });
+    html = '<img class="px px-logo" alt="' + text + '" src="' + o.toDataURL() + '" width="' + o.width * cell + '" height="' + o.height * cell + '">';
+  } catch (e) { /* 캔버스가 없으면 글자로 */ }
+  PX_LOGO_CACHE[key] = html;
+  return html;
+}
+
 // ----- 가끔 점프 (크게 보이는 그림만) -----
 (function () {
   if (typeof setInterval !== "function" || typeof document === "undefined" || !document.querySelectorAll) return;

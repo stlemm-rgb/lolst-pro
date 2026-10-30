@@ -148,7 +148,7 @@ function timelineHTML(m, s) {
     return '<tr class="ev-row ev-' + side + " ev-" + (info.cat || "") + (e.p === USER_ID ? " me" : "") + '">' +
       '<td class="r muted small">' + (e.t < 10 ? "0" : "") + e.t + "분</td>" +
       '<td class="c">' + info.icon + "</td>" +
-      '<td><span class="ev-team">' + escapeHTML(teamShort(teams[e.s])) + "</span> " + matchEventText(e, nameOf) + (e.tr ? miniChips([e.tr]) : "") + (e.sg ? ' <span class="joker-tag sig-tag">✒️ 시그니처</span>' : "") + decoyCallHTML(e) + "</td>" +
+      '<td><span class="ev-tm s' + e.s + '">' + escapeHTML(teamShort(teams[e.s])) + "</span> " + matchEventText(e, nameOf) + (e.tr ? miniChips([e.tr]) : "") + (e.sg ? ' <span class="joker-tag sig-tag">✒️ 시그니처</span>' : "") + decoyCallHTML(e) + "</td>" +
       '<td class="r">' + num + "</td></tr>";
   }).join("");
   return '<h2 class="sub">경기 흐름 <span class="muted small">숫자 = 그 팀 점수 ±(실수는 −) · 심리 = 이후 실수·슈퍼플레이 확률이 바뀜' +
@@ -217,7 +217,7 @@ pages.results = function () {
     "<h1>경기 결과</h1>" +
     '<div class="results-layout">' +
       '<div class="card res-list"><h2>' + state.year + " 시즌</h2>" + items + "</div>" +
-      '<div class="res-main"><div class="buttons"><button class="primary" data-replay="' + matchKey(m) + '">▶ 다시 보기</button><span class="muted small">경기 흐름을 미니맵으로 재생해요 (결과는 같아요)</span></div>' + matchHeaderHTML(m) + '<div class="buttons res-tabs">' + tabs + "</div>" + body + "</div>" +
+      '<div class="res-main' + sideSwapClass(m) + '"><div class="buttons"><button class="primary" data-replay="' + matchKey(m) + '">▶ 다시 보기</button><span class="muted small">경기 흐름을 미니맵으로 재생해요 (결과는 같아요)</span></div>' + matchHeaderHTML(m) + '<div class="buttons res-tabs">' + tabs + "</div>" + body + "</div>" +
     "</div>"
   );
 };
@@ -294,7 +294,7 @@ function seriesSummaryHTML(m) {
     key.slice(0, 10).map(function (k) {
       const teams = [m.a, m.b];
       const nameOf = function (id, side, pos) { return detailName(id, teams[side], pos); };
-      return "<li>" + '<span class="muted small">' + (k.set + 1) + "세트 " + k.e.t + "분</span> " + k.info.icon + " " + matchEventText(k.e, nameOf) + (k.e.tr ? miniChips([k.e.tr]) : "") + (k.e.sg ? ' <span class="joker-tag sig-tag">✒️ 시그니처</span>' : "") +
+      return "<li>" + '<span class="muted small">' + (k.set + 1) + "세트 " + k.e.t + '분</span> <span class="ev-tm s' + k.e.s + '">' + escapeHTML(teamShort(teams[k.e.s])) + "</span> " + k.info.icon + " " + matchEventText(k.e, nameOf) + (k.e.tr ? miniChips([k.e.tr]) : "") + (k.e.sg ? ' <span class="joker-tag sig-tag">✒️ 시그니처</span>' : "") +
         (k.e.x ? ' <b class="' + (k.e.x > 0 ? "up" : "down") + '">' + (k.e.x > 0 ? "+" : "−") + Math.abs(k.e.x).toFixed(0) + "</b>" : "") + decoyCallHTML(k.e) + "</li>";
     }).join("") + "</ul></div>" : "";
   const focusHTML = focusNoteHTML(m, d.sets);

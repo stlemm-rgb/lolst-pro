@@ -4,7 +4,7 @@
 
 let snsTab = "inbox";
 let openMsgId = null; // 펼쳐 둔 메시지
-let deckIdx = 0;        // 받은 연락 카드: 지금 보는 카드 번호 (197)
+let deckOpenId = null;  // 223: 휴대폰에서 열어 둔 대화 (null = 대화 목록, 연락이 1개면 바로 그 대화)
 let deckLastId = null;  // 받은 연락 카드: 방금 답한 연락 (결과 한 줄)
 
 pages.sns = function () {
@@ -38,10 +38,14 @@ pages.sns = function () {
         "<div>" + escapeHTML(m.text) + "</div></div>";
     }).join("");
   } else if (snsTab === "inbox") {
-    // 197 (시안 13 P1): 답장 대기 연락은 맨 위 카드로, 나머지는 '지난 연락' 목록
+    // 220: 받은 연락 탭은 휴대폰을 화면 맨 위 왼쪽에 (선택지까지 스크롤 없이), 제목·탭·지난 연락은 휴대폰 오른쪽
     const deck = deckMessages();
     const rest = list.filter(function (m) { return deck.indexOf(m) === -1; });
-    body = '<div class="inbox-split">' + msgDeckHTML(deck) + inboxListHTML(rest) + "</div>"; // 209: 휴대폰 + 지난 연락
+    return '<div class="sns-ib">' +
+      '<div class="sns-ib-head">' + pageHeadHTML("sns", "SNS") + '<div class="buttons sns-tabs">' + tabHTML + "</div></div>" +
+      msgDeckHTML(deck) +
+      '<div class="card sns-ib-list">' + inboxListHTML(rest) + "</div>" +
+    "</div>";
   } else if (snsTab === "news") {
     body = newsPaperHTML(list); // 206: 주간 신문 (js/news.js) — 신문 기사 보관함도 이 안으로
   } else {
@@ -125,44 +129,87 @@ function deckMessages() {
 }
 
 // 209 (시안 16 A안): 왼쪽 '내 휴대폰' = 답장 대기 연락을 대화처럼 하나씩, 오른쪽 = 끝난 연락 한 줄 목록
+// 218 (시안 20 가 '메신저 앱'): 휴대폰 몸체(카메라 섬·옆 버튼) + 상태 줄 + 앱 머리(보낸 사람) + 말풍선 + 아래 '답장 고르기' 칸
+// 217: 방금 답한 연락은 결과만 따로 보여 주고, [다음 연락 보기]를 눌러야 다음 연락이 나옴
+// 223: 연락이 2개 이상이면 휴대폰 첫 화면 = 대화 목록 (몇 개가 와 있는지 한눈에), 계약 제안이 2개 이상이면 맨 위에 비교표.
+//      대화를 누르면 열리고 ‹ 로 목록으로. 계약 제안 대화에는 '수락하면 다른 제안 n개는 정리돼요' 경고
 function msgDeckHTML(deck) {
   const last = deckLastId !== null ? state.inbox.find(function (m) { return m.id === deckLastId; }) : null;
-  const lastHTML = last && last.choices && last.answered !== null && last.answered !== "ignored"
-    ? '<div class="ph-me">' + escapeHTML(last.choices[last.answered].label) + "</div>" +
-      (last.result || changesText(last.changes) ? '<div class="ph-bub res">' + (last.result ? escapeHTML(last.result) : "") + (changesText(last.changes) ? '<div class="log-changes">' + changesText(last.changes) + "</div>" : "") + "</div>" : "")
-    : "";
-  if (deckIdx >= deck.length) deckIdx = Math.max(0, deck.length - 1);
-  if (deckIdx < 0) deckIdx = 0;
-  const m = deck[deckIdx];
-  const nav = deck.length > 1 ? '<button data-deck="-1"' + (deckIdx === 0 ? " disabled" : "") + '>◀</button><span>' + (deckIdx + 1) + " / " + deck.length + '</span><button data-deck="1"' + (deckIdx === deck.length - 1 ? " disabled" : "") + ">▶</button>" : (deck.length ? "<span>1 / 1</span>" : "");
+  const lastOk = last && last.choices && last.answered !== null && last.answered !== "ignored";
+  let m = deckOpenId !== null ? deck.find(function (x) { return x.id === deckOpenId; }) : null;
+  if (!m) deckOpenId = null;
+  if (!m && deck.length === 1) m = deck[0];
+  const listView = !lastOk && !m && deck.length > 1;
+  const shown = lastOk ? last : m; // 앱 머리에 나오는 연락
   const tipText = MSG_DECK.later + " · " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. " + MSG_DECK.legend;
-  let chat;
-  if (m && !m.choices) { // 210: 일반 연락 — 읽고 [확인]
-    const av = msgAvatar(m);
+  const avHTML = function (x) { return '<span class="ph-av">' + msgAvatar(x).icon + "</span>"; };
+  const offers = deck.filter(function (x) { return x.kind === "offer" && x.offer && x.choices; });
+  const leftWeeks = function (x) { return Math.max(0, EVENT_RULES.ignoreAfterWeeks - ((state.year - x.year) * CREATION.weeksPerSeason + state.week - x.week)); };
+  const inBub = function (x) {
+    const av = msgAvatar(x), ch = changesText(x.changes);
+    const isOffer = x.kind === "offer" && x.offer; // 220: 계약 제안은 계약 조건 글 + 연봉 계산 내역
+    const notes = x.notes && x.notes.length && (!x.choices || isOffer) ? '<div class="msg-notes">' + x.notes.map(escapeHTML).join("<br>") + "</div>" : ""; // 223: 협상 결과도 보이게
+    return '<div class="ph-in">' + avHTML(x) + '<div class="ph-bub"><b class="ph-bt">' + escapeHTML(av.title) + "</b>" + escapeHTML(isOffer ? offerText(x.offer) : x.text) +
+      (isOffer ? offerBreakdownHTML(x.offer) : "") +
+      (!x.choices && ch ? '<div class="log-changes">' + ch + "</div>" : "") + notes + "</div></div>";
+  };
+  const dateChip = function (x) { return '<span class="ph-date">' + x.year + "년 " + x.week + "주차</span>"; };
+  let chat, sheet = "";
+  if (listView) {
+    // 계약 제안 비교표 (2개 이상일 때)
+    const cmp = offers.length > 1 ? '<div class="ph-cmp"><div class="ph-cmp-h">📝 계약 제안 ' + offers.length + "개 · 하나를 수락하면 나머지는 정리돼요</div>" +
+      '<table><tr><th>구단</th><th>연봉</th><th>기간</th><th>출전 보장</th></tr>' + offers.map(function (x) {
+        const o = x.offer, t = findTeam(o.teamId);
+        return '<tr data-deckopen="' + x.id + '"><td><b>' + escapeHTML(t ? t.short : "?") + "</b>" + (o.renewal ? ' <span class="ph-tag">재계약</span>' : "") + "<br><small>" + (t ? nextTierName(t.id) + " · 전력 " + teamStrength(t.id).toFixed(1) : "") + "</small></td>" +
+          "<td>" + moneyText(o.salary) + "</td><td>" + (o.loan ? "임대" : o.years + "년") + "</td><td>" + (o.guarantee ? o.guarantee + "경기" : "없음") + "</td></tr>";
+      }).join("") + "</table></div>" : "";
+    chat = cmp + '<div class="ph-list">' + deck.map(function (x) {
+      const isOffer = x.kind === "offer" && x.offer;
+      const pre = String(isOffer ? offerText(x.offer) : x.text || "").split("\n")[0];
+      const left = leftWeeks(x);
+      return '<button class="ph-row' + (x.read ? "" : " new") + '" data-deckopen="' + x.id + '">' + avHTML(x) +
+        '<span class="ph-row-t"><b>' + escapeHTML(msgAvatar(x).title) + "</b><span>" + escapeHTML(pre) + "</span></span>" +
+        '<span class="ph-row-r">' + (x.choices ? '<span class="ph-due' + (left <= 1 ? " last" : "") + '">' + (left ? left + "주" : "이번 주") + "</span>" : "") + (x.read ? "" : '<i class="ph-dot"></i>') + "</span></button>";
+    }).join("") + "</div>";
+  } else if (lastOk) {
+    const ch = changesText(last.changes);
+    chat = dateChip(last) + inBub(last) +
+      '<div class="ph-out"><span class="ph-read">읽음</span><div class="ph-me">' + escapeHTML(last.choices[last.answered].label) + "</div></div>" +
+      (last.result || ch || (last.notes && last.notes.length) ? '<div class="ph-sys">' + (last.result ? escapeHTML(last.result) : "") + (ch ? '<div class="log-changes">' + ch + "</div>" : "") +
+        (last.notes && last.notes.length ? '<div class="msg-notes">' + last.notes.map(escapeHTML).join("<br>") + "</div>" : "") + "</div>" : ""); // 220: 계약 결과(재계약 완료 등)는 notes
+    const nx = deck[0];
+    sheet = deck.length > 1
+      ? '<button class="ph-next" data-decknext="1"><span class="ph-av">💬</span><span class="ph-next-t"><b>대화 목록으로</b><span>남은 연락 ' + deck.length + "개</span></span>▶</button>"
+      : nx ? '<button class="ph-next" data-decknext="1">' + avHTML(nx) + '<span class="ph-next-t"><b>다음 연락 보기</b><span>' + escapeHTML(msgAvatar(nx).title) + " (1개 남음)</span></span>▶</button>"
+      : '<button class="primary ph-next solo" data-decknext="1">확인</button>';
+  } else if (m && !m.choices) { // 210: 일반 연락 — 읽고 [확인]
     const plain = deck.filter(function (x) { return !x.choices; }).length;
-    const ch = changesText(m.changes);
-    chat = lastHTML +
-      '<div class="ph-bub"><div class="ph-bt"><span class="ph-ic">' + av.icon + "</span><b>" + escapeHTML(av.title) + "</b></div>" + escapeHTML(m.text) +
-        (ch ? '<div class="log-changes">' + ch + "</div>" : "") + (m.notes && m.notes.length ? '<div class="msg-notes">' + m.notes.map(escapeHTML).join("<br>") + "</div>" : "") + "</div>" +
-      '<div class="deck-choices"><button class="primary ph-ok" data-msgok="' + m.id + '">' + MSG_DECK.okLabel + "</button>" +
-        (plain > 1 ? '<button class="ph-okall" data-msgok="all">' + MSG_DECK.okAllLabel + " (" + plain + ")</button>" : "") + "</div>";
+    chat = dateChip(m) + inBub(m);
+    sheet = '<div class="deck-choices"><button class="primary ph-ok" data-msgok="' + m.id + '">' + MSG_DECK.okLabel + "</button>" +
+      (plain > 1 ? '<button class="ph-okall" data-msgok="all">' + MSG_DECK.okAllLabel + " (" + plain + ")</button>" : "") + "</div>";
   } else if (m) {
     m.read = true;
-    const av = msgAvatar(m);
-    const age = (state.year - m.year) * CREATION.weeksPerSeason + state.week - m.week;
-    const left = Math.max(0, EVENT_RULES.ignoreAfterWeeks - age);
-    chat = lastHTML +
-      '<div class="ph-bub"><div class="ph-bt"><span class="ph-ic">' + av.icon + "</span><b>" + escapeHTML(av.title) + "</b></div>" + escapeHTML(m.text) + "</div>" + // 아이콘은 말풍선 제목 줄 안 (왼쪽 빈 칸 없음)
+    const left = leftWeeks(m);
+    const others = m.kind === "offer" ? offers.filter(function (x) { return x !== m; }).length : 0;
+    chat = dateChip(m) + inBub(m) +
       '<div class="ph-time' + (left <= 1 ? " last" : "") + '">⏳ ' + (left ? left + "주 안에 답하기" : "이번 주가 마지막") + "</div>" +
-      '<div class="deck-choices">' + choiceButtonsHTML(m) + "</div>";
+      (others ? '<div class="ph-note warn">⚠️ 다른 계약 제안이 ' + others + "개 더 있어요. 수락하면 나머지는 정리돼요. ‹ 목록에서 비교해 보세요.</div>" : "");
+    sheet = '<div class="ph-sh"><span>답장 고르기</span><span>' + m.choices.length + "개</span></div>" +
+      '<div class="deck-choices">' + choiceButtonsHTML(m) + "</div>" +
+      '<div class="ph-input" aria-hidden="true"><i>＋</i><span>위에서 답장을 골라요</span><i>➤</i></div>';
   } else {
-    chat = lastHTML + '<div class="ph-empty"><b>📭</b>' + MSG_DECK.empty + "</div>";
+    chat = '<div class="ph-empty"><b>📭</b>' + MSG_DECK.empty + "</div>";
   }
-  const dots = deck.length > 1 ? '<div class="ph-dots">' + deck.map(function (x, i) { return "<i" + (i === deckIdx ? ' class="on"' : "") + "></i>"; }).join("") + "</div>" : "";
-  return '<div class="phone"><div class="ph-scr">' +
-    '<div class="ph-bar"><span>' + state.year + "년 " + state.week + "주차</span><span>📶 🔋</span></div>" +
-    '<div class="ph-hd">💬 <b>' + MSG_DECK.phoneTitle + '</b> <span class="tip" tabindex="0" data-tip="' + escapeHTML(tipText) + '">ⓘ</span><span class="ph-nav">' + nav + "</span></div>" +
-    '<div class="ph-chat deck">' + chat + "</div>" + dots + '<div class="ph-home"></div>' +
+  if (!lastOk && state.inbox.some(function (x) { return x.kind === "staffPick" && x.answered === null; })) chat = '<div class="ph-note">' + MSG_DECK.staffNote + "</div>" + chat;
+  const back = !listView && !lastOk && deck.length > 1 ? '<button class="ph-back" data-deckback="1" title="대화 목록">‹</button>' : "";
+  const who = listView ? '<span class="ph-who"><b>' + MSG_DECK.phoneTitle + "</b><span>답할 연락 " + deck.length + "개" + (offers.length ? " · 계약 제안 " + offers.length + "개" : "") + "</span></span>"
+    : shown ? avHTML(shown) + '<span class="ph-who"><b>' + escapeHTML(msgAvatar(shown).title) + "</b><span>" + (lastOk ? "답장함" : deck.length > 1 ? deck.length + "개 중 " + (deck.indexOf(shown) + 1) + "번째 연락" : MSG_DECK.phoneTitle) + "</span></span>"
+    : '<span class="ph-who"><b>' + MSG_DECK.phoneTitle + "</b></span>";
+  return '<div class="phone"><i class="ph-island"></i><div class="ph-scr deck">' +
+    '<div class="ph-bar"><span>' + state.year + "년 " + state.week + '주차</span><span class="ph-icons"><span class="ph-sig"><i></i><i></i><i></i><i></i></span><span class="ph-bat"></span></span></div>' +
+    '<div class="ph-hd">' + back + who + '<span class="tip" tabindex="0" data-tip="' + escapeHTML(tipText) + '">ⓘ</span></div>' +
+    '<div class="ph-chat">' + chat + "</div>" +
+    (sheet ? '<div class="ph-sheet">' + sheet + "</div>" : "") + '<div class="ph-home"></div>' +
   "</div></div>";
 }
 
@@ -242,20 +289,8 @@ function bindSns(page) {
   page.querySelectorAll("[data-snstab]").forEach(function (btn) {
     btn.onclick = function () { snsTab = btn.getAttribute("data-snstab"); openMsgId = null; deckLastId = null; newsEdition = null; selectMenu("sns"); }; // 210: 소식 탭은 늘 최신 호부터
   });
-  page.querySelectorAll("[data-msgok]").forEach(function (btn) { // 210: 일반 연락 확인 → 지난 연락으로
-    btn.onclick = function () {
-      const v = btn.getAttribute("data-msgok");
-      state.inbox.forEach(function (m) { if (m.tab === "inbox" && !m.choices && (v === "all" || m.id === Number(v))) m.read = true; });
-      deckLastId = null;
-      if (state.settings.autoSave) saveGame();
-      renderAll();
-    };
-  });
   page.querySelectorAll("[data-ibf]").forEach(function (btn) {
     btn.onclick = function () { inboxFilter = btn.getAttribute("data-ibf"); renderPage(); };
-  });
-  page.querySelectorAll("[data-deck]").forEach(function (btn) {
-    btn.onclick = function () { deckIdx += Number(btn.getAttribute("data-deck")); deckLastId = null; renderPage(); };
   });
   page.querySelectorAll("[data-msg]").forEach(function (el) {
     el.onclick = function () {
@@ -268,15 +303,7 @@ function bindSns(page) {
       renderPage();
     };
   });
-  page.querySelectorAll("[data-answer]").forEach(function (btn) {
-    btn.onclick = function () {
-      const parts = btn.getAttribute("data-answer").split(":");
-      if (btn.closest(".deck")) deckLastId = Number(parts[0]); // 카드에서 답함 → 결과 한 줄 + 다음 카드 (197)
-      answerMessage(Number(parts[0]), Number(parts[1]));
-      if (state.settings.autoSave) saveGame();
-      renderAll();
-    };
-  });
+  bindPhoneDeck(page); // 휴대폰 안 버튼 (221: 대시보드 휴대폰 창과 같이 씀)
   const readAll = page.querySelector("[data-readall]");
   if (readAll) readAll.onclick = function () {
     state.inbox.forEach(function (m) { if (m.tab === "news") m.read = true; });
@@ -284,4 +311,70 @@ function bindSns(page) {
     renderMenu();
     renderPage();
   };
+}
+
+// ----- 휴대폰 버튼 (SNS 화면·휴대폰 창 같이 씀, 221) -----
+function bindPhoneDeck(root) {
+  root.querySelectorAll("[data-msgok]").forEach(function (btn) { // 210: 일반 연락 확인 → 지난 연락으로
+    btn.onclick = function () {
+      const v = btn.getAttribute("data-msgok");
+      state.inbox.forEach(function (m) { if (m.tab === "inbox" && !m.choices && (v === "all" || m.id === Number(v))) m.read = true; });
+      deckLastId = null;
+      if (state.settings.autoSave) saveGame();
+      renderAll();
+    };
+  });
+  root.querySelectorAll("[data-decknext]").forEach(function (btn) { // 217: 결과를 보고 다음 연락(1개 남음)·대화 목록(2개 이상)으로, 휴대폰 창에서 남은 게 없으면 닫기
+    btn.onclick = function () {
+      deckLastId = null; deckOpenId = null;
+      if (phoneOpen && !deckMessages().length) { closePhone(); return; }
+      renderPage();
+    };
+  });
+  root.querySelectorAll("[data-deckopen]").forEach(function (el) { // 223: 대화 목록·비교표에서 열기
+    el.onclick = function () { deckOpenId = Number(el.getAttribute("data-deckopen")); deckLastId = null; renderPage(); };
+  });
+  root.querySelectorAll("[data-deckback]").forEach(function (btn) { // 223: ‹ 대화 목록으로
+    btn.onclick = function () { deckOpenId = null; deckLastId = null; renderPage(); };
+  });
+  root.querySelectorAll("[data-answer]").forEach(function (btn) {
+    btn.onclick = function () {
+      const parts = btn.getAttribute("data-answer").split(":");
+      const id = Number(parts[0]);
+      if (btn.closest(".deck")) { deckLastId = id; deckOpenId = id; } // 카드에서 답함 → 결과 화면 (217), 협상처럼 답이 안 끝나면 그 대화 그대로 (223)
+      answerMessage(id, Number(parts[1]));
+      if (state.settings.autoSave) saveGame();
+      renderAll();
+    };
+  });
+}
+
+// ----- 휴대폰 창 (221): 대시보드 등에서 [📱 휴대폰 열기] → SNS 메뉴로 가지 않고 그 자리에서 답하기 -----
+// 화면을 다시 그릴 때마다(renderPage 끝) 열려 있으면 다시 그림 → 답하면 결과·다음 연락이 바로 보임
+let phoneOpen = false;
+function openPhone() {
+  phoneOpen = true; deckOpenId = null; deckLastId = null;
+  renderPhoneOverlay(true);
+}
+function closePhone() {
+  phoneOpen = false; deckLastId = null;
+  const el = document.getElementById("phone-overlay");
+  if (el) { el.hidden = true; el.innerHTML = ""; }
+  renderAll(); // 대시보드 숫자·배지 새로
+}
+function renderPhoneOverlay(opening) { // opening: 처음 열 때만 떠오르는 움직임 (다시 그릴 때마다 깜빡이지 않게)
+  let el = document.getElementById("phone-overlay");
+  const layout = document.getElementById("layout");
+  if (!phoneOpen || !state.player || !layout || layout.hidden) { if (el) el.hidden = true; return; }
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "phone-overlay";
+    document.body.appendChild(el);
+    el.addEventListener("click", function (e) { if (e.target === el || e.target.closest("[data-phoneclose]")) closePhone(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && phoneOpen) closePhone(); });
+  }
+  el.innerHTML = '<div class="po-wrap' + (opening ? " po-anim" : "") + '"><button class="po-close" data-phoneclose="1" title="닫기 (Esc)">✕</button>' + msgDeckHTML(deckMessages()) + "</div>";
+  el.hidden = false;
+  bindPhoneDeck(el);
+  linkifyNames(el);
 }

@@ -1,69 +1,211 @@
-// ===== 초보자 도움: 튜토리얼 · 지금 목표 · 이번 주 추천 · 게임 방법 (글은 data/guide.js) =====
-// state.tutorial = { on: true/false, done: { plan: true, ... }, visited: { schedule: true, ... }, restDone }
+// ===== 초보자 도움: 코치 안내 · 그때그때 팁 · 지금 목표 · 이번 주 추천 · 게임 방법 (글은 data/guide.js) =====
+// state.tutorial = { on: 코치 안내 중, step: 지금 단계(COACH_TOUR 번호), startPlan, tips: { id: true(본 팁) }, tipsOn }
+// 화면만 바꿈: 게임 결과와 무관 (Math.random 안 씀)
 
 function tutorialState() {
   if (!state.tutorial) state.tutorial = { on: false, done: {}, visited: {} };
   const t = state.tutorial;
-  t.done = t.done || {}; t.visited = t.visited || {};
+  if (t.step === undefined) { // 예전 세이브(체크리스트 시절, 214 이전): 코치 안내는 끝난 것으로, 팁은 안내를 켜 두었던 사람만
+    t.step = COACH_TOUR.length;
+    t.tipsOn = !!t.on;
+    t.on = false;
+    delete t.done; delete t.visited; delete t.restDone; delete t.finished;
+  }
+  t.tips = t.tips || {};
   return t;
 }
 
-// 단계 완료 확인 (지금 상태를 보고 자동으로)
-function tutorialChecks(check) {
+// 코치 안내·팁을 처음부터 다시 ([설정·저장], ❓ 게임 방법)
+function restartCoach() {
   const t = tutorialState();
-  switch (check) {
-    case "plan": return !!state.plan && state.plan !== t.startPlan; // 처음 골라져 있는 솔로 랭크에서 다른 훈련으로 바꿔 봐야 완료 (v1.1)
-    case "advance": return !!state.weekReport;
-    case "sns": return state.inbox.some(function (m) { return m.tab === "inbox" && m.choices && m.answered !== null && m.answered !== "ignored"; });
-    case "schedule": return !!t.visited.schedule;
-    case "rest": return !!t.restDone;
-    case "shop": return !!t.visited.shop;
+  t.on = true; t.step = 0; t.tips = {}; t.tipsOn = true;
+  delete t.planTouched; delete t.lastWeek; delete t.lastSawDash;
+  t.startPlan = state.plan;
+  t.startAbs = absWeek();
+  coachScrolledStep = -1;
+}
+
+// ----- 코치 안내: 단계가 끝났나 (data/guide.js COACH_TOUR wait) — 지시대로 하면 저절로 넘어감 (216) -----
+function coachStepDone(wait) {
+  const t = tutorialState();
+  switch (wait) {
+    case "trainingOpen": return state.currentMenu === "training";
+    case "planPicked": return !!t.planTouched || (!!state.plan && state.plan !== t.startPlan); // 훈련 버튼을 한 번이라도 누름 (지금 훈련 다시 눌러도)
+    case "advanced": return t.startAbs !== undefined ? absWeek() !== t.startAbs : !!state.weekReport; // 처음부터 다시 볼 때는 그때부터 한 주
+    case "moved": // 마지막 단계: 대시보드를 본 뒤 다른 화면으로 가거나 한 주를 더 넘기면 끝
+      return t.lastWeek !== undefined && (state.week !== t.lastWeek || (t.lastSawDash && state.currentMenu !== "dashboard"));
     default: return false;
   }
 }
 
-// 매번 화면을 그릴 때: 끝난 단계 표시, 다 끝나면 자동으로 끔
+// 매번 화면을 그릴 때 (main.js renderPage): 끝난 단계는 넘기고, 진행했으면 마지막 단계로
 function updateTutorial() {
   const t = tutorialState();
   if (!t.on) return;
-  TUTORIAL_STEPS.forEach(function (s) { if (!t.done[s.check] && tutorialChecks(s.check)) t.done[s.check] = true; });
-  if (TUTORIAL_STEPS.every(function (s) { return t.done[s.check]; })) {
-    t.on = false;
-    t.finished = true;
-    state.notice = "🎉 처음 안내를 모두 마쳤어요! 이제 대시보드 오른쪽 🎯 목표와 '이번 주' 카드의 💡 추천을 따라가 보세요. (게임 규칙은 왼쪽 아래 ❓ 게임 방법)";
+  const last = COACH_TOUR.length - 1;
+  if (t.step < last && coachStepDone("advanced")) t.step = last; // 안내 중간에 이미 한 주를 넘겼으면 마무리 단계로
+  while (t.step < COACH_TOUR.length && COACH_TOUR[t.step].wait && coachStepDone(COACH_TOUR[t.step].wait)) t.step++;
+  if (t.step >= COACH_TOUR.length) { endCoachTour(); return; }
+  if (t.step === last) { // 마지막 단계 들어온 주·대시보드를 봤는지
+    if (t.lastWeek === undefined) t.lastWeek = state.week;
+    if (state.currentMenu === "dashboard") t.lastSawDash = true;
   }
 }
-
-// 메뉴를 열 때 (main.js selectMenu에서)
-function tutorialVisit(id) {
-  if (state && state.tutorial) state.tutorial.visited[id] = true;
+function endCoachTour() {
+  const t = tutorialState();
+  t.on = false; t.step = COACH_TOUR.length; t.tipsOn = true;
+  delete t.planTouched; delete t.lastWeek; delete t.lastSawDash; delete t.startAbs;
+}
+// 훈련 버튼을 누른 것 (지금 훈련을 다시 눌러도 '골랐다'로): 화면이 다시 그려지기 전에 잡으려고 capture
+if (typeof document !== "undefined" && document.addEventListener) {
+  document.addEventListener("click", function (e) {
+    if (!state || !state.tutorial || !state.tutorial.on || !e.target.closest) return;
+    if (e.target.closest("[data-plan]")) state.tutorial.planTouched = true;
+  }, true);
 }
 
-// 📘 처음이라면: 평소엔 지금 단계 한 줄만, [전체 보기 ▾]를 누르면 6단계 모두 (2026-10-07 대시보드 정리)
-let tutorialExpanded = false;
-function tutorialCardHTML() {
+// ----- 그때그때 팁 (data/guide.js COACH_TIPS when) -----
+function coachTipWhen(when) {
+  switch (when) {
+    case "benched": return !!state.benched;
+    case "tired": return state.stamina < TIRED_LIMIT;
+    case "matchWeek": { const wk = userWeekMatches(state.week); return !state.benched && wk.matches.length + wk.preview.length > 0; }
+    case "inbox": return state.inbox.some(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; });
+    case "quest": return (state.quests || []).length > 0;
+    case "patch": return !!state.weekReport && MASTERY.patchWeeks.indexOf(state.week) !== -1;
+    case "transfer": return isAnyTransferWindow();
+    case "rich": return state.money >= 10000000;
+    default: return false;
+  }
+}
+function coachTipNow() {
   const t = tutorialState();
-  if (!t.on) return "";
-  let current = -1;
-  const rows = TUTORIAL_STEPS.map(function (s, i) {
-    const ok = !!t.done[s.check];
-    if (!ok && current === -1) current = i;
-    const now = !ok && current === i;
-    // 아직 안 한 단계는 모두 설명과 [열기] 버튼 (지금 단계는 진하게)
-    const go = s.go ? ' <button class="small-btn" data-tutgo="' + s.go + '">' + s.goLabel + " ▶</button>" : "";
-    return '<li class="' + (ok ? "done" : now ? "now" : "") + '">' + (ok ? "✅" : now ? "▶" : "⬜") + " " + s.title +
-      (!ok ? '<div class="tut-hint' + (now ? "" : " later") + '">' + s.hint + go + "</div>" : "") + "</li>";
-  }).join("");
-  const doneCount = TUTORIAL_STEPS.filter(function (s) { return t.done[s.check]; }).length;
-  const step = TUTORIAL_STEPS[current];
-  const head = '<div class="tut-line"><b>📘 처음이라면</b> <span class="muted small">' + doneCount + " / " + TUTORIAL_STEPS.length + "</span>" +
-    (step && !tutorialExpanded
-      ? ' <span class="tut-now tip" tabindex="0" data-tip="' + escapeHTML(step.hint) + '">▶ ' + step.title + "</span>" +
-        (step.go ? ' <button class="small-btn" data-tutgo="' + step.go + '">' + step.goLabel + " ▶</button>" : "")
-      : "") +
-    '<span class="tut-btns"><button class="small-btn" data-tutexpand="1">' + (tutorialExpanded ? "접기 ▴" : "전체 보기 ▾") + "</button>" +
-    '<button class="small-btn" data-tutorial="off">안내 끄기</button></span></div>';
-  return '<div class="card tutorial compact">' + head + (tutorialExpanded ? '<ol class="tut-steps">' + rows + "</ol>" : "") + "</div>";
+  if (t.on || !t.tipsOn) return null;
+  return COACH_TIPS.find(function (tip) { return !t.tips[tip.id] && coachTipWhen(tip.when); }) || null;
+}
+
+// ----- 코치 말풍선 (#coach-tip): 화면 오른쪽 아래(휴대폰은 아래 탭 위)에 붙고, 가리키는 곳은 빛나는 테두리 -----
+function coachFaceHTML() {
+  const team = myTeam();
+  return portraitHTMLFrom(randomLook("coach:" + (team ? team.id : "fa")), team ? uniformOfTeam(team.id) : FREE_AGENT_UNIFORM, { scale: 1.5 });
+}
+function coachText(text) {
+  const team = myTeam();
+  return escapeHTML(text).replace("{name}", escapeHTML(state.player.name)).replace("{team}", team ? escapeHTML(team.name) : "구단");
+}
+function visibleTarget(list) {
+  for (let i = 0; i < (list || []).length; i++) {
+    const el = document.querySelector("#layout " + list[i]) || document.querySelector(list[i]);
+    if (el && el.getClientRects && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden") return el; // (노드 검사용 가짜 화면엔 없음)
+  }
+  return null;
+}
+
+let coachScrolledStep = -1;
+let coachTarget = null; // 지금 가리키는 화면 요소 (말풍선·강조 테두리가 따라감)
+function renderCoach() {
+  let box = document.getElementById("coach-tip");
+  let ring = document.getElementById("coach-ring");
+  document.querySelectorAll(".coach-hl").forEach(function (el) { el.classList.remove("coach-hl"); });
+  coachTarget = null;
+  const layout = document.getElementById("layout");
+  const t = state.player && !state.retired && layout && !layout.hidden ? tutorialState() : null;
+  const tour = t && t.on ? COACH_TOUR[t.step] : null;
+  const tip = t && !tour ? coachTipNow() : null;
+  if (!tour && !tip) { if (box) box.hidden = true; if (ring) ring.hidden = true; return; }
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "coach-tip";
+    box.setAttribute("role", "status");
+    document.body.appendChild(box);
+    box.addEventListener("click", onCoachClick);
+    ring = document.createElement("div");
+    ring.id = "coach-ring";
+    document.body.appendChild(ring);
+    window.addEventListener("scroll", placeCoach, { passive: true });
+    window.addEventListener("resize", placeCoach);
+  }
+  let buttons = "", head = "";
+  if (tour) {
+    const wrongPage = tour.menu && state.currentMenu !== tour.menu;
+    head = '<span class="coach-step">' + (t.step + 1) + " / " + COACH_TOUR.length + "</span>";
+    buttons = (wrongPage ? '<button data-coach="menu">대시보드 열기</button>' : "") +
+      (tour.btn ? '<button class="primary" data-coach="next">' + tour.btn + "</button>" : "") +
+      (t.step === COACH_TOUR.length - 1 ? "" : '<button class="coach-skip" data-coach="skip">안내 건너뛰기</button>');
+    coachTarget = visibleTarget(tour.targetM && window.innerWidth <= 760 ? tour.targetM : tour.target);
+    if (coachTarget) {
+      coachTarget.classList.add("coach-hl");
+      if (coachScrolledStep !== t.step) { // 단계가 바뀐 처음 한 번만: 가리키는 곳이 화면 밖이면 보이게
+        coachScrolledStep = t.step;
+        const r = coachTarget.getBoundingClientRect();
+        if (r.top < 60 || r.bottom > window.innerHeight - 160) coachTarget.scrollIntoView({ block: "center", behavior: "auto" });
+      }
+    }
+  } else {
+    buttons = (tip.go ? '<button data-coach="go" data-go="' + tip.go + '">' + tip.goLabel + "</button>" : "") +
+      '<button class="primary" data-coach="ok" data-tip="' + tip.id + '">알겠어요</button>' +
+      '<button class="coach-skip" data-coach="tipsoff">팁 그만 보기</button>';
+  }
+  const team = myTeam();
+  box.className = tour ? "tour" : "tip";
+  box.innerHTML = '<i class="coach-arrow"></i><div class="coach-face">' + coachFaceHTML() + "</div>" +
+    '<div class="coach-body"><div class="coach-who">' + (team ? escapeHTML(team.name) + " " : "") + "코치" + head + "</div>" +
+    '<p class="coach-text">' + coachText((tour || tip).text) + "</p>" +
+    '<div class="coach-btns">' + buttons + "</div></div>";
+  box.hidden = false;
+  placeCoach();
+}
+
+// 말풍선을 가리키는 곳 바로 옆에 (아래 → 위 → 화면 아래쪽 순), 화살표는 가리키는 곳 가운데로.
+// 가리키는 곳 둘레는 두꺼운 테두리 + 나머지 화면은 어둡게 (#coach-ring, 누르는 건 그대로 됨)
+function placeCoach() {
+  const box = document.getElementById("coach-tip"), ring = document.getElementById("coach-ring");
+  if (!box || box.hidden) return;
+  const arrow = box.querySelector(".coach-arrow");
+  const target = coachTarget && document.body.contains && document.body.contains(coachTarget) ? coachTarget : null;
+  const r = target ? target.getBoundingClientRect() : null;
+  if (!r || (!r.width && !r.height)) {
+    box.classList.remove("anchored"); box.style.left = box.style.top = "";
+    if (ring) ring.hidden = true;
+    return;
+  }
+  const pad = 6, gap = 16, vw = window.innerWidth, vh = window.innerHeight;
+  const bottomSafe = vw <= 760 ? 8 : 12;
+  ring.hidden = false;
+  ring.style.left = (r.left - pad) + "px"; ring.style.top = (r.top - pad) + "px";
+  ring.style.width = (r.width + pad * 2) + "px"; ring.style.height = (r.height + pad * 2) + "px";
+  box.classList.add("anchored");
+  const w = box.offsetWidth, h = box.offsetHeight;
+  let top, side;
+  if (r.bottom + pad + gap + h <= vh - bottomSafe) { top = r.bottom + pad + gap; side = "up"; } // 아래에 (화살표는 위를 봄)
+  else if (r.top - pad - gap - h >= 8) { top = r.top - pad - gap - h; side = "down"; } // 위에
+  else { top = Math.max(8, vh - h - bottomSafe); side = ""; } // 둘 다 안 되면 화면 아래쪽 (큰 카드)
+  const cx = r.left + r.width / 2;
+  const left = Math.max(10, Math.min(vw - w - 10, cx - w / 2));
+  box.style.left = left + "px"; box.style.top = top + "px";
+  arrow.className = "coach-arrow" + (side ? " " + side : "");
+  arrow.style.left = Math.max(18, Math.min(w - 18, cx - left)) + "px";
+}
+
+function onCoachClick(e) {
+  const btn = e.target.closest("[data-coach]");
+  if (!btn) return;
+  const t = tutorialState();
+  const act = btn.getAttribute("data-coach");
+  if (act === "next") {
+    t.step++;
+    if (t.step >= COACH_TOUR.length) endCoachTour();
+  } else if (act === "skip") endCoachTour();
+  else if (act === "ok") t.tips[btn.getAttribute("data-tip")] = true;
+  else if (act === "tipsoff") t.tipsOn = false;
+  else if (act === "go") {
+    const tip = coachTipNow();
+    if (tip) t.tips[tip.id] = true;
+    if (btn.getAttribute("data-go") === "phone") { renderCoach(); openPhone(); } else selectMenu(btn.getAttribute("data-go"));
+    return;
+  } else if (act === "menu") { selectMenu("dashboard"); return; }
+  updateTutorial();
+  renderCoach();
 }
 
 // ----- 🎯 지금 목표 -----
@@ -119,7 +261,7 @@ function weekAdvice(noQuest) {
   if (pendingSkins().length) list.push({ text: "🎨 월드 우승 스킨으로 만들 챔피언을 골라 주세요.", label: "컬렉션 열기", act: { go: "collection" } });
   // 3) 답하지 않은 연락
   const waiting = state.inbox.filter(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; }).length;
-  if (waiting) list.push({ text: "답하지 않은 연락이 " + waiting + "개 있어요. 4주가 지나면 그냥 지나가요.", label: "SNS 열기", act: { sns: true } });
+  if (waiting) list.push({ text: "답하지 않은 연락이 " + waiting + "개 있어요. 4주가 지나면 그냥 지나가요.", label: "📱 휴대폰 열기", act: { phone: true } });
   // 4) 지금 훈련이 채우지 않는 퀘스트
   const q = (state.quests || []).find(function (x) { return questPlan(x) && !questPlanActive(x); });
   if (q && !noQuest) list.push({ text: "퀘스트 '" + findQuest(q.id).title + "' (" + Math.max(0, q.deadline - absWeek()) + "주 남음)", label: questPlanLabel(q) + "(으)로 선택", act: { quest: q.uid } });
@@ -137,7 +279,7 @@ function weekAdvice(noQuest) {
   if (state.money >= 10000000 && gearCount === 0) list.push({ text: "자금이 " + moneyText(state.money) + " 쌓였어요. 장비를 사면 훈련 효과가 영구로 올라요.", label: "상점 가기", act: { go: "shop" } });
   // 8) 이적 시장 기간 + 제안
   if (isAnyTransferWindow() && state.inbox.some(function (m) { return m.kind === "offer" && m.answered === null; })) {
-    list.push({ text: "이적 시장 기간이에요. 계약 제안을 확인해 보세요.", label: "SNS 열기", act: { sns: true } });
+    list.push({ text: "이적 시장 기간이에요. 계약 제안을 확인해 보세요.", label: "📱 휴대폰 열기", act: { phone: true } });
   }
   return list.slice(0, 3);
 }
@@ -172,7 +314,7 @@ function bindGuide(page) {
       if (!a) return;
       if (a.go) selectMenu(a.go);
       else if (a.rest) advanceWeek(true);
-      else if (a.sns) { snsTab = "inbox"; selectMenu("sns"); }
+      else if (a.phone) openPhone(); // 221: SNS 메뉴로 가지 않고 휴대폰 창
       else if (a.plan) { state.plan = a.plan; if (a.plan === "champion") state.practiceChamp = ""; state.notice = "이번 주 훈련을 <b>" + findTraining(a.plan).name + "</b>(으)로 골랐어요."; renderPage(); }
       else if (a.quest) {
         const q = (state.quests || []).find(function (x) { return x.uid === a.quest; });
@@ -186,18 +328,12 @@ function bindGuide(page) {
       }
     };
   });
-  page.querySelectorAll("[data-tutexpand]").forEach(function (btn) {
-    btn.onclick = function () { tutorialExpanded = !tutorialExpanded; renderPage(); };
+  page.querySelectorAll("[data-coach-restart]").forEach(function (btn) {
+    btn.onclick = function () { restartCoach(); state.notice = "코치 안내를 처음부터 다시 보여 줄게요."; selectMenu("dashboard"); };
   });
-  page.querySelectorAll("[data-tutgo]").forEach(function (btn) {
-    btn.onclick = function () { selectMenu(btn.getAttribute("data-tutgo")); };
+  page.querySelectorAll("[data-coach-tips]").forEach(function (btn) {
+    btn.onclick = function () { tutorialState().tipsOn = btn.getAttribute("data-coach-tips") === "on"; renderPage(); };
   });
-  const off = page.querySelector("[data-tutorial]");
-  if (off) off.onclick = function () {
-    tutorialState().on = off.getAttribute("data-tutorial") === "on";
-    if (tutorialState().on) { tutorialState().done = {}; }
-    renderPage();
-  };
 }
 
 // ----- ❓ 게임 방법 -----
@@ -242,15 +378,16 @@ function masteryGuideHTML() {
 }
 
 pages.howto = function () {
+  // 215: 묶음마다 한두 줄(short)만 보이고, 자세한 줄은 [자세히]를 펼쳐야 보임
   const cards = HOW_TO_PLAY.map(function (h) {
-    return '<div class="card"><h2>' + h.icon + " " + h.title + '</h2><ul class="howto">' + h.lines.map(function (l) { return "<li>" + escapeHTML(l) + "</li>"; }).join("") + "</ul></div>";
+    return '<div class="card howto-card"><h2>' + h.icon + " " + h.title + '</h2><p class="howto-short">' + escapeHTML(h.short) + "</p>" +
+      '<details class="howto-more"><summary>자세히</summary><ul class="howto">' + h.lines.map(function (l) { return "<li>" + escapeHTML(l) + "</li>"; }).join("") + "</ul></details></div>";
   }).join("");
-  const t = tutorialState();
   return "<h1>게임 방법</h1>" +
-    '<div class="card"><h2>현재 경기 환경</h2><p>' + escapeHTML(eraMatchRule().label) + '</p><p class="muted small">' + escapeHTML(ERA_MATCH_HELP) + '</p></div>' +
-    '<div class="card"><p>처음이라면 대시보드의 📘 처음이라면 안내를 따라가 보세요. ' +
-      (t.on ? '<span class="up small">(지금 켜져 있어요)</span>' : '<button class="small-btn" data-tutorial="on">처음 안내 다시 켜기</button>') + "</p></div>" +
+    '<div class="card howto-start"><p>처음이라면 코치 안내를 따라가 보세요. 첫 주에 한 단계씩 알려 주고, 그 뒤에는 처음 생기는 일마다 짧게 알려 줘요.</p>' +
+      '<button class="small-btn" data-coach-restart="1">코치 안내 처음부터 다시</button></div>' +
     '<div class="grid">' + cards + "</div>" +
+    '<div class="card"><h2>현재 경기 환경</h2><p>' + escapeHTML(eraMatchRule().label) + '</p><p class="muted small">' + escapeHTML(ERA_MATCH_HELP) + "</p></div>" +
     '<div class="card"><h2>⌨️ 단축키 <span class="muted small">PC 키보드 · [설정]에서 끌 수 있어요 · 게임 중 / 를 누르면 이 목록</span></h2>' + shortcutTableHTML() + "</div>" + // 198 (js/shortcuts.js)
     masteryGuideHTML();
 };

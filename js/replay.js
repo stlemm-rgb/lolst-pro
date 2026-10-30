@@ -69,7 +69,7 @@ function replayShellHTML(m) {
       (mine && id === mine.id ? '<div class="rp-mine">우리 팀</div>' : "") + "</div></div>";
   };
   const speeds = REPLAY_RULES.speeds.map(function (s) { return '<button data-rpsp="' + s + '"' + (s === RP.speed ? ' class="on"' : "") + ">" + s + "배</button>"; }).join("");
-  return '<div class="rp-box">' +
+  return '<div class="rp-box' + sideSwapClass(m) + '">' + // 219: 우리 팀 = 하늘색
     '<div class="rp-board">' + tm(0) + '<div class="rp-score"><div class="muted small">' + escapeHTML(m.label) + " · " + m.bo + "판 " + Math.ceil(m.bo / 2) + '선승' +
       (RP.queue.length > 1 ? " · 이번 주 " + (RP.qi + 1) + "/" + RP.queue.length + "경기" : "") + '</div><div class="rp-big" id="rp-score">0 : 0</div></div>' + tm(1) +
       '<button class="rp-close" data-rpclose="1" title="닫기">✕</button></div>' +
@@ -93,8 +93,8 @@ const REPLAY_MAP_SVG = '<svg viewBox="0 0 100 100"><rect width="100" height="100
   '<path d="M10 92 L10 10 L92 10" stroke="#3b4a3a" stroke-width="5" fill="none"/><path d="M8 90 L90 8" stroke="#3b4a3a" stroke-width="5"/><path d="M10 90 L90 90 L90 10" stroke="#3b4a3a" stroke-width="5" fill="none"/>' +
   [[62, 23], [23, 62], [77, 38], [38, 77]].map(function (p) { return '<g transform="translate(' + p[0] + " " + p[1] + ')"><circle r="3.2" fill="#2d3b26" stroke="#8fbf6a" stroke-width=".8"/><circle cx="-1" cy="-.6" r=".7" fill="#cfe8a8"/><circle cx="1" cy="-.6" r=".7" fill="#cfe8a8"/></g>'; }).join("") +
   '<circle cx="34" cy="31" r="4" fill="#4a2b6b"/><circle cx="67" cy="70" r="4" fill="#5a3a1a"/>' +
-  '<rect x="2" y="84" width="14" height="14" rx="3" fill="#0a3a5a" stroke="#00e0ff"/><rect x="84" y="2" width="14" height="14" rx="3" fill="#5a0a22" stroke="#ff3d71"/>' +
-  [[10, 60, 0], [10, 35, 1], [40, 10, 1], [65, 10, 1], [30, 70, 0], [70, 30, 1], [40, 90, 0], [65, 90, 0], [90, 60, 1], [90, 35, 1]].map(function (p) { return '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="1.8" fill="' + (p[2] ? "#ff3d71" : "#00e0ff") + '" opacity=".8"/>'; }).join("") +
+  '<rect class="rp-base sa" x="2" y="84" width="14" height="14" rx="3"/><rect class="rp-base sb" x="84" y="2" width="14" height="14" rx="3"/>' + // 219: 색은 css (--side-a/--side-b)
+  [[10, 60, 0], [10, 35, 1], [40, 10, 1], [65, 10, 1], [30, 70, 0], [70, 30, 1], [40, 90, 0], [65, 90, 0], [90, 60, 1], [90, 35, 1]].map(function (p) { return '<circle class="rp-tw ' + (p[2] ? "sb" : "sa") + '" cx="' + p[0] + '" cy="' + p[1] + '" r="1.8"/>'; }).join("") +
   '<text x="34" y="25" font-size="4" fill="#b98bff" text-anchor="middle">바론</text><text x="67" y="79" font-size="4" fill="#ffb26b" text-anchor="middle">용</text></svg>';
 
 function rpJit(n) { const x = Math.sin(n * 999) * 10000; return x - Math.floor(x); }
@@ -158,7 +158,7 @@ function drawReplayLanes(m, s) {
   const rev = RP.t >= REPLAY_RULES.laneRevealMin;
   const who = function (id, side, pos, right) {
     const nm = id ? escapeHTML(playerName(id)) : escapeHTML(teamShort(side ? m.b : m.a)) + " " + findPosition(pos).name;
-    return '<span class="rp-who' + (right ? " r" : "") + '">' + (id ? portraitImg(id, { face: true, size: 18 }) : "") + '<span class="' + (id === USER_ID ? "my-team" : "") + '">' + nm + "</span></span>";
+    return '<span class="rp-who' + (right ? " r" : "") + '">' + (id ? portraitImg(id, { face: true, size: 18 }) : "") + '<span class="ev-n s' + side + (id === USER_ID ? " me" : "") + '">' + nm + "</span></span>"; // 219: 팀 색
   };
   document.getElementById("rp-lanes").innerHTML = '<div class="muted small">라인전 ' + (rev ? "결과" : "진행 중 (" + REPLAY_RULES.laneRevealMin + "분에 공개)") + "</div>" +
     s.lanes.map(function (l, i) {
@@ -188,7 +188,7 @@ function rpAddEvent(m, e, i) {
   const f = document.createElement("div");
   f.className = "rp-fe " + (e.s ? "b" : "a") + (info.size === "l" ? " big" : "") + (mine ? " mine" : "");
   f.setAttribute("data-rpi", i);
-  f.innerHTML = '<span class="t">' + e.t + "분</span><span>" + (e.p ? portraitImg(e.p, { face: true, size: mine ? 24 : 18 }) : "") + '</span><span class="' + (e.k === "bad" ? "down" : e.k === "psych" ? "rp-psych" : "") + '">' +
+  f.innerHTML = '<span class="t">' + e.t + '분</span><span class="ev-tm s' + e.s + '">' + escapeHTML(teamShort(e.s ? m.b : m.a)) + "</span><span>" + (e.p ? portraitImg(e.p, { face: true, size: mine ? 24 : 18 }) : "") + '</span><span class="' + (e.k === "bad" ? "down" : e.k === "psych" ? "rp-psych" : "") + '">' +
     (mine ? '<span class="rp-me">' + REPLAY_TEXTS.meTag + "</span> " : "") + (info.icon || "") + " " + matchEventText(e, rpName(m)) + "</span>";
   f.title = REPLAY_TEXTS.jumpTip;
   f.onclick = function () { replayJumpTo(e, i); }; // 기록 한 줄을 누르면 그 시간으로 + 장소 강조

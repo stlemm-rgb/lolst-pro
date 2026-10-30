@@ -70,10 +70,10 @@ function staffPickDeckHTML(m) {
 }
 
 // ----- 대형 신인 카드 (대시보드, 새 시즌 1~4주) -----
-const ROOKIE_CARD = { showWeeks: 4, sAbove: 3 }; // S급 = 1부 주전 평균보다 sAbove 이상
+const ROOKIE_CARD = { showWeeks: 1, sAbove: 3 }; // S급 = 1부 주전 평균보다 sAbove 이상. 222: 4주 → 새 시즌 첫 주만 (사용자 요청), [닫기]로 바로 숨김
 function rookieCardsHTML() {
   const R = state.league && state.league.rookieCards;
-  if (!R || R.year !== state.year || state.week > ROOKIE_CARD.showWeeks || !R.ids.length) return "";
+  if (!R || R.year !== state.year || state.week > ROOKIE_CARD.showWeeks || !R.ids.length || R.closed) return "";
   const first = !R.seen;
   R.seen = true;
   const cards = R.ids.map(function (id, i) {
@@ -84,7 +84,8 @@ function rookieCardsHTML() {
     return flipCardHTML({ key: "rk" + R.year + "-" + i, flipped: !first, grade: sc >= R.avg + ROOKIE_CARD.sAbove ? "S" : "A", backIcon: "🌟", backLbl: "대형 신인", role: findPosition(p.pos).name, isNew: true,
       pf: portraitImg(id, { scale: 3 }), name: p.name, eff: "종합 능력 <b>" + sc.toFixed(1) + "</b> · " + p.age + "세<br>" + (t ? escapeHTML(t.name) + (t.tier === 1 ? " · 1부 직행" : "") : "FA") });
   }).join("");
-  return '<div class="card rookie-card"><h2>🌟 ' + R.year + '년 대형 신인 <span class="muted small">새 시즌 ' + ROOKIE_CARD.showWeeks + "주차까지 보여요 · [선수 검색]에서 🌟</span></h2>" +
+  return '<div class="card rookie-card"><h2>🌟 ' + R.year + '년 대형 신인 <span class="muted small">이번 주만 보여요 · 다시 보려면 [선수 검색]에서 🌟</span>' +
+      '<button class="small-btn rookie-close" data-rookieclose="1">닫기</button></h2>' +
     '<div class="fc-deck' + (first ? " fc-deal" : "") + '">' + cards + "</div></div>";
 }
 

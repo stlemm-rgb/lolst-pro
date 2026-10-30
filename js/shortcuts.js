@@ -6,7 +6,7 @@
 function shortcutsOn() { return !state.settings || state.settings.shortcuts !== false; }
 
 function popupOpen() {
-  return ["ws-overlay", "replay-overlay", "news-popup", "gs-overlay", "look-overlay", "confirm-box", "sc-help"].some(function (id) {
+  return ["ws-overlay", "replay-overlay", "news-popup", "gs-overlay", "look-overlay", "confirm-box", "sc-help", "reg-fx", "phone-overlay"].some(function (id) {
     const el = document.getElementById(id);
     return el && !el.hidden && getComputedStyle(el).display !== "none"; // 창은 position: fixed라 offsetParent로는 못 봄
   });

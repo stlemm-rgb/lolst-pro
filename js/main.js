@@ -25,7 +25,7 @@ function createNewState() {
     career: { finalsWon: 0, gainTried: {}, seasonGames: 0, games: 0, wins: 0, earned: 0, moments: [] }, // 커리어 기록
     retirePlanned: false,         // true면 이번 시즌이 끝날 때 은퇴 (js/retire.js)
     shop: { gear: {}, staff: {}, fame: {}, invest: [], investProfit: 0 }, // 상점 (js/shop.js)
-    tutorial: { on: true, done: {}, visited: {}, startPlan: "solo_rank" }, // 처음 안내 (js/guide.js). startPlan = 처음 골라져 있는 훈련 (다른 훈련으로 바꾸면 첫 단계 완료). 예전 세이브를 불러오면 꺼짐
+    tutorial: { on: true, step: 0, startPlan: "solo_rank", tips: {}, tipsOn: true }, // 코치 안내·팁 (215, js/guide.js). startPlan = 처음 골라져 있는 훈련 예전 세이브를 불러오면 꺼짐
     activities: [],               // 오래 가는 계약·활동 (스폰서·개인 방송·라이벌, js/events.js)
     pendingEvents: [],            // 몇 주 뒤에 올 후속 연락
     compPlan: "auto",             // 조합 전략: meta / counter / auto (js/comps.js)
@@ -132,7 +132,6 @@ pages.dashboard = function () {
   // 조각들은 js/dashboard.js
   return (
     '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/history_pages.js)
-    tutorialCardHTML() + // 📘 처음이라면: 한 줄 (js/guide.js). 🎯 목표는 내 선수 카드, 💡 추천은 '이번 주' 카드 안
     dashGoalsHTML() + // 다음 목표 3칸: 다음 일정 · 계약 만료 · 다음 패치 (196, js/dash_plus.js)
     heroCardHTML() + // 맨 위 내 선수 카드 (디자인 D2, js/dashboard.js)
     rookieCardsHTML() + // 새 시즌 대형 신인 카드 (디자인 D4, js/ui.js)
@@ -316,9 +315,9 @@ pages.settings = function () {
       weekSummarySettingHTML() + // 이번 주 요약 창 켜기·끄기 (196, js/dash_plus.js)
       shortcutSettingHTML() + // 단축키 켜기·끄기·목록 (198, js/shortcuts.js)
       motionSettingHTML() + // 움직임 켜기·끄기 (디자인 D6, js/ui.js)
-      '<div class="setting-row">처음 안내 (📘 대시보드 맨 위) ' +
-        (state.tutorial && state.tutorial.on ? '<button data-tutorial="off">끄기</button>' : '<button data-tutorial="on">다시 켜기</button>') +
-      "</div>" +
+      '<div class="setting-row">코치 안내 <button data-coach-restart="1">처음부터 다시</button> ' +
+        (tutorialState().tipsOn ? '<button data-coach-tips="off">그때그때 팁 끄기</button>' : '<button data-coach-tips="on">그때그때 팁 켜기</button>') +
+        ' <span class="muted small">첫 주 단계별 안내와, 처음 생기는 일마다 나오는 짧은 팁</span></div>' +
     "</div>" +
     '<div class="card"><h2>🧑 내 캐릭터 얼굴</h2><div id="look-settings">' + lookEditorHTML(false) + "</div></div>" + // 얼굴 바꾸기 (js/look_edit.js)
     '<div class="card"><h2>새 게임</h2>' +
@@ -469,7 +468,6 @@ function selectMenu(id) {
   state.notice = "";
   const lay = document.getElementById("layout");
   if (lay) lay.classList.remove("menu-open"); // 휴대폰: 메뉴를 고르면 닫기
-  tutorialVisit(id); // 처음 안내: 들어가 본 메뉴 (js/guide.js)
   renderMenu();
   renderPage();
   if (id === "sns") window.scrollTo(0, 0); // SNS에 들어갈 때는 항상 맨 위부터 보기
@@ -537,7 +535,7 @@ function staminaBadgeHTML() {
 // ===== 우측 본문 =====
 function renderPage() {
   applyMotion(); // 움직임 끄기 설정 (디자인 D6, js/ui.js)
-  updateTutorial(); // 처음 안내 단계 확인 (js/guide.js)
+  updateTutorial(); // 코치 안내 단계 확인 (215, js/guide.js)
   renderTopbar(); // 상단바 (고른 훈련·체력이 바뀌었을 수 있어서)
   const page = document.getElementById("page");
   const draw = pages[state.currentMenu];
@@ -561,7 +559,7 @@ function renderPage() {
   page.innerHTML = html;
   linkifyNames(page); // 선수·구단 이름을 누르면 선수 검색·구단 탐색으로 (js/links.js)
   if (state.currentMenu === "dashboard") greatDashJump(page); // 대성공 주: 내 포트레잇 크게 점프 (js/great.js)
-  maybeShowNews(); // 대회 결과 뉴스 팝업 (js/news.js)
+  if (!phoneOpen) maybeShowNews(); // 대회 결과 뉴스 팝업 (js/news.js) — 221: 휴대폰 창이 열려 있으면 닫은 뒤에
   // 안내 문구에서 SNS로 바로 가기 (예: 선수 SNS 언급 알림 → 💬 선수 SNS 탭)
   page.querySelectorAll("[data-gosns]").forEach(function (el) {
     el.onclick = function () { snsTab = el.getAttribute("data-gosns"); openMsgId = null; selectMenu("sns"); };
@@ -643,6 +641,11 @@ function renderPage() {
       renderPage();
     };
   });
+  page.querySelectorAll("[data-rookieclose]").forEach(function (btn) { // 222: 대형 신인 카드 닫기
+    btn.onclick = function () { state.league.rookieCards.closed = true; renderPage(); };
+  });
+  renderCoach(); // 코치 안내·팁 말풍선 (215, js/guide.js) — 화면을 다 그린 뒤 (가리킬 버튼이 있어야 해서)
+  if (phoneOpen) renderPhoneOverlay(); // 221: 휴대폰 창이 열려 있으면 같이 새로 (js/sns_page.js)
 }
 
 // ===== 다음 주로 진행 =====
@@ -666,7 +669,6 @@ function nextWeek(restWeek) {
   const training = (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
   state.skipTraining = false;
   state.weekCtx.training = training.id; // 선수 SNS용 (이번 주 훈련 글)
-  if (training.id === "rest" && state.tutorial) state.tutorial.restDone = true; // 처음 안내: 쉬어 보기
   const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
   const great = rollGreat(training); // 훈련 대성공: 오른 스탯·숙련도 2배 (js/great.js)
   const changes = {};
@@ -965,6 +967,7 @@ function renderAll() {
   document.getElementById("layout").hidden = creating || ended;
   document.getElementById("creation").hidden = !creating;
   document.getElementById("ending").hidden = !ended;
+  if (creating || ended) { renderMobileNav(); renderCoach(); renderPhoneOverlay(); } // 212·215: 새 게임으로 바꿨을 때 휴대폰 아래 탭이 남지 않게 (layout이 숨으면 탭도 숨김)
   if (ended) {
     document.getElementById("creation").innerHTML = "";
     renderEnding();
