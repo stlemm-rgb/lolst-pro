@@ -1862,7 +1862,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .ev-tm.s1 { color: var(--side-b); background: rgba(var(--side-b-rgb), 0.14); border: 1px solid rgba(var(--side-b-rgb), 0.5); }
 
 /* ===== 28. 대시보드 '이번 주 중심' (225, 시안 22 가) ===== */
-.dgoals .dgoal { border-radius: 0; border: 0; border-right: 1px solid var(--border); padding: 8px 14px; min-height: 0; }
+.dgoals .dgoal { border-radius: 0; border: 0; border-right: 1px solid var(--border); padding: 8px 14px; min-height: 0; background: rgba(var(--accent-rgb), 0.06); } /* 227: 눌러서 그 화면으로 */
+.dgoals .dgoal:hover { background: rgba(var(--accent-rgb), 0.16); }
 .dgoals .dgoal:last-child { border-right: 0; }
 .dgoals .dg-num, .dgoals .dgoal.main .dg-num { font-size: 24px; }
 .d2-top { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); gap: 16px; align-items: stretch; margin-bottom: 16px; }
@@ -1886,3 +1887,15 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .qcard.click { cursor: pointer; border: 1px solid transparent; } .qcard.click:hover { border-color: var(--accent); }
 @media (max-width: 1100px) { .d2-top { grid-template-columns: 1fr; } .d2-row { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .wc-plan { grid-template-columns: 1fr; } .wc-go { display: none; } /* 휴대폰은 아래 진행 막대 */ }
+
+/* ===== 29. 대시보드에서 누를 수 있는 것만 강조 (227) — 하늘 테두리 + 옅은 하늘 바탕 + 누르면 빛남. 글·숫자 칸은 그대로 ===== */
+:is(.d2-top, .d2-row, .dash) button:not(.primary):not(:disabled),
+.qcard.click {
+  border: 1px solid rgba(var(--accent-rgb), 0.55); background: rgba(var(--accent-rgb), 0.08); color: #dff9ff; cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+:is(.d2-top, .d2-row, .dash) button:not(.primary):not(:disabled):hover,
+.qcard.click:hover { background: rgba(var(--accent-rgb), 0.16); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2); }
+.dgoals .dgoal .dg-t::after { content: " ›"; color: var(--accent); }
+.qcard.click .quest-pick { border: 1px solid rgba(var(--accent-rgb), 0.55); background: rgba(var(--accent-rgb), 0.12); color: #dff9ff; }
+:is(.d2-top, .d2-row, .dash) button:focus-visible, .qcard.click:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }

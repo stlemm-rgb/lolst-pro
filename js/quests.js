@@ -225,8 +225,7 @@ function bindQuestPlan(page) {
       state.plan = qp.plan;
       if (qp.focusChamp !== undefined) state.focusChamp = qp.focusChamp;
       if (qp.practiceChamp !== undefined) state.practiceChamp = qp.practiceChamp;
-      state.notice = "이번 주 훈련을 <b>" + escapeHTML(questPlanLabel(q)) + "</b>(으)로 골랐어요. (퀘스트: " + escapeHTML(findQuest(q.id).title) + ")";
-      renderPage();
+      state.notice = ""; /* 226: 훈련 고른 알림 없음 (위 훈련 배지가 바로 바뀜) */ renderPage();
     };
   });
 }

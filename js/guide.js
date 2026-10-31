@@ -306,7 +306,7 @@ function adviceRowsHTML(noQuest) {
 
 function bindGuide(page) {
   page.querySelectorAll("[data-meta-practice]").forEach(function (b) { // 대시보드 챔피언 카드 (203)
-    b.onclick = function () { state.plan = "champion"; state.practiceChamp = ""; state.notice = "이번 주 훈련을 <b>" + findTraining("champion").name + "</b>(으)로 골랐어요."; renderPage(); };
+    b.onclick = function () { state.plan = "champion"; state.practiceChamp = ""; state.notice = ""; /* 226: 훈련 고른 알림 없음 (위 훈련 배지가 바로 바뀜) */ renderPage(); };
   });
   page.querySelectorAll("[data-advice]").forEach(function (b) {
     b.onclick = function () {
@@ -315,7 +315,7 @@ function bindGuide(page) {
       if (a.go) selectMenu(a.go);
       else if (a.rest) advanceWeek(true);
       else if (a.phone) openPhone(); // 221: SNS 메뉴로 가지 않고 휴대폰 창
-      else if (a.plan) { state.plan = a.plan; if (a.plan === "champion") state.practiceChamp = ""; state.notice = "이번 주 훈련을 <b>" + findTraining(a.plan).name + "</b>(으)로 골랐어요."; renderPage(); }
+      else if (a.plan) { state.plan = a.plan; if (a.plan === "champion") state.practiceChamp = ""; state.notice = ""; /* 226: 훈련 고른 알림 없음 (위 훈련 배지가 바로 바뀜) */ renderPage(); }
       else if (a.quest) {
         const q = (state.quests || []).find(function (x) { return x.uid === a.quest; });
         const qp = q && questPlan(q);
@@ -323,8 +323,7 @@ function bindGuide(page) {
         state.plan = qp.plan;
         if (qp.focusChamp !== undefined) state.focusChamp = qp.focusChamp;
         if (qp.practiceChamp !== undefined) state.practiceChamp = qp.practiceChamp;
-        state.notice = "이번 주 훈련을 <b>" + escapeHTML(questPlanLabel(q)) + "</b>(으)로 골랐어요.";
-        renderPage();
+        state.notice = ""; /* 226: 훈련 고른 알림 없음 (위 훈련 배지가 바로 바뀜) */ renderPage();
       }
     };
   });

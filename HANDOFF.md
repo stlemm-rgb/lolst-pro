@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-31 갱신 (PROGRESS 225까지, 시작 화면·캐릭터 생성·등록 도장·코치 안내, ver 1.2.1)
+# 다음 세션 이어가기 — 2026-10-31 갱신 (PROGRESS 227까지, 시작 화면·캐릭터 생성·등록 도장·코치 안내, ver 1.2.1)
 
 새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → CLAUDE.md → FILEMAP.md(파일 위치) → PROGRESS.md 최근 항목 → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태(`git status --short`, `git log --oneline -10`)를 확인한다.
 예전 기록: ver 1.0(1~133번)은 [docs/PROGRESS_1-133.md](docs/PROGRESS_1-133.md), 뉴스 개편 검증 요청문(끝난 일)은 [docs/AI_REVIEW_HANDOFF.md](docs/AI_REVIEW_HANDOFF.md), 뉴스 검증 결과는 [tools/NEWS_VALIDATION.md](tools/NEWS_VALIDATION.md).
@@ -199,4 +199,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 1. `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
 2. 새 사용자 요청 우선. 없으면 7장의 해외 진출 (선택지로 묻기부터).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 226**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 228**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
