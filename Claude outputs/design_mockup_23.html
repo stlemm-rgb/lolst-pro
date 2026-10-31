@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>상점 시안 (23)</title>
+<style>
+:root{--bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;--accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--bad:#ff3d71;--good:#2bff9e;
+--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7);--sans:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#000;color:var(--text);font-family:var(--sans);padding:24px 16px 60px}
+.wrap{max-width:1240px;margin:0 auto}
+.doc h1{font-size:22px;margin:0 0 6px}.doc h2{font-size:19px;margin:44px 0 4px}
+.doc h2 small{font-size:12px;background:var(--gold);color:#000;border-radius:6px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+.doc p{font-size:14px;color:#b9b9cc;line-height:1.7;margin:0 0 6px;max-width:80ch}.doc p b{color:var(--text)}
+.scr{margin-top:12px;border:1px solid #33334d;border-radius:12px;background:var(--bg);padding:18px;overflow:hidden}
+.mut{color:var(--muted);font-size:12px}
+.buy{border:1px solid rgba(0,224,255,.55);background:rgba(0,224,255,.1);color:#dff9ff;border-radius:10px;padding:7px 12px;font:700 13px var(--sans)}
+.buy.pri{border:0;background:var(--grad-btn);color:#fff}.buy.off{border-color:var(--border);background:none;color:#5d5d78}
+.own{font-size:12px;color:var(--good);border:1px solid rgba(43,255,158,.5);border-radius:999px;padding:3px 9px}
+table.cmp{border-collapse:collapse;margin-top:14px;font-size:14px;width:100%;max-width:980px}
+table.cmp th,table.cmp td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}table.cmp th{background:var(--panel-2)}
+
+.wallet{display:flex;align-items:center;gap:18px;padding:14px 18px;border-radius:14px;background:linear-gradient(120deg,#2a2410,#11111c 60%);border:1px solid rgba(255,210,63,.35);margin-bottom:14px}
+.wallet .m{font-size:28px;font-weight:900;color:var(--gold)}.wallet .f{display:flex;gap:16px;margin-left:auto;font-size:13px}
+.wallet .f b{display:block;font-size:16px}.up{color:var(--good)}.dn{color:var(--bad)}
+
+/* 가 */
+.ga{display:grid;grid-template-columns:200px minmax(0,1fr);gap:16px}
+.cats{display:flex;flex-direction:column;gap:4px}
+.cat{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:14px;color:#b8b8cc;border:1px solid transparent}
+.cat .ic{width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center}
+.cat.on{background:rgba(0,224,255,.1);border-color:rgba(0,224,255,.5);color:#fff;font-weight:700}
+.cat small{margin-left:auto;font-size:11px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.item{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.item .hd{display:flex;gap:10px;align-items:center}.item .ic{width:44px;height:44px;border-radius:12px;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:24px}
+.item b{font-size:15px}.item .lv{display:flex;gap:4px}.item .lv i{flex:1;height:6px;border-radius:3px;background:#23233a}.item .lv i.on{background:var(--accent)}
+.item .eff{font-size:13px;color:#cfcfe0}.item .eff em{font-style:normal;color:var(--good)}
+.item .ft{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
+.item .pr{font-weight:800;color:var(--gold)}
+.item.rec{border-color:rgba(255,210,63,.6)}.item .tag{font-size:11px;color:#000;background:var(--gold);border-radius:6px;padding:1px 6px;margin-left:auto}
+
+/* 나 */
+.room{position:relative;height:330px;border-radius:16px;background:radial-gradient(ellipse 70% 60% at 50% 40%,#1d1838,#0b0b14);border:1px solid var(--border);overflow:hidden}
+.desk{position:absolute;left:12%;right:12%;bottom:70px;height:16px;border-radius:6px;background:#3a2c22}
+.spot{position:absolute;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px}
+.spot .ic{width:62px;height:62px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(0,224,255,.5);display:flex;align-items:center;justify-content:center;font-size:32px}
+.spot .ic.lv0{border-style:dashed;border-color:#44445f;opacity:.6}
+.spot .lvt{font-size:11px;color:var(--accent)}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.box{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 14px}.box h4{margin:0 0 8px;font-size:14px}
+.row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #1e1e30;font-size:13px}.row:last-child{border:0}.row span:nth-child(2){flex:1}
+
+/* 다 */
+.recs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.recs .item{border-color:rgba(255,210,63,.55);background:linear-gradient(160deg,rgba(255,210,63,.08),var(--panel))}
+details.sec{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px 14px;margin-bottom:8px}
+details.sec summary{cursor:pointer;font-weight:700;display:flex;align-items:center;gap:8px;list-style:none}
+details.sec summary small{margin-left:auto;font-weight:400;color:var(--muted)}
+</style>
+</head>
+<body><div class="wrap">
+<div class="doc"><h1>상점 시안 (23)</h1>
+<p>지금 상점 문제: 진행 중 계약 · 거주지 · 장비 · 개인 고용 · 투자 · 스카우트 티켓 · 팬·명성 <b>7묶음이 표로 길게</b> 이어져서(화면 2,100px) 무엇을 사면 좋은지, 지금 무엇을 갖고 있는지 한눈에 안 보여요. 매주 나가는 돈(월세·고용)도 따로 안 보여요.</p>
+<p>세 안 모두 위에 <b>지갑 띠</b>(자금 · 매주 들어오는 돈 · 매주 나가는 돈)가 있고, 파는 물건과 효과·값은 지금과 같아요.</p></div>
+
+<div class="doc"><h2>가. 분류 탭 + 상품 카드 <small>추천</small></h2>
+<p>왼쪽 분류 6개(거주지·장비·개인 고용·투자·팬 명성·티켓, 옆에 '가진 것' 수), 오른쪽은 고른 분류만 카드로. 카드 = 아이콘 · 이름 · 단계 막대(장비 Lv1~3) · 지금 효과 → 다음 효과 · 값 · [구매]. 돈이 모자라면 버튼이 흐려지고, 지금 사면 좋은 것(예: 체력 소모가 큰 사람에게 의자)은 금색 '추천'.</p></div>
+<div class="scr">
+ <div class="wallet"><span>💰</span><div><span class="mut">자금</span><div class="m">1억 5,000만 원</div></div><div class="f"><div><span class="mut">매주 들어옴</span><b class="up">+23만</b></div><div><span class="mut">매주 나감</span><b class="dn">−15만</b></div><div><span class="mut">진행 중 계약</span><b>0개</b></div></div></div>
+ <div class="ga"><div class="cats">
+  <div class="cat"><span class="ic">🏠</span>거주지<small>합숙</small></div>
+  <div class="cat on"><span class="ic">🛒</span>장비<small>0/5</small></div>
+  <div class="cat"><span class="ic">🧑‍🏫</span>개인 고용<small>0명</small></div>
+  <div class="cat"><span class="ic">💹</span>투자<small>없음</small></div>
+  <div class="cat"><span class="ic">🌟</span>팬·명성</div>
+  <div class="cat"><span class="ic">🎫</span>스카우트 티켓<small>0장</small></div>
+ </div>
+ <div class="grid">
+  <div class="item"><div class="hd"><span class="ic">⌨️</span><div><b>기계식 키보드</b><div class="mut">입력 정확도 훈련</div></div></div><div class="lv"><i></i><i></i><i></i></div><div class="eff">지금 없음 → <em>훈련 +5%</em></div><div class="ft"><span class="pr">300만</span><button class="buy">Lv1 구매</button></div></div>
+  <div class="item"><div class="hd"><span class="ic">🖱️</span><div><b>게이밍 마우스</b><div class="mut">반응속도 훈련</div></div></div><div class="lv"><i class="on"></i><i></i><i></i></div><div class="eff">지금 +5% → <em>+10%</em></div><div class="ft"><span class="pr">1,500만</span><button class="buy">Lv2 업그레이드</button></div></div>
+  <div class="item rec"><div class="hd"><span class="ic">🪑</span><div><b>게이밍 의자</b><div class="mut">체력 소모</div></div><span class="tag">추천</span></div><div class="lv"><i></i><i></i><i></i></div><div class="eff">지금 없음 → <em>체력 소모 −5%</em></div><div class="ft"><span class="pr">500만</span><button class="buy pri">Lv1 구매</button></div></div>
+  <div class="item"><div class="hd"><span class="ic">🖥️</span><div><b>고주사율 모니터</b><div class="mut">시야·거리 조절</div></div></div><div class="lv"><i class="on"></i><i class="on"></i><i class="on"></i></div><div class="eff">최고 단계 · <em>+15%</em></div><div class="ft"><span class="own">✓ 다 모음</span></div></div>
+  <div class="item"><div class="hd"><span class="ic">🎧</span><div><b>헤드셋</b><div class="mut">오더·한타</div></div></div><div class="lv"><i></i><i></i><i></i></div><div class="eff">지금 없음 → <em>+5%</em></div><div class="ft"><span class="pr">300만</span><button class="buy">Lv1 구매</button></div></div>
+ </div></div></div>
+
+<div class="doc"><h2>나. 내 방 꾸미기</h2>
+<p>위에 <b>내 방 그림</b>: 책상 위 키보드·마우스·모니터·헤드셋·의자 자리를 누르면 그 장비를 사거나 올려요(안 산 건 점선). 단계가 오르면 아이콘 아래 Lv. 아래 두 칸에 집·고용·투자·팬 명성을 줄 목록으로. 가장 재밌지만 작업이 커요.</p></div>
+<div class="scr">
+ <div class="wallet"><span>💰</span><div><span class="mut">자금</span><div class="m">1억 5,000만 원</div></div><div class="f"><div><span class="mut">매주 들어옴</span><b class="up">+23만</b></div><div><span class="mut">매주 나감</span><b class="dn">−15만</b></div></div></div>
+ <div class="room"><div class="desk"></div>
+  <div class="spot" style="left:46%;top:40px"><span class="ic">🖥️</span>모니터<span class="lvt">Lv3</span></div>
+  <div class="spot" style="left:30%;top:150px"><span class="ic lv0">⌨️</span>키보드<span class="mut">300만</span></div>
+  <div class="spot" style="left:58%;top:150px"><span class="ic">🖱️</span>마우스<span class="lvt">Lv1</span></div>
+  <div class="spot" style="left:72%;top:60px"><span class="ic lv0">🎧</span>헤드셋<span class="mut">300만</span></div>
+  <div class="spot" style="left:12%;top:120px"><span class="ic lv0">🪑</span>의자<span class="mut">500만</span></div>
+ </div>
+ <div class="below"><div class="box"><h4>🏠 집 · 🧑‍🏫 개인 고용</h4><div class="row"><span>🛏️</span><span>팀 합숙소 (지금)</span><span class="mut">훈련 +25%</span></div><div class="row"><span>🏠</span><span>원룸 · 주 15만</span><button class="buy">이사</button></div><div class="row"><span>📊</span><span>개인 분석가 · 주 30만</span><button class="buy">고용</button></div></div>
+ <div class="box"><h4>💹 투자 · 🌟 팬 명성 · 🎫 티켓</h4><div class="row"><span>🏦</span><span>안정형 펀드 8주</span><button class="buy">넣기</button></div><div class="row"><span>🤝</span><span>팬미팅 · 300만</span><button class="buy">하기</button></div><div class="row"><span>🎫</span><span>스카우트 티켓 · 800만</span><button class="buy">사기</button></div></div></div>
+</div>
+
+<div class="doc"><h2>다. 추천 3개 + 접는 목록</h2>
+<p>맨 위 <b>'지금 사면 좋은 것' 3개</b>(내 상황으로 고름: 모자란 스탯 훈련 장비, 체력이 자주 낮으면 트레이너 등), 아래는 분류별 접는 목록(눌러서 펼침). 처음 하는 사람이 고르기 쉽지만 전체를 보려면 펼쳐야 해요.</p></div>
+<div class="scr">
+ <div class="wallet"><span>💰</span><div><span class="mut">자금</span><div class="m">1억 5,000만 원</div></div><div class="f"><div><span class="mut">매주 들어옴</span><b class="up">+23만</b></div><div><span class="mut">매주 나감</span><b class="dn">−15만</b></div></div></div>
+ <div class="recs">
+  <div class="item"><div class="hd"><span class="ic">🪑</span><div><b>게이밍 의자 Lv1</b><div class="mut">체력이 자주 30 아래예요</div></div></div><div class="eff"><em>체력 소모 −5%</em></div><div class="ft"><span class="pr">500만</span><button class="buy pri">구매</button></div></div>
+  <div class="item"><div class="hd"><span class="ic">⌨️</span><div><b>기계식 키보드 Lv1</b><div class="mut">입력 정확도가 가장 낮아요</div></div></div><div class="eff"><em>훈련 +5%</em></div><div class="ft"><span class="pr">300만</span><button class="buy pri">구매</button></div></div>
+  <div class="item"><div class="hd"><span class="ic">🏠</span><div><b>원룸으로 이사</b><div class="mut">컨디션 상한 40 → 80</div></div></div><div class="eff">주 15만 · <em>경기력 +</em></div><div class="ft"><span class="pr">주 15만</span><button class="buy pri">이사</button></div></div>
+ </div>
+ <details class="sec" open><summary>🛒 장비 <small>0/5 · 300만~</small></summary><div class="mut" style="padding:8px 0">키보드 · 마우스 · 모니터 · 헤드셋 · 의자 (가 안 같은 카드)</div></details>
+ <details class="sec"><summary>🏠 거주지 <small>지금 합숙</small></summary></details>
+ <details class="sec"><summary>🧑‍🏫 개인 고용 <small>0명</small></summary></details>
+ <details class="sec"><summary>💹 투자 <small>없음</small></summary></details>
+ <details class="sec"><summary>🌟 팬·명성 · 🎫 티켓</summary></details>
+</div>
+
+<div class="doc"><h2>한눈에 비교</h2></div>
+<table class="cmp"><tr><th></th><th>가. 분류 탭 + 카드</th><th>나. 내 방 꾸미기</th><th>다. 추천 + 접는 목록</th></tr>
+<tr><td>화면 길이</td><td>짧음 (한 분류씩)</td><td>중간</td><td>짧음</td></tr>
+<tr><td>가진 것 확인</td><td>쉬움 (분류 옆 숫자·카드 표시)</td><td>장비는 가장 쉬움</td><td>펼쳐야</td></tr>
+<tr><td>뭘 살지 고르기</td><td>추천 표시</td><td>보통</td><td>가장 쉬움</td></tr>
+<tr><td>재미</td><td>보통</td><td>가장 큼</td><td>보통</td></tr>
+<tr><td>작업량</td><td>중간</td><td>큼</td><td>중간</td></tr></table>
+<div class="doc"><p style="margin-top:14px">섞어도 돼요. 예: "가인데 맨 위에 다의 추천 3개", "가인데 장비 탭만 나의 내 방 그림".</p></div>
+</div></body></html>

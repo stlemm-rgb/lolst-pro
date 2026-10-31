@@ -178,56 +178,92 @@ function shopEffectText(e) {
   return parts.join(", ");
 }
 
+// 229 (시안 23 가): 위 지갑 띠 + 왼쪽 분류 탭 + 오른쪽 고른 분류만 (장비·고용·팬 명성은 상품 카드)
+let shopTab = "gear";
+const SHOP_TABS = [
+  ["home", "🏠", "거주지"], ["gear", "🛒", "장비"], ["staff", "🧑‍🏫", "개인 고용"], ["invest", "💹", "투자"],
+  ["fame", "🌟", "팬·명성"], ["ticket", "🎫", "스카우트 티켓"], ["act", "📋", "계약·활동"],
+];
+function shopWeeklyOut() {
+  const s = shopState();
+  return SHOP_STAFF.reduce(function (a, st) { return a + (s.staff[st.id] ? st.weekly : 0); }, 0) + (currentHome() && currentHome().rent ? currentHome().rent : 0);
+}
+// 분류 옆 작은 글자 (가진 것)
+function shopTabInfo(id) {
+  const s = shopState();
+  if (id === "home") return currentHome() ? currentHome().name.replace(/\s*\(.*\)/, "") : "합숙";
+  if (id === "gear") return SHOP_GEAR.filter(function (g) { return s.gear[g.id] > 0; }).length + "/" + SHOP_GEAR.length;
+  if (id === "staff") { const n = SHOP_STAFF.filter(function (st) { return s.staff[st.id]; }).length; return n ? n + "명" : ""; }
+  if (id === "invest") return s.invest.length ? s.invest.length + "개 진행" : "";
+  if (id === "ticket") return (s.tickets || 0) + "장";
+  if (id === "act") { const n = (state.activities || []).length; return n ? n + "개" : ""; }
+  return "";
+}
+// 추천: 내 포지션 가산점 스탯을 올리는 장비 중 가장 싼 것, 체력이 낮으면 의자
+function shopRecGear() {
+  const s = shopState();
+  if (state.stamina < TEAM_MATCH.lowStaminaLimit + 10 && (s.gear.chair || 0) < 1) return "chair";
+  let best = null;
+  SHOP_GEAR.forEach(function (g) {
+    const lv = s.gear[g.id] || 0;
+    if (lv >= g.levels.length) return;
+    const ts = g.levels[lv].effects.trainingStat || {};
+    if (!Object.keys(ts).some(function (k) { return isBonusStat(k, state.player.position); })) return;
+    if (!best || g.levels[lv].price < best.p) best = { id: g.id, p: g.levels[lv].price };
+  });
+  return best ? best.id : null;
+}
+function shopItemHTML(o) {
+  return '<div class="sh-item' + (o.rec ? " rec" : "") + (o.on ? " on" : "") + '"><div class="sh-hd"><span class="sh-ic">' + o.icon + "</span><div><b>" + o.name + '</b><div class="muted small">' + o.sub + "</div></div>" +
+    (o.rec ? '<span class="sh-tag">추천</span>' : "") + "</div>" + (o.lv || "") + '<div class="sh-eff">' + o.eff + "</div>" +
+    '<div class="sh-ft"><span class="sh-pr">' + (o.price || "") + "</span>" + o.action + "</div></div>";
+}
+
 pages.shop = function () {
   const s = shopState();
   const weeklyIn = state.contract ? Math.round(state.contract.salary / CREATION.weeksPerSeason) : 0;
-  const weeklyOut = SHOP_STAFF.reduce(function (a, st) { return a + (s.staff[st.id] ? st.weekly : 0); }, 0);
-  const btn = function (attr, label, disabledWhy) {
-    return '<button class="small-btn"' + attr + (disabledWhy ? ' disabled title="' + escapeHTML(disabledWhy) + '"' : "") + ">" + label + "</button>" +
-      (disabledWhy ? ' <span class="muted small">' + escapeHTML(disabledWhy) + "</span>" : "");
+  const weeklyOut = shopWeeklyOut();
+  const buy = function (attr, label, why, pri) {
+    return '<button class="small-btn sh-buy' + (pri && !why ? " primary" : "") + '"' + attr + (why ? ' disabled title="' + escapeHTML(why) + '"' : "") + ">" + (why ? "🔒 " + escapeHTML(why) : label) + "</button>";
   };
-
-  const gearRows = SHOP_GEAR.map(function (g) {
-    const lv = s.gear[g.id] || 0;
-    const now = lv > 0 ? shopEffectText(g.levels[lv - 1].effects) : '<span class="muted">없음</span>';
-    let action;
-    if (lv >= g.levels.length) action = '<span class="chip gold">최고 단계</span>';
-    else {
-      const next = g.levels[lv];
-      action = btn(' data-buygear="' + g.id + '"', "Lv" + (lv + 1) + " 구매 " + moneyText(next.price), state.money < next.price ? "자금이 부족해요" : "") +
-        '<div class="muted small">→ ' + shopEffectText(next.effects) + "</div>";
-    }
-    return "<tr><td>" + g.icon + " <b>" + g.name + '</b><div class="muted small">' + g.what + "</div></td>" +
-      '<td class="c"><span class="pips tip" tabindex="0" data-tip="' + (lv > 0 ? "Lv" + lv : "아직 없음") + " / 최고 Lv" + g.levels.length + '">' + g.levels.map(function (x, i) { return "<i" + (i < lv ? ' class="on"' : "") + "></i>"; }).join("") + "</span></td><td>" + now + "</td><td>" + action + "</td></tr>";
+  let body;
+  if (shopTab === "gear") {
+    const rec = shopRecGear();
+    body = '<div class="sh-grid">' + SHOP_GEAR.map(function (g) {
+      const lv = s.gear[g.id] || 0, max = lv >= g.levels.length, next = g.levels[lv];
+      const pips = '<div class="sh-lv">' + g.levels.map(function (x, i) { return "<i" + (i < lv ? ' class="on"' : "") + "></i>"; }).join("") + "</div>";
+      return shopItemHTML({ icon: g.icon, name: g.name, sub: g.what, lv: pips, rec: !max && g.id === rec, on: max,
+        eff: max ? "최고 단계 · <em>" + shopEffectText(g.levels[lv - 1].effects) + "</em>" : (lv ? shopEffectText(g.levels[lv - 1].effects) : "지금 없음") + " → <em>" + shopEffectText(next.effects) + "</em>",
+        price: max ? "" : moneyText(next.price),
+        action: max ? '<span class="chip good">✓ 다 모음</span>' : buy(' data-buygear="' + g.id + '"', lv ? "Lv" + (lv + 1) + " 업그레이드" : "Lv1 구매", state.money < next.price ? "자금 부족" : "", g.id === rec) });
+    }).join("") + '</div><p class="muted small">한 번 사면 계속 · 단계가 오를수록 효과가 커져요. 장비 단계는 훈련 대성공 확률도 조금 올려요.</p>';
+  } else if (shopTab === "staff") {
+    body = '<div class="sh-grid">' + SHOP_STAFF.map(function (st) {
+      const on = !!s.staff[st.id];
+      return shopItemHTML({ icon: st.icon, name: st.name, sub: on ? '<span class="up">고용 중</span>' : "매주 비용", eff: st.desc, on: on, price: "주 " + moneyText(st.weekly),
+        action: on ? '<button class="small-btn sh-buy" data-staff="' + st.id + '">해지</button>' : buy(' data-staff="' + st.id + '"', "고용", state.money < st.weekly ? "자금 부족" : "") });
+    }).join("") + '</div><p class="muted small">매주 비용이 나가는 동안만 효과 · 자금이 모자라면 자동 해지</p>';
+  } else if (shopTab === "fame") {
+    body = '<div class="sh-grid">' + SHOP_FAME.map(function (f) {
+      const why = fameAvailable(f);
+      return shopItemHTML({ icon: f.icon, name: f.name, sub: f.once ? "한 번 (영구)" : f.perSeason ? "시즌 " + f.perSeason + "번" : "제한 없음", eff: f.desc, price: moneyText(f.price),
+        action: buy(' data-fame="' + f.id + '"', f.once ? "사기" : "하기", why) });
+    }).join("") + "</div>";
+  } else if (shopTab === "home") body = housingCardHTML();
+  else if (shopTab === "invest") body = investCardHTML();
+  else if (shopTab === "ticket") body = staffShopCardHTML(); // 🎫 (js/staff.js)
+  else body = activitiesCardHTML();
+  const tabs = SHOP_TABS.map(function (t) {
+    const info = shopTabInfo(t[0]);
+    return '<button class="sh-cat' + (shopTab === t[0] ? " on" : "") + '" data-shoptab="' + t[0] + '"><span class="sh-cic">' + t[1] + "</span>" + t[2] + (info ? "<small>" + escapeHTML(info) + "</small>" : "") + "</button>";
   }).join("");
-
-  const staffRows = SHOP_STAFF.map(function (st) {
-    const on = !!s.staff[st.id];
-    return "<tr" + (on ? ' class="me"' : "") + "><td>" + st.icon + " <b>" + st.name + "</b></td><td>" + st.desc + '</td><td class="r">주 ' + moneyText(st.weekly) + "</td><td>" +
-      (on ? btn(' data-staff="' + st.id + '"', "해지") + ' <span class="up small">고용 중</span>'
-          : btn(' data-staff="' + st.id + '"', "고용", state.money < st.weekly ? "자금이 부족해요" : "")) + "</td></tr>";
-  }).join("");
-
-  const fameRows = SHOP_FAME.map(function (f) {
-    const limit = f.once ? "한 번 (영구)" : f.perSeason ? "시즌 " + f.perSeason + "번" : "제한 없음";
-    return "<tr><td>" + f.icon + " <b>" + f.name + "</b></td><td>" + f.desc + ' <span class="muted small">· ' + limit + '</span></td><td class="r">' + moneyText(f.price) + "</td><td>" +
-      btn(' data-fame="' + f.id + '"', f.once ? "사기" : "하기", fameAvailable(f)) + "</td></tr>";
-  }).join("");
-
   return (
     "<h1>상점</h1>" +
-    '<div class="card"><div class="shop-money">💰 자금 <b>' + moneyText(state.money) + "</b>" +
-      ' <span class="muted small">· 매주 연봉 +' + moneyText(weeklyIn) + (weeklyOut ? " · 개인 고용 −" + moneyText(weeklyOut) : "") + (currentHome() && currentHome().rent ? " · 월세 −" + moneyText(currentHome().rent) : "") + "</span></div></div>" +
-    activitiesCardHTML() +
-    housingCardHTML() +
-    '<div class="card"><h2>🛒 장비 <span class="muted small">한 번 사면 계속 · 단계가 오를수록 효과가 커져요</span></h2>' +
-      '<table class="roster shop-table"><tr><th>장비</th><th class="c">단계</th><th>지금 효과</th><th>다음 단계</th></tr>' + gearRows + "</table></div>" +
-    '<div class="card"><h2>🧑‍🏫 개인 고용 <span class="muted small">매주 비용이 나가는 동안만 효과 · 자금이 모자라면 자동 해지</span></h2>' +
-      '<table class="roster shop-table">' + staffRows + "</table></div>" +
-    investCardHTML() +
-    staffShopCardHTML() + // 🎫 스태프 스카우트 티켓 (js/staff.js)
-    '<div class="card"><h2>🌟 팬·명성</h2>' +
-      '<table class="roster shop-table">' + fameRows + "</table></div>"
+    '<div class="sh-wallet"><span class="sh-wic">💰</span><div><span class="muted small">자금</span><div class="sh-money">' + moneyText(state.money) + "</div></div>" +
+      '<div class="sh-flow"><div><span class="muted small">매주 들어옴 (연봉)</span><b class="up">+' + moneyText(weeklyIn) + "</b></div>" +
+      '<div><span class="muted small">매주 나감 (월세·고용)</span><b class="' + (weeklyOut ? "down" : "muted") + '">' + (weeklyOut ? "−" + moneyText(weeklyOut) : "없음") + "</b></div>" +
+      '<div><span class="muted small">진행 중 계약·활동</span><b>' + (state.activities || []).length + "개</b></div></div></div>" +
+    '<div class="sh-layout"><div class="sh-cats">' + tabs + '</div><div class="sh-body">' + body + "</div></div>"
   );
 };
 
@@ -271,6 +307,7 @@ function activitiesCardHTML() {
 
 // 버튼 연결 (main.js renderPage에서 부름)
 function bindShop(page) {
+  page.querySelectorAll("[data-shoptab]").forEach(function (b) { b.onclick = function () { shopTab = b.getAttribute("data-shoptab"); renderPage(); }; }); // 229
   page.querySelectorAll("[data-home]").forEach(function (b) { b.onclick = function () { moveHome(b.getAttribute("data-home") || null); }; });
   page.querySelectorAll("[data-buygear]").forEach(function (b) { b.onclick = function () { buyGear(b.getAttribute("data-buygear")); }; });
   page.querySelectorAll("[data-staff]").forEach(function (b) { b.onclick = function () { toggleStaff(b.getAttribute("data-staff")); }; });

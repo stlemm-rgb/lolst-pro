@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-10-31 갱신 (PROGRESS 227까지, 시작 화면·캐릭터 생성·등록 도장·코치 안내, ver 1.2.1)
+# 다음 세션 이어가기 — 2026-10-31 갱신 (PROGRESS 229까지, 시작 화면·캐릭터 생성·등록 도장·코치 안내, ver 1.2.1)
 
 새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → CLAUDE.md → FILEMAP.md(파일 위치) → PROGRESS.md 최근 항목 → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태(`git status --short`, `git log --oneline -10`)를 확인한다.
 예전 기록: ver 1.0(1~133번)은 [docs/PROGRESS_1-133.md](docs/PROGRESS_1-133.md), 뉴스 개편 검증 요청문(끝난 일)은 [docs/AI_REVIEW_HANDOFF.md](docs/AI_REVIEW_HANDOFF.md), 뉴스 검증 결과는 [tools/NEWS_VALIDATION.md](tools/NEWS_VALIDATION.md).
@@ -112,7 +112,7 @@ git push
 - 경기 화면 팀 색(219): 우리 팀 하늘 · 상대 분홍 = css --side-a/--side-b, 우리 팀이 b면 sideSwapClass(m). 새 경기 화면 요소도 .a/.b·s0/s1에 이 변수를 쓸 것 (--accent/--bad 직접 쓰지 말기).
 - 빅게임: bigGameOf(x, y), 쌍 추가는 data/club.js BIG_GAMES 한 줄.
 - 디자인 부품: 새 화면도 pageHeadHTML·teamMarkHTML·rankBadgeHTML·emptyBoxHTML·portraitImg/faceTd 쓰기 (data/ui.js·js/ui.js·js/portrait.js). 색은 css/style.css 맨 위 변수만.
-- 훈련 대성공: data/great.js GREAT_RULES, 저장 칸 state.great.
+- 훈련 대성공: data/great.js GREAT_RULES (228: 기본 2%·최대 10%, 유망주 7%·15%), 저장 칸 state.great.
 - 시작 화면·캐릭터 생성(212·213, js/creation.js): 캐릭터가 없으면 renderCreation → 시작 화면(startScreenDone=false) → [선수 등록하기] → 7단계(CREATION_STEPS, data/ui.js). 시작 화면 검사는 **구단 목록 맞추기 뒤**에 있어야 함 (측정 도구 sim_lib.new_career가 draft.startYear만 바꾸고 renderCreation을 불러서, 앞에 두면 정답지가 달라짐). 단계 화면 버튼은 그 단계에만 있으니 묶을 때 없으면 건너뜀. 도트 글자 로고 = js/portrait.js pixelLogoHTML. 버전 글자는 Challenger_Road.html 로고 한 곳.
 - 단축키(198·199, 사용자 지정 Space 다음 주·F 휴식·A(ㅁ) 요약 확인·D·S·T·/ 목록): data/ui.js SHORTCUTS, js/shortcuts.js. 새 겹창을 만들면 shortcuts.js popupOpen() 목록에 id를 넣을 것 (창이 열려 있을 때 N으로 주가 넘어가지 않게).
 
@@ -199,4 +199,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 1. `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
 2. 새 사용자 요청 우선. 없으면 7장의 해외 진출 (선택지로 묻기부터).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 228**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 230**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

@@ -1899,3 +1899,35 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .dgoals .dgoal .dg-t::after { content: " ›"; color: var(--accent); }
 .qcard.click .quest-pick { border: 1px solid rgba(var(--accent-rgb), 0.55); background: rgba(var(--accent-rgb), 0.12); color: #dff9ff; }
 :is(.d2-top, .d2-row, .dash) button:focus-visible, .qcard.click:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* ===== 30. 상점 (229, 시안 23 가): 지갑 띠 + 분류 탭 + 상품 카드 ===== */
+.sh-wallet { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 14px 18px; border-radius: var(--r); background: linear-gradient(120deg, #2a2410, var(--panel) 60%); border: 1px solid rgba(var(--gold-rgb), 0.35); margin-bottom: 14px; }
+.sh-wic { font-size: 28px; }
+.sh-money { font-size: 28px; font-weight: 900; color: var(--gold); line-height: 1.1; }
+.sh-flow { display: flex; gap: 22px; margin-left: auto; flex-wrap: wrap; } .sh-flow b { display: block; font-size: 16px; }
+.sh-layout { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 16px; align-items: start; }
+.sh-cats { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 76px; }
+.sh-cat { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 9px 12px; border-radius: var(--r-s); border: 1px solid transparent; background: none; color: #b8b8cc; font-weight: 400; font-size: 14px; }
+.sh-cat:hover { background: rgba(255, 255, 255, 0.05); }
+.sh-cat.on { background: rgba(var(--accent-rgb), 0.1); border-color: rgba(var(--accent-rgb), 0.5); color: #fff; font-weight: 700; }
+.sh-cic { width: 30px; height: 30px; border-radius: 9px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; flex: none; }
+.sh-cat small { margin-left: auto; font-size: 11px; color: var(--muted); font-weight: 400; }
+.sh-body > .card { margin-top: 0; }
+.sh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.sh-item { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.sh-item.rec { border-color: rgba(var(--gold-rgb), 0.6); }
+.sh-item.on { border-color: rgba(var(--good-rgb), 0.45); }
+.sh-hd { display: flex; gap: 10px; align-items: center; } .sh-hd b { font-size: 15px; }
+.sh-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--panel-2); display: flex; align-items: center; justify-content: center; font-size: 24px; flex: none; }
+.sh-tag { margin-left: auto; font-size: 11px; font-weight: 800; color: var(--on-gold); background: var(--gold); border-radius: 6px; padding: 1px 6px; }
+.sh-lv { display: flex; gap: 4px; } .sh-lv i { flex: 1; height: 6px; border-radius: 3px; background: var(--track); } .sh-lv i.on { background: var(--accent); }
+.sh-eff { font-size: 13px; color: #cfcfe0; } .sh-eff em { font-style: normal; color: var(--good); }
+.sh-ft { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.sh-pr { font-weight: 800; color: var(--gold); }
+.sh-buy:not(:disabled):not(.primary) { border: 1px solid rgba(var(--accent-rgb), 0.55); background: rgba(var(--accent-rgb), 0.1); color: #dff9ff; }
+@media (max-width: 860px) {
+  .sh-layout { grid-template-columns: 1fr; }
+  .sh-cats { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+  .sh-cat { width: auto; flex: none; white-space: nowrap; }
+  .sh-flow { margin-left: 0; }
+}

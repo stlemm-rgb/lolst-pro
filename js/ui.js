@@ -98,7 +98,7 @@ const PAGE_HEAD_SIDE = {
   training: function () { return ["체력", state.stamina + " / " + state.staminaMax]; },
   sns: function () { const n = unreadCount("inbox") + unreadCount("news") + unreadCount("social"); return n ? ["안 읽음", n + "개"] : null; },
   career: function () { return ["종합 능력", playerScore(USER_ID).toFixed(1)]; },
-  shop: function () { return ["💰 자금", moneyText(state.money)]; },
+  // shop: 229부터 화면 안 지갑 띠에 자금이 크게 나와서 머리 오른쪽 숫자는 뺌
   team: function () { return ["팀 내 입지", String(standingValue())]; },
   calendar: function () { return ["지금", state.week + "주차"]; },
   standings: function () { const r = myLeagueRank(); return r ? ["우리 팀", r + "위"] : null; },

@@ -9,7 +9,7 @@ function greatFire() { return greatState().streak >= 2; } // 불타는 손
 
 // 확률과 이유 (훈련 화면 표시용)
 function greatChanceParts() {
-  const R = GREAT_RULES, parts = [["기본", R.base]];
+  const R = GREAT_RULES, pro = greatProspect(), parts = [[pro ? "기본 (🌱 유망주)" : "기본", pro ? R.prospectBase : R.base]];
   if (state.condition >= R.condMin) parts.push(["컨디션 " + R.condMin + " 이상", R.condBonus]);
   const t = myTeam();
   if (t && t.staff && t.staff.coach) parts.push(["구단 코치 " + gradeName(t.staff.coach.g) + "급", R.coach[t.staff.coach.g] || 0]);
@@ -19,11 +19,14 @@ function greatChanceParts() {
 }
 function greatChance() {
   const R = GREAT_RULES;
-  let p = Math.min(R.max, greatChanceParts().reduce(function (a, x) { return a + x[1]; }, 0));
+  let p = Math.min(greatMax(), greatChanceParts().reduce(function (a, x) { return a + x[1]; }, 0));
   if (greatFire()) p += R.streakBonus;
   if (state.stamina < TIRED_LIMIT) p *= R.tiredMult;
   return p;
 }
+// 228: 🌱 유망주 특성이면 기본 7%·최대 15%, 아니면 기본 2%·최대 10%
+function greatProspect() { return !!(state.player && state.player.traits && state.player.traits.indexOf(GREAT_RULES.prospectTrait) !== -1); }
+function greatMax() { return greatProspect() ? GREAT_RULES.prospectMax : GREAT_RULES.max; }
 function greatPct(p) { return (Math.round(p * 1000) / 10) + "%"; }
 // 스탯이나 숙련도가 오르는 훈련만 대성공 가능 (휴식 제외)
 function greatEligible(training) {
@@ -41,10 +44,10 @@ function rollGreat(training) {
 // ----- 훈련 화면 -----
 function greatChipHTML() {
   const p = greatChance();
-  const why = greatChanceParts().map(function (x) { return x[0] + " +" + greatPct(x[1]); }).join(" · ") + " (최대 " + greatPct(GREAT_RULES.max) + ")" +
+  const why = greatChanceParts().map(function (x) { return x[0] + " +" + greatPct(x[1]); }).join(" · ") + " (최대 " + greatPct(greatMax()) + ")" +
     (greatFire() ? " · 🔥 불타는 손 +" + greatPct(GREAT_RULES.streakBonus) : "") + (state.stamina < TIRED_LIMIT ? " · 너무 지쳐서 절반" : "");
   return '<span class="gsc tip" tabindex="0" data-tip="' + escapeHTML("대성공이면 그 주 오른 스탯·숙련도 2배. " + why) + '">🎯 대성공 ' + greatPct(p) +
-    ' <span class="gsc-bar"><i style="width:' + Math.round(p / (GREAT_RULES.max + GREAT_RULES.streakBonus) * 100) + '%"></i></span></span>';
+    ' <span class="gsc-bar"><i style="width:' + Math.round(p / (greatMax() + GREAT_RULES.streakBonus) * 100) + '%"></i></span></span>';
 }
 function greatLineHTML() {
   const hint = state.condition < GREAT_RULES.condMin ? " · 컨디션을 " + GREAT_RULES.condMin + " 이상으로 올리면 +" + greatPct(GREAT_RULES.condBonus) : "";
