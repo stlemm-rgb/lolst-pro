@@ -56,6 +56,8 @@ const PAGE_HEADS = {
   results:      { icon: "📺", desc: "지난 경기 기록과 다시 보기" },
   calendar:     { icon: "🗓️", desc: "올해 시즌 흐름과 대회 대진표" },
   standings:    { icon: "🏆", desc: "리그별 순위표 · 세트 득실과 최근 5경기" },
+  rank:         { icon: "🏆", desc: "국내 리그 순위와 해외 지역 리그" }, // 224: 순위 묶음
+  collect:      { icon: "💎", desc: "업적 도감과 컬렉션" }, // 224: 수집 묶음
   world:        { icon: "🌏", desc: "해외 지역 리그 순위와 스타 선수" },
   achievements: { icon: "🎖️", desc: "커리어·우승·개인상·명장면 업적 모음" },
   collection:   { icon: "🎨", desc: "시그니처 픽과 월드 우승 스킨" },

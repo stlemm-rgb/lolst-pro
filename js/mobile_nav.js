@@ -44,7 +44,7 @@ function currentMenuParent() {
 }
 
 function mobileSheetHTML() {
-  const icon = function (id) { return MOBILE_NAV.sheetIcons[id] || (PAGE_HEADS[id] ? PAGE_HEADS[id].icon : "•"); };
+  const icon = function (id) { const it = MENUS_ICON[id]; if (it) return it; return MOBILE_NAV.sheetIcons[id] || (PAGE_HEADS[id] ? PAGE_HEADS[id].icon : "•"); };
   const item = function (it) {
     return '<button class="mnav-item' + (currentMenuParent() === it.id ? " on" : "") + '" data-mnav-go="' + it.id + '"><span class="mnav-ic">' + icon(it.id) + "</span>" + escapeHTML(it.name.replace(/^[^\s가-힣A-Za-z]+\s*/, "")) + "</button>";
   };

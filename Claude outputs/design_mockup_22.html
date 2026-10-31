@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대시보드 시안 (22)</title>
+<style>
+:root{--bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;--accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--bad:#ff3d71;--good:#2bff9e;
+--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7);--sans:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:#000;color:var(--text);font-family:var(--sans);padding:24px 16px 60px}
+.wrap{max-width:1240px;margin:0 auto}
+.doc h1{font-size:22px;margin:0 0 6px}.doc h2{font-size:19px;margin:44px 0 4px}
+.doc h2 small{font-size:12px;background:var(--gold);color:#000;border-radius:6px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+.doc p{font-size:14px;color:#b9b9cc;line-height:1.7;margin:0 0 6px;max-width:80ch}.doc p b{color:var(--text)}
+.scr{margin-top:12px;border:1px solid #33334d;border-radius:12px;background:var(--bg);padding:18px;overflow:hidden}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.mut{color:var(--muted);font-size:12px}
+.bar{height:8px;border-radius:4px;background:#23233a;position:relative;overflow:hidden}.bar i{position:absolute;inset:0 auto 0 0;border-radius:4px}
+.btn{border:0;border-radius:10px;padding:9px 14px;font:700 14px var(--sans);color:#fff;background:var(--grad-btn)}
+.btn.g{background:var(--panel-2);border:1px solid var(--border);color:var(--text);font-weight:400}
+.chip{display:inline-block;font-size:12px;border:1px solid var(--border);border-radius:999px;padding:2px 9px;margin:2px 4px 2px 0}
+.chip.s{border-color:#ff9f1c;color:#ff9f1c}.chip.a{border-color:var(--gold);color:var(--gold)}
+.pf{width:72px;height:72px;border-radius:12px;background:radial-gradient(circle at 50% 70%,#34305e,#1c1b30);display:flex;align-items:flex-end;justify-content:center;font-size:44px;flex:none}
+table.cmp{border-collapse:collapse;margin-top:14px;font-size:14px;width:100%;max-width:980px}
+table.cmp th,table.cmp td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}table.cmp th{background:var(--panel-2)}
+
+/* 가 */
+.ga{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px}
+.week{grid-column:1;background:linear-gradient(140deg,#1a0f2e,#0d1a2b 70%);border-color:#33335a;padding:18px 20px}
+.week .hd{display:flex;justify-content:space-between;align-items:baseline}.week .hd b{font-size:20px}
+.vs{display:flex;align-items:center;gap:14px;margin:14px 0;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.04)}
+.vs .t{flex:1;text-align:center}.vs .t b{display:block;font-size:17px}.vs .mid{font-size:13px;color:var(--gold);text-align:center}
+.plan{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.plan .box{border-radius:12px;background:rgba(255,255,255,.04);padding:10px 12px}.plan .box b{display:block;font-size:15px;margin:2px 0 6px}
+.go{display:flex;gap:10px;margin-top:14px}.go .btn{flex:1;padding:12px;font-size:15px}
+.me{grid-column:2;display:flex;flex-direction:column;gap:10px}
+.me .top{display:flex;gap:12px;align-items:center}.me .top b{font-size:18px}
+.big{font-size:40px;font-weight:900;background:linear-gradient(90deg,#b44dff,#00e0ff);-webkit-background-clip:text;color:transparent;line-height:1}
+.strip{grid-column:1/-1;display:flex;gap:0;border-radius:12px;overflow:hidden;border:1px solid var(--border)}
+.strip div{flex:1;padding:9px 14px;background:var(--panel);font-size:13px;border-right:1px solid var(--border)}.strip div:last-child{border:0}
+.strip b{color:var(--gold);font-size:16px;margin-right:4px}
+.low{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.low h3,.tb h3{margin:0 0 8px;font-size:15px}
+.ln{font-size:13px;line-height:1.7;color:#cfcfe0}
+.q{display:flex;justify-content:space-between;font-size:13px;margin:6px 0 3px}
+
+/* 나 */
+.tb .tabs{display:flex;gap:6px;margin:14px 0 12px}.tb .tabs span{padding:8px 16px;border-radius:10px;border:1px solid var(--border);font-size:14px}
+.tb .tabs span.on{background:var(--grad-btn);border:0;font-weight:700}
+.hero{display:flex;gap:16px;align-items:center}
+.hero .stats{margin-left:auto;display:grid;grid-template-columns:repeat(4,auto);gap:4px 22px;text-align:center}
+.hero .stats b{display:block;font-size:22px}
+.tb .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* 다 */
+.da{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.w{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-height:108px}
+.w .k{font-size:12px;color:var(--muted)}.w .v{font-size:26px;font-weight:900}.w .d{font-size:12px;color:#cfcfe0}
+.w.wide{grid-column:span 2}.w.tall{grid-row:span 2}
+.w.hl{border-color:var(--accent);background:rgba(0,224,255,.05)}
+</style>
+</head>
+<body><div class="wrap">
+<div class="doc"><h1>대시보드 시안 (22)</h1>
+<p>지금 대시보드 문제: 맨 위 3칸·선수 카드·이번 주·챔피언·조합 전략·지난주 결과·솔로 랭크·스탯이 <b>모두 같은 크기의 카드</b>로 길게 이어져서, 이번 주에 <b>무엇을 해야 하는지</b>(경기·훈련·[다음 주로 진행])가 눈에 잘 안 띄어요. 스크롤도 길어요.</p>
+<p>세 안 모두 들어가는 정보는 지금과 같아요 (예시 숫자는 스크린샷의 Pack 선수).</p></div>
+
+<div class="doc"><h2>가. '이번 주' 중심 <small>추천</small></h2>
+<p>왼쪽 위 가장 큰 칸 = <b>이번 주 할 일</b>: 이번 주 경기(우리 vs 상대), 고른 훈련·체력·컨디션, 큰 [다음 주로 진행]. 오른쪽 = 내 선수(종합 능력·목표). 다음 일정·계약·패치 3칸은 한 줄 띠로 얇게. 아래 3칸 = 지난주 결과 · 퀘스트 · 챔피언 메타. 조합 전략·솔로 랭크·스탯은 그 아래로.</p></div>
+<div class="scr"><div class="ga">
+ <div class="strip"><div><b>3주</b> 뒤 정규 시즌 개막</div><div><b>1년</b> 남은 계약 (2015년 끝)</div><div><b>19주</b> 뒤 패치</div></div>
+ <div class="card week"><div class="hd"><b>▶ 2015년 3주차 · 이번 주</b><span class="mut">First Stand</span></div>
+  <div class="vs"><div class="t"><b>GEN.G ALPHA</b><span class="mut">우리 팀 · 1부 1위</span></div><div class="mid">이번 주 경기 없음<br><span class="mut">우리 팀은 이번 라운드 휴식</span></div><div class="t"><b>-</b><span class="mut">&nbsp;</span></div></div>
+  <div class="plan"><div class="box"><span class="mut">이번 주 훈련</span><b>🏋️ 챔피언 집중 연습 · 카르마</b><span class="chip a">퀘스트 진행 중</span></div>
+   <div class="box"><span class="mut">체력 63/80 · 컨디션 36/40</span><div class="bar" style="margin:8px 0"><i style="width:79%;background:var(--good)"></i></div><div class="bar"><i style="width:36%;background:var(--gold)"></i></div><span class="mut" style="color:var(--gold)">💡 컨디션 36 → 쉬거나 이기면 올라요</span></div></div>
+  <div class="go"><button class="btn g">휴식 주 💤</button><button class="btn">다음 주로 진행 ▶</button></div></div>
+ <div class="card me"><div class="top"><div class="pf">🧑</div><div><b>Pack</b> <span class="mut">서포트 · 19세</span><br><span class="mut">GEN.G ALPHA · 1군 주전 · 연봉 2,900만</span></div></div>
+  <div style="display:flex;align-items:flex-end;gap:12px"><div class="big">57.5</div><span class="mut">종합 능력<br>리그 서포트 21명 중 12위</span></div>
+  <div><span class="chip">타고난 리더</span><span class="chip">철인</span><span class="chip">냉철한 판단</span></div>
+  <div style="font-size:13px">🎯 <b>리그 우승</b> <span class="mut">주전 ✓ → 1부 승격 ✓ → <b style="color:var(--accent)">리그 우승</b> → 월드 → 전설</span></div>
+  <div class="mut">💚 에메랄드 2,289점 · 솔랭 98위 · 팬 17만</div></div>
+ <div class="low">
+  <div class="card"><h3>📰 지난주 결과</h3><div class="ln">훈련: 카르마 숙련도 +4<br>경기: 1승 3패 · 커리어 −40점<br>새 연락 1건 <span class="chip">📱 휴대폰 열기</span></div></div>
+  <div class="card"><h3>📋 퀘스트</h3><div class="q"><span>주력 챔피언 만들기</span><span class="mut">8주</span></div><div class="bar"><i style="width:66%;background:var(--gold)"></i></div><div class="q"><span>팀 합 맞추기</span><span class="mut">10주</span></div><div class="bar"><i style="width:3%;background:var(--gold)"></i></div></div>
+  <div class="card"><h3>⚔️ 챔피언 메타</h3><div class="ln">메타 숙련도 평균 <b style="color:var(--bad)">42</b> → 경기력 깎임</div><span class="chip s">S 카르마 93</span><span class="chip a">A 판테온 11</span><span class="chip a">A 럭스 37</span></div>
+ </div></div></div>
+
+<div class="doc"><h2>나. 내 선수 + 탭</h2>
+<p>맨 위 넓은 내 선수 띠(얼굴·종합 능력·순위·체력·컨디션 숫자), 아래는 탭 4개(<b>이번 주 · 경기 · 챔피언 · 성장</b>)로 나눠서 한 번에 한 묶음만. 스크롤이 거의 없지만 다른 탭 내용은 눌러야 보여요.</p></div>
+<div class="scr tb"><div class="card hero"><div class="pf">🧑</div><div><b style="font-size:20px">Pack</b> <span class="mut">서포트 · GEN.G ALPHA 1군</span><br><span class="mut">🎯 리그 우승</span></div>
+ <div class="stats"><div><b style="color:var(--accent)">57.5</b><span class="mut">종합 능력</span></div><div><b>1위</b><span class="mut">팀 순위</span></div><div><b>63</b><span class="mut">체력</span></div><div><b style="color:var(--gold)">36</b><span class="mut">컨디션</span></div></div></div>
+ <div class="tabs"><span class="on">이번 주</span><span>경기</span><span>챔피언</span><span>성장</span></div>
+ <div class="grid2"><div class="card"><h3>▶ 이번 주</h3><div class="ln">경기 없음 (라운드 휴식)<br>훈련: 챔피언 집중 연습 · 카르마<br>💡 컨디션 36 → 쉬거나 이기면 올라요</div><div class="go" style="display:flex;gap:8px;margin-top:10px"><button class="btn g">휴식 주</button><button class="btn">다음 주로 진행 ▶</button></div></div>
+ <div class="card"><h3>📋 퀘스트 · 지난주</h3><div class="q"><span>주력 챔피언 만들기</span><span class="mut">2/3</span></div><div class="bar"><i style="width:66%;background:var(--gold)"></i></div><div class="ln" style="margin-top:8px">지난주: 1승 3패 · 새 연락 1건</div></div></div></div>
+
+<div class="doc"><h2>다. 숫자 위젯 판</h2>
+<p>4열 위젯: 칸마다 큰 숫자 하나(종합 능력·팀 순위·체력·컨디션·솔랭·메타 숙련도·계약·다음 경기). 한눈에 상태를 보기 좋지만, 설명 글은 눌러서 봐야 하고 '할 일'이 덜 드러나요.</p></div>
+<div class="scr"><div class="da">
+ <div class="w hl wide"><span class="k">이번 주 · 2015년 3주차</span><span class="v" style="font-size:18px">경기 없음 · 챔피언 집중 연습</span><div class="go" style="display:flex;gap:8px"><button class="btn g">휴식 주</button><button class="btn">다음 주로 진행 ▶</button></div></div>
+ <div class="w"><span class="k">종합 능력</span><span class="v" style="color:var(--accent)">57.5</span><span class="d">서포트 21명 중 12위</span></div>
+ <div class="w"><span class="k">팀 순위</span><span class="v">1위</span><span class="d">GEN.G ALPHA · 1부</span></div>
+ <div class="w"><span class="k">체력</span><span class="v">63<small class="mut">/80</small></span><div class="bar"><i style="width:79%;background:var(--good)"></i></div></div>
+ <div class="w"><span class="k">컨디션</span><span class="v" style="color:var(--gold)">36<small class="mut">/40</small></span><span class="d">합숙 상한 40</span></div>
+ <div class="w"><span class="k">메타 숙련도</span><span class="v" style="color:var(--bad)">42</span><span class="d">60 이상이면 괜찮아요</span></div>
+ <div class="w"><span class="k">솔로 랭크</span><span class="v" style="font-size:20px">💚 에메랄드</span><span class="d">2,289점 · 98위</span></div>
+ <div class="w wide"><span class="k">퀘스트</span><div class="q"><span>주력 챔피언 만들기</span><span class="mut">2/3 · 8주</span></div><div class="bar"><i style="width:66%;background:var(--gold)"></i></div></div>
+ <div class="w"><span class="k">다음 일정</span><span class="v">3주</span><span class="d">정규 시즌 개막</span></div>
+ <div class="w"><span class="k">계약</span><span class="v">1년</span><span class="d">2015년 끝</span></div>
+</div></div>
+
+<div class="doc"><h2>한눈에 비교</h2></div>
+<table class="cmp"><tr><th></th><th>가. 이번 주 중심</th><th>나. 내 선수 + 탭</th><th>다. 숫자 위젯</th></tr>
+<tr><td>이번 주 할 일</td><td>가장 크게, 맨 위</td><td>탭 첫 화면</td><td>맨 위 넓은 칸</td></tr>
+<tr><td>스크롤</td><td>줄어듦</td><td>거의 없음</td><td>줄어듦</td></tr>
+<tr><td>정보 찾기</td><td>한 화면에 대부분</td><td>탭을 눌러야</td><td>숫자는 빠름, 설명은 눌러야</td></tr>
+<tr><td>작업량</td><td>중간</td><td>큼</td><td>중간</td></tr></table>
+<div class="doc"><p style="margin-top:14px">섞어도 돼요. 예: "가인데 오른쪽 내 선수 칸을 다의 숫자 위젯으로".</p></div>
+</div></body></html>

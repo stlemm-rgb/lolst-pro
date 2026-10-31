@@ -127,24 +127,17 @@ function changesText(changes) {
 const pages = {};
 
 pages.dashboard = function () {
-  // 대시보드 (2026-10-06 리뉴얼)
-  // 맨 위 요약 4칸 → 왼쪽(이번 주 할 일: 지난주 결과·이번 주·최근 경기) / 오른쪽(내 선수: 프로필·챔피언·솔로 랭크) → 맨 아래 내 스탯
-  // 조각들은 js/dashboard.js
+  // 225 (시안 22 가 '이번 주 중심'): 얇은 일정 띠 → [이번 주 할 일(크게) | 내 선수] → [지난주 결과 · 퀘스트 · 챔피언] → 조합 전략·솔로 랭크·최근 경기 → 스탯
+  // 조각들은 js/dashboard.js (weekCommandHTML·questPanelHTML), js/dash_plus.js
   return (
     '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/history_pages.js)
-    dashGoalsHTML() + // 다음 목표 3칸: 다음 일정 · 계약 만료 · 다음 패치 (196, js/dash_plus.js)
-    heroCardHTML() + // 맨 위 내 선수 카드 (디자인 D2, js/dashboard.js)
+    dashGoalsHTML() + // 다음 일정 · 계약 만료 · 다음 패치 (196, 225에서 얇은 띠로)
     rookieCardsHTML() + // 새 시즌 대형 신인 카드 (디자인 D4, js/ui.js)
+    '<div class="d2-top"><div class="d2-week">' + weekCommandHTML() + '</div><div class="d2-me">' + heroCardHTML(true) + "</div></div>" +
+    '<div class="d2-row">' + weekReportHTML() + questPanelHTML() + championCardHTML() + "</div>" +
     '<div class="dash">' +
-      '<div class="dash-main">' +
-        thisWeekHTML() +
-        weekReportHTML() +
-      "</div>" +
-      '<div class="dash-side">' +
-        championCardHTML() +
-        leagueLadderHTML() +
-        recentMatchesHTML() +
-      "</div>" +
+      '<div class="dash-main">' + '<div class="card">' + compPlanHTML() + "</div>" + recentMatchesHTML() + "</div>" +
+      '<div class="dash-side">' + leagueLadderHTML() + "</div>" +
     "</div>" +
     statsCardHTML()
   );
@@ -428,21 +421,22 @@ function parentMenuOf(pageId) {
   return found;
 }
 
+// 224 (시안 21 가): 아이콘 + 묶음 색 + 오른쪽 알림 숫자(빨강)·상태(금색)
+function menuSideInfo(id) {
+  if (id === "sns") { const n = unreadCount("inbox") + unreadCount("social"); return n ? { badge: n } : null; }
+  if (id === "market" && isAnyTransferWindow()) return { tag: "열림" };
+  if (id === "rank" && state.league) { const r = myLeagueRank(); return r ? { sub: r + "위" } : null; }
+  return null;
+}
 function renderMenu() {
   const menu = document.getElementById("menu");
   menu.innerHTML = "";
   const addItem = function (item, extraClass) {
     const li = document.createElement("li");
-    li.textContent = item.name;
-    if (extraClass) li.className = extraClass;
-    // SNS: 안 읽었거나 답하지 않은 받은 연락 수 + 나를 언급한 안 읽은 선수 SNS 글
-    const badge = item.id === "sns" ? unreadCount("inbox") + unreadCount("social") : 0;
-    if (badge) {
-      const b = document.createElement("span");
-      b.className = "badge";
-      b.textContent = badge;
-      li.appendChild(b);
-    }
+    li.className = "mi" + (extraClass ? " " + extraClass : "");
+    const info = menuSideInfo(item.id);
+    li.innerHTML = '<span class="mi-ic">' + (item.icon || "•") + '</span><span class="mi-nm">' + escapeHTML(item.name) + "</span>" +
+      (info && info.badge ? '<span class="badge">' + info.badge + "</span>" : info && info.tag ? '<span class="mi-tag">' + info.tag + "</span>" : info && info.sub ? '<span class="mi-sub">' + info.sub + "</span>" : "");
     if (menuItemActive(item)) li.classList.add("active");
     li.onclick = function () { selectMenu(item.id); };
     menu.appendChild(li);
@@ -450,11 +444,15 @@ function renderMenu() {
   MENU_GROUPS.forEach(function (g) {
     const head = document.createElement("li");
     head.className = "menu-group";
+    head.setAttribute("style", "--gc: var(--" + (g.color || "muted") + ")"); // (노드 검사용 가짜 화면에도 있는 방법)
     head.textContent = g.title;
     menu.appendChild(head);
     g.items.forEach(function (item) { addItem(item); });
   });
-  MENU_BOTTOM.forEach(function (item, i) { addItem(item, i === 0 ? "menu-bottom" : ""); });
+  const bottom = document.createElement("li");
+  bottom.className = "menu-bottom";
+  menu.appendChild(bottom);
+  MENU_BOTTOM.forEach(function (item) { addItem(item, "mi-small"); });
 }
 
 // id: 화면 id 또는 합친 메뉴 id (합친 메뉴면 마지막에 본 탭, 처음이면 첫 탭)
@@ -607,6 +605,9 @@ function renderPage() {
   bindQuestPlan(page);
 
   // 다른 메뉴로 가는 버튼 (예: 대시보드 [훈련 바꾸기])
+  page.querySelectorAll("[data-dashgo]").forEach(function (btn) { // 225: 대시보드 이번 주 칸의 [휴식 주] [다음 주로 진행]
+    btn.onclick = function () { advanceWeek(btn.getAttribute("data-dashgo") === "rest"); };
+  });
   page.querySelectorAll("[data-go]").forEach(function (btn) {
     btn.onclick = function () { selectMenu(btn.getAttribute("data-go")); };
   });

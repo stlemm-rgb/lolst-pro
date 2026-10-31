@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>왼쪽 메뉴 시안 (21)</title>
+<style>
+:root{--bg:#07070d;--panel:#11111c;--panel-2:#181828;--side:#0b0b14;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;--accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--bad:#ff3d71;
+  --grad-btn:linear-gradient(90deg,#8a3dff,#0096c7);--sans:"Malgun Gothic","Apple SD Gothic Neo","Noto Sans CJK KR",sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--text);font-family:var(--sans);padding:24px 16px 60px}
+.wrap{max-width:1180px;margin:0 auto}
+.doc h1{font-size:22px;margin:0 0 6px}.doc h2{font-size:19px;margin:40px 0 4px}
+.doc h2 small{font-size:12px;background:var(--gold);color:#000;border-radius:6px;padding:2px 7px;margin-left:8px;vertical-align:2px}
+.doc p{font-size:14px;color:#b9b9cc;line-height:1.7;margin:0 0 6px;max-width:78ch}.doc p b{color:var(--text)}
+.frame{display:flex;height:640px;border:1px solid #33334d;border-radius:12px;overflow:hidden;margin-top:12px;background:var(--bg)}
+.fake{flex:1;padding:22px;display:grid;grid-template-rows:auto auto 1fr;gap:12px;min-width:0}
+.fake .bar{height:40px;border-radius:10px;background:var(--panel)}
+.fake .row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.fake .row i{height:60px;border-radius:12px;background:var(--panel)}
+.fake .big{border-radius:14px;background:var(--panel)}
+table.cmp{border-collapse:collapse;margin-top:14px;font-size:14px;width:100%;max-width:960px}
+table.cmp th,table.cmp td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top}table.cmp th{background:var(--panel-2)}
+
+/* 지금 */
+.now{width:220px;background:var(--side);padding:16px 10px;overflow:hidden}
+.now .logo{font-weight:800;font-size:17px;padding:0 8px 14px}
+.now .g{font-size:11px;color:#5d5d78;padding:10px 12px 4px}
+.now .it{padding:8px 12px;font-size:15px;color:#9a9ab4;border-radius:10px}
+.now .it.on{background:var(--grad-btn);color:#fff;font-weight:700}
+
+/* 가 */
+.ga{width:224px;background:var(--side);padding:14px 10px;display:flex;flex-direction:column;gap:4px;border-right:1px solid #1a1a2a}
+.logo2{display:flex;align-items:baseline;gap:6px;padding:2px 8px 12px;font-weight:800;font-size:17px}.logo2 small{font-size:10px;color:var(--muted);font-weight:400}
+.grp{margin-top:6px;padding:8px 10px 4px;font-size:12px;font-weight:700;color:var(--gc);display:flex;align-items:center;gap:6px}
+.grp::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--gc)}
+.mi{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;font-size:14px;color:#b8b8cc;position:relative}
+.mi .ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,255,255,.04)}
+.mi:hover{background:rgba(255,255,255,.05)}
+.mi.on{background:rgba(0,224,255,.1);color:#fff;font-weight:700}
+.mi.on::before{content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:4px;border-radius:0 4px 4px 0;background:var(--accent)}
+.mi.on .ic{background:var(--grad-btn)}
+.bdg{margin-left:auto;font-size:11px;font-weight:800;background:var(--bad);color:#fff;border-radius:999px;padding:1px 7px}
+.bdg.g{background:none;color:var(--gold);border:1px solid rgba(255,210,63,.5)}
+.sub{font-size:11px;color:#5d5d78;margin-left:auto}
+.bottom{margin-top:auto;border-top:1px solid #1e1e30;padding-top:6px;display:flex;gap:4px}
+.bottom .mi{flex:1;justify-content:center;font-size:12px;padding:8px 4px}
+
+/* 나 */
+.na{display:flex}
+.rail{width:72px;background:var(--side);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;border-right:1px solid #1a1a2a}
+.rail .lg{width:40px;height:40px;border-radius:12px;background:var(--grad-btn);display:flex;align-items:center;justify-content:center;font-weight:900;margin-bottom:10px}
+.rb{width:62px;padding:7px 0 6px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#9a9ab4;position:relative}
+.rb .ic{font-size:19px}
+.rb.on{background:rgba(0,224,255,.12);color:#fff;font-weight:700}
+.rb .bdg{position:absolute;top:2px;right:8px;margin:0;padding:0 5px;font-size:10px}
+.rail .sep{width:30px;height:1px;background:#26263d;margin:4px 0}
+.rail .bt{margin-top:auto}
+.flyout{width:190px;background:#0e0e18;border-right:1px solid #1a1a2a;padding:16px 10px}
+.flyout h4{margin:0 0 8px;padding:0 8px;font-size:13px;color:var(--muted)}
+.flyout .mi{font-size:14px}
+
+/* 다 */
+.da{width:236px;background:var(--side);padding:14px 10px;display:flex;flex-direction:column;gap:6px}
+.now-card{border-radius:14px;padding:10px;background:linear-gradient(160deg,#1b1b2c,#12121d);border:1px solid #26263d;margin-bottom:6px}
+.now-card b{font-size:13px}.now-card .s{font-size:11px;color:var(--muted);margin-top:2px}
+.now-card .go{margin-top:8px;border-radius:10px;background:var(--grad-btn);text-align:center;font-size:13px;font-weight:700;padding:8px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tile{border-radius:12px;background:var(--panel);border:1px solid #1e1e30;padding:9px 8px;font-size:12px;color:#b8b8cc;display:flex;flex-direction:column;gap:4px;position:relative}
+.tile .ic{font-size:18px}.tile.on{border-color:var(--accent);background:rgba(0,224,255,.08);color:#fff;font-weight:700}
+.tile .bdg{position:absolute;top:6px;right:6px;margin:0}
+.da .grp{margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="doc"><h1>왼쪽 메뉴 시안 (21)</h1>
+<p>지금 메뉴 문제: <b>17칸이 글자만 똑같이</b> 늘어서서 찾기 어렵고, 묶음 제목(내 선수·경기·수집·이적·기록)이 너무 작고 흐려요. 수집·이적·기록은 칸이 1~2개뿐인데 묶음이 따로 있어서 길어지고, 화면이 작으면 스크롤이 생겨요 (위 스크린샷).</p>
+<p>세 안 모두 메뉴로 가는 화면은 그대로예요. 해외 리그는 '순위' 안의 탭으로, 업적 도감·컬렉션은 '수집' 안의 탭으로 합쳐서 <b>17칸 → 13칸</b>.</p></div>
+
+<div class="doc"><h2>지금</h2></div>
+<div class="frame"><div class="now"><div class="logo">챌린저 로드</div>
+<div class="g">내 선수</div><div class="it on">대시보드</div><div class="it">훈련</div><div class="it">SNS</div><div class="it">친구</div><div class="it">선수 정보</div><div class="it">상점</div>
+<div class="g">경기</div><div class="it">소속팀</div><div class="it">경기 결과</div><div class="it">일정</div><div class="it">리그 순위</div><div class="it">해외 리그</div>
+<div class="g">수집</div><div class="it">업적 도감</div><div class="it">컬렉션</div></div><div class="fake"><div class="bar"></div><div class="row"><i></i><i></i><i></i></div><div class="big"></div></div></div>
+
+<div class="doc"><h2>가. 아이콘 + 색 묶음 <small>추천</small></h2>
+<p>칸마다 아이콘, 묶음마다 색 점과 진한 제목(하늘·보라·금색). 지금 화면은 왼쪽 막대 + 밝은 배경. 오른쪽에 알림 숫자(빨강)와 상태(금색, 예: 일정 '3주 뒤 경기', 이적 시장 '열림'). 맨 아래 게임 방법·설정은 작은 두 칸으로. 13칸이라 작은 화면에서도 스크롤 없음.</p></div>
+<div class="frame"><div class="ga">
+<div class="logo2">챌린저 로드 <small>ver 1.2.1</small></div>
+<div class="grp" style="--gc:var(--accent)">내 선수</div>
+<div class="mi on"><span class="ic">🏠</span>대시보드</div>
+<div class="mi"><span class="ic">🏋️</span>훈련</div>
+<div class="mi"><span class="ic">📱</span>SNS<span class="bdg">1</span></div>
+<div class="mi"><span class="ic">🤝</span>친구</div>
+<div class="mi"><span class="ic">🧑</span>선수 정보</div>
+<div class="mi"><span class="ic">🛒</span>상점</div>
+<div class="grp" style="--gc:var(--accent2)">리그</div>
+<div class="mi"><span class="ic">🛡️</span>소속팀</div>
+<div class="mi"><span class="ic">📺</span>경기 결과</div>
+<div class="mi"><span class="ic">📅</span>일정<span class="sub">3주 뒤</span></div>
+<div class="mi"><span class="ic">🏆</span>순위<span class="sub">국내·해외</span></div>
+<div class="grp" style="--gc:var(--gold)">이적 · 기록</div>
+<div class="mi"><span class="ic">🔁</span>이적 시장<span class="bdg g">열림</span></div>
+<div class="mi"><span class="ic">💎</span>수집<span class="sub">업적·컬렉션</span></div>
+<div class="mi"><span class="ic">🏛️</span>기록실</div>
+<div class="bottom"><div class="mi">❓ 게임 방법</div><div class="mi">⚙ 설정</div></div>
+</div><div class="fake"><div class="bar"></div><div class="row"><i></i><i></i><i></i></div><div class="big"></div></div></div>
+
+<div class="doc"><h2>나. 아이콘 레일 (넓은 화면)</h2>
+<p>왼쪽은 묶음 4개만 큰 아이콘으로(내 선수·리그·이적 기록·더보기), 누르면 옆에 그 묶음 칸이 열려요. 대시보드가 넓어지지만 한 번 더 눌러야 하는 곳이 생겨요.</p></div>
+<div class="frame"><div class="na"><div class="rail"><div class="lg">CR</div>
+<div class="rb on"><span class="ic">🧑</span>내 선수<span class="bdg">1</span></div><div class="rb"><span class="ic">🏆</span>리그</div><div class="rb"><span class="ic">🔁</span>이적·기록</div>
+<div class="sep"></div><div class="rb bt"><span class="ic">❓</span>방법</div><div class="rb"><span class="ic">⚙</span>설정</div></div>
+<div class="flyout"><h4>내 선수</h4><div class="mi on"><span class="ic">🏠</span>대시보드</div><div class="mi"><span class="ic">🏋️</span>훈련</div><div class="mi"><span class="ic">📱</span>SNS<span class="bdg">1</span></div><div class="mi"><span class="ic">🤝</span>친구</div><div class="mi"><span class="ic">🧑</span>선수 정보</div><div class="mi"><span class="ic">🛒</span>상점</div></div></div>
+<div class="fake"><div class="bar"></div><div class="row"><i></i><i></i><i></i></div><div class="big"></div></div></div>
+
+<div class="doc"><h2>다. 내 선수 카드 + 타일</h2>
+<p>맨 위에 작은 내 선수 카드(이름·주차·[다음 주]), 자주 쓰는 6칸은 2열 타일, 나머지는 아래 줄 목록. 게임 느낌이 강하지만 칸이 작아 글자가 줄어요.</p></div>
+<div class="frame"><div class="da">
+<div class="now-card"><b>Pack · 서포트</b><div class="s">GEN.G ALPHA · 2015년 3주차</div><div class="go">다음 주로 진행 ▶</div></div>
+<div class="tiles"><div class="tile on"><span class="ic">🏠</span>대시보드</div><div class="tile"><span class="ic">🏋️</span>훈련</div><div class="tile"><span class="ic">📱</span>SNS<span class="bdg">1</span></div><div class="tile"><span class="ic">🤝</span>친구</div><div class="tile"><span class="ic">🧑</span>선수 정보</div><div class="tile"><span class="ic">🛒</span>상점</div></div>
+<div class="grp" style="--gc:var(--accent2)">리그</div><div class="mi"><span class="ic">🛡️</span>소속팀</div><div class="mi"><span class="ic">📺</span>경기 결과</div><div class="mi"><span class="ic">📅</span>일정</div><div class="mi"><span class="ic">🏆</span>순위</div>
+<div class="grp" style="--gc:var(--gold)">이적 · 기록</div><div class="mi"><span class="ic">🔁</span>이적 시장</div>
+</div><div class="fake"><div class="bar"></div><div class="row"><i></i><i></i><i></i></div><div class="big"></div></div></div>
+
+<div class="doc"><h2>한눈에 비교</h2></div>
+<table class="cmp"><tr><th></th><th>가. 아이콘 + 색 묶음</th><th>나. 아이콘 레일</th><th>다. 카드 + 타일</th></tr>
+<tr><td>찾기 쉬움</td><td>가장 쉬움 (아이콘·색·숫자)</td><td>묶음을 알아야 함</td><td>자주 쓰는 6칸은 쉬움</td></tr>
+<tr><td>누르는 횟수</td><td>1번</td><td>1~2번</td><td>1번</td></tr>
+<tr><td>대시보드 넓이</td><td>지금과 같음</td><td>가장 넓음</td><td>조금 좁아짐</td></tr>
+<tr><td>휴대폰</td><td>지금처럼 ☰ 메뉴판</td><td>☰ 메뉴판</td><td>☰ 메뉴판</td></tr></table>
+<div class="doc"><p style="margin-top:14px">섞어도 돼요. 예: "가인데 다의 내 선수 카드를 맨 위에".</p></div>
+</div>
+</body>
+</html>

@@ -208,10 +208,11 @@ function questPlanLabel(q) {
   return findTraining(qp.plan).name + (qp.focusChamp ? " · " + qp.focusChamp : qp.plan === "champion" ? " · 자동(메타 위주)" : "");
 }
 
-function questPlanButtonHTML(q) {
+function questPlanButtonHTML(q, inCard) { // inCard (225): 대시보드 퀘스트 카드 안 — 카드 전체가 눌리므로 모양만
   if (!questPlan(q)) return "";
   if (questPlanActive(q)) return '<span class="quest-picked">✓ 이번 주 훈련으로 선택됨</span>';
-  return '<button class="small-btn quest-pick" data-questplan="' + q.uid + '">▶ 이번 주 훈련으로 선택 <span class="muted">(' + escapeHTML(questPlanLabel(q)) + ")</span></button>";
+  const inner = '▶ 이번 주 훈련으로 선택 <span class="muted">(' + escapeHTML(questPlanLabel(q)) + ")</span>";
+  return inCard ? '<span class="small-btn quest-pick">' + inner + "</span>" : '<button class="small-btn quest-pick" data-questplan="' + q.uid + '">' + inner + "</button>";
 }
 
 // 버튼 연결 (main.js의 renderPage에서 부름)
@@ -326,10 +327,11 @@ function questCardsHTML() {
       pct = rank <= q.need ? 100 : Math.max(0, Math.round((from - rank) / Math.max(1, from - q.need) * 100));
       prog = rank + "위→" + q.need + "위";
     }
-    return '<div class="qcard"><div class="qcard-h"><span class="muted small">' + QUEST_GIVERS[tpl.giver] + "</span> <b>" + escapeHTML(tpl.title) + '</b><span class="muted small qcard-left">' +
+    const pick = questPlan(q) && !questPlanActive(q); // 225: 카드 전체를 누르면 훈련 선택
+    return '<div class="qcard' + (pick ? ' click" data-questplan="' + q.uid + '" title="눌러서 이번 주 훈련으로 선택' : "") + '"><div class="qcard-h"><span class="muted small">' + QUEST_GIVERS[tpl.giver] + "</span> <b>" + escapeHTML(tpl.title) + '</b><span class="muted small qcard-left">' +
       (q.deadline > now ? (q.deadline - now) + "주 남음" : "이번 주까지") + "</span></div>" +
       '<div class="qcard-p"><span class="bar"><span class="bar-fill gold" style="width:' + pct + '%"></span></span><span class="small">' + prog + "</span></div>" +
       '<div class="muted small tip" tabindex="0" data-tip="' + escapeHTML(questText(q, tpl.desc)) + '">보상 ' + escapeHTML(rewardText(q)) + "</div>" +
-      questPlanButtonHTML(q) + "</div>";
+      questPlanButtonHTML(q, true) + "</div>";
   }).join("") + "</div>";
 }
