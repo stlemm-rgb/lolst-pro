@@ -512,6 +512,7 @@ function weekCommandHTML() {
   return (
     '<div class="card upcoming wc"><div class="wc-hd"><b>▶ ' + state.year + "년 " + week + '주차 · 이번 주</b><span class="muted small">' +
       (matches.length ? "경기 " + matches.length + "개 · 우리 팀 전력 " + teamStrength(mine.id).toFixed(1) : escapeHTML(scheduleOfWeek(week).name)) + "</span></div>" +
+      roomBlockHTML(matches.length) + // 이번 주 행동 그림 (js/room.js, 시안 24)
       matchHTML + plan +
       adviceRowsHTML(true) + // 💡 이번 주 추천 (js/guide.js) — 퀘스트는 옆 퀘스트 칸
       ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고

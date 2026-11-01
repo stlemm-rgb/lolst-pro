@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>시안 24 — 이번 주 행동 그림 · 대시보드 · 휴대폰 SNS</title>
+<style>
+:root{--bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;--accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--good:#2bff9e;--bad:#ff3d71;
+  --grad:linear-gradient(90deg,#b44dff,#00e0ff);--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7)}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--text);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;padding:24px 16px}
+.wrap{max-width:1240px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+h2.t{font-size:20px;margin:48px 0 4px;padding-top:16px;border-top:1px solid #222238}
+h3{font-size:15px;margin:18px 0 8px;color:#d6d6e6}
+.why{font-size:14px;color:#b9b9cc;margin:0 0 12px;line-height:1.65}.why b{color:var(--text)}
+.rec{display:inline-block;font-size:11px;background:var(--gold);color:#000;border-radius:6px;padding:1px 6px;font-weight:800;margin-left:6px;vertical-align:middle}
+.small{font-size:12px}.muted{color:var(--muted)}
+.up{color:var(--good)}.down{color:var(--bad)}
+.px,canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+button{font:inherit;cursor:pointer}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 14px}
+.toolbar button{background:var(--panel-2);color:var(--text);border:1px solid rgba(0,224,255,.45);border-radius:10px;padding:6px 12px;font-size:13px}
+
+/* ---------- 1. 방 그림 ---------- */
+.scenes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:1100px){.scenes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sc{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.sc .nm{font-size:13px;font-weight:800;align-self:flex-start}
+.sc .cap{font-size:12px;color:#c9c9dc;text-align:center}
+.room{background-repeat:no-repeat;animation:roomPlay 4s steps(20) infinite}
+@keyframes roomPlay{from{background-position:0 0}to{background-position:var(--end) 0}}
+.still .room{animation:none}
+.tex-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.tex-row{grid-template-columns:1fr}}
+.tex{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center}
+.tex b{display:block;margin-bottom:6px}
+.zoomrow{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+
+/* ---------- 공통 게임 부품 ---------- */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:12px;white-space:nowrap}
+.btn-p{background:var(--grad-btn);color:#fff;border:0;border-radius:12px;font-weight:800}
+.bar{height:6px;border-radius:4px;background:#26263d;overflow:hidden}.bar i{display:block;height:100%;background:var(--grad)}
+.bar.low i{background:var(--bad)}
+.one{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.nw{white-space:nowrap}
+
+/* 알림 배너 (잠금화면 알림 느낌) */
+.notif{display:flex;gap:10px;align-items:center;background:linear-gradient(120deg,rgba(180,77,255,.18),rgba(0,224,255,.10));border:1px solid rgba(180,77,255,.55);border-radius:16px;padding:10px 12px;cursor:pointer;position:relative;animation:nIn .6s ease-out}
+@keyframes nIn{0%{transform:translateY(-6px)}60%{transform:translateY(1px)}100%{transform:none;opacity:1}}
+.notif .ic{width:40px;height:40px;border-radius:12px;background:#0b0b14;display:grid;place-items:center;font-size:20px;flex:none;position:relative}
+.notif .ic em{position:absolute;top:-5px;right:-5px;background:var(--bad);color:#fff;font-style:normal;font-size:11px;font-weight:800;border-radius:999px;padding:0 5px;line-height:16px}
+.notif .tx{flex:1;min-width:0}
+.notif .tx .h{display:flex;gap:6px;font-size:11px;color:var(--muted)}
+.notif .tx b{display:block;font-size:14px}
+.notif .tx p{margin:1px 0 0;font-size:12.5px;color:#c9c9dc}
+.notif .cnt{font-size:11px;color:var(--accent);margin-top:3px}
+.notif .go{flex:none;font-size:12px;color:var(--accent);font-weight:800}
+
+/* ---------- 2. 모바일 대시보드 ---------- */
+.mrow{display:grid;grid-template-columns:390px minmax(0,1fr);gap:24px;align-items:start}
+@media(max-width:900px){.mrow{grid-template-columns:1fr}}
+.mframe{width:390px;max-width:100%;border:1px solid #33334d;border-radius:12px;overflow:hidden;background:var(--bg);position:relative}
+.m-top{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px}
+.m-top b{font-size:14px}.m-top .sp{flex:1}
+.m-body{padding:10px 12px 14px;display:flex;flex-direction:column;gap:10px}
+.m-scene{background:linear-gradient(180deg,#141428,#0d0d18);border:1px solid var(--border);border-radius:14px;padding:8px 8px 10px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.m-scene .wk{font-size:13.5px;font-weight:800}
+.m-scene .wk span{color:var(--muted);font-weight:400}
+.mt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 10px;font-size:13px}
+.mt .tag{font-size:11px;color:var(--good);border:1px solid rgba(43,255,158,.5);border-radius:6px;padding:0 5px}
+.mt .vs{font-weight:800}
+.mt .sub{font-size:11.5px;color:var(--muted)}
+.mt .arr{color:var(--accent);font-size:12px}
+.stat4{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 10px}
+.st .k{font-size:11.5px;color:var(--muted)}
+.st .v{font-size:18px;font-weight:900;margin:1px 0 4px}
+.st .v small{font-size:12px;color:var(--muted);font-weight:400}
+.warn{font-size:12px;color:var(--bad);background:rgba(255,61,113,.08);border:1px solid rgba(255,61,113,.35);border-radius:10px;padding:6px 10px}
+.qline{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 10px;font-size:13px}
+.qline .p{font-weight:800;color:var(--accent)}
+.more{background:var(--panel-2);border:1px dashed #3a3a58;border-radius:12px;padding:9px 12px;font-size:13px;display:flex;justify-content:space-between}
+.more span{color:var(--muted);font-size:12px}
+.m-fix{position:sticky;bottom:0;background:rgba(7,7,13,.96);border-top:1px solid var(--border)}
+.m-go{display:flex;gap:8px;padding:8px 12px}
+.m-go .btn-p{flex:1;padding:10px;text-align:left;font-size:15px}
+.m-go .btn-p small{display:block;font-weight:400;font-size:11px;opacity:.85}
+.m-go .rest{background:var(--panel-2);border:1px solid rgba(0,224,255,.45);color:var(--text);border-radius:12px;padding:0 14px}
+.m-tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border)}
+.m-tabs div{text-align:center;font-size:11px;padding:6px 0 8px;color:var(--muted);position:relative}
+.m-tabs div b{display:block;font-size:18px}
+.m-tabs .on{color:var(--accent)}
+.m-tabs em{position:absolute;top:2px;left:55%;background:var(--bad);color:#fff;font-style:normal;font-size:10px;border-radius:999px;padding:0 5px}
+.cmp{width:100%;border-collapse:collapse;font-size:13px}
+.cmp td,.cmp th{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
+.cmp th{color:var(--muted);font-weight:400}
+.hmeter{font-size:12px;color:var(--gold);margin:4px 0 0}
+
+/* ---------- 3. PC 대시보드 ---------- */
+.pcwrap{border:1px solid #33334d;border-radius:12px;overflow:hidden;background:var(--bg)}
+.pc-top{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.pc-top .sp{flex:1}
+.pc-top .b{border:1px solid rgba(0,224,255,.45);border-radius:10px;padding:5px 10px;white-space:nowrap}
+.pc-top .b.warn2{border-color:var(--gold);color:var(--gold)}
+.pc-top .btn-p{padding:7px 14px}
+.pc-body{display:grid;grid-template-columns:150px minmax(0,1fr);min-height:760px}
+.pc-menu{border-right:1px solid var(--border);padding:12px 10px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:9px}
+.pc-menu .on{color:var(--accent);font-weight:800}
+.pc-main{padding:16px;display:flex;flex-direction:column;gap:14px}
+.pc-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px}
+.wkcard{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
+.wkcard .side{display:flex;flex-direction:column;gap:8px}
+.wkcard h4{margin:0;font-size:17px}
+.trow{display:flex;align-items:center;gap:8px;font-size:13px}
+.trow .lbl{color:var(--muted);width:56px;flex:none}
+.trow .bar{flex:1}
+.trow .n{width:48px;text-align:right;font-weight:800;flex:none}
+.pc-matches{display:grid;gap:8px;margin-top:10px}
+.phw{display:flex;flex-direction:column;gap:8px}
+.phw .hd{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.phw .hd b{font-size:15px}
+.pc-row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.pc-row3 h4{margin:0 0 8px;font-size:14px}
+.li{font-size:13px;line-height:1.55;color:#d6d6e6}
+
+/* ---------- 4. 휴대폰 창 ---------- */
+.phones{display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
+.ph{width:300px;border-radius:38px;padding:10px;background:linear-gradient(160deg,#2a2a40,#0d0d16);box-shadow:0 0 0 2px #33334d,0 20px 50px rgba(0,0,0,.6),0 0 40px rgba(180,77,255,.15)}
+.ph .scr{border-radius:28px;background:#0b0b14;overflow:hidden;height:600px;display:flex;flex-direction:column;position:relative}
+.ph .isl{width:80px;height:20px;background:#000;border-radius:12px;margin:8px auto 2px}
+.ph .stb{display:flex;justify-content:space-between;padding:0 20px 4px;font-size:11px;color:#c9c9dc}
+.ph .apphd{display:flex;align-items:center;gap:8px;padding:6px 14px 8px;border-bottom:1px solid var(--border)}
+.ph .apphd b{flex:1;font-size:16px}
+.ph .apphd .logo{font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:18px;letter-spacing:-.02em}
+.ph .cont{flex:1;overflow-y:auto}
+.dock{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);background:#0e0e1a}
+.dock div{text-align:center;padding:7px 0 9px;font-size:10.5px;color:var(--muted);position:relative}
+.dock div b{display:block;font-size:19px}
+.dock .on{color:var(--accent)}
+.dock em{position:absolute;top:3px;left:58%;background:var(--bad);color:#fff;font-style:normal;font-size:10px;border-radius:999px;padding:0 5px;line-height:15px}
+.cl{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid #1c1c2e}
+.cl .av{width:40px;height:40px;border-radius:50%;background:var(--panel-2);display:grid;place-items:center;font-size:20px;flex:none}
+.cl .tx{flex:1;min-width:0}
+.cl .tx b{display:block;font-size:13.5px}
+.cl .tx p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.cl .r{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:11px;color:var(--bad)}
+.cl .r i{width:8px;height:8px;border-radius:50%;background:var(--bad)}
+.stories{display:flex;gap:10px;padding:10px 12px;overflow-x:auto;border-bottom:1px solid #1c1c2e}
+.story{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:#c9c9dc;flex:none;width:52px}
+.story .ring{width:50px;height:50px;border-radius:50%;padding:2px;background:conic-gradient(#b44dff,#00e0ff,#ffd23f,#b44dff)}
+.story .ring.seen{background:#33334d}
+.story .in{width:100%;height:100%;border-radius:50%;background:#0b0b14;display:grid;place-items:center;overflow:hidden;border:2px solid #0b0b14}
+.story .in img{width:40px;height:40px}
+.post{padding:10px 14px 8px;border-bottom:1px solid #1c1c2e}
+.post .hd{display:flex;gap:8px;align-items:center}
+.post .fa{width:34px;height:34px;border-radius:50%;overflow:hidden;background:var(--panel-2);display:grid;place-items:center;flex:none;font-weight:800;font-size:13px}
+.post .fa img{width:34px;height:34px}
+.post .who{flex:1;min-width:0;font-size:12px;color:var(--muted)}
+.post .who b{color:var(--text);font-size:13.5px}
+.post .vf{color:var(--accent);font-size:12px}
+.post .body{font-size:13.5px;line-height:1.5;margin:6px 0 6px}
+.post .body .at{color:var(--accent);font-weight:700}
+.post.mine{background:linear-gradient(90deg,rgba(255,210,63,.07),transparent);box-shadow:inset 3px 0 0 var(--gold)}
+.post .act{display:flex;gap:14px;font-size:12.5px;color:var(--muted);align-items:center}
+.heart{background:none;border:0;color:var(--muted);padding:0;display:inline-flex;gap:4px;align-items:center;font-size:12.5px}
+.heart b{font-size:16px;transition:transform .15s}
+.heart.on{color:var(--bad)}.heart.on b{transform:scale(1.25)}
+.nt{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid #1c1c2e;font-size:13px;line-height:1.45}
+.nt.new{background:rgba(255,210,63,.06)}
+.nt .fa{width:34px;height:34px;border-radius:50%;overflow:hidden;background:var(--panel-2);flex:none;display:grid;place-items:center}
+.nt .fa img{width:34px;height:34px}
+.nt .tm{font-size:11px;color:var(--muted)}
+.prof{padding:14px;display:flex;flex-direction:column;align-items:center;gap:6px;border-bottom:1px solid #1c1c2e;text-align:center}
+.prof .pa{width:96px;height:96px;border-radius:50%;padding:3px;background:var(--grad)}
+.prof .pa div{width:100%;height:100%;border-radius:50%;background:#141428;display:grid;place-items:center;overflow:hidden}
+.prof .nmv{font-size:17px;font-weight:900}
+.prof .nums{display:flex;gap:18px;margin-top:4px}
+.prof .nums div{font-size:11px;color:var(--muted)}
+.prof .nums b{display:block;font-size:16px;color:var(--text)}
+.ptabs{display:grid;grid-template-columns:1fr 1fr;font-size:12.5px;text-align:center;border-bottom:1px solid #1c1c2e}
+.ptabs div{padding:8px 0;color:var(--muted)}.ptabs .on{color:var(--text);box-shadow:inset 0 -2px 0 var(--accent)}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:8px}
+.pr{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:6px 10px;font-size:12.5px}
+.pr b{width:64px;flex:none}.pr .sw{display:flex;border-radius:4px;overflow:hidden;flex:none}.pr .sw i{width:20px;height:22px;display:block}.pr span{color:var(--muted)}
+.zcap{font-size:11px;color:var(--muted);text-align:center;margin-top:2px}
+.lbl2{text-align:center;font-size:12.5px;color:#c9c9dc;margin-top:8px}
+</style></head>
+<body><div class="wrap">
+<h1>🏠 시안 24 — 이번 주 행동 그림 · 대시보드 · 휴대폰 SNS</h1>
+<p class="why">토론 결과(<b>Claude outputs/debate_dashboard.md</b>)와 고르신 것으로 만들었어요. 상황은 측정 때와 같은 <b>2017년 31주차 · GS CYCLONE(2부) · 미드 · 훈련 리플레이 분석 · 이번 주 경기 2개 · 답장할 연락 3개 · 나를 언급한 글 2개</b>.<br>
+방 그림은 <b>진짜 코드로 픽셀을 찍어 그린 것</b>이에요 (게임에 넣을 때도 같은 방식). 피부·머리 색은 게임의 색표, 옷은 팀 유니폼 색에서 가져와요.</p>
+<div class="toolbar">
+  <button id="reroll">🎲 다른 선수·팀 색으로 바꿔 보기</button>
+  <button id="still">⏸ 움직임 끄기 / 켜기</button>
+</div>
+
+<!-- ================= 1 ================= -->
+<h2 class="t">① 이번 주 행동 그림 <span class="rec">굵은 도트로 결정</span></h2>
+<p class="why">장면은 이번 주 상황에 따라 저절로 골라져요: <b>경기 있는 주 → 경기장 부스</b> / <b>휴식 → 내가 사는 집</b>(합숙이면 2층 침대, 원룸이면 원룸…) / <b>그 밖 → 훈련 방</b>. 숨쉬기는 어깨·머리만 1칸, 눈은 4초에 한 번 깜박여요 (휴식은 자는 중이라 Z).</p>
+
+<h3>🎨 색 정리표 (팔레트) — 방 그림은 이 표의 색만 써요</h3>
+<p class="why">색마다 <b>밝은 → 어두운</b> 단계 묶음. 상자의 윗면 = 고른 단계, 왼면 = 한 단계 어둡게, 오른면 = 두 단계 어둡게 → 그림자도 같은 묶음 색이라 어울려요. 벽은 회보라, 바닥은 청록으로 채도를 낮춰 네온 화면에서 튀지 않게, 반짝이는 곳(모니터·LED·트로피)만 네온·금색. <b>팀 색</b>(유니폼·포스터·이불·LED 벽)만 표 밖에서 와요.</p>
+<div class="pal" id="palette"></div>
+<h3>캐릭터 크기 — 이전 → 새 (조금 더 크게)</h3>
+<div class="zoomrow" id="zoom"></div>
+<p class="lbl2">↑ 10배 확대. 왼쪽 = 이전(머리 3×3 · 키 9), 가운데·오른쪽 = 새(머리 4×4 · 키 11, 서기·앉기). 실제 화면에선 아래 방 크기예요.</p>
+<h3>장면 5개 — 굵은 도트 (96×64를 3배 = 288×192)</h3>
+<p class="why">휴식 장면은 <b>지금 사는 집</b>을 따라가요: 합숙 → 🛏 합숙소 / 원룸·투룸 → 🏠 원룸·투룸 / 아파트·고급·초고급 → 🏢 아파트. <b>우승 트로피</b>는 집마다 놓는 자리가 있어요 (합숙소 = 사물함 위, 원룸 = 벽 선반, 아파트 = 장식장). 아래 버튼으로 트로피 수를 바꿔 보세요.</p>
+<div class="toolbar" id="trophyBtns"><button data-tro="0">🏆 트로피 0개</button><button data-tro="3">🏆 3개 (리그·LCK 컵·MSI)</button><button data-tro="9">🏆 많이 (월드 2 · MSI · First Stand · 리그 3 · LCK 컵 2)</button></div>
+<div class="scenes" id="scenesA"></div>
+
+<!-- ================= 2 ================= -->
+<h2 class="t">② 모바일 대시보드 (390px) <span class="rec">지금 6.2화면 → 약 2화면</span></h2>
+<p class="why">위에서부터 <b>행동 그림 → 📱 새 연락 알림 → 이번 주 경기 한 줄 → 상태 4칸 → 퀘스트 1개 → [더 보기]</b>. 긴 이름은 한 줄 + 말줄임(…), 숫자는 절대 안 꺾여요. 체력 경고처럼 <b>지금 상황에 필요한 규칙만</b> 한 줄로 보여요.</p>
+<div class="mrow">
+  <div>
+    <div class="mframe" id="mdash"></div>
+    <div class="hmeter" id="mheight"></div>
+  </div>
+  <div>
+    <table class="cmp">
+      <tr><th>지금 대시보드 덩어리</th><th>모바일 새 구조</th></tr>
+      <tr><td>트로피 진열장 · 다음 목표 3칸</td><td>숨김 → [더 보기]·일정 메뉴 (다음 일정 1줄만 그림 아래)</td></tr>
+      <tr><td>이번 주 경기 카드 2개 (얼굴·전적·분석 리포트·추천)</td><td><b>한 줄 카드 2개</b> · 누르면 펼쳐서 분석·조합 전략</td></tr>
+      <tr><td>이번 주 훈련 · 체력·컨디션 막대 · 팁</td><td>그림 아래 한 줄 + 상태 4칸 · 팁은 경고일 때만</td></tr>
+      <tr><td>[📱 휴대폰 열기] (2화면째)</td><td><b>첫 화면 알림 배너</b> + 아래 탭 📱</td></tr>
+      <tr><td>내 선수 카드 (특성·목표 사다리·평판·솔랭·팬)</td><td>[선수 정보]로 · 종합 능력만 상태 칸에</td></tr>
+      <tr><td>지난주 결과 · 퀘스트 2 · 챔피언</td><td>퀘스트 1개만 · 나머지 [더 보기]</td></tr>
+      <tr><td>조합 전략 · 최근 경기 · 솔랭 TOP10 · 스탯 16개</td><td>경기 카드 안 / [경기 결과]·[순위]·[선수 정보]로</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ================= 3 ================= -->
+<h2 class="t">③ PC 대시보드 첫 화면 (1280×900)</h2>
+<p class="why">스크롤 없이 <b>이번 주에 뭘 하는지(그림) · 내 상태 · 새 연락</b>이 한눈에. 왼쪽 = 이번 주, 오른쪽 = 휴대폰 알림 + 상태. 그 아래 지난주 결과 · 퀘스트 · 챔피언 3칸, 나머지는 아래로.</p>
+<div class="pcwrap" id="pcdash"></div>
+
+<!-- ================= 4 ================= -->
+<h2 class="t">④ 휴대폰 창 — 💬 메시지 · 📸 SNS · 🔔 알림 · 내 프로필</h2>
+<p class="why">대시보드의 알림 배너나 아래 탭 📱을 누르면 열려요. 휴대폰 아래 앱 바로 <b>메시지 ↔ SNS ↔ 알림</b>을 오가요. SNS는 <b>이번 주 글쓴이 얼굴 줄 · ✔ 프로 선수 · ❤ 하트(눌러 보세요)</b>, 내 프로필은 <b>방 그림의 작은 내 캐릭터 + 팔로워</b>. 하트 숫자는 화면용이라 게임 결과에 영향이 없어요. 같은 문장 글은 접지 않고 그대로 보여요.</p>
+<div class="phones" id="phones"></div>
+<p class="why" style="margin-top:30px">고르실 것: <b>도트 질감 가/나</b> · 그 밖에 바꾸고 싶은 점 (예: "그림을 더 크게", "알림 배너를 그림 위로", "SNS 앱 이름 바꾸기").</p>
+</div>
+
+<script src="../data/ui.js"></script>
+<script src="../js/portrait.js"></script>
+<script>
+// =====================================================================
+//  방 그림 엔진 (시안용 — 게임에 넣을 때 js/room.js + data/room.js로 나눔)
+// =====================================================================
+var FRAMES = 20;
+var BREATH = [0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,1,1]; // 2초 주기 숨쉬기
+var BLINK_AT = 12;                                         // 4초에 한 번 깜박
+function rgb(h){h=h.replace("#","");return[parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+function hex(c){return"#"+c.map(function(v){v=Math.max(0,Math.min(255,Math.round(v)));return(v<16?"0":"")+v.toString(16);}).join("");}
+function shade(h,f){return hex(rgb(h).map(function(v){return v*f;}));}
+function mix(a,b,t){var x=rgb(a),y=rgb(b);return hex(x.map(function(v,i){return v+(y[i]-v)*t;}));}
+
+// ===== 색 정리표: 묶음마다 밝은 → 어두운 =====
+var RAMP={
+  wall:{n:"벽",u:"방 벽 (낮 1·밤 2단계부터)",c:["#aba3cf","#8b83b4","#6f6797","#554e7a","#3d375c","#2a2642"]},
+  floor:{n:"바닥",u:"바닥 판·판 옆면",c:["#86bdb0","#67a095","#4f827b","#3a6461","#284847","#1a3132"]},
+  wood:{n:"나무",u:"책상·선반·침대 틀",c:["#dcab7a","#b9875b","#936645","#6e4a33","#4c3223"]},
+  cloth:{n:"천·러그",u:"러그·쿠션",c:["#cdbbef","#ad97da","#8b75bd","#6b549b","#4c3b74"]},
+  linen:{n:"흰 천",u:"매트리스·베개·창틀",c:["#f7f4fc","#e0dbf0","#bdb6d7","#948db3","#6e6890"]},
+  metal:{n:"금속",u:"모니터·의자·2층 침대·바지",c:["#62627e","#4a4a64","#36364d","#25253a","#171724"]},
+  leaf:{n:"잎",u:"화분",c:["#9fd98e","#6fb874","#4b8f58","#326a42","#22492f"]},
+  day:{n:"낮 창",u:"훈련 방 창밖",c:["#c8edff","#98d7f7","#6bb7e2","#4b8fbf"]},
+  sky:{n:"밤 창",u:"휴식 방 창밖",c:["#56689f","#3c4c86","#2a3769","#1c264d"]},
+  neon:{n:"네온",u:"모니터 빛·무대 테두리·LCK 컵",c:["#8af4ff","#00e0ff","#00acc9","#007d94"]},
+  violet:{n:"보라 네온",u:"둘째 모니터·관중 불빛·First Stand",c:["#dba4ff","#b44dff","#8c33d4","#6422a3"]},
+  silver:{n:"은",u:"월드 트로피",c:["#ffffff","#d3d7e6","#a3a8bf","#6f7590"]},
+  gold:{n:"금",u:"MSI·리그 트로피·별·내 표시",c:["#fff0a0","#ffd23f","#dba92b","#a97c1d"]},
+  rose:{n:"분홍",u:"의자·커튼·빈백",c:["#ffa6c9","#e9789f","#c3577f","#913f5f"]},
+  stage:{n:"무대",u:"경기장 벽·바닥",c:["#3a3a63","#2a2a50","#1e1e3c","#14142a","#0c0c1a"]},
+};
+function RC(c){if(!c)return c;var m=/^([a-z]+)([0-9])$/.exec(c);if(!m||!RAMP[m[1]])return c;var r=RAMP[m[1]].c;return r[Math.min(+m[2],r.length-1)];}
+function rampFaces(c){var m=/^([a-z]+)([0-9])$/.exec(c||"");if(!m||!RAMP[m[1]])return null;var r=RAMP[m[1]].c,i=+m[2],L=function(k){return r[Math.min(k,r.length-1)];};return{top:L(i),left:L(i+1),right:L(i+2)};}
+
+function Raster(w,h){this.w=w;this.h=h;this.d=new Uint8ClampedArray(w*h*4);}
+Raster.prototype.px=function(x,y,col){x=Math.floor(x);y=Math.floor(y);if(x<0||y<0||x>=this.w||y>=this.h||!col)return;var c=rgb(col),i=(y*this.w+x)*4;this.d[i]=c[0];this.d[i+1]=c[1];this.d[i+2]=c[2];this.d[i+3]=255;};
+Raster.prototype.poly=function(pts,col){col=RC(col);
+  var minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9;pts.forEach(function(p){minx=Math.min(minx,p[0]);maxx=Math.max(maxx,p[0]);miny=Math.min(miny,p[1]);maxy=Math.max(maxy,p[1]);});
+  for(var y=Math.floor(miny);y<=Math.ceil(maxy);y++)for(var x=Math.floor(minx);x<=Math.ceil(maxx);x++){
+    var cx=x+.5,cy=y+.5,ins=false;
+    for(var i=0,j=pts.length-1;i<pts.length;j=i++){var a=pts[i],b=pts[j];if((a[1]>cy)!==(b[1]>cy)&&cx<(b[0]-a[0])*(cy-a[1])/(b[1]-a[1])+a[0])ins=!ins;}
+    if(ins)this.px(x,y,col);
+  }
+};
+
+// 해상도 2가지: 가 = 굵은(96×64, 방 36칸), 나 = 섬세한(128×96, 방 50칸)
+var RES = {
+  A:{cw:96,ch:64,W:36,H:21,scale:3,s:1,fine:false},
+  B:{cw:128,ch:96,W:50,H:30,scale:2,s:50/36,fine:true},
+};
+function G(res){
+  var R=new Raster(res.cw,res.ch),s=res.s,W=res.W,H=res.H;
+  var oy=H+3,ox=W+2+Math.floor((res.cw-(2*W+2))/2);
+  var g={R:R,res:res,s:s,W:W,H:H};
+  function P(x,y,z){return[ox+(x-y),oy+(x+y)/2-z];}
+  function S(v){return Math.round(v*s);}
+  g.P=P;g.S=S;
+  // 상자: 좌표는 굵은 도트 기준 칸 → 해상도에 맞게 늘림
+  g.box=function(x,y,z,w,d,h,col,o){o=o||{};x=S(x);y=S(y);z=S(z);w=Math.max(1,S(w));d=Math.max(1,S(d));h=S(h);
+    if(h<=0)return;
+    var rf=rampFaces(col);
+    R.poly([P(x,y+d,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x,y+d,z+h)],o.left||(rf?rf.left:shade(col,.78)));
+    R.poly([P(x+w,y,z),P(x+w,y+d,z),P(x+w,y+d,z+h),P(x+w,y,z+h)],o.right||(rf?rf.right:shade(col,.62)));
+    R.poly([P(x,y,z+h),P(x+w,y,z+h),P(x+w,y+d,z+h),P(x,y+d,z+h)],o.top||(rf?rf.top:col));
+  };
+  g.boxRaw=function(x,y,z,w,d,h,col,o){var ss=s;s=1;g.box(x,y,z,w,d,h,col,o);s=ss;};
+  g.wallL=function(y1,z1,y2,z2,col){y1=S(y1);y2=S(y2);z1=S(z1);z2=S(z2);R.poly([P(0,y1,z1),P(0,y2,z1),P(0,y2,z2),P(0,y1,z2)],col);}; // 왼쪽 벽(x=0)
+  g.wallR=function(x1,z1,x2,z2,col){x1=S(x1);x2=S(x2);z1=S(z1);z2=S(z2);R.poly([P(x1,0,z1),P(x2,0,z1),P(x2,0,z2),P(x1,0,z2)],col);};   // 오른쪽 벽(y=0)
+  g.floor=function(x1,y1,x2,y2,col){x1=S(x1);x2=S(x2);y1=S(y1);y2=S(y2);R.poly([P(x1,y1,0),P(x2,y1,0),P(x2,y2,0),P(x1,y2,0)],col);};
+  g.room=function(c){ // 바닥 판 + 벽 2개 (벽 두께 2) — 색은 정리표 묶음에서
+    var T=2,wr=RAMP[c.wall].c,fr=RAMP[c.floor].c,L=function(r,i){return r[Math.min(i,r.length-1)];};
+    g.boxRaw(0,0,-3,W,W,3,null,{top:L(fr,c.fi),left:c.slab?RC(c.slab[0]):L(fr,c.fi+2),right:c.slab?RC(c.slab[1]):L(fr,c.fi+3)});
+    g.boxRaw(-T,-T,0,T,W+T,H,null,{right:L(wr,c.wi+1),top:L(wr,0),left:L(wr,c.wi+3)});
+    g.boxRaw(0,-T,0,W,T,H,null,{left:L(wr,c.wi),top:L(wr,0),right:L(wr,c.wi+3)});
+    g.wallL(0,0,W,1,L(wr,c.wi+2));g.wallR(0,0,W,1,L(wr,c.wi+2)); // 걸레받이
+  };
+  // 사람 그림 (가로 세로 글자 지도) — 발 밑 가운데를 (x,y,z) 칸에 맞춤
+  g.sprite=function(spr,x,y,z,col,f,opt){opt=opt||{};var p=P(S(x),S(y),S(z));var rows=spr.rows,w=rows[0].length,h=rows.length;
+    var bx=Math.round(p[0]-w/2),by=Math.round(p[1])-h;
+    var br=opt.noBreath?0:BREATH[f],blink=f===BLINK_AT;
+    for(var r=0;r<h;r++){var up=(br&&r<spr.split)?1:0;
+      for(var c=0;c<w;c++){var k=rows[r][c];if(k===".")continue;if(k==="E"&&blink)k="S";
+        var colr=col[k];R.px(bx+c,by+r-up,colr);if(up&&r===spr.split-1)R.px(bx+c,by+r,colr);}}
+    return{x:bx,y:by,w:w};
+  };
+  g.mark=function(at,f){var y=at.y-4+(f%10<5?0:-1),x=at.x+Math.floor(at.w/2);var gd=RC("gold1");R.px(x-1,y,gd);R.px(x,y,gd);R.px(x+1,y,gd);R.px(x,y+1,gd);};
+  g.zz=function(at,f){var zc=RC("linen1"),t=f%10;[[0,0],[3,-4],[6,-8]].forEach(function(o,i){var yy=at.y-3+o[1]-Math.floor(t/3),xx=at.x+at.w+o[0];if((t+i*3)%10<7){R.px(xx,yy,zc);R.px(xx+1,yy,zc);R.px(xx+1,yy+1,zc);R.px(xx,yy+2,zc);R.px(xx+1,yy+2,zc);}});};
+  return g;
+}
+
+// ----- 사람 지도: H 머리 S 피부 E 눈 D 감은 눈 U 유니폼 V 유니폼 둘째 색 P 바지 K 신발 -----
+//   split = 숨쉴 때 위로 1칸 움직이는 줄 수 (머리·어깨만, 엉덩이·발은 그대로)
+var SPR = {
+  old:{front:{split:5,rows:[".HHH.",".ESE.",".SSS.","UUUUU","SUVUS",".UUU.",".PPP.",".P.P.",".K.K."]}},
+  coarse:{
+    front:{split:6,rows:[".HHHH.",".HSSH.",".ESSE.",".SSSS.","UUUUUU","SUVVUS","SUUUUS",".UUUU.",".PPPP.",".P..P.",".K..K."]},
+    sitL:{split:6,rows:["..HHHH.","..ESHH.","..SSSH.","..SSS..","..UUUU.","SSUVUU.","..UVUU.","..UUUU.","PPPPP..","P...P..","K...K.."]},
+    lie:{split:0,rows:["HHHH","DSSD","SSSS"]},
+  },
+};
+SPR.fine=SPR.coarse;
+
+// ----- 트로피 (대회마다 색·크기, A 밝은 B 중간 C 받침) -----
+var TROPHY_PX={
+  worlds:{c:"silver",rows:[".A.","ABA","ABA",".B.",".B.","CCC"]},
+  msi:{c:"gold",rows:["ABA","ABA",".B.","CCC"]},
+  firststand:{c:"violet",rows:[".A.","ABA",".B.","CCC"]},
+  playoffs:{c:"gold",rows:["ABA",".B.","CCC"]},
+  cup:{c:"neon",rows:["AB","CC"]},
+};
+var TROPHY_SETS={0:[],3:["playoffs","cup","msi"],9:["worlds","worlds","msi","firststand","playoffs","playoffs","playoffs","cup","cup"]};
+var TROPHIES=TROPHY_SETS[/tro9/.test(location.hash)?9:3];
+function drawTrophies(g,slots,f){
+  TROPHIES.slice(0,slots.length).forEach(function(t,i){var T=TROPHY_PX[t],r=RAMP[T.c].c,sl=slots[i];
+    var at=g.sprite({split:0,rows:T.rows},sl[0],sl[1],sl[2],{A:r[0],B:r[1],C:r[r.length-1]},f,{noBreath:true});
+    if((f+i*3)%10===0)g.R.px(at.x+Math.floor(at.w/2),at.y-1,"#ffffff"); // 반짝
+  });
+}
+
+// ----- 방 종류 (벽·바닥 묶음과 시작 단계) -----
+var PAL = {
+  day:{wall:"wall",wi:1,floor:"floor",fi:1},
+  night:{wall:"wall",wi:2,floor:"floor",fi:2},
+  apt:{wall:"wall",wi:1,floor:"wood",fi:2},
+  stage:{wall:"stage",wi:2,floor:"stage",fi:1,slab:["neon1","neon2"]},
+};
+// ----- 장면 데이터 (굵은 도트 칸 기준, 방 36×36 · 높이 21). 색 = 정리표 이름(예 wood1) 또는 팀 색 -----
+var SCENES = {
+  train:{name:"🏋️ 훈련",pal:"day",draw:function(g,f,me){
+    g.floor(8,12,28,30,"cloth3");g.floor(9,13,27,29,"cloth2");
+    g.wallR(19,7,32,17,"linen1");g.wallR(20,8,31,16,f%10<5?"day1":"day0");g.wallR(25,8,26,16,"linen1");g.wallR(20,12,31,13,"linen1");
+    g.wallL(4,8,11,16,me.u[0]);g.wallL(5,9,10,10,me.u[1]);g.wallL(5,13,10,14,me.u[1]);
+    g.box(28,2,0,6,5,11,"wood2");g.box(29,3,11,1,2,2,"rose1");g.box(30,3,11,1,2,3,"neon2");g.box(31,3,11,1,2,2,"cloth1");g.box(28,2,6,6,5,1,"wood1");
+    g.box(0,9,0,9,17,8,"wood1");
+    g.box(1,11,8,2,6,7,"metal2",{right:f%4<2?RC("neon1"):RC("neon0")});g.box(1,19,8,2,6,7,"metal2",{right:f%6<3?RC("violet1"):RC("violet0")});
+    g.box(5,13,8,2,10,1,"metal1");
+    g.box(30,28,0,3,3,3,"wood2");g.box(30,28,3,3,3,4,"leaf1");
+    g.box(12,14,0,6,7,4,"rose2");
+    var at=g.sprite(me.spr.sitL,12,18,3,me.col,f);
+    g.box(17,14,4,2,7,8,"metal2",{top:me.u[0]});
+    return at;}},
+  restRoom:{name:"💤 휴식 · 원룸·투룸",pal:"night",draw:function(g,f,me){
+    g.floor(14,12,32,30,"cloth3");g.floor(15,13,31,29,"cloth2");
+    g.wallR(6,7,18,17,"linen2");g.wallR(7,8,17,16,"sky2");[[9,14],[12,10],[15,13],[10,9]].forEach(function(s){var q=g.P(g.S(s[0]),0,g.S(s[1]));g.R.px(q[0],q[1],RC("gold0"));});
+    g.wallR(4,6,7,18,"rose1");g.wallR(17,6,19,18,"rose2");
+    g.wallL(4,9,11,16,me.u[0]);g.wallL(5,10,10,11,me.u[1]);
+    g.box(22,0,0,9,6,7,"wood2");g.box(24,1,7,4,3,1,"metal2",{top:f%6<3?RC("neon1"):RC("neon0")});
+    g.box(21,0,11,12,3,1,"wood1");drawTrophies(g,[[23,1.5,12],[25.5,1.5,12],[28,1.5,12],[30.5,1.5,12]],f);
+    g.box(0,13,0,12,21,4,"wood3");g.box(0,13,4,12,21,2,"linen1");
+    g.box(1,14,6,10,3,2,"linen0");
+    var at=g.sprite(me.spr.lie,6,17,8,me.col,f,{noBreath:true});
+    g.box(1,18,6,11,15,2,me.u[0]);
+    if(BREATH[f])g.box(3,21,8,7,8,1,me.u[0]);
+    g.box(26,24,0,6,6,3,"rose1");
+    g.zz(at,f);return at;}},
+  restDorm:{name:"💤 휴식 · 합숙소",pal:"night",draw:function(g,f,me){
+    g.floor(10,10,26,34,"cloth4");
+    g.wallR(14,9,22,17,"linen2");g.wallR(15,10,21,16,"sky2");
+    g.box(24,0,0,12,4,16,me.u[0]);g.box(24,3,0,12,1,16,shade(me.u[0],.5));
+    drawTrophies(g,[[26,1.5,16],[28.5,1.5,16],[31,1.5,16],[33.5,1.5,16]],f);
+    g.box(0,6,0,10,18,3,"metal1");g.box(0,6,3,10,18,1,"linen2");g.box(1,7,4,7,3,1,"linen1");
+    g.box(9,6,0,1,1,14,"metal3");g.box(9,23,0,1,1,14,"metal3");
+    g.box(0,6,10,10,18,2,"metal1");g.box(0,6,12,10,18,1,"linen1");
+    g.box(1,7,13,7,3,1,"linen0");
+    var at=g.sprite(me.spr.lie,4,10,14,me.col,f,{noBreath:true});
+    g.box(1,11,13,8,12,1,me.u[0]);
+    if(BREATH[f])g.box(3,14,14,4,6,1,me.u[0]);
+    g.box(20,24,0,6,6,3,"metal2");
+    g.zz(at,f);return at;}},
+  restApt:{name:"💤 휴식 · 아파트",pal:"apt",draw:function(g,f,me){
+    g.floor(14,12,32,30,"cloth3");g.floor(15,13,31,29,"cloth1");
+    // 통유리창 야경
+    g.wallR(1,3,22,20,"linen2");g.wallR(2,4,21,19,"sky3");
+    [[2,4,5,11],[5,4,8,15],[8,4,10,9],[10,4,13,14],[13,4,16,10],[16,4,19,16],[19,4,21,12]].forEach(function(b,i){g.wallR(b[0],b[1],b[2],b[3],i%2?"metal1":"metal2");
+      for(var wx=b[0];wx<b[2]-0.5;wx+=1.5)for(var wz=b[1]+2;wz<b[3]-1;wz+=2){if(((wx*7+wz*3+i)|0)%4===(Math.floor(f/5)%4))continue;var q=g.P(g.S(wx+.5),0,g.S(wz));g.R.px(q[0],q[1],RC("gold0"));}});
+    var mq=g.P(g.S(19),0,g.S(18));g.R.px(mq[0],mq[1],RC("silver0"));g.R.px(mq[0]+1,mq[1],RC("silver0"));
+    g.wallR(11.5,4,12,19,"linen2");
+    // 액자 (팀 색)
+    g.wallL(3,8,12,17,"gold2");g.wallL(4,9,11,16,me.u[0]);g.wallL(5,11,10,12,me.u[1]);
+    // 트로피 장식장
+    g.box(24,0,0,10,5,2,"wood2");g.wallR(24,2,34,15,"wood4");
+    g.box(24,0,2,1,5,13,"wood2");g.box(33,0,2,1,5,13,"wood2");
+    g.box(25,0,7,8,5,1,"wood1");g.box(24,0,15,10,5,1,"wood1");
+    drawTrophies(g,[[26.5,2,2],[29,2,2],[31.5,2,2],[26.5,2,8],[29,2,8],[31.5,2,8]],f);
+    // 큰 침대
+    g.box(0,13,0,14,21,4,"wood3");g.box(0,13,4,14,21,2,"linen1");
+    g.box(1,14,6,5,3,2,"linen0");g.box(7,14,6,5,3,2,"linen0");
+    var at=g.sprite(me.spr.lie,4,17,8,me.col,f,{noBreath:true});
+    g.box(1,18,6,13,15,2,me.u[0]);
+    if(BREATH[f])g.box(3,21,8,7,8,1,me.u[0]);
+    // 스탠드
+    g.box(17,13,0,2,2,8,"metal2");g.box(16,12,8,4,4,3,f%10<8?"gold0":"gold1");
+    g.zz(at,f);return at;}},
+  match:{name:"🏟️ 경기 준비 (부스)",pal:"stage",draw:function(g,f,me){
+    var band=f%10;
+    for(var z=3;z<20;z+=2){var c=(Math.floor(z/2)+band)%5===0?RC("linen0"):(z%4===1?me.u[0]:shade(me.u[0],.65));g.wallR(2,z,34,z+2,c);}
+    for(var i=0;i<14;i++){var yy=3+(i*7)%30,zz=5+(i*5)%13;if((i+f)%3)g.wallL(yy,zz,yy+1,zz+1,["neon1","violet1","gold1"][i%3]);}
+    g.floor(4,6,34,30,"stage0");
+    var mates=me.mates,at=null,XS=[7,13,19,25,31];
+    XS.forEach(function(x,i){var m=i===2?me:mates[i];var a=g.sprite(m.spr.front,x,13,2,m.col,(f+i*4)%FRAMES);if(i===2)at=a;});
+    XS.forEach(function(x){g.box(x-2,18,7,4,1,3,"metal4",{left:RC("metal3")});});
+    g.box(4,18,0,30,5,7,"stage0",{left:me.u[0]});
+    g.box(4,22,0,30,1,1,"neon1");
+    g.mark(at,f);return at;}},
+};
+var SCENE_KEYS=["train","match","restDorm","restRoom","restApt"];
+
+// ----- 내 선수 (무작위 얼굴 + 팀 색) -----
+var SEED=7,me;
+function makePerson(seed,uni){
+  var look=randomLook("room"+seed),P=PORTRAIT;
+  return{look:look,u:uni,col:{H:P.hairColors[look.hairC].c,S:P.skins[look.skin].c,E:"#2a1717",D:shade(P.skins[look.skin].c,.6),U:uni[0],V:uni[1],P:RC("metal2"),K:RC("metal4")}};
+}
+function setup(){
+  var uni=UNIFORM_POOL[SEED%UNIFORM_POOL.length];
+  me=makePerson(SEED,uni);me.mates=[0,1,2,3,4].map(function(i){return makePerson(SEED*31+i+1,uni);});
+}
+// 띠(20프레임) 만들기 → data URL
+var CACHE={};
+function strip(key,resKey){
+  var ck=key+resKey+SEED+"|"+TROPHIES.join(",");if(CACHE[ck])return CACHE[ck];
+  var res=RES[resKey],cv=document.createElement("canvas");cv.width=res.cw*FRAMES;cv.height=res.ch;var cx=cv.getContext("2d");
+  var sc=SCENES[key];
+  function withSpr(p){p.spr=res.fine?SPR.fine:SPR.coarse;return p;}
+  withSpr(me);me.mates.forEach(withSpr);
+  for(var f=0;f<FRAMES;f++){var g=G(res);g.room(PAL[sc.pal]);sc.draw(g,f,me);cx.putImageData(new ImageData(g.R.d,res.cw,res.ch),f*res.cw,0);}
+  return CACHE[ck]=cv.toDataURL();
+}
+function roomHTML(key,resKey,mult){
+  var res=RES[resKey],k=mult||res.scale,w=res.cw*k,h=res.ch*k;
+  return'<div class="room px" style="width:'+w+'px;height:'+h+'px;background-image:url('+strip(key,resKey)+');background-size:'+(w*FRAMES)+'px '+h+'px;--end:-'+(w*FRAMES)+'px"></div>';
+}
+// 사람만 크게 (확대 비교용)
+function personHTML(resKey,kind,mult){
+  var res=RES[resKey]||RES.A,spr=(resKey==="old"?SPR.old:SPR.coarse)[kind],w=spr.rows[0].length+2,h=spr.rows.length+3;
+  var cv=document.createElement("canvas");cv.width=w*FRAMES;cv.height=h;var cx=cv.getContext("2d");
+  for(var f=0;f<FRAMES;f++){var R=new Raster(w,h),br=BREATH[f],blink=f===BLINK_AT;
+    spr.rows.forEach(function(row,r){var up=(br&&r<spr.split)?1:0;row.split("").forEach(function(k,c){if(k===".")return;if(k==="E"&&blink)k="S";R.px(c+1,r+2-up,me.col[k]);if(up&&r===spr.split-1)R.px(c+1,r+2,me.col[k]);});});
+    cx.putImageData(new ImageData(R.d,w,h),f*w,0);}
+  var W=w*mult,H=h*mult;
+  return'<div class="room px" style="width:'+W+'px;height:'+H+'px;background-image:url('+cv.toDataURL()+');background-size:'+(W*FRAMES)+'px '+H+'px;--end:-'+(W*FRAMES)+'px"></div>';
+}
+
+// =====================================================================
+//  화면 시안
+// =====================================================================
+var CAP={train:"31주차 · 🏋️ 리플레이 분석",restDorm:"휴식 · 🛏 합숙소 (집: 합숙)",restRoom:"휴식 · 🏠 원룸·투룸 (집: 원룸·투룸)",restApt:"휴식 · 🏢 아파트 (집: 아파트·고급·초고급)",match:"31주차 · ⚔ 경기 2 준비 · 🏋️ 리플레이 분석"};
+function face(seed,uniIdx){try{return portraitHTMLFrom(randomLook("sns"+seed),UNIFORM_POOL[uniIdx%12],{face:true,size:34});}catch(e){return"🙂";}}
+function hearts(t,pro){var h=pfSeed(t);return pro?20+h%480:h%50;}
+function fmt(n){return n>=10000?(n/10000).toFixed(1).replace(/\.0$/,"")+"만":n.toLocaleString();}
+
+function notifHTML(compact){
+  return'<div class="notif"><div class="ic">💬<em>3</em></div><div class="tx"><div class="h"><span>메시지</span><span>· 이번 주</span></div>'+
+    '<b class="one">Gore 선수 · 콜 문제로 갈등</b><p class="one">스크림 도중 콜 문제로 Gore 선수와 언성이 높아졌다…</p>'+
+    '<div class="cnt">답장할 연락 3 · 📸 나를 언급 2</div></div><div class="go">열기 ›</div></div>';
+}
+function mobileDash(){
+  return'<div class="m-top"><b class="nw">2017년 31주차</b><span class="muted nw">· 2부 후반기</span><span class="sp"></span><span class="nw">💰 813만</span></div>'+
+  '<div class="m-body">'+
+    '<div class="m-scene">'+roomHTML("match","A")+'<div class="wk">⚔ 경기 2 준비 <span>· 🏋️ 리플레이 분석 [바꾸기]</span></div><div class="small muted">다음 일정 · 플레이인 개막 4주 뒤</div></div>'+
+    notifHTML()+
+    '<div class="mt"><span class="tag">경기</span><div class="one"><span class="vs">GS</span> vs <span class="vs">KD SOLIS</span><div class="sub one">전력 52.0 · 맞수 Fang · 상대 전적 1승 1패</div></div><span class="arr">준비 ›</span></div>'+
+    '<div class="mt"><span class="tag">경기</span><div class="one"><span class="vs">GS</span> vs <span class="vs">EL APEX</span><div class="sub one">전력 51.0 · 맞수 Duke · 상대 전적 0승 2패</div></div><span class="arr">준비 ›</span></div>'+
+    '<div class="stat4">'+
+      '<div class="st"><div class="k">체력</div><div class="v down">26<small>/80</small></div><div class="bar low"><i style="width:32%"></i></div></div>'+
+      '<div class="st"><div class="k">컨디션</div><div class="v">78<small>/80</small></div><div class="bar"><i style="width:97%"></i></div></div>'+
+      '<div class="st"><div class="k">종합 능력</div><div class="v">49.8 <small class="up">▲0.2</small></div><div class="small muted one">리그 미드 20위</div></div>'+
+      '<div class="st"><div class="k">돈</div><div class="v">813<small>만</small></div><div class="small muted one">연봉 1,300만</div></div>'+
+    '</div>'+
+    '<div class="warn">⚠ 체력 30 미만 → 이번 주 경기력 −10% · <b>휴식</b>을 추천해요</div>'+
+    '<div class="qline">📋 <span class="one" style="flex:1">라인전 감각 끌어올리기</span><span class="p nw">0/3</span><span class="small muted nw">3주</span></div>'+
+    '<div class="qline">📋 <span class="one" style="flex:1">주력 챔피언 만들기</span><span class="p nw">0/5</span><span class="small muted nw">7주</span></div>'+
+    '<div class="more">더 보기 ▾ <span>지난주 결과 · 챔피언 · 목표</span></div>'+
+  '</div>'+
+  '<div class="m-fix"><div class="m-go"><button class="btn-p">▶ 다음 주<small>31주차 진행 · 경기 2</small></button><button class="rest">💤 휴식</button></div>'+
+  '<div class="m-tabs"><div class="on"><b>🏠</b>대시보드</div><div><b>🏋️</b>훈련</div><div><b>📱</b>휴대폰<em>5</em></div><div><b>☰</b>전체</div></div></div>';
+}
+function pcDash(){
+  return'<div class="pc-top"><b>챌린저 로드</b><span class="muted">2017년 31주차 · 정규 시즌 3·4라운드 · 💰 813만 원</span><span class="sp"></span>'+
+    '<span class="b">🏋️ 리플레이 분석</span><span class="b warn2">💪 체력 26/80</span><span class="b">💤 휴식 주</span><button class="btn-p">다음 주로 진행 ▶</button></div>'+
+  '<div class="pc-body"><div class="pc-menu"><span class="on">🏠 대시보드</span><span>🏋️ 훈련</span><span>📱 휴대폰 <b class="down">5</b></span><span>🤝 친구</span><span>👤 선수 정보</span><span>🛒 상점</span><span>🛡 소속팀</span><span>📊 경기 결과</span><span>📅 일정</span><span>🏆 순위</span><span>🔁 이적 시장</span></div>'+
+  '<div class="pc-main"><div class="pc-grid">'+
+    '<div class="card"><div class="wkcard">'+roomHTML("match","A")+
+      '<div class="side"><h4 class="nw">31주차 · 이번 주</h4><div class="small muted">⚔ 경기 2 준비 · 2부 후반기 3라운드</div>'+
+      '<div class="trow"><span class="lbl">훈련</span><b class="one" style="flex:1">🏋️ 리플레이 분석</b><span class="chip">바꾸기</span></div>'+
+      '<div class="trow"><span class="lbl">체력</span><div class="bar low"><i style="width:32%"></i></div><span class="n down">26/80</span></div>'+
+      '<div class="trow"><span class="lbl">컨디션</span><div class="bar"><i style="width:97%"></i></div><span class="n">78/80</span></div>'+
+      '<div class="warn">⚠ 체력 30 미만 → 경기력 −10% · 휴식 추천</div></div></div>'+
+      '<div class="pc-matches">'+
+        '<div class="mt"><span class="tag">경기</span><div class="one"><span class="vs">GS CYCLONE</span> vs <span class="vs">KD SOLIS</span> <span class="sub">· 전력 52.0 · 맞수 Fang · 상대 전적 1승 1패 · 추천 메타 따라가기</span></div><span class="arr">분석 리포트 ›</span></div>'+
+        '<div class="mt"><span class="tag">경기</span><div class="one"><span class="vs">GS CYCLONE</span> vs <span class="vs">EL APEX</span> <span class="sub">· 전력 51.0 · 맞수 Duke · 상대 전적 0승 2패 · 추천 메타 카운터</span></div><span class="arr">분석 리포트 ›</span></div>'+
+      '</div></div>'+
+    '<div class="phw"><div class="card phw"><div class="hd"><b>📱 내 휴대폰</b><span class="small muted">메시지 3 · SNS 언급 2</span></div>'+notifHTML()+
+      '<div class="notif" style="border-color:rgba(255,210,63,.5);background:linear-gradient(120deg,rgba(255,210,63,.12),transparent)"><div class="ic">📸<em>2</em></div><div class="tx"><div class="h"><span>프로피드</span><span>· 이번 주</span></div><b class="one">@Cyan 님이 나를 언급했어요</b><p class="one">숙소 근처에 맛집 발견했는데 나중에 김챌린저로드 선수…</p></div><div class="go">보기 ›</div></div></div>'+
+      '<div class="stat4"><div class="st"><div class="k">종합 능력</div><div class="v">49.8 <small class="up">▲0.2</small></div><div class="small muted">리그 미드 20위</div></div>'+
+      '<div class="st"><div class="k">팀 내 입지</div><div class="v">46 <small>주전</small></div><div class="small muted">4주 뒤 감독 평가</div></div>'+
+      '<div class="st"><div class="k">팔로워</div><div class="v">2.0<small>만</small></div><div class="small muted">인기도 9 · 무명</div></div>'+
+      '<div class="st"><div class="k">목표</div><div class="v" style="font-size:15px">1부 승격</div><div class="small muted">우리 팀 8위</div></div></div></div>'+
+  '</div>'+
+  '<div class="pc-row3">'+
+    '<div class="card"><h4>📅 지난주 결과 <span class="small muted">30주차</span></h4><div class="li"><b class="up">승</b> vs JD VENOM 2:0 · 평점 9.0<br><b class="down">패</b> vs QY LEGION 1:2 · 평점 3.3<br>훈련 리플레이 분석 · 브랜드 숙련도 +2</div></div>'+
+    '<div class="card"><h4>📋 퀘스트</h4><div class="li">라인전 감각 끌어올리기 <b class="nw">0/3</b> · 3주<br>주력 챔피언 만들기 <b class="nw">0/5</b> · 7주</div></div>'+
+    '<div class="card"><h4>⚔️ 챔피언 <span class="small muted">2017년 2차 패치</span></h4><div class="li">메타 숙련도 평균 <b class="down">40</b> → 경기력이 깎여요<br>메타: 블라디미르 34 · 브랜드 34 · 카타리나 43</div></div>'+
+  '</div><div class="muted small" style="text-align:center">▼ 아래: 조합 전략 · 최근 경기 · 솔로 랭크 · 내 스탯 (지금처럼, 접어 둠)</div>'+
+  '</div></div>';
+}
+var POSTS=[
+  {a:"Hold",t:"Dplus · 원딜",pro:1,txt:"이번 시즌 역대급으로 치열한 것 같아 정말 재밌습니다. 끝까지 화이팅.",w:"이번 주",s:11,u:0},
+  {a:"과몰입러2020",txt:"QY LEGION가 오늘 준비 진짜 잘해왔네 벽 느꼈다",w:"이번 주",s:12},
+  {a:"Cyan",t:"QY · 서포트",pro:1,txt:"숙소 근처에 맛집 발견했는데 나중에 @김챌린저로드 선수 밥 한번 사겠습니다.",w:"3주 전",s:13,u:3,mine:1},
+  {a:"분석충4590",txt:"@김챌린저로드 이적 선택 잘됐으면 좋겠다 GS CYCLONE에서 좋은 모습 보여주자",w:"2주 전",s:14,mine:1},
+  {a:"탑신병자4510",txt:"이번 패치 메타 너무 어렵다",w:"1주 전",s:15},
+  {a:"Atom",t:"KW · 미드",pro:1,txt:"이번 시즌 역대급으로 치열한 것 같아 정말 재밌습니다. 끝까지 화이팅.",w:"5주 전",s:16,u:5},
+  {a:"Jade",t:"Hanwha · 탑",pro:1,txt:"리플레이 분석할수록 @김챌린저로드 선수가 왜 잘하는지 알 것 같습니다.",w:"6주 전",s:17,u:7,mine:1},
+];
+function postHTML(p,i){
+  var fa=p.pro?face(p.s,p.u):'<span style="color:'+["#00e0ff","#b44dff","#ffd23f","#2bff9e"][i%4]+'">'+p.a.charAt(0)+"</span>";
+  var body=p.txt.replace(/@김챌린저로드/g,'<span class="at">@김챌린저로드</span>');
+  return'<div class="post'+(p.mine?" mine":"")+'"><div class="hd"><span class="fa">'+fa+'</span><div class="who one"><b>'+p.a+"</b>"+(p.pro?' <span class="vf">✔</span>':"")+"<br>"+(p.t?p.t+" · ":"")+p.w+'</div></div><div class="body">'+body+'</div><div class="act"><button class="heart"><b>♡</b><span>'+fmt(hearts(p.txt+p.a,p.pro))+"</span></button>"+(p.mine?'<span style="color:var(--gold)">📣 나를 언급</span>':"")+"</div></div>";
+}
+function phoneShell(title,body,tab,logo){
+  return'<div><div class="ph"><div class="scr"><div class="isl"></div><div class="stb"><span>9:41</span><span>📶 🔋</span></div>'+
+    '<div class="apphd">'+(logo?'<span class="logo">프로피드</span><b></b>':"<b>"+title+"</b>")+'<span class="small muted">✕</span></div><div class="cont">'+body+"</div>"+
+    '<div class="dock"><div class="'+(tab==="msg"?"on":"")+'"><b>💬</b>메시지<em>3</em></div><div class="'+(tab==="sns"?"on":"")+'"><b>📸</b>SNS</div><div class="'+(tab==="noti"?"on":"")+'"><b>🔔</b>알림<em>2</em></div></div></div></div></div>';
+}
+function phones(){
+  var msg=[["✉️","콜 문제로 갈등","스크림 도중 콜 문제로 Gore 선수와 언성이 높아졌…","1주"],["📋","새 퀘스트: 주력 챔피언 만들기","코치: \"챔피언 집중 연습을 5회 해라.\"",""],["🤝","서머 중반 · 누구와 시간을 보낼까?","이적 시장이 지나가고 숙소 분위기가 조금 달라졌…","2주"]]
+    .map(function(m){return'<div class="cl"><div class="av">'+m[0]+'</div><div class="tx"><b class="one">'+m[1]+'</b><p class="one">'+m[2]+'</p></div><div class="r">'+(m[3]?"<span>"+m[3]+"</span>":"<span></span>")+"<i></i></div></div>";}).join("")+
+    '<div class="cl" style="opacity:.55"><div class="av">🧑‍🏫</div><div class="tx"><b class="one">GS CYCLONE 코치</b><p class="one">✓ 답장함 · 다음 경기 준비 잘하자.</p></div><div class="r"><span class="muted">3주</span></div></div>';
+  var stories='<div class="stories">'+[["Hold",11,0],["Cyan",13,3],["Atom",16,5],["Jade",17,7],["Vice",18,9],["Sane",19,2]].map(function(s,i){return'<div class="story"><div class="ring'+(i>3?" seen":"")+'"><div class="in">'+face(s[1],s[2])+"</div></div>"+s[0]+"</div>";}).join("")+"</div>";
+  var feed=stories+POSTS.map(postHTML).join("");
+  var noti=[["Cyan",13,3,"님이 게시물에서 나를 언급했어요: “…나중에 @김챌린저로드 선수 밥 한번 사겠습니다.”","3주 전",1],["분석충4590",0,0,"님이 나를 언급했어요: “@김챌린저로드 이적 선택 잘됐으면…”","2주 전",1],["Jade",17,7,"님이 나를 언급했어요: “리플레이 분석할수록…”","6주 전",0]]
+    .map(function(n){return'<div class="nt'+(n[5]?" new":"")+'"><span class="fa">'+(n[1]?face(n[1],n[2]):'<b style="color:#b44dff">분</b>')+'</span><div><b>'+n[0]+"</b>"+n[3]+'<div class="tm">'+n[4]+(n[5]?' · <b style="color:var(--gold)">새 알림</b>':"")+"</div></div></div>";}).join("");
+  var prof='<div class="prof"><div class="pa"><div>'+personHTML("A","front",6)+'</div></div><div class="nmv">김챌린저로드 <span class="vf" style="color:var(--accent)">✔</span></div><div class="small muted">GS CYCLONE · 미드 · 17세</div>'+
+    '<div class="nums"><div><b>2.0만</b>팔로워</div><div><b>49.8</b>종합 능력</div><div><b>무명</b>스타 등급</div></div></div>'+
+    '<div class="ptabs"><div class="on">📣 나를 언급한 글</div><div>🏆 기록</div></div>'+POSTS.filter(function(p){return p.mine;}).map(postHTML).join("");
+  return phoneShell("받은 연락",msg,"msg")+phoneShell("",feed,"sns",1)+phoneShell("🔔 알림",noti,"noti")+phoneShell("내 프로필",prof,"sns");
+}
+
+function render(){
+  setup();CACHE={};
+  document.getElementById("palette").innerHTML=Object.keys(RAMP).map(function(k){var r=RAMP[k];return'<div class="pr"><b>'+r.n+'</b><span class="sw">'+r.c.map(function(c){return'<i style="background:'+c+'" title="'+c+'"></i>';}).join("")+"</span><span>"+r.u+"</span></div>";}).join("")+'<div class="pr"><b>팀 색</b><span class="sw"><i style="background:'+me.u[0]+'"></i><i style="background:'+me.u[1]+'"></i></span><span>유니폼·포스터·이불·LED 벽 (팀마다 다름)</span></div>';
+  document.getElementById("zoom").innerHTML='<div>'+personHTML("old","front",10)+'<div class="zcap">이전</div></div><div>'+personHTML("A","front",10)+'<div class="zcap">새 · 서기</div></div><div>'+personHTML("A","sitL",10)+'<div class="zcap">새 · 앉기</div></div>';
+  ["A"].forEach(function(r){document.getElementById("scenes"+r).innerHTML=SCENE_KEYS.map(function(k){return'<div class="sc"><div class="nm">'+SCENES[k].name+"</div>"+roomHTML(k,r,/big/.test(location.hash)?RES[r].scale*2:0)+'<div class="cap">'+CAP[k]+"</div></div>";}).join("");});
+  document.getElementById("mdash").innerHTML=mobileDash();
+  document.getElementById("pcdash").innerHTML=pcDash();
+  var ph=document.getElementById("phones");ph.innerHTML=phones();
+  ph.querySelectorAll(".heart").forEach(function(b){b.onclick=function(){var on=b.classList.toggle("on");var s=b.querySelector("span");var n=parseInt(s.getAttribute("data-n")||s.textContent.replace(/[^0-9]/g,""),10);s.setAttribute("data-n",n);b.querySelector("b").textContent=on?"♥":"♡";s.textContent=fmt(on?n+1:n);};});
+  var h=document.getElementById("mdash").scrollHeight;
+  document.getElementById("mheight").textContent="이 모바일 대시보드 길이: "+h+"px = 약 "+(h/900).toFixed(1)+"화면 (지금 게임 5614px = 6.2화면)";
+}
+document.querySelectorAll("[data-tro]").forEach(function(b){b.onclick=function(){TROPHIES=TROPHY_SETS[b.getAttribute("data-tro")];render();};});
+document.getElementById("reroll").onclick=function(){SEED=Math.floor(Math.random()*9999)+1;render();};
+document.getElementById("still").onclick=function(){document.body.classList.toggle("still");};
+render();
+</script>
+</body></html>

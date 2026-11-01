@@ -6,7 +6,7 @@
 |---|---|---|---|
 | `data/menus.js` | 2 | 좌측 메뉴 (2026-10-06 정리: 묶음 4개 + 맨 아래 설정) |  |
 | `data/shop.js` | 8 | 상점 ([상점] 메뉴) — 모은 돈을 쓰는 곳 |  |
-| `data/guide.js` | 21 | 초보자 도움 (js/guide.js) |  |
+| `data/guide.js` | 24 | 초보자 도움 (js/guide.js) |  |
 | `data/player.js` | 16 | 내 선수 기본 규칙: 스탯·성장 곡선·포지션·유형·커리어 | stats.js, growth.js, positions.js, archetypes.js, career.js |
 | `data/traits.js` | 28 | 특성 목록 |  |
 | `data/champions.js` | 9 | 챔피언 목록 (리그 오브 레전드 실제 챔피언, 2026년 6월 기준 173명) |  |
@@ -25,7 +25,8 @@
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
 | `data/news.js` | 43 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
-| `data/ui.js` | 9 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
+| `data/ui.js` | 11 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
+| `data/room.js` | 10 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/replay.js` | 2 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
@@ -39,28 +40,28 @@
 | `data/romance.js` | 51 | 연애: 규칙·대상 | romance_rules.js, romance.js |
 | `js/player.js` | 9 | 선수 관련 계산 |  |
 | `js/champions.js` | 18 | 챔피언 · 숙련도 · 메타(패치) |  |
-| `js/creation.js` | 31 | 캐릭터 생성 |  |
+| `js/creation.js` | 38 | 캐릭터 생성 |  |
 | `js/save.js` | 22 | 저장 / 불러오기 |  |
 | `js/league.js` | 26 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
 | `js/matchsim.js` | 43 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 11 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 54 | 게임 상태 |  |
+| `js/main.js` | 55 | 게임 상태 |  |
 | `js/training_page.js` | 20 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 19 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 36 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
-| `js/sns_page.js` | 14 | SNS 화면 |  |
+| `js/sns_page.js` | 24 | SNS 화면 |  |
 | `js/contracts.js` | 33 | 연봉 · 계약 · 2군행 · 이적 |  |
 | `js/club_market.js` | 29 | 구단 이적 시장·여름 이적 | club_market.js, summer_market.js |
 | `js/market_pages.js` | 26 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
 | `js/links.js` | 4 | 선수·구단 이름 링크: 어느 화면이든 이름을 누르면 [선수 검색] / [구단 탐색]의 그 선수·구단으로 |  |
 | `js/news.js` | 22 | 뉴스: 소식·신문 팝업·월즈 특집·역사 뉴스 | news.js, news_popup.js, worlds_news.js, historical_news.js |
-| `js/dashboard.js` | 37 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
+| `js/dashboard.js` | 38 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
 | `js/records.js` | 10 | 기록: 세트 평점, POG, 시즌 기록, 시상, 커리어 시즌 기록 |  |
 | `js/quests.js` | 18 | 퀘스트: 코치·감독 과제 |  |
-| `js/shop.js` | 21 | 상점·거주지 | shop.js, housing.js |
-| `js/guide.js` | 16 | 초보자 도움: 튜토리얼 · 지금 목표 · 이번 주 추천 · 게임 방법 (글은 data/guide.js) |  |
+| `js/shop.js` | 24 | 상점·거주지 | shop.js, housing.js |
+| `js/guide.js` | 23 | 초보자 도움: 코치 안내 · 그때그때 팁 · 지금 목표 · 이번 주 추천 · 게임 방법 (글은 data/guide.js) |  |
 | `js/records_pages.js` | 12 | 기록 화면: 선수 정보 기록(위쪽), 개인 시상, 대회 일정(아래쪽) |  |
 | `js/player_page.js` | 32 | [선수 정보] 내 선수의 모든 것 (2026-10-07, 예전 '나의 커리어'를 바꿈) |  |
 | `js/retire.js` | 16 | 노화 · 은퇴 · 엔딩 · 명예의 전당 · 커리어 주요 순간 |  |
@@ -81,12 +82,13 @@
 | `js/world_moves.js` | 12 | ③ 선수 오가기 + 외국인 수 제한 + 언어 소통 (v1.1) |  |
 | `js/rivals.js` | 17 | 맞대결 전적·구단별 빅게임 | h2h.js, biggame.js |
 | `js/staff.js` | 17 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
-| `js/portrait.js` | 9 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
-| `js/replay.js` | 23 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
+| `js/portrait.js` | 11 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
+| `js/replay.js` | 24 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
 | `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
 | `js/dash_plus.js` | 12 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
+| `js/room.js` | 13 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |
 | `js/start.js` | 0 | 게임 시작 |  |

@@ -26,6 +26,7 @@
  *  24. 단축키 (198, js/shortcuts.js)
  *  27. 경기 기록 팀 색 (219): 우리 팀 하늘 · 상대 분홍 (--side-a/--side-b, .side-swap)
  *  26. 코치 안내·그때그때 팁 (215, js/guide.js renderCoach) · 게임 방법 접기
+ *  31. 이번 주 행동 그림 (js/room.js, 시안 24) — 맨 아래
  *  25. 시작 화면 · 선수 등록증 (212, 시안 18 나) · 캐릭터 생성 단계 (213, 시안 19 가) — js/creation.js
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
@@ -1931,3 +1932,10 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
   .sh-cat { width: auto; flex: none; white-space: nowrap; }
   .sh-flow { margin-left: 0; }
 }
+
+/* ===== 31. 이번 주 행동 그림 (js/room.js · data/room.js, 시안 24): 아이소메트릭 픽셀 방, 20장 띠를 steps로 넘김 ===== */
+.room-block { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 6px 0 10px; padding: 6px 0 8px; border-radius: var(--r-s); background: radial-gradient(ellipse at 50% 45%, rgba(var(--accent2-rgb), 0.14), transparent 70%); }
+.room-pic { max-width: 100%; background-repeat: no-repeat; image-rendering: pixelated; image-rendering: crisp-edges; animation-name: room-play; animation-iteration-count: infinite; }
+@keyframes room-play { from { background-position: 0 0; } to { background-position: var(--room-end) 0; } }
+@media (prefers-reduced-motion: reduce) { .room-pic { animation: none; } }
+.room-cap { font-size: 13px; font-weight: 700; color: var(--text); text-align: center; }
