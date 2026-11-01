@@ -110,11 +110,21 @@ function dashQuestProgress(q) {
   return tpl.kind === "ladderTop" ? myLadderRank() + "위→" + q.need + "위" : q.progress + "/" + q.need;
 }
 
+// 그림 아래 솔로 랭크 (236): 랭크 그림 · 티어 · 점수 · 리그 순위 · 이번 주 변화 (훈련 이름은 위쪽 막대에 있어서 뺌)
+function dashLadderLineHTML() {
+  const sr = state.soloRank || { points: LADDER.startPoints };
+  const board = leagueLadder(), rank = board.findIndex(function (x) { return x.id === USER_ID; }) + 1;
+  const l = state.weekReport && state.weekReport.ladder, d = l && l.games ? l.delta : null;
+  return '<span class="dm-ladder">' + tierEmblemSVG(sr.points, 26) + '<b style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + "</b>" +
+    "<b>" + sr.points.toLocaleString() + "점</b>" + '<span class="muted">솔랭 ' + rank + "위</span>" +
+    (d !== null ? '<span class="' + (d >= 0 ? "up" : "down") + '">' + (d >= 0 ? "▲" : "▼") + Math.abs(d) + "</span>" : "") + "</span>";
+}
+
 // ----- 휴대폰 대시보드 -----
 function dashMobileHTML() {
   const w = dashWeek();
   return '<div class="dm">' + rookieCardsHTML() +
-    '<div class="card dm-scene">' + roomBlockHTML(w.matches.length) + dashRailHTML() + "</div>" +
+    '<div class="card dm-scene">' + roomBlockHTML(w.matches.length, dashLadderLineHTML()) + dashRailHTML() + "</div>" +
     dashMatchRowsHTML(w) +
     dashTilesHTML() +
     dashMiniStatsHTML() +

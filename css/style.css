@@ -2064,6 +2064,7 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 
 /* ===== 34. 휴대폰 대시보드 바로가기 아이콘 · 빠른 선택 창 · 미니 스탯 (235, 시안 25 · js/dash_layout.js) ===== */
 .dm-rail { display: flex; flex-direction: column; gap: 8px; }
+.dm-ladder { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-size: 13px; } .dm-ladder svg { flex: none; } /* 236: 그림 아래 솔로 랭크 */
 .dm-ic { position: relative; width: 48px; height: 48px; padding: 0; border-radius: 14px; border: 1px solid rgba(var(--accent-rgb), 0.5); background: rgba(var(--accent-rgb), 0.07); display: grid; place-items: center; font-size: 22px; line-height: 1; }
 .dm-ic em { position: absolute; top: -6px; right: -6px; background: var(--bad); color: #fff; font-style: normal; font-size: 11px; font-weight: 800; line-height: 17px; padding: 0 5px; border-radius: 999px; }
 .dm-stats { display: block; width: 100%; text-align: left; white-space: normal; background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-s); padding: 8px 10px; color: var(--text); }

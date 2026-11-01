@@ -266,8 +266,8 @@ function roomFigureHTML(k) {
   return '<img class="px room-fig" src="' + url + '" width="' + (spr.rows[0].length + 2) * k + '" height="' + (spr.rows.length + 2) * k + '" alt="">';
 }
 
-// 대시보드에 넣는 덩어리: 그림 + 한 줄
-function roomBlockHTML(matchCount) {
+// 대시보드에 넣는 덩어리: 그림 + 한 줄 (capHTML을 주면 그림 아래 줄을 그것으로 — 236: 휴대폰은 솔로 랭크)
+function roomBlockHTML(matchCount, capHTML) {
   const key = roomSceneKey(matchCount);
   const url = roomStripURL(key, roomContext(key));
   if (!url) return "";
@@ -275,5 +275,5 @@ function roomBlockHTML(matchCount) {
   const caption = roomCaption(key, matchCount);
   return '<div class="room-block"><div class="room-pic" role="img" aria-label="' + escapeHTML(caption) + '" style="width:' + w + "px;height:" + h + "px;background-image:url(" + url + ");background-size:" + (w * R.frames) + "px " + h + "px;--room-end:-" + (w * R.frames) +
     "px;animation-duration:" + (R.frames * R.frameMs) + "ms;animation-timing-function:steps(" + R.frames + ')"></div>' +
-    '<div class="room-cap">' + escapeHTML(caption) + "</div></div>";
+    '<div class="room-cap">' + (capHTML || escapeHTML(caption)) + "</div></div>";
 }
