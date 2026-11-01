@@ -75,17 +75,51 @@ function dashAdviceMobileHTML() {
   return rows ? '<div class="card dm-advice">' + rows + "</div>" : "";
 }
 
+// ----- 휴대폰 대시보드 (235, 시안 25): 그림 오른쪽 바로가기 아이콘 · 미니 스탯 · 퀘스트 한 줄씩 -----
+// 아이콘: 📱 휴대폰 창(배지 = 답할 연락 + 안 읽은 언급) · 🏋️ 훈련 빠른 선택(안 골랐을 때만 !) · 📋 퀘스트 빠른 선택(배지 = 퀘스트 수) · 👤 선수 정보
+function dashRailHTML() {
+  const n = { phone: deckMessages().length + unreadCount("social"), train: state.plan ? 0 : "!", quest: (state.quests || []).length, me: 0 };
+  return '<div class="dm-rail">' + QUICK_ACTIONS.icons.map(function (x) {
+    return '<button class="dm-ic" ' + (x[0] === "me" ? 'data-go="career"' : 'data-quick="' + x[0] + '"') + ' title="' + x[2] + '" aria-label="' + x[2] + '">' + x[1] +
+      (n[x[0]] ? "<em>" + n[x[0]] + "</em>" : "") + "</button>";
+  }).join("") + "</div>";
+}
+// 미니 스탯: 12개 숫자, 이번 주 오른 스탯 ▲ (진행 전 스탯 = weekReport.growthBase), 포지션 가산점 ★. 누르면 [선수 정보 → 능력]
+function dashMiniStatsHTML() {
+  const base = state.weekReport && state.weekReport.growthBase && state.weekReport.growthBase.stats;
+  let ups = 0;
+  const cells = STATS.map(function (s) {
+    const v = state.stats[s.id], up = base && base[s.id] < v, star = isBonusStat(s.id, state.player.position);
+    if (up) ups++;
+    return '<span class="' + (star ? "star" : "") + '"><i class="one">' + (star ? "★" : "") + escapeHTML(s.name) + '</i><b class="' + (up ? "up" : "") + '">' + v + "</b></span>";
+  }).join("");
+  return '<button class="dm-stats" data-go="career" data-ptabgo="ability"><span class="h"><b>' + QUICK_ACTIONS.statsTitle + "</b><span>" + (ups ? "이번 주 ▲ " + ups + "개 · " : "") + QUICK_ACTIONS.statsMore + '</span></span><span class="g">' + cells + "</span></button>";
+}
+// 퀘스트 한 줄씩 (누르면 📋 빠른 선택 창)
+function dashQuestLinesHTML() {
+  const list = state.quests || [];
+  if (!list.length) return "";
+  const now = absWeek();
+  return '<button class="card dm-quests" data-quick="quest">' + list.map(function (q) {
+    const tpl = findQuest(q.id);
+    return '<span class="dm-ql"><b class="one">📋 ' + escapeHTML(tpl.title) + '</b><span class="nw">' + dashQuestProgress(q) + " · " + (q.deadline > now ? (q.deadline - now) + "주" : "이번 주") + "</span></span>";
+  }).join("") + "</button>";
+}
+function dashQuestProgress(q) {
+  const tpl = findQuest(q.id);
+  return tpl.kind === "ladderTop" ? myLadderRank() + "위→" + q.need + "위" : q.progress + "/" + q.need;
+}
+
 // ----- 휴대폰 대시보드 -----
 function dashMobileHTML() {
-  const w = dashWeek(), t = state.plan ? findTraining(state.plan) : null;
+  const w = dashWeek();
   return '<div class="dm">' + rookieCardsHTML() +
-    '<div class="card dm-scene">' + roomBlockHTML(w.matches.length) +
-      '<button class="small-btn" data-go="training">' + (t ? "🏋️ 훈련 바꾸기" : "🏋️ 훈련 고르기") + "</button></div>" +
-    dashPhoneHTML() +
+    '<div class="card dm-scene">' + roomBlockHTML(w.matches.length) + dashRailHTML() + "</div>" +
     dashMatchRowsHTML(w) +
     dashTilesHTML() +
+    dashMiniStatsHTML() +
     dashAdviceMobileHTML() +
-    questPanelHTML() +
+    dashQuestLinesHTML() +
     dashDetails("more", "card dm-more", '더 보기 <span class="muted small">지난주 결과 · 내 선수 · 챔피언 · 목표 · 조합 전략 · 최근 경기</span>',
       weekReportHTML() + heroCardHTML(true) + championCardHTML() + dashGoalsHTML() + '<div class="card">' + compPlanHTML() + "</div>" + recentMatchesHTML()) +
   "</div>";
@@ -124,10 +158,77 @@ function dashPcHTML() {
     statsCardHTML();
 }
 
+// ----- 빠른 선택 창 (235, 시안 25): 🏋️ 훈련 · 📋 퀘스트를 다른 화면으로 가지 않고 이름만 보고 고르기 (아래에서 올라옴) -----
+let quickKind = null;
+function quickTrainHTML() {
+  const quests = state.quests || [];
+  return TRAININGS.map(function (t) {
+    const on = state.plan === t.id;
+    const sub = t.id === "champ_focus" && on ? (focusIsAuto() ? "자동(" + focusChamp() + ")" : focusChamp()) : t.id === "champion" && on ? (state.practiceChamp || "자동") : "";
+    const hasQ = quests.some(function (q) { const qp = questPlan(q); return qp && qp.plan === t.id; });
+    return '<button class="qs-opt' + (on ? " on" : "") + '" data-qsplan="' + t.id + '"><span class="ico">' + (QUICK_ACTIONS.trainIcons[t.id] || "🏋️") + '</span><span class="nm">' + escapeHTML(t.name) +
+      (sub ? "<small>" + escapeHTML(sub) + "</small>" : "") + "</span>" + (hasQ ? '<span class="q">' + QUICK_ACTIONS.questTag + "</span>" : "") + "</button>";
+  }).join("") + '<button class="qs-more" data-qsgo="training">' + QUICK_ACTIONS.trainMore + "</button>";
+}
+function quickQuestHTML() {
+  const list = state.quests || [], now = absWeek();
+  if (!list.length) return '<p class="muted">' + QUICK_ACTIONS.questEmpty + "</p>";
+  return list.map(function (q) {
+    const tpl = findQuest(q.id), qp = questPlan(q), on = questPlanActive(q);
+    const pct = tpl.kind === "ladderTop" ? 0 : Math.round(q.progress / q.need * 100);
+    return '<button class="qs-opt' + (on ? " on" : "") + '"' + (qp ? ' data-qsquest="' + q.uid + '"' : "") + '><span class="ico">' + QUEST_GIVERS[tpl.giver].split(" ")[0] + '</span><span class="nm">' + escapeHTML(tpl.title) +
+      "<small>" + (qp ? "→ " + escapeHTML(findTraining(qp.plan).name) + " · " : "") + (q.deadline > now ? (q.deadline - now) + "주 남음" : "이번 주까지") + "</small></span>" +
+      '<span class="pr"><span class="bar"><span class="bar-fill gold" style="width:' + pct + '%"></span></span><span class="small">' + dashQuestProgress(q) + "</span></span></button>";
+  }).join("") + '<button class="qs-more" data-qsgo="training">' + QUICK_ACTIONS.questMore + "</button>";
+}
+function openQuick(kind) { quickKind = kind; renderQuick(true); }
+function closeQuick() {
+  quickKind = null;
+  const el = document.getElementById("qs-overlay");
+  if (el) { el.hidden = true; el.innerHTML = ""; }
+}
+function renderQuick(opening) {
+  let el = document.getElementById("qs-overlay");
+  if (!quickKind) { if (el) el.hidden = true; return; }
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "qs-overlay";
+    document.body.appendChild(el);
+    el.addEventListener("click", function (e) { if (e.target === el) closeQuick(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && quickKind) closeQuick(); });
+  }
+  const train = quickKind === "train";
+  el.innerHTML = '<div class="qs-sheet' + (opening ? " qs-anim" : "") + '" role="dialog" aria-label="' + (train ? QUICK_ACTIONS.trainTitle : QUICK_ACTIONS.questTitle) + '"><div class="qs-grip"></div>' +
+    '<div class="qs-hd"><b>' + (train ? QUICK_ACTIONS.trainTitle : QUICK_ACTIONS.questTitle) + "</b><span>" + (train ? QUICK_ACTIONS.trainSub : QUICK_ACTIONS.questSub) + "</span></div>" +
+    (train ? quickTrainHTML() : quickQuestHTML()) + "</div>";
+  el.hidden = false;
+  el.querySelectorAll("[data-qsplan]").forEach(function (b) {
+    b.onclick = function () { state.plan = b.getAttribute("data-qsplan"); state.notice = ""; closeQuick(); renderAll(); };
+  });
+  el.querySelectorAll("[data-qsquest]").forEach(function (b) { // js/quests.js bindQuestPlan과 같은 방법
+    b.onclick = function () {
+      const q = (state.quests || []).find(function (x) { return x.uid === Number(b.getAttribute("data-qsquest")); });
+      const qp = q && questPlan(q);
+      if (!qp) return;
+      state.plan = qp.plan;
+      if (qp.focusChamp !== undefined) state.focusChamp = qp.focusChamp;
+      if (qp.practiceChamp !== undefined) state.practiceChamp = qp.practiceChamp;
+      state.notice = ""; closeQuick(); renderAll();
+    };
+  });
+  el.querySelectorAll("[data-qsgo]").forEach(function (b) { b.onclick = function () { closeQuick(); selectMenu(b.getAttribute("data-qsgo")); }; });
+}
+
 // ----- 버튼 (js/main.js renderPage에서 부름) -----
 function bindDashLayout(page) {
   page.querySelectorAll("[data-openphone]").forEach(function (b) {
     b.onclick = function () { openPhone(b.getAttribute("data-openphone")); };
+  });
+  page.querySelectorAll("[data-quick]").forEach(function (b) {
+    b.onclick = function () { const k = b.getAttribute("data-quick"); if (k === "phone") openPhone(); else openQuick(k); };
+  });
+  page.querySelectorAll("[data-ptabgo]").forEach(function (b) { // 미니 스탯 → [선수 정보] 능력 탭 (data-go보다 먼저)
+    b.addEventListener("click", function () { playerTab = b.getAttribute("data-ptabgo"); });
   });
   page.querySelectorAll("details[data-dopen]").forEach(function (d) {
     d.addEventListener("toggle", function () { dashOpen[d.getAttribute("data-dopen")] = d.open; });

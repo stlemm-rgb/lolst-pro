@@ -128,6 +128,16 @@ const MSG_DECK = {
   legend: "⚠️ 낮은 확률로 나쁜 특성 · 💚 나쁜 특성 극복 · ✨ 좋은 특성 · 🎲 능력치로 성공·실패가 갈림", // 205: 카드 ⓘ 안내
 };
 
+// ----- 휴대폰 대시보드 바로가기 아이콘 · 빠른 선택 창 · 미니 스탯 (235, 시안 25 · js/dash_layout.js) -----
+const QUICK_ACTIONS = {
+  icons: [["phone", "📱", "휴대폰"], ["train", "🏋️", "훈련 고르기"], ["quest", "📋", "퀘스트"], ["me", "👤", "선수 정보"]],
+  trainIcons: { solo_rank: "🎮", scrim: "🤝", replay: "🎬", champion: "⚔️", champ_focus: "🎯", rest: "💤" },
+  trainTitle: "이번 주 훈련", trainSub: "누르면 바로 바뀌어요", trainMore: "자세한 효과 · 챔피언 고르기는 훈련 화면에서 자세히 ›",
+  questTitle: "퀘스트", questSub: "누르면 그 퀘스트 훈련으로", questMore: "보상 · 자세한 내용은 훈련 화면 퀘스트 칸에서 ›",
+  questEmpty: "지금 받은 퀘스트가 없어요.", questTag: "📋 퀘스트",
+  statsTitle: "📊 내 스탯", statsMore: "누르면 자세히 ›",
+};
+
 // ----- 휴대폰 앱 (231, 시안 24): 아래 앱 바 💬 메시지 · 📸 SNS · 🔔 알림, SNS 머리의 내 얼굴 = 내 프로필 (js/sns_page.js) -----
 // 하트 숫자는 화면용 (글 번호로 정해지는 고정 숫자, 저장 안 함, 게임 결과와 관계없음)
 const PHONE_APPS = {

@@ -29,6 +29,7 @@
  *  31. 이번 주 행동 그림 (js/room.js, 시안 24) — 맨 아래
  *  32. 휴대폰 앱: 앱 바 · SNS 피드 · 알림 · 내 프로필 (231, js/sns_page.js)
  *  33. 대시보드 PC · 휴대폰 따로 (232, js/dash_layout.js) · 긴 글자 한 줄 규칙
+ *  34. 휴대폰 대시보드 바로가기 아이콘 · 빠른 선택 창 · 미니 스탯 · 위쪽 막대 한 줄 (235)
  *  25. 시작 화면 · 선수 등록증 (212, 시안 18 나) · 캐릭터 생성 단계 (213, 시안 19 가) — js/creation.js
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
@@ -571,7 +572,7 @@ td.pf-cell { width: 44px; padding-top: 3px; padding-bottom: 3px; padding-right: 
 .topbar-actions { display: flex; gap: 8px; flex: none; }
 .topbar-actions .tip:hover::after { left: auto; right: 0; transform: none; bottom: auto; top: calc(100% + 8px); }
 /* 좁은 화면(휴대폰): 상단 버튼 묶음이 화면 밖으로 나가지 않게 줄바꿈 (167) */
-@media (max-width: 700px) { .topbar { padding: 10px 12px; gap: 8px 12px; } .topbar-actions { flex: 1 1 100%; flex-wrap: wrap; } }
+@media (max-width: 700px) { .topbar { padding: 10px 12px; gap: 8px 12px; } .topbar-actions { flex: 1 1 100%; flex-wrap: nowrap; min-width: 0; } .topbar-actions > * { flex: none; } .topbar-actions > .plan-badge { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; } } /* 235: 휴대폰에서 줄바꿈하지 않음 — 훈련 배지만 남은 폭, 넘치면 … */
 /* 좁은 화면: SNS 신문 기사 보관함은 겹친 카드 여백을 줄여 본문 폭 확보 (167) */
 @media (max-width: 700px) { details.card { padding: 10px 12px; } details.card details.card { padding: 8px 10px; margin: 6px 0; } details.card .msg-text { padding: 0 0 8px; } }
 
@@ -2030,8 +2031,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 /* 휴대폰 대시보드 */
 .dm { display: flex; flex-direction: column; gap: 10px; }
 .dm > .card { margin-bottom: 0; }
-.dm-scene { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 8px 10px; }
-.dm-scene .room-block { margin: 0; padding-bottom: 2px; }
+.dm-scene { display: grid; grid-template-columns: minmax(0, 1fr) 52px; gap: 6px; align-items: center; padding: 8px 8px 8px 4px; } /* 235: 그림 + 오른쪽 바로가기 아이콘 (css 34) */
+.dm-scene .room-block { margin: 0; padding-bottom: 2px; min-width: 0; }
 .dm .dm-match { margin: 0; }
 .dm-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .dm-tile { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-s); padding: 8px 10px; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
@@ -2060,3 +2061,32 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
   table.roster td .small, table.roster td small { white-space: normal; display: inline-block; min-width: 120px; }
   .tcompare td:first-child, .tcompare th:first-child { position: sticky; left: 0; z-index: 1; background: var(--panel); }
 }
+
+/* ===== 34. 휴대폰 대시보드 바로가기 아이콘 · 빠른 선택 창 · 미니 스탯 (235, 시안 25 · js/dash_layout.js) ===== */
+.dm-rail { display: flex; flex-direction: column; gap: 8px; }
+.dm-ic { position: relative; width: 48px; height: 48px; padding: 0; border-radius: 14px; border: 1px solid rgba(var(--accent-rgb), 0.5); background: rgba(var(--accent-rgb), 0.07); display: grid; place-items: center; font-size: 22px; line-height: 1; }
+.dm-ic em { position: absolute; top: -6px; right: -6px; background: var(--bad); color: #fff; font-style: normal; font-size: 11px; font-weight: 800; line-height: 17px; padding: 0 5px; border-radius: 999px; }
+.dm-stats { display: block; width: 100%; text-align: left; white-space: normal; background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-s); padding: 8px 10px; color: var(--text); }
+.dm-stats .h { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); margin-bottom: 5px; } .dm-stats .h b { color: var(--text); font-size: 13px; }
+.dm-stats .g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px 12px; font-size: 12px; }
+.dm-stats .g > span { display: flex; justify-content: space-between; gap: 3px; min-width: 0; }
+.dm-stats .g i { font-style: normal; color: var(--muted); }
+.dm-stats .g .star i { color: var(--gold); }
+.dm-stats .g b { font-weight: 800; white-space: nowrap; } .dm-stats .g b.up { color: var(--good); } .dm-stats .g b.up::after { content: "▲"; font-size: 9px; margin-left: 1px; }
+.dm-quests { display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: left; white-space: normal; color: var(--text); padding: 9px 10px; }
+.dm-ql { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 13px; min-width: 0; }
+.dm-ql > span { font-size: 12px; color: var(--muted); }
+.nw { white-space: nowrap; }
+/* 빠른 선택 창 (아래에서 올라옴) */
+#qs-overlay { position: fixed; inset: 0; z-index: 1045; background: rgba(0, 0, 0, 0.55); display: flex; align-items: flex-end; justify-content: center; }
+#qs-overlay[hidden] { display: none; }
+.qs-sheet { width: min(520px, 100%); max-height: 85vh; overflow-y: auto; background: linear-gradient(180deg, #1a1a2c, var(--panel)); border-top: 1px solid rgba(var(--accent-rgb), 0.4); border-radius: 20px 20px 0 0; padding: 8px 14px 18px; }
+.qs-sheet.qs-anim { animation: ws-up 0.22s ease-out; }
+.qs-grip { width: 44px; height: 5px; border-radius: 3px; background: #3a3a58; margin: 0 auto 10px; }
+.qs-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 4px; } .qs-hd b { font-size: 16px; } .qs-hd span { font-size: 12px; color: var(--muted); }
+.qs-opt { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; white-space: normal; border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-top: 8px; font-size: 15px; font-weight: 700; background: #0f0f1b; color: var(--text); }
+.qs-opt .ico { font-size: 20px; flex: none; } .qs-opt .nm { flex: 1; min-width: 0; } .qs-opt .nm small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+.qs-opt.on { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.12); } .qs-opt.on::after { content: "✓"; color: var(--accent); font-size: 18px; }
+.qs-opt .q { font-size: 12px; color: var(--gold); white-space: nowrap; }
+.qs-opt .pr { width: 80px; flex: none; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; } .qs-opt .pr .bar { width: 100%; }
+.qs-more { display: block; width: 100%; margin-top: 12px; background: none; border: 0; box-shadow: none; color: var(--muted); font-size: 12px; text-decoration: underline; }

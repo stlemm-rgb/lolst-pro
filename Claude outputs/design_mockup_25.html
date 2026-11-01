@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>시안 25 — 휴대폰 대시보드 바로가기 아이콘 · 훈련/퀘스트 빠른 선택 · 미니 스탯</title>
+<style>
+:root{--bg:#07070d;--panel:#11111c;--panel-2:#181828;--text:#f1f1f7;--muted:#8a8aa6;--border:#26263d;--accent:#00e0ff;--accent2:#b44dff;--gold:#ffd23f;--good:#2bff9e;--bad:#ff3d71;
+  --grad:linear-gradient(90deg,#b44dff,#00e0ff);--grad-btn:linear-gradient(90deg,#8a3dff,#0096c7)}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:var(--text);font-family:"Malgun Gothic","Apple SD Gothic Neo",sans-serif;padding:24px 16px}
+.wrap{max-width:1300px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}
+h2.t{font-size:19px;margin:40px 0 4px;padding-top:14px;border-top:1px solid #222238}
+.why{font-size:14px;color:#b9b9cc;margin:0 0 12px;line-height:1.65}.why b{color:var(--text)}
+.rec{display:inline-block;font-size:11px;background:var(--gold);color:#000;border-radius:6px;padding:1px 6px;font-weight:800;margin-left:6px;vertical-align:middle}
+.row{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.lbl{font-size:13px;color:var(--gold);margin:0 0 6px;font-weight:700}
+.small{font-size:12px}.muted{color:var(--muted)}.up{color:var(--good)}.down{color:var(--bad)}
+.one{display:block;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 휴대폰 틀 (390px 실제 크기) */
+.ph{width:390px;border:1px solid #33334d;border-radius:14px;overflow:hidden;background:var(--bg);position:relative}
+.ph.short{height:844px}
+/* 위쪽 막대 */
+.top{padding:10px 12px 8px;border-bottom:1px solid var(--border)}
+.top .d{font-size:13px;color:#c9c9dc;margin-bottom:6px}.top .d b{color:var(--text)}
+.tbtns{display:flex;gap:8px}
+.tb{border:1px solid rgba(0,224,255,.6);border-radius:12px;padding:7px 11px;font-size:14px;font-weight:700;background:#0d0d18;color:var(--text)}
+.tb.plan{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb.sta{flex:none;border-color:#3a3a58;font-weight:400}
+.tbtns.bad{flex-wrap:wrap}.tbtns.bad .tb.plan{flex:none;white-space:normal}
+.body{padding:10px 12px 14px;display:flex;flex-direction:column;gap:10px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px}
+/* 그림 + 아이콘 줄 */
+.scene{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:6px;align-items:center;padding:8px 8px 8px 6px;background:radial-gradient(ellipse at 45% 45%,rgba(180,77,255,.14),transparent 70%),var(--panel)}
+.room{width:288px;height:192px;max-width:100%;background:url(mock25_room_strip.png) no-repeat;background-size:5760px 192px;image-rendering:pixelated;animation:rp 4s steps(20) infinite;justify-self:center}
+@keyframes rp{to{background-position:-5760px 0}}
+.cap{grid-column:1/-1;text-align:center;font-size:13px;font-weight:700;margin-top:-2px}
+.rail{display:flex;flex-direction:column;gap:8px}
+.ic{position:relative;width:48px;height:48px;border-radius:14px;border:1px solid rgba(0,224,255,.5);background:rgba(0,224,255,.07);display:grid;place-items:center;font-size:22px;cursor:pointer}
+.ic.on{background:rgba(0,224,255,.25);box-shadow:0 0 12px rgba(0,224,255,.45)}
+.ic em{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font-style:normal;font-size:11px;font-weight:800;line-height:17px;padding:0 5px;border-radius:999px}
+/* 기존 조각 */
+.mt{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:8px 10px;font-size:13px}
+.tag{font-size:11px;color:var(--good);border:1px solid rgba(43,255,158,.5);border-radius:6px;padding:0 5px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tile{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 10px}
+.tile .k{font-size:11.5px;color:var(--muted)}.tile b{display:block;font-size:18px}.tile b small{font-size:12px;color:var(--muted);font-weight:400}
+.bar{height:5px;border-radius:3px;background:#26263d;overflow:hidden;margin-top:4px}.bar i{display:block;height:100%;background:var(--grad)}
+.ql{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:9px 10px;font-size:13px}
+.more{background:var(--panel-2);border:1px dashed #3a3a58;border-radius:12px;padding:9px 12px;font-size:13px}
+/* 미니 스탯 */
+.ms{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:8px 10px}
+.ms .h{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:5px}.ms .h b{color:var(--text);font-size:13px}
+.ms .g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px 12px;font-size:12px}
+.ms .g span{display:flex;justify-content:space-between;gap:3px;white-space:nowrap}
+.ms .g span i{font-style:normal;color:var(--muted)}
+.ms .g span b{font-weight:800}.ms .g span b.up::after{content:"▲";font-size:9px;margin-left:1px}
+.ms .g span.star i{color:var(--gold)}
+/* 아래 고정 */
+.fix{position:absolute;left:0;right:0;bottom:0;background:rgba(7,7,13,.97);border-top:1px solid var(--border)}
+.go{display:flex;gap:8px;padding:8px 12px}.go .p{flex:1;background:var(--grad-btn);border-radius:12px;padding:9px 12px;font-weight:800}.go .p small{display:block;font-weight:400;font-size:11px;opacity:.85}
+.go .r{border:1px solid rgba(0,224,255,.5);border-radius:12px;padding:0 14px;display:grid;place-items:center}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;font-size:11px;color:var(--muted);padding:5px 0 8px}.tabs b{display:block;font-size:18px}.tabs .on{color:var(--accent)}
+/* 빠른 선택 시트 */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#1a1a2c,#11111c);border-top:1px solid rgba(0,224,255,.4);border-radius:20px 20px 0 0;padding:8px 14px 18px}
+.grip{width:44px;height:5px;border-radius:3px;background:#3a3a58;margin:0 auto 10px}
+.sheet h3{margin:0 0 4px;font-size:16px;display:flex;justify-content:space-between;align-items:baseline}
+.sheet h3 small{font-size:12px;color:var(--muted);font-weight:400}
+.opt{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:8px;font-size:15px;font-weight:700;background:#0f0f1b}
+.opt .ico{font-size:20px}.opt .nm{flex:1;min-width:0}.opt .nm small{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+.opt.on{border-color:var(--accent);background:rgba(0,224,255,.12)}.opt.on::after{content:"✓";color:var(--accent);font-size:18px}
+.opt .q{font-size:12px;color:var(--gold);font-weight:700;white-space:nowrap}
+.opt .pr{width:80px;flex:none}
+.sheet .hint{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}
+/* 미니 스탯 자리 비교 */
+.place{width:300px}
+.place .ph{width:300px;transform-origin:top left}
+.mini{font-size:11px;color:var(--muted);padding:8px;border:1px dashed #33334d;border-radius:10px;text-align:center}
+.cmp{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}.cmp td,.cmp th{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}.cmp th{color:var(--muted);font-weight:400}
+</style></head>
+<body><div class="wrap">
+<h1>📱 시안 25 — 휴대폰 대시보드 바로가기 아이콘 · 훈련/퀘스트 빠른 선택 · 미니 스탯</h1>
+<p class="why">실제 휴대폰 크기(390px). 방 그림은 게임에서 뽑은 진짜 그림이에요. <b>그림 오른쪽 아이콘 4개가 늘 보이고</b>(밀 필요 없음), 🏋️ · 📋는 다른 화면으로 가지 않고 <b>아래에서 올라오는 선택 창</b>으로 바로 골라요.</p>
+
+<h2 class="t">① 새 휴대폰 대시보드</h2>
+<div class="row">
+  <div>
+    <div class="lbl">새 모습 (새 연락 3개 · 퀘스트 2개)</div>
+    <div class="ph short">
+      <div class="top"><div class="d"><b>2012</b>년 <b>26</b>주차 · MSI</div>
+        <div class="tbtns"><span class="tb plan">🏋️ 챔피언 집중 연습 · 자동(블라디미르)</span><span class="tb sta">💪 체력 <b>75</b>/80</span></div></div>
+      <div class="body">
+        <div class="card scene">
+          <div class="room"></div>
+          <div class="rail">
+            <div class="ic" title="휴대폰">📱<em>3</em></div>
+            <div class="ic" title="훈련 고르기">🏋️</div>
+            <div class="ic" title="퀘스트">📋<em>2</em></div>
+            <div class="ic" title="선수 정보">👤</div>
+          </div>
+          <div class="cap">26주차 · 🏋️ 챔피언 집중 연습</div>
+        </div>
+        <div class="mt"><span class="tag">경기</span><span class="one"><b>GS CYCLONE vs KD SOLIS</b><br><span class="small muted">2부 후반기 3라운드 · 전력 52.0 · 맞수 Fang</span></span><span class="small" style="color:var(--accent)">준비 ▾</span></div>
+        <div class="tiles">
+          <div class="tile"><span class="k">체력</span><b>75<small>/80</small></b><div class="bar"><i style="width:94%"></i></div></div>
+          <div class="tile"><span class="k">컨디션</span><b>40<small>/40</small></b><div class="bar"><i style="width:40%"></i></div></div>
+          <div class="tile"><span class="k">종합 능력</span><b>37.4 <small class="up">▲0.4</small></b><span class="small muted">리그 미드 31위</span></div>
+          <div class="tile"><span class="k">돈</span><b>117만 원</b><span class="small muted">연봉 1,300만</span></div>
+        </div>
+        <div class="ms" id="msA"></div>
+        <div class="ql">📋 <b>라인전 감각 끌어올리기</b> <span class="muted small">0/3 · 3주</span><br>📋 <b>주력 챔피언 만들기</b> <span class="muted small">0/5 · 7주</span></div>
+        <div class="more">더 보기 ▾ <span class="muted small">지난주 결과 · 내 선수 · 챔피언 · 목표 · 조합 전략 · 최근 경기</span></div>
+      </div>
+      <div class="fix"><div class="go"><div class="p">▶ 다음 주<small>26주차 진행</small></div><div class="r">💤 휴식</div></div>
+        <div class="tabs"><div class="on"><b>🏠</b>대시보드</div><div><b>🏋️</b>훈련</div><div><b>📱</b>휴대폰</div><div><b>☰</b>전체</div></div></div>
+    </div>
+  </div>
+  <div style="flex:1;min-width:300px">
+    <div class="lbl">바뀌는 점</div>
+    <table class="cmp">
+      <tr><th>지금</th><th>새 모습</th></tr>
+      <tr><td>그림 아래 [🏋️ 훈련 바꾸기] 버튼</td><td>없앰 → 오른쪽 <b>🏋️ 아이콘</b>. 그림 아래는 이름 한 줄만</td></tr>
+      <tr><td>"📱 새 연락 없음 · 프로피드에서…" 칸</td><td><b>없앰</b> → <b>📱 아이콘</b>에 빨간 숫자(배지)만. 새 연락이 있을 때도 배너 대신 배지</td></tr>
+      <tr><td>퀘스트 큰 카드 2개 (버튼·보상 설명 포함)</td><td>이름 · 진행 · 남은 주 <b>한 줄씩</b>. 고르기는 <b>📋 아이콘</b>에서</td></tr>
+      <tr><td>위쪽 훈련 버튼이 길면 두 줄로 꺾임</td><td><b>한 줄 고정</b>, 긴 이름은 끝을 … 로 (아래 ③)</td></tr>
+      <tr><td>스탯은 [선수 정보]에만</td><td><b>미니 스탯</b> 12개 숫자 + 이번 주 오른 것 ▲ (자리는 ④에서 고르기)</td></tr>
+    </table>
+    <p class="why" style="margin-top:12px">🏋️ 훈련 아이콘은 늘 골라져 있어서 배지 없음 (훈련을 안 골랐을 때만 빨간 <b>!</b>).<br>📱 = 휴대폰 창, 👤 = 선수 정보 화면으로 바로.<br>길이: 지금보다 약 <b>110px 짧아지고</b> 미니 스탯이 약 80px 늘어서 전체는 조금 짧아져요.</p>
+  </div>
+</div>
+
+<h2 class="t">② 🏋️ · 📋 를 누르면 — 아래에서 올라오는 빠른 선택 창</h2>
+<p class="why">다른 화면으로 가지 않아요. <b>이름만</b> 보이고, 누르면 바로 골라지고 창이 닫혀요. 설명이 필요하면 맨 아래 [훈련 화면에서 자세히].</p>
+<div class="row">
+  <div>
+    <div class="lbl">🏋️ 훈련 고르기</div>
+    <div class="ph short">
+      <div class="top"><div class="d"><b>2012</b>년 <b>26</b>주차 · MSI</div><div class="tbtns"><span class="tb plan">🏋️ 챔피언 집중 연습 · 자동(블라디미르)</span><span class="tb sta">💪 체력 <b>75</b>/80</span></div></div>
+      <div class="body"><div class="card scene"><div class="room"></div><div class="rail"><div class="ic">📱<em>3</em></div><div class="ic on">🏋️</div><div class="ic">📋<em>2</em></div><div class="ic">👤</div></div></div></div>
+      <div class="dim"></div>
+      <div class="sheet"><div class="grip"></div>
+        <h3>이번 주 훈련 <small>누르면 바로 바뀌어요</small></h3>
+        <div class="opt"><span class="ico">🎮</span><span class="nm">솔로 랭크</span><span class="q">📋 퀘스트</span></div>
+        <div class="opt"><span class="ico">🤝</span><span class="nm">팀 스크림</span></div>
+        <div class="opt"><span class="ico">🎬</span><span class="nm">리플레이 분석</span></div>
+        <div class="opt"><span class="ico">⚔️</span><span class="nm">챔피언 연습</span></div>
+        <div class="opt on"><span class="ico">🎯</span><span class="nm">챔피언 집중 연습<small>자동(블라디미르)</small></span><span class="q">📋 퀘스트</span></div>
+        <div class="opt"><span class="ico">💤</span><span class="nm">휴식</span></div>
+        <div class="hint">자세한 효과 · 챔피언 고르기는 <u>훈련 화면에서 자세히 ›</u></div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="lbl">📋 퀘스트</div>
+    <div class="ph short">
+      <div class="top"><div class="d"><b>2012</b>년 <b>26</b>주차 · MSI</div><div class="tbtns"><span class="tb plan">🏋️ 챔피언 집중 연습 · 자동(블라디미르)</span><span class="tb sta">💪 체력 <b>75</b>/80</span></div></div>
+      <div class="body"><div class="card scene"><div class="room"></div><div class="rail"><div class="ic">📱<em>3</em></div><div class="ic">🏋️</div><div class="ic on">📋<em>2</em></div><div class="ic">👤</div></div></div></div>
+      <div class="dim"></div>
+      <div class="sheet"><div class="grip"></div>
+        <h3>퀘스트 <small>누르면 그 퀘스트 훈련으로</small></h3>
+        <div class="opt"><span class="ico">🧑‍🏫</span><span class="nm">라인전 감각 끌어올리기<small>→ 솔로 랭크 · 3주 남음</small></span><span class="pr"><span class="bar"><i style="width:0%"></i></span><span class="small muted">0/3</span></span></div>
+        <div class="opt on"><span class="ico">🧑‍🏫</span><span class="nm">주력 챔피언 만들기<small>→ 챔피언 집중 연습 · 7주 남음</small></span><span class="pr"><span class="bar"><i style="width:0%"></i></span><span class="small muted">0/5</span></span></div>
+        <div class="hint">✓ = 지금 고른 훈련이 이 퀘스트에 맞아요 · 보상은 <u>훈련 화면 퀘스트 칸에서 ›</u></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="t">③ 위쪽 막대 줄바꿈 고치기 (위쪽 구성은 그대로)</h2>
+<p class="why">원인: 훈련 이름이 길면("챔피언 집중 연습 · 자동(블라디미르)") 체력 버튼이 다음 줄로 밀려요. → <b>체력 버튼은 고정, 훈련 버튼만 남은 폭을 쓰고 넘치면 …</b></p>
+<div class="row">
+  <div><div class="lbl">지금 (두 줄)</div><div class="ph"><div class="top"><div class="d"><b>2012</b>년 <b>26</b>주차 · MSI</div><div class="tbtns bad"><span class="tb plan">🏋️ 챔피언 집중 연습 · 자동(블라디미르)</span><span class="tb sta">💪 체력 <b>75</b>/80</span></div></div></div></div>
+  <div><div class="lbl">고친 뒤 (한 줄)</div><div class="ph"><div class="top"><div class="d"><b>2012</b>년 <b>26</b>주차 · MSI</div><div class="tbtns"><span class="tb plan">🏋️ 챔피언 집중 연습 · 자동(블라디미르)</span><span class="tb sta">💪 체력 <b>75</b>/80</span></div></div></div></div>
+</div>
+
+<h2 class="t">④ 미니 스탯 — 어디에 넣을까요? <span class="muted small">(고르실 것)</span></h2>
+<p class="why">스탯 12개를 숫자만 4줄(3칸씩)로. <b>이번 주에 오른 스탯은 초록 ▲</b>, 포지션 가산점 스탯은 금색 ★. 누르면 [선수 정보 → 스탯]으로.</p>
+<div class="row">
+  <div class="place"><div class="lbl">가. 상태 4칸 바로 아래 <span class="rec">추천</span></div>
+    <div class="mini">그림 + 아이콘</div><div class="mini" style="margin-top:4px">경기 한 줄</div><div class="mini" style="margin-top:4px">상태 4칸</div>
+    <div class="ms" id="msB" style="margin-top:4px"></div><div class="mini" style="margin-top:4px">퀘스트 한 줄씩 · 더 보기</div>
+    <p class="why small">체력·컨디션·종합 능력 바로 밑이라 '내 상태'가 한 덩어리. 성장이 바로 보임.</p></div>
+  <div class="place"><div class="lbl">나. 그림 카드 안, 그림 바로 아래</div>
+    <div class="card" style="padding:6px"><div class="mini">그림 + 아이콘</div><div class="ms" id="msC" style="margin-top:4px;border:0;padding:4px 2px"></div></div>
+    <div class="mini" style="margin-top:4px">경기 한 줄 · 상태 4칸 · 퀘스트 · 더 보기</div>
+    <p class="why small">훈련 그림과 오른 스탯이 붙어 있어서 '이번 주 훈련 → 성장'이 이어져 보임. 그림 카드가 길어짐.</p></div>
+  <div class="place"><div class="lbl">다. 맨 아래, [더 보기] 바로 위</div>
+    <div class="mini">그림 + 아이콘 · 경기 · 상태 4칸 · 퀘스트</div>
+    <div class="ms" id="msD" style="margin-top:4px"></div><div class="mini" style="margin-top:4px">더 보기</div>
+    <p class="why small">위쪽 화면이 가장 짧음. 대신 스크롤해야 보임.</p></div>
+</div>
+<p class="why" style="margin-top:26px">고르실 것: <b>미니 스탯 자리(가/나/다)</b> · 그 밖에 바꿀 점 (예: "👤 대신 🛒 상점", "아이콘을 그림 왼쪽에").</p>
+</div>
+<script>
+var ST=[["라인전",44,1,1],["한타",59,0,0],["운영",54,2,0],["시야",52,0,0],["오더",61,0,0],["챔피언 폭",54,0,1],["멘탈",45,0,0],["반응속도",50,1,1],["정확도",35,0,0],["거리 조절",50,1,0],["적응력",40,0,0],["집중력",52,0,0]];
+var html='<div class="h"><b>📊 내 스탯</b><span>이번 주 ▲ 4개 · 누르면 자세히 ›</span></div><div class="g">'+ST.map(function(s){return'<span class="'+(s[3]?"star":"")+'"><i>'+(s[3]?"★":"")+s[0]+'</i><b class="'+(s[2]?"up":"")+'">'+s[1]+"</b></span>";}).join("")+"</div>";
+["msA","msB","msC","msD"].forEach(function(id){document.getElementById(id).innerHTML=html;});
+</script>
+</body></html>
