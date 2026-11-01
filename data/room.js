@@ -137,6 +137,17 @@ const ROOM_SCENES = {
   ] },
 };
 
+// ----- 😂 해프닝 소품 (234, data/mishaps.js prop): 지난주 해프닝에 소품이 있으면 방 바닥 빈자리에 놓임 (경기 부스 장면은 안 나옴) -----
+// boxes: [x, y, z, 가로, 세로, 높이, 색, 면 색] (놓는 자리 기준) · sprite: 글자 지도 (alt = 절반 시간 동안 바뀌는 모양) · steam: 김 모락모락
+const ROOM_PROPS = {
+  cat: { at: [1, 1, 0], colors: { O: "#e8913a", D: "#b8682a", K: "#2a1a10", W: "#fff3df" },
+    sprite: ["O.O....", "OOO....", "KOK...D", "OWO...D", "OOOOOOD", ".O..O.."],
+    alt:    ["O.O....", "OOO....", "KOK....", "OWO....", "OOOOOOD", ".O..O.D"] },
+  pizza: { boxes: [[0, 0, 0, 6, 6, 1, "#d9b77a", { top: "#ecd09a" }], [1, 1, 1, 4, 4, 1, "#e8a33a", { top: "#f2c14e" }], [2, 2, 2, 1, 1, 1, "#c8402e"], [3.5, 1.5, 2, 1, 1, 1, "#c8402e"]] },
+  ramen: { boxes: [[0, 0, 0, 3, 3, 2, "linen1", { top: "#e39a3e" }]], steam: true },
+};
+const ROOM_PROP_SPOT = { train: [22, 27], restDorm: [14, 27], restRoom: [17, 30], restApt: [22, 31] };
+
 // ----- 그림 아래 한 줄 -----
 const ROOM_TEXT = {
   match: "⚔ 경기 {n} 준비",

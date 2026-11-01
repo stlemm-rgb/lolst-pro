@@ -1974,7 +1974,7 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .sp-act { display: flex; gap: 14px; align-items: center; font-size: 12.5px; color: var(--muted); }
 .sp-heart { background: none; border: 0; box-shadow: none; padding: 2px 0; color: var(--muted); display: inline-flex; gap: 4px; align-items: center; font-size: 12.5px; }
 .sp-heart b { font-size: 16px; line-height: 1; transition: transform 0.15s; } .sp-heart.on { color: var(--bad); } .sp-heart.on b { transform: scale(1.2); }
-.sp-tag { color: var(--gold); }
+.sp-tag { color: var(--gold); } .sp-tag.mh { color: #ffb3d1; }
 .sp-more { margin: 10px 12px 14px; }
 .sp-noti { display: flex; gap: 10px; width: 100%; text-align: left; white-space: normal; align-items: flex-start; background: none; border: 0; border-bottom: 1px solid #1c1c2e; border-radius: 0; box-shadow: none; padding: 10px 14px; font-size: 13px; line-height: 1.45; color: var(--text); }
 .sp-noti > span:last-child { flex: 1; min-width: 0; overflow-wrap: anywhere; }

@@ -163,12 +163,22 @@ function roomDrawFrame(scene, cx) {
       roomPx(rs, x - 1, y, g); roomPx(rs, x, y, g); roomPx(rs, x + 1, y, g); roomPx(rs, x, y + 1, g);
     }
   });
+  // 😂 지난주 해프닝 소품 (234, data/room.js ROOM_PROPS) — 바닥 빈자리에 맨 나중에
+  const pr = cx.prop && ROOM_PROPS[cx.prop], spot = cx.spot;
+  if (pr && spot) {
+    (pr.boxes || []).forEach(function (b) { box(spot[0] + b[0], spot[1] + b[1], b[2], b[3], b[4], b[5], b[6], b[7]); });
+    if (pr.sprite) sprite({ split: 0, rows: pr.alt && cx.f % 10 >= 5 ? pr.alt : pr.sprite }, spot[0] + pr.at[0], spot[1] + pr.at[1], pr.at[2], pr.colors, true);
+    if (pr.steam) {
+      const q = P(spot[0] + 1.5, spot[1] + 1.5, 3), st = col("linen0");
+      [0, 1, 2].forEach(function (i) { const t = (cx.f + i * 3) % 9; if (t < 6) roomPx(rs, q[0] + (i - 1) * 2 + (t % 2), q[1] - 1 - t, st); });
+    }
+  }
   return rs;
 }
 
 // ----- 20장 띠 → 그림 주소 (캐시) -----
 function roomStripURL(key, cx) {
-  const ck = JSON.stringify([key, cx.empty, cx.me, cx.team, cx.mates, cx.trophies]);
+  const ck = JSON.stringify([key, cx.empty, cx.me, cx.team, cx.mates, cx.trophies, cx.prop || ""]);
   if (ROOM_CACHE[ck] !== undefined) return ROOM_CACHE[ck];
   let url = "";
   try {
@@ -217,6 +227,9 @@ function roomContext(key) {
     cx.mates = ids.slice(0, 4).map(function (id) { return roomPersonColors(lookOf(id), uni); });
   }
   if (key.indexOf("rest") === 0) cx.trophies = roomTrophyList();
+  // 😂 지난주 해프닝에 소품이 있으면 (js/sns_page.js mishapAt, 게임을 한 주라도 진행한 뒤에만)
+  const mh = key !== "match" && socialPosts().length ? mishapAt(absWeek() - 1) : null;
+  if (mh && mh.prop && ROOM_PROP_SPOT[key]) { cx.prop = mh.prop; cx.spot = ROOM_PROP_SPOT[key]; }
   return cx;
 }
 function roomCaption(key, matchCount) {

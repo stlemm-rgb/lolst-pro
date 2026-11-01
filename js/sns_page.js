@@ -15,7 +15,7 @@ pages.sns = function () {
       (n ? ' <span class="badge inline">' + n + "</span>" : "") + "</button>";
   }).join("");
 
-  const list = state.inbox.filter(function (m) { return m.tab === snsTab; });
+  const list = snsTab === "social" ? socialFeedPosts() : state.inbox.filter(function (m) { return m.tab === snsTab; }); // 234: 선수 SNS 탭에는 😂 해프닝도
   let body;
   if (!list.length && snsTab !== "news") {
     body = '<p class="muted">아직 메시지가 없어요. 주를 진행하면 연락과 소식이 와요.</p>';
@@ -437,7 +437,7 @@ function socialPostHTML(m, byName) {
       (pro ? ' <i class="sp-vf" title="프로 선수">✔</i>' : "") + "<small>" + (pro ? escapeHTML(proTeamText(pro)) + " · " : "") + socialAgo(m) + "</small></span></div>" +
     '<div class="sp-body">' + body + "</div>" +
     '<div class="sp-act"><button class="sp-heart' + (liked ? " on" : "") + '" data-like="' + m.id + '" data-n="' + base + '"><b>' + (liked ? "♥" : "♡") + "</b><span>" + socialCountText(base + (liked ? 1 : 0)) + "</span></button>" +
-      (m.mention ? '<span class="sp-tag">' + PHONE_APPS.mentionTag + "</span>" : "") + "</div></div>";
+      (m.mention ? '<span class="sp-tag">' + PHONE_APPS.mentionTag + "</span>" : "") + (m.mishap ? '<span class="sp-tag mh">' + MISHAP_RULES.tag + "</span>" : "") + "</div></div>";
 }
 // 화면에 나온 언급은 읽음 (그린 뒤에 표시 → 이번 화면에는 '새' 표시가 남음)
 function socialMarkShown(list) {
@@ -450,7 +450,7 @@ function socialFeedHeadHTML() {
     '<button class="sp-meb" data-phoneapp="me" title="' + PHONE_APPS.meTitle + '">' + roomFigureHTML(2) + "</button>";
 }
 function socialFeedHTML() {
-  const all = socialPosts();
+  const all = socialFeedPosts(); // 234: 😂 해프닝 섞어서
   if (!all.length) return '<div class="ph-empty"><b>📸</b>' + PHONE_APPS.feedEmpty + "</div>";
   const byName = socialByName();
   const shown = all.slice(0, PHONE_APPS.feedPage * phoneFeedPages);
@@ -528,7 +528,7 @@ function bindPhoneApps(root) {
   root.querySelectorAll("[data-story],[data-notipost]").forEach(function (b) {
     b.onclick = function () {
       const id = Number(b.getAttribute("data-story") || b.getAttribute("data-notipost"));
-      const i = socialPosts().findIndex(function (m) { return m.id === id; });
+      const i = socialFeedPosts().findIndex(function (m) { return m.id === id; });
       phoneApp = "sns";
       phoneFeedPages = Math.max(phoneFeedPages, Math.ceil((i + 1) / PHONE_APPS.feedPage));
       phoneFocusId = id;
@@ -541,4 +541,45 @@ function bindPhoneApps(root) {
     if (el || phoneApp !== "sns") phoneFocusId = null;
   }
   if (phoneMarked) { phoneMarked = false; renderMenu(); renderMobileNav(); }
+}
+
+// ===== 😂 해프닝 (234, data/mishaps.js): 게임 결과·저장과 관계없는 웃긴 사건사고 =====
+// 4주 묶음마다 한 번. 어느 주·어느 해프닝인지 = 내 이름 + 묶음 번호로 계산한 고정 번호 (Math.random 안 씀, 저장 안 함 → 다시 열어도 같음)
+// 해프닝 목록은 묶음 순서대로 한 바퀴 돌아요 (60개면 60묶음 = 약 4.6년 동안 겹치지 않음). 방 그림 소품은 js/room.js
+function mishapGcd(a, b) { return b ? mishapGcd(b, a % b) : a; }
+function mishapAt(abs) {
+  const R = MISHAP_RULES, n = MISHAPS.length;
+  if (!n || !state.player) return null;
+  const slot = Math.floor(abs / R.every);
+  if (abs % R.every !== pfSeed(state.player.name + "|" + slot) % R.every) return null;
+  const step = [7, 11, 13, 17, 19, 23, 29, 31].find(function (k) { return mishapGcd(k, n) === 1; }) || 1;
+  return MISHAPS[(slot * step + pfSeed(state.player.name)) % n];
+}
+// 그 주의 해프닝 글 (글쓴이도 고정 번호로: pro 글이 있으면 절반쯤 다른 팀 프로 선수, 아니면 팬)
+function mishapPostOf(abs) {
+  const m = mishapAt(abs);
+  if (!m) return null;
+  const W = CREATION.weeksPerSeason, year = Math.floor((abs - 1) / W), h = pfSeed("mishap|" + state.player.name + "|" + abs);
+  let title = "", proId = null, text = m.fan;
+  if (m.pro && h % 100 < MISHAP_RULES.proRate * 100) {
+    const mine = myTeam() ? myTeam().id : null;
+    const ids = Object.keys(state.league.players).filter(function (id) { const t = state.league.players[id].teamId; return t && t !== mine; }).sort();
+    if (ids.length) { proId = ids[h % ids.length]; title = "@" + state.league.players[proId].name; text = m.pro; }
+  }
+  if (!proId) title = "@" + SOCIAL_FAN_NAMES[h % SOCIAL_FAN_NAMES.length] + (1000 + h % 9000);
+  return { id: -abs, tab: "social", year: year, week: abs - year * W, title: title, text: fillText(text, {}), proId: proId, mention: false, read: true, mishap: m.id };
+}
+// SNS 피드 = 저장된 글 + 그 사이 주의 해프닝 (가장 오래된 저장 글 주부터 지난주까지, 같은 주면 해프닝이 위)
+function socialFeedPosts() {
+  const posts = socialPosts();
+  if (!posts.length) return posts;
+  const now = absWeek(), oldest = socialAbsWeek(posts[posts.length - 1]), extra = [];
+  for (let a = now - 1; a >= oldest; a--) { const p = mishapPostOf(a); if (p) extra.push(p); }
+  const out = [];
+  let i = 0;
+  posts.forEach(function (m) {
+    while (i < extra.length && socialAbsWeek(extra[i]) >= socialAbsWeek(m)) out.push(extra[i++]);
+    out.push(m);
+  });
+  return out.concat(extra.slice(i));
 }

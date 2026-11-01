@@ -497,6 +497,20 @@ function postSocial() {
   Array.prototype.splice.apply(cats, [at, 0].concat(early));
 
   let posted = 0, mentions = 0;
+  // 최근 글 피하기 (234): 최근 SOCIAL_RULES.recentAvoid개 글과 같은 문장이 되는 글은 빼고 고름 (다 빠지면 원래 목록).
+  //   고르는 난수는 그대로 pick 1번 → 게임 결과(난수 순서)는 바뀌지 않고 글 내용만 다양해짐
+  const recent = {};
+  state.inbox.filter(function (m) { return m.tab === "social"; }).slice(0, R.recentAvoid).forEach(function (m) { recent[m.text] = true; });
+  const freshOf = function (list, c) {
+    const f = list.filter(function (t) { return !recent[fillText(t, c)]; });
+    return f.length ? f : list;
+  };
+  const post = function (who, raw, c) {
+    const mention = raw.indexOf("{name}") !== -1, text = fillText(raw, c);
+    postMessage("social", who.title, text, { read: !mention, mention: mention, proId: who.proId });
+    recent[text] = true;
+    return mention;
+  };
   // 리그 우승·월드 우승 주에는 우승 글을 2~3개 꼭 올림 (한 주 최대 개수와 따로)
   if (w.champion && R.bigTitleWords && R.bigTitleWords.some(function (t) { return w.champion.indexOf(t) !== -1; })) {
     const count = randInt(R.bigTitlePosts[0], R.bigTitlePosts[1]);
@@ -505,11 +519,10 @@ function postSocial() {
       const who = author("champion");
       const list = listOf(who.posts, "champion").filter(function (t) { return used.indexOf(t) === -1; });
       if (!list.length) break;
-      const raw = pick(list);
+      const c = Object.assign({}, ctx, { proteam: who.proteam });
+      const raw = pick(freshOf(list, c));
       used.push(raw);
-      const mention = raw.indexOf("{name}") !== -1;
-      postMessage("social", who.title, fillText(raw, Object.assign({}, ctx, { proteam: who.proteam })), { read: !mention, mention: mention, proId: who.proId });
-      if (mention) mentions++;
+      if (post(who, raw, c)) mentions++;
     }
     cats.splice(cats.indexOf("champion"), 1); // 아래에서 또 올리지 않게
   }
@@ -523,12 +536,10 @@ function postSocial() {
     // 인기도가 낮으면(또는 2부에서 프로 선수 글이면) 내 이름이 들어간 글을 덜 고름
     if (!mentionAllowed(cat, who)) list = list.filter(function (t) { return t.indexOf("{name}") === -1; });
     if (!list.length) return;
-    const raw = pick(list);
-    const mention = raw.indexOf("{name}") !== -1;
     const c = Object.assign({}, ctx, { proteam: who.proteam }, cat === "patch" ? { champ: mySMeta() } : {});
-    postMessage("social", who.title, fillText(raw, c), { read: !mention, mention: mention, proId: who.proId });
+    const raw = pick(freshOf(list, c));
     posted++;
-    if (mention) mentions++;
+    if (post(who, raw, c)) mentions++;
   });
   return mentions;
 }
