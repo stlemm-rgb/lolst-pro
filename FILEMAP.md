@@ -47,7 +47,7 @@
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
 | `js/matchsim.js` | 43 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 11 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 55 | 게임 상태 |  |
+| `js/main.js` | 54 | 게임 상태 |  |
 | `js/training_page.js` | 20 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 19 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 36 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
@@ -57,7 +57,7 @@
 | `js/market_pages.js` | 26 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
 | `js/links.js` | 4 | 선수·구단 이름 링크: 어느 화면이든 이름을 누르면 [선수 검색] / [구단 탐색]의 그 선수·구단으로 |  |
 | `js/news.js` | 22 | 뉴스: 소식·신문 팝업·월즈 특집·역사 뉴스 | news.js, news_popup.js, worlds_news.js, historical_news.js |
-| `js/dashboard.js` | 38 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
+| `js/dashboard.js` | 36 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
 | `js/records.js` | 10 | 기록: 세트 평점, POG, 시즌 기록, 시상, 커리어 시즌 기록 |  |
 | `js/quests.js` | 18 | 퀘스트: 코치·감독 과제 |  |
 | `js/shop.js` | 24 | 상점·거주지 | shop.js, housing.js |
@@ -89,6 +89,7 @@
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
 | `js/dash_plus.js` | 12 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
 | `js/room.js` | 14 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |
+| `js/dash_layout.js` | 10 | 대시보드 PC · 휴대폰 따로 (232, 시안 24 ② · Codex 토론) |  |
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |
 | `js/start.js` | 0 | 게임 시작 |  |

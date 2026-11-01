@@ -127,20 +127,8 @@ function changesText(changes) {
 const pages = {};
 
 pages.dashboard = function () {
-  // 225 (시안 22 가 '이번 주 중심'): 얇은 일정 띠 → [이번 주 할 일(크게) | 내 선수] → [지난주 결과 · 퀘스트 · 챔피언] → 조합 전략·솔로 랭크·최근 경기 → 스탯
-  // 조각들은 js/dashboard.js (weekCommandHTML·questPanelHTML), js/dash_plus.js
-  return (
-    '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/history_pages.js)
-    dashGoalsHTML() + // 다음 일정 · 계약 만료 · 다음 패치 (196, 225에서 얇은 띠로)
-    rookieCardsHTML() + // 새 시즌 대형 신인 카드 (디자인 D4, js/ui.js)
-    '<div class="d2-top"><div class="d2-week">' + weekCommandHTML() + '</div><div class="d2-me">' + heroCardHTML(true) + "</div></div>" +
-    '<div class="d2-row">' + weekReportHTML() + questPanelHTML() + championCardHTML() + "</div>" +
-    '<div class="dash">' +
-      '<div class="dash-main">' + '<div class="card">' + compPlanHTML() + "</div>" + recentMatchesHTML() + "</div>" +
-      '<div class="dash-side">' + leagueLadderHTML() + "</div>" +
-    "</div>" +
-    statsCardHTML()
-  );
+  // 232 (시안 24 ②): PC와 휴대폰(760px 이하)을 따로 — js/dash_layout.js
+  return dashboardHTML();
 };
 
 // 최근 기록 (훈련·경기·소식 30개) — [선수 정보] ⏳ 나이·은퇴 탭
@@ -603,6 +591,7 @@ function renderPage() {
 
   // 퀘스트 [이번 주 훈련으로 선택] (js/quests.js)
   bindQuestPlan(page);
+  bindDashLayout(page); // 대시보드 📱 알림 배너 · 펼친 칸 기억 (js/dash_layout.js)
 
   // 다른 메뉴로 가는 버튼 (예: 대시보드 [훈련 바꾸기])
   page.querySelectorAll("[data-dashgo]").forEach(function (btn) { // 225: 대시보드 이번 주 칸의 [휴식 주] [다음 주로 진행]

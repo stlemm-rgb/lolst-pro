@@ -484,42 +484,7 @@ function resetLadder(finalBoard) {
 }
 
 // ----- 왼쪽: 이번 주 (훈련 · 경기 · 조합 전략 · 퀘스트) -----
-// 225 (시안 22 가): 대시보드 맨 위 왼쪽 큰 칸 = 이번 주 할 일 (경기 · 고른 훈련 · 체력·컨디션 · 추천 · [휴식 주] [다음 주로 진행])
-function weekCommandHTML() {
-  const mine = myTeam();
-  const week = state.week;
-  // 이미 잡힌 경기 + 토너먼트는 이번 주에 정해질 대진을 미리 계산 (js/matchsim.js userWeekMatches)
-  const wk = userWeekMatches(week);
-  const matches = wk.matches.concat(wk.preview);
-  let matchHTML;
-  if (matches.length) {
-    matchHTML = matches.map(function (m) {
-      const opp = m.a === mine.id ? m.b : m.a;
-      return matchCardHTML(m, mine, opp, bigGameOf(mine.id, opp));
-    }).join("") +
-    (wk.sameWeekFinal ? '<div class="rep-row muted small">4강을 이기면 같은 주에 LCK 컵 결승 (' + LEAGUE.bestOf.cup_final + "판 " + Math.ceil(LEAGUE.bestOf.cup_final / 2) + "선승)도 치러요.</div>" : "");
-  } else {
-    const later = nextUserMatch();
-    const ko = ["cup_po", "first_stand", "road_to_msi", "msi", "playin", "playoffs", "promotion", "worlds"].some(function (id) { return scheduleOfWeek(week).id.indexOf(id) === 0; });
-    matchHTML = '<div class="wc-nomatch"><b>이번 주 경기 없음</b><span class="muted small">' + (ko ? "우리 팀은 이번 라운드에 나가지 않아요" : "훈련에 집중하는 주예요") +
-      (later ? " · 다음 경기 " + later.week + "주차 " + escapeHTML(later.label) + " vs " + escapeHTML(teamName(later.a === mine.id ? later.b : later.a)) : "") + "</span></div>";
-  }
-  const t = state.plan ? findTraining(state.plan) : null;
-  const low = state.stamina < TIRED_LIMIT, warn = state.stamina < TEAM_MATCH.lowStaminaLimit;
-  const plan = '<div class="wc-plan"><div class="wc-box"><span class="muted small">이번 주 훈련</span><b>' + (t ? escapeHTML(t.name) : '<span class="down">아직 안 골랐어요</span>') + "</b>" +
-      '<button class="small-btn" data-go="training">훈련 바꾸기</button></div>' +
-    '<div class="wc-box">' + miniBarHTML("체력", state.stamina, state.staminaMax, low ? "neg" : warn ? "warn" : "") + conditionBarHTML() + "</div></div>";
-  return (
-    '<div class="card upcoming wc"><div class="wc-hd"><b>▶ ' + state.year + "년 " + week + '주차 · 이번 주</b><span class="muted small">' +
-      (matches.length ? "경기 " + matches.length + "개 · 우리 팀 전력 " + teamStrength(mine.id).toFixed(1) : escapeHTML(scheduleOfWeek(week).name)) + "</span></div>" +
-      roomBlockHTML(matches.length) + // 이번 주 행동 그림 (js/room.js, 시안 24)
-      matchHTML + plan +
-      adviceRowsHTML(true) + // 💡 이번 주 추천 (js/guide.js) — 퀘스트는 옆 퀘스트 칸
-      ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고
-      '<div class="wc-go"><button data-dashgo="rest">휴식 주 💤</button><button class="primary" data-dashgo="next">다음 주로 진행 ▶</button></div>' +
-    "</div>"
-  );
-}
+// 232: 이번 주 칸(경기 · 고른 훈련 · 체력·컨디션 · 추천 · [휴식 주] [다음 주로 진행])은 js/dash_layout.js (PC · 휴대폰 따로)
 
 // 225: 퀘스트 칸 (카드를 누르면 그 퀘스트에 맞는 훈련이 바로 골라짐, js/quests.js)
 function questPanelHTML() {

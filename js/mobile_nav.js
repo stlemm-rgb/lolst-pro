@@ -1,7 +1,7 @@
 // ===== 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) =====
 // 휴대폰 폭(760px 이하)에서만 보임 (css 23부분). PC는 왼쪽 메뉴·위쪽 버튼 그대로.
 //   진행 막대: [▶ 다음 주 · n주차 진행 · 경기 k · 시즌 n/52] + [💤 휴식]  → advanceWeek (js/main.js)
-//   아래 탭: 대시보드 · 훈련 · SNS · ☰ 전체(아래에서 올라오는 메뉴판)
+//   아래 탭: 대시보드 · 훈련 · 📱 휴대폰(휴대폰 창) · ☰ 전체(아래에서 올라오는 메뉴판)
 // 화면만 바꿈: 게임 결과 그대로 (Math.random 안 씀). 값·문구는 data/ui.js MOBILE_NAV
 let mnavSheetOpen = false;
 
@@ -24,7 +24,7 @@ function renderMobileNav() {
   const cur = currentMenuParent();
   const tabs = MOBILE_NAV.tabs.map(function (t) {
     const on = t.id === "more" ? mnavSheetOpen : !mnavSheetOpen && cur === t.id;
-    const badge = t.id === "sns" ? unreadCount("inbox") + unreadCount("social") : 0;
+    const badge = t.id === "phone" ? deckMessages().length + unreadCount("social") : 0; // 232: 답할 연락 + 안 읽은 언급
     return '<button class="mnav-tab' + (on ? " on" : "") + '" data-mnav="' + t.id + '">' + (badge ? '<span class="mnav-badge">' + badge + "</span>" : "") +
       '<span class="mnav-ic">' + t.icon + "</span>" + t.name + "</button>";
   }).join("");
@@ -60,6 +60,7 @@ function onMobileNavClick(e) {
   if (!b) return;
   const id = b.getAttribute("data-mnav");
   if (id === "go" || id === "rest") { mnavSheetOpen = false; advanceWeek(id === "rest"); return; }
+  if (id === "phone") { mnavSheetOpen = false; renderMobileNav(); openPhone(); return; } // 232: 휴대폰 창 (js/sns_page.js)
   if (id === "more") { mnavSheetOpen = !mnavSheetOpen; renderMobileNav(); return; }
   if (id === "close") { mnavSheetOpen = false; renderMobileNav(); return; }
   mnavSheetOpen = false;

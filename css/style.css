@@ -28,6 +28,7 @@
  *  26. 코치 안내·그때그때 팁 (215, js/guide.js renderCoach) · 게임 방법 접기
  *  31. 이번 주 행동 그림 (js/room.js, 시안 24) — 맨 아래
  *  32. 휴대폰 앱: 앱 바 · SNS 피드 · 알림 · 내 프로필 (231, js/sns_page.js)
+ *  33. 대시보드 PC · 휴대폰 따로 (232, js/dash_layout.js) · 긴 글자 한 줄 규칙
  *  25. 시작 화면 · 선수 등록증 (212, 시안 18 나) · 캐릭터 생성 단계 (213, 시안 19 가) — js/creation.js
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
@@ -1987,3 +1988,71 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .sp-sub { padding: 8px 14px; font-size: 12.5px; color: #c9c9dc; border-bottom: 1px solid #1c1c2e; }
 .room-fig { image-rendering: pixelated; image-rendering: crisp-edges; }
 .sp-wide { max-width: 680px; border: 1px solid #1c1c2e; border-radius: var(--r-s); overflow: hidden; }
+
+/* ===== 33. 대시보드 PC · 휴대폰 따로 (232, js/dash_layout.js): 📱 알림 배너 · 경기 한 줄 · 상태 4칸 · 더 보기 · 한 줄 글자 ===== */
+.one { display: block; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* PC 이번 주 칸: 그림 왼쪽 + 할 일 오른쪽 */
+.dp-wk { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; margin: 4px 0 8px; }
+.dp-wk .room-block { margin: 0; }
+.dp-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.dp-side .wc-box { margin: 0; }
+.d2-top > .dp-stack { display: flex; flex-direction: column; gap: 16px; }
+.d2-top > .dp-stack > .card { height: auto; }
+.d2-top > .dp-stack > .hero { flex: 1; }
+.dp-phone { display: flex; flex-direction: column; gap: 8px; }
+.dp-ph-hd { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.dp-ph-hd b { font-size: 15px; }
+/* 📱 새 연락 알림 (잠금화면 알림 느낌) */
+.dphone { display: flex; gap: 10px; align-items: center; width: 100%; text-align: left; white-space: normal; padding: 10px 12px; border-radius: 16px; color: var(--text);
+  border: 1px solid rgba(var(--accent2-rgb), 0.55); background: linear-gradient(120deg, rgba(var(--accent2-rgb), 0.18), rgba(var(--accent-rgb), 0.08)); animation: dphIn 0.5s ease-out; }
+.dphone.sns { border-color: rgba(var(--gold-rgb), 0.5); background: linear-gradient(120deg, rgba(var(--gold-rgb), 0.12), transparent); }
+.dphone.quiet { border-color: var(--border); background: var(--panel-2); animation: none; }
+@keyframes dphIn { 0% { transform: translateY(-6px); } 60% { transform: translateY(1px); } 100% { transform: none; } }
+.dph-ic { position: relative; flex: none; width: 40px; height: 40px; border-radius: 12px; background: #0b0b14; display: grid; place-items: center; font-size: 20px; overflow: visible; }
+.dph-ic img { width: 38px; height: 38px; border-radius: 12px; }
+.dph-ic em { position: absolute; top: -5px; right: -5px; background: var(--bad); color: #fff; font-style: normal; font-size: 11px; font-weight: 800; line-height: 16px; padding: 0 5px; border-radius: 999px; }
+.dph-tx { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dph-h { font-size: 11px; color: var(--muted); }
+.dph-tx b { font-size: 14px; }
+.dph-tx > span.one { font-size: 12.5px; color: #c9c9dc; }
+.dph-n { font-size: 11px; color: var(--accent); margin-top: 2px; }
+.dph-go { flex: none; font-size: 12px; font-weight: 800; color: var(--accent); }
+/* 이번 주 경기 한 줄 (누르면 원래 경기 카드) */
+.dm-match { border: 1px solid var(--border); border-radius: var(--r-s); background: var(--panel-2); margin: 6px 0; }
+.dm-match > summary { list-style: none; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 10px; cursor: pointer; }
+.dm-match > summary::-webkit-details-marker { display: none; }
+.dm-mt { min-width: 0; display: flex; flex-direction: column; }
+.dm-mt b, .dm-mt small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dm-mt small { font-size: 11.5px; color: var(--muted); }
+.dm-arr { font-size: 12px; color: var(--accent); white-space: nowrap; }
+.dm-match[open] .dm-arr { color: var(--muted); }
+.dm-match > .mcard { margin: 0 8px 8px; }
+/* 휴대폰 대시보드 */
+.dm { display: flex; flex-direction: column; gap: 10px; }
+.dm > .card { margin-bottom: 0; }
+.dm-scene { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 8px 10px; }
+.dm-scene .room-block { margin: 0; padding-bottom: 2px; }
+.dm .dm-match { margin: 0; }
+.dm-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.dm-tile { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-s); padding: 8px 10px; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.dm-tile .k { font-size: 11.5px; color: var(--muted); }
+.dm-tile > b { font-size: 18px; font-weight: 900; white-space: nowrap; }
+.dm-tile > b small { font-size: 12px; color: var(--muted); font-weight: 400; }
+.dm-advice { padding: 8px 10px; }
+.dm-advice .rep-row.advice { flex-wrap: wrap; margin: 0; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.dm-advice .rep-row.advice:last-child { border-bottom: 0; }
+.dm .d2-quest { margin: 0; }
+.dm-more > summary { cursor: pointer; font-weight: 700; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.dm-more[open] > summary { margin-bottom: 10px; }
+.dm-more > .card { margin: 8px 0 0; }
+/* 긴 글자 꺾임 (232): 숫자·단위·짧은 이름은 한 줄 */
+.dg-num, .qcard-p .small, .qcard-left, .mini-value, .stat-value, .dm-tile > b { white-space: nowrap; }
+@media (max-width: 760px) {
+  .mside b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mside > div { min-width: 0; }
+  .hero-name { overflow-wrap: anywhere; }
+  .stat.mastery-row { grid-template-columns: minmax(0, 1fr) 40px; row-gap: 3px; }
+  .stat.mastery-row .stat-label { grid-column: 1 / -1; }
+  .sns-tabs { flex-wrap: nowrap; overflow-x: auto; }
+  .sns-tabs button { white-space: nowrap; flex: none; }
+}

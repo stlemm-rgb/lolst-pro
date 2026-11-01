@@ -296,10 +296,11 @@ function goalLineHTML() {
 }
 
 // 💡 이번 주 추천 줄들 ('이번 주' 카드 맨 위, js/dashboard.js). 훈련 미선택도 여기서 알려 줌 (훈련 줄은 없앰)
-function adviceRowsHTML(noQuest) {
+function adviceRowsHTML(noQuest, noPhone) { // noPhone (232): 📱 알림 배너가 있는 대시보드에서는 "답하지 않은 연락" 줄 빼기
   const advice = weekAdvice(noQuest);
   adviceActions = advice.map(function (a) { return a.act; });
   return advice.map(function (a, i) {
+    if (noPhone && a.act && a.act.phone) return "";
     return '<div class="rep-row advice"><span class="rep-tag tip-tag">💡</span><span>' + escapeHTML(a.text) + '</span><button class="small-btn" data-advice="' + i + '">' + escapeHTML(a.label) + "</button></div>";
   }).join("");
 }

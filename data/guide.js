@@ -13,7 +13,7 @@ const COACH_TOUR = [
     text: "훈련마다 오르는 스탯이 달라요. 마음에 드는 훈련의 버튼을 눌러요. 지금 훈련이 좋으면 그 버튼을 눌러도 돼요." },
   { target: ["#next-week", ".mnav-go"], wait: "advanced",
     text: "좋아요. 이제 여기를 눌러 한 주를 넘겨요. 훈련을 하고, 경기가 있는 주면 경기도 치러요. PC에서는 Space 키로도 돼요." },
-  { target: [".card.report", ".hero"], wait: "moved", btn: "알겠어요", menu: "dashboard",
+  { target: [".card.report", ".hero"], targetM: [".dm-more"], wait: "moved", btn: "알겠어요", menu: "dashboard",
     text: "지난주에 무슨 일이 있었는지는 여기서 봐요. 🎯 목표를 따라가면 돼요. 앞으로 처음 생기는 일은 그때그때 알려 줄게요." },
 ];
 

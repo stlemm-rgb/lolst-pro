@@ -97,7 +97,7 @@ const MOBILE_NAV = {
   tabs: [
     { id: "dashboard", icon: "🏠", name: "대시보드" },
     { id: "training",  icon: "🏋️", name: "훈련" },
-    { id: "sns",       icon: "📱", name: "SNS" },
+    { id: "phone",     icon: "📱", name: "휴대폰" }, // 232: 누르면 휴대폰 창 (SNS 메뉴는 ☰ 전체에)
     { id: "more",      icon: "☰",  name: "전체" },   // 나머지 메뉴판
   ],
   sheetIcons: { dashboard: "🏠", team: "🛡️" },      // 메뉴판 아이콘 (나머지는 PAGE_HEADS 아이콘)
