@@ -339,9 +339,10 @@ function bindPhoneDeck(root) {
 // ----- 휴대폰 창 (221): 대시보드 등에서 [📱 휴대폰 열기] → SNS 메뉴로 가지 않고 그 자리에서 답하기 -----
 // 화면을 다시 그릴 때마다(renderPage 끝) 열려 있으면 다시 그림 → 답하면 결과·다음 연락이 바로 보임
 let phoneOpen = false;
-function openPhone(app) { // app: "msg"(기본) · "sns" · "noti" · "me" (231)
+function openPhone(app) { // app: "msg"(기본) · "sns" · "noti"(= SNS의 📣 나를 언급) · "me" (231, 237)
   phoneOpen = true; deckOpenId = null; deckLastId = null;
-  phoneApp = typeof app === "string" && app ? app : "msg"; phoneFeedPages = 1;
+  phoneApp = typeof app === "string" && app ? app : "msg"; phoneFeedPages = 1; phoneSnsFilter = "all";
+  if (phoneApp === "noti") { phoneApp = "sns"; phoneSnsFilter = "mention"; }
   renderPhoneOverlay(true);
 }
 function closePhone() {
@@ -368,12 +369,14 @@ function renderPhoneOverlay(opening) { // opening: 처음 열 때만 떠오르�
   linkifyNames(el);
 }
 
-// ===== 휴대폰 앱 (231, 시안 24): 아래 앱 바 💬 메시지 · 📸 SNS · 🔔 알림, SNS 머리의 내 캐릭터 = 내 프로필 =====
+// ===== 휴대폰 앱 (231, 시안 24): 아래 앱 바 💬 메시지 · 📸 SNS, SNS 머리의 내 캐릭터 = 내 프로필 =====
+// 237: 🔔 알림 앱을 SNS 안 [전체 | 📣 나를 언급] 탭으로 합침
 // 글·숫자는 data/ui.js PHONE_APPS. 화면만 바꿈 (선수 SNS 글은 js/events.js가 만드는 그대로)
-// 읽음: SNS·프로필에서 화면에 나온 '나를 언급한 글'만 읽음 (예전엔 SNS 탭을 열면 전부), 🔔 알림을 열면 언급 전부 읽음
+// 읽음: SNS·프로필에서 화면에 나온 '나를 언급한 글'만 읽음 (예전엔 SNS 탭을 열면 전부), 📣 나를 언급 탭을 열면 언급 전부 읽음
 // 하트: 글 번호로 정해지는 화면용 숫자, 누르면 +1 (저장 안 함, 게임 결과와 관계없음)
 let phoneApp = "msg";
 let phoneFeedPages = 1;     // SNS 피드: 몇 쪽까지 보여 줄지 (한 쪽 = PHONE_APPS.feedPage개)
+let phoneSnsFilter = "all"; // SNS 위쪽 탭: "all" 전체 · "mention" 📣 나를 언급 (237)
 let phoneFocusId = null;    // 얼굴 줄·알림을 누르면 그 글로 스크롤
 let phoneMarked = false;    // 이번에 그리면서 읽음 처리한 글이 있음 → 메뉴 배지 새로
 const phoneFresh = {};      // 이번에 열어서 읽은 언급 (휴대폰을 닫을 때까지 '새 알림'으로 표시)
@@ -381,7 +384,6 @@ const phoneLikes = {};      // 내가 누른 하트 (저장 안 함)
 
 function phoneScreenHTML(deck) {
   if (phoneApp === "sns") return phoneAppShellHTML(socialFeedHeadHTML(), socialFeedHTML());
-  if (phoneApp === "noti") return phoneAppShellHTML('<span class="ph-who"><b>🔔 ' + PHONE_APPS.notiTitle + "</b></span>", socialNotiHTML());
   if (phoneApp === "me") return phoneAppShellHTML('<button class="ph-back" data-phoneapp="sns" title="' + PHONE_APPS.snsName + '">‹</button><span class="ph-who"><b>' + PHONE_APPS.meTitle + "</b></span>", socialMeHTML());
   return msgDeckHTML(deck);
 }
@@ -392,7 +394,7 @@ function phoneAppShellHTML(head, body) {
     '<div class="ph-feed">' + body + "</div>" + phoneDockHTML() + '<div class="ph-home"></div></div></div>';
 }
 function phoneDockHTML() {
-  const n = { msg: deckMessages().length, sns: 0, noti: unreadCount("social") };
+  const n = { msg: deckMessages().length, sns: unreadCount("social") }; // 237: SNS 배지 = 안 읽은 언급
   return '<div class="ph-dock">' + PHONE_APPS.dock.map(function (d) {
     const on = phoneApp === d[0] || (d[0] === "sns" && phoneApp === "me");
     return '<button class="' + (on ? "on" : "") + '" data-phoneapp="' + d[0] + '"><b>' + d[1] + "</b>" + d[2] + (n[d[0]] ? "<em>" + n[d[0]] + "</em>" : "") + "</button>";
@@ -450,8 +452,18 @@ function socialFeedHeadHTML() {
     '<button class="sp-meb" data-phoneapp="me" title="' + PHONE_APPS.meTitle + '">' + roomFigureHTML(2) + "</button>";
 }
 function socialFeedHTML() {
+  const mentions = socialPosts().filter(function (m) { return m.mention; });
+  const unread = mentions.filter(function (m) { return !m.read; }).length;
+  const tabs = '<div class="sp-filter"><button class="' + (phoneSnsFilter === "all" ? "on" : "") + '" data-snsfilter="all">' + PHONE_APPS.filterAll + "</button>" +
+    '<button class="' + (phoneSnsFilter === "mention" ? "on" : "") + '" data-snsfilter="mention">' + PHONE_APPS.filterMention + (unread ? " <em>" + unread + "</em>" : "") + "</button></div>";
+  if (phoneSnsFilter === "mention") { // 237: 예전 🔔 알림 앱 — 나를 언급한 글 전부 (열면 읽음)
+    const byName = socialByName();
+    const html = tabs + (mentions.length ? mentions.map(function (m) { return socialPostHTML(m, byName); }).join("") : '<div class="ph-empty"><b>📣</b>' + PHONE_APPS.notiEmpty + "</div>");
+    socialMarkShown(mentions);
+    return html;
+  }
   const all = socialFeedPosts(); // 234: 😂 해프닝 섞어서
-  if (!all.length) return '<div class="ph-empty"><b>📸</b>' + PHONE_APPS.feedEmpty + "</div>";
+  if (!all.length) return tabs + '<div class="ph-empty"><b>📸</b>' + PHONE_APPS.feedEmpty + "</div>";
   const byName = socialByName();
   const shown = all.slice(0, PHONE_APPS.feedPage * phoneFeedPages);
   // 맨 위 얼굴 줄: 최근 1주 안에 글을 올린 프로 선수 (누르면 그 글로)
@@ -465,25 +477,9 @@ function socialFeedHTML() {
     const id = m.proId || byName[m.title];
     return '<button class="sp-story" data-story="' + m.id + '"><span class="sp-ring">' + portraitImg(id, { face: true, size: 36 }) + "</span><span>" + escapeHTML(state.league.players[id].name) + "</span></button>";
   }).join("") + "</div>" : "";
-  const html = storyHTML + shown.map(function (m) { return socialPostHTML(m, byName); }).join("") +
+  const html = tabs + storyHTML + shown.map(function (m) { return socialPostHTML(m, byName); }).join("") +
     (all.length > shown.length ? '<button class="sp-more" data-feedmore="1">' + PHONE_APPS.more + " (" + (all.length - shown.length) + ")</button>" : "");
   socialMarkShown(shown);
-  return html;
-}
-
-// ----- 🔔 알림: 나를 언급한 글 -----
-function socialNotiHTML() {
-  const list = socialPosts().filter(function (m) { return m.mention; });
-  if (!list.length) return '<div class="ph-empty"><b>🔔</b>' + PHONE_APPS.notiEmpty + "</div>";
-  const byName = socialByName();
-  const html = list.map(function (m) {
-    const fresh = !!phoneFresh[m.id] || !m.read;
-    const text = String(m.text || ""), cut = text.length > 46 ? text.slice(0, 46) + "…" : text;
-    return '<button class="sp-noti' + (fresh ? " new" : "") + '" data-notipost="' + m.id + '"><span class="sp-face">' + socialFaceHTML(m, byName) + "</span>" +
-      "<span><b>" + escapeHTML(String(m.title || "").replace(/^@/, "")) + "</b>" + PHONE_APPS.notiText + ": “" + escapeHTML(cut) + "”" +
-      "<small>" + socialAgo(m) + (fresh ? " · <em>" + PHONE_APPS.notiNew + "</em>" : "") + "</small></span></button>";
-  }).join("");
-  socialMarkShown(list);
   return html;
 }
 
@@ -513,7 +509,10 @@ function phoneRerender(keepScroll) {
 }
 function bindPhoneApps(root) {
   root.querySelectorAll("[data-phoneapp]").forEach(function (b) {
-    b.onclick = function () { phoneApp = b.getAttribute("data-phoneapp"); phoneFeedPages = 1; deckOpenId = null; deckLastId = null; phoneRerender(false); };
+    b.onclick = function () { phoneApp = b.getAttribute("data-phoneapp"); phoneFeedPages = 1; phoneSnsFilter = "all"; deckOpenId = null; deckLastId = null; phoneRerender(false); };
+  });
+  root.querySelectorAll("[data-snsfilter]").forEach(function (b) { // 237: SNS 위쪽 탭
+    b.onclick = function () { phoneSnsFilter = b.getAttribute("data-snsfilter"); phoneFeedPages = 1; phoneRerender(false); };
   });
   root.querySelectorAll("[data-like]").forEach(function (b) { // 다시 그리지 않고 그 자리에서 (스크롤이 튀지 않게)
     b.onclick = function () {
@@ -525,11 +524,11 @@ function bindPhoneApps(root) {
     };
   });
   root.querySelectorAll("[data-feedmore]").forEach(function (b) { b.onclick = function () { phoneFeedPages++; phoneRerender(true); }; });
-  root.querySelectorAll("[data-story],[data-notipost]").forEach(function (b) {
+  root.querySelectorAll("[data-story]").forEach(function (b) {
     b.onclick = function () {
-      const id = Number(b.getAttribute("data-story") || b.getAttribute("data-notipost"));
+      const id = Number(b.getAttribute("data-story"));
       const i = socialFeedPosts().findIndex(function (m) { return m.id === id; });
-      phoneApp = "sns";
+      phoneApp = "sns"; phoneSnsFilter = "all";
       phoneFeedPages = Math.max(phoneFeedPages, Math.ceil((i + 1) / PHONE_APPS.feedPage));
       phoneFocusId = id;
       phoneRerender(false);

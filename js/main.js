@@ -539,7 +539,7 @@ function renderPage() {
     html = subTabsHTML(parent) + html.replace(/^\s*<h1>[\s\S]*?<\/h1>/, "");
   }
   html = applyPageHead(html, parent ? parent.id : state.currentMenu); // 맨 위 제목 → 페이지 머리 카드 (디자인 D5, js/ui.js)
-  if (state.notice) {
+  if (state.notice && !(dashIsMobile() && state.notice.indexOf('data-gosns="social"') !== -1)) { // 237: 휴대폰은 📱 아이콘 배지로 알려서 '언급한 글' 알림 줄은 안 보여 줌
     html = '<div class="notice">' + state.notice + "</div>" + html;
   }
   page.innerHTML = html;

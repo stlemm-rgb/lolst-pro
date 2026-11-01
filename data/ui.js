@@ -141,17 +141,16 @@ const QUICK_ACTIONS = {
 // ----- 휴대폰 앱 (231, 시안 24): 아래 앱 바 💬 메시지 · 📸 SNS · 🔔 알림, SNS 머리의 내 얼굴 = 내 프로필 (js/sns_page.js) -----
 // 하트 숫자는 화면용 (글 번호로 정해지는 고정 숫자, 저장 안 함, 게임 결과와 관계없음)
 const PHONE_APPS = {
-  dock: [["msg", "💬", "메시지"], ["sns", "📸", "SNS"], ["noti", "🔔", "알림"]],
+  dock: [["msg", "💬", "메시지"], ["sns", "📸", "SNS"]], // 237: 🔔 알림은 SNS 안 📣 나를 언급 탭으로
   snsName: "프로피드",            // 게임 속 SNS 앱 이름 (실제 서비스 흉내 안 냄)
   feedPage: 12,                   // 한 번에 보여 주는 글 수 (아래 [이전 글 더 보기])
   storyMax: 8,                    // 맨 위 얼굴 줄: 최근 1주 안에 글을 올린 프로 선수
   hearts: { pro: [20, 480], fan: [0, 50] }, // [최소, 폭]
   feedEmpty: "아직 올라온 글이 없어요. 주를 진행하면 선수와 팬들이 글을 올려요.",
   more: "이전 글 더 보기",
-  notiTitle: "알림",
+  filterAll: "전체", filterMention: "📣 나를 언급",
   notiText: "님이 나를 언급했어요",
   notiEmpty: "아직 나를 언급한 글이 없어요.",
-  notiNew: "새 알림",
   meTitle: "내 프로필",
   meMentions: "📣 나를 언급한 글",
   followers: "팔로워",
