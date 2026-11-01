@@ -232,6 +232,27 @@ function roomCaption(key, matchCount) {
   return state.week + "주차 · " + text;
 }
 
+// 방 그림의 작은 내 캐릭터만 (휴대폰 SNS 프로필, js/sns_page.js) — k배로 키운 <img>
+function roomFigureHTML(k) {
+  const team = myTeam(), uni = uniformOfTeam(team ? team.id : null);
+  const colors = roomPersonColors(lookOf(USER_ID), uni), spr = ROOM_SPRITES.front;
+  const ck = JSON.stringify(["figure", colors]);
+  let url = ROOM_CACHE[ck];
+  if (url === undefined) {
+    url = "";
+    try {
+      const w = spr.rows[0].length + 2, h = spr.rows.length + 2, rs = roomCanvas(w, h);
+      spr.rows.forEach(function (row, r) { row.split("").forEach(function (c, i) { if (c !== ".") roomPx(rs, i + 1, r + 1, colors[c]); }); });
+      const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+      cv.getContext("2d").putImageData(new ImageData(rs.d, w, h), 0, 0);
+      url = cv.toDataURL();
+    } catch (e) { url = ""; }
+    ROOM_CACHE[ck] = url; roomCacheSize++;
+  }
+  if (!url) return "";
+  return '<img class="px room-fig" src="' + url + '" width="' + (spr.rows[0].length + 2) * k + '" height="' + (spr.rows.length + 2) * k + '" alt="">';
+}
+
 // 대시보드에 넣는 덩어리: 그림 + 한 줄
 function roomBlockHTML(matchCount) {
   const key = roomSceneKey(matchCount);
