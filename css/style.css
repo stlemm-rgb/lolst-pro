@@ -2055,4 +2055,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
   .stat.mastery-row .stat-label { grid-column: 1 / -1; }
   .sns-tabs { flex-wrap: nowrap; overflow-x: auto; }
   .sns-tabs button { white-space: nowrap; flex: none; }
+  /* 표: 머리·칸은 한 줄, 넓어지면 옆으로 밀어서 보기 (설명 글은 줄바꿈 허용) */
+  table.roster th, table.roster td, .tcompare th { white-space: nowrap; }
+  table.roster td .small, table.roster td small { white-space: normal; display: inline-block; min-width: 120px; }
+  .tcompare td:first-child, .tcompare th:first-child { position: sticky; left: 0; z-index: 1; background: var(--panel); }
 }
