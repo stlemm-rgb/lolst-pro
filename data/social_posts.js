@@ -275,6 +275,20 @@ const SOCIAL_POSTS = {
     "변한 메타로 대진 보는 재미가 새로 생김",
     "이번엔 교전 길이가 어떻게 달라질지 기대됨",
   ],
+  injured: [ // 238 부상 중
+    "{name} 부상이라니... 무리하지 말고 푹 쉬고 와라",
+    "{team} 선수 관리 좀 제대로 해라 {name} 혹사시키더니 결국 다쳤네",
+    "{name} 없는 {team} 경기 보니까 빈자리 확 느껴진다",
+    "손목 부상은 진짜 조심해야 됨 {name} 완전히 나을 때까지 복귀 서두르지 마",
+    "{name} 재활 영상 올라온 거 봤는데 표정 밝아서 다행",
+    "부상 기사 보고 놀람 {name} 빨리 나아라",
+    "솔랭 매일 몇십 판씩 돌리더니 결국 몸이 버티질 못했네",
+    "{name} 복귀전 무조건 본방 사수한다",
+    "후보 선수도 잘하긴 하는데 그 자리는 결국 {name} 자리지",
+    "프로들 손목 관리 진짜 중요하다 {name} 이번 기회에 푹 쉬길",
+    "{team} 팬들 {name} 응원 메시지 모으는 중이래 나도 써야지",
+    "다치면서까지 연습하는 건 아니다 {name} 몸이 먼저다",
+  ],
   benched: [
     "{name} 왜 2군 감? 납득이 안 되네",
     "{name} 빨리 1군 복귀하자 기다린다",
@@ -1257,7 +1271,7 @@ const SOCIAL_RULES = {
   chance: {
     pog: 0.6, training: 0.4,
     soloKill: 0.6, loseStreak: 0.7, champion: 1, patch: 0.5,
-    benched: 0.3, popular: 0.2, rookie: 0.15, veteran: 0.15, general: 0.3,
+    benched: 0.3, injured: 0.6, popular: 0.2, rookie: 0.15, veteran: 0.15, general: 0.3,
     // 2026-10-07 추가
     winStreak: 0.6, streakBreak: 0.8, superPlay: 0.6, blunder: 0.4, promoted: 1, relegated: 1,
     benchReturn: 0.8, transfer: 1, renewal: 0.7, award: 1, ladderTop: 0.8, streaming: 0.15, sponsor: 0.1,

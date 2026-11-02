@@ -22,6 +22,7 @@ function greatChance() {
   let p = Math.min(greatMax(), greatChanceParts().reduce(function (a, x) { return a + x[1]; }, 0));
   if (greatFire()) p += R.streakBonus;
   if (state.stamina < TIRED_LIMIT) p *= R.tiredMult;
+  if (isBurnedOut()) p = 0; // 번아웃: 대성공 없음 (js/health.js)
   return p;
 }
 // 228: 🌱 유망주 특성이면 기본 7%·최대 15%, 아니면 기본 2%·최대 10%
@@ -45,7 +46,7 @@ function rollGreat(training) {
 function greatChipHTML() {
   const p = greatChance();
   const why = greatChanceParts().map(function (x) { return x[0] + " +" + greatPct(x[1]); }).join(" · ") + " (최대 " + greatPct(greatMax()) + ")" +
-    (greatFire() ? " · 🔥 불타는 손 +" + greatPct(GREAT_RULES.streakBonus) : "") + (state.stamina < TIRED_LIMIT ? " · 너무 지쳐서 절반" : "");
+    (greatFire() ? " · 🔥 불타는 손 +" + greatPct(GREAT_RULES.streakBonus) : "") + (state.stamina < TIRED_LIMIT ? " · 너무 지쳐서 절반" : "") + (isBurnedOut() ? " · 🥵 번아웃이라 대성공 없음" : "");
   return '<span class="gsc tip" tabindex="0" data-tip="' + escapeHTML("대성공이면 그 주 오른 스탯·숙련도 2배. " + why) + '">🎯 대성공 ' + greatPct(p) +
     ' <span class="gsc-bar"><i style="width:' + Math.round(p / (greatMax() + GREAT_RULES.streakBonus) * 100) + '%"></i></span></span>';
 }

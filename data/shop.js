@@ -45,7 +45,7 @@ const SHOP_STAFF = [
   { id: "analyst",   icon: "📊", name: "개인 분석가",  weekly: 300000, desc: "운영·시야·오더 훈련 +15%",        effects: { trainingStat: { macro: 0.15, vision: 0.15, shotcall: 0.15 } } },
   { id: "physical",  icon: "⚡", name: "피지컬 코치",  weekly: 300000, desc: "반응속도·입력 정확도 훈련 +15%",   effects: { trainingStat: { reaction: 0.15, accuracy: 0.15 } } },
   { id: "mental",    icon: "🧘", name: "멘탈 코치",    weekly: 200000, desc: "패배 후 컨디션 하락 절반",          effects: { lossMental: -0.5 } },
-  { id: "trainer",   icon: "💪", name: "트레이너",     weekly: 200000, desc: "매주 체력 +3 회복",                 effects: { staminaRegen: 3 } },
+  { id: "trainer",   icon: "💪", name: "트레이너",     weekly: 200000, desc: "매주 체력 +3 회복, 부상 기간 −1주",  effects: { staminaRegen: 3, injuryCut: 1 } },
   { id: "nutrition", icon: "🥗", name: "영양사",       weekly: 150000, desc: "노화로 줄어드는 양 −20%",           effects: { agingCut: 0.2 } },
 ];
 
@@ -73,7 +73,7 @@ const SHOP_INVEST = [
 const INVEST_AMOUNTS = [0.1, 0.25, 0.5, 1];
 
 // ----- 거주지 (부동산) — js/shop.js -----
-// 집이 없으면 '합숙': 모든 훈련 효과 보너스(스탯·챔피언 숙련도), 대신 컨디션이 상한 이상 못 올라가서 경기력이 덜 나와요
+// 집이 없으면 '합숙': 모든 훈련 효과 보너스(스탯·챔피언 숙련도), 대신 합숙 생활로 매주 컨디션이 조금씩 깎여요 (238: 상한 40 → 매주 −2)
 // 합숙 피로: 합숙한 기간이 길수록 보너스가 줄어요 (첫해 +25% → 1년마다 −5%p, 최소 +5%. 집에 살다 돌아와도 쌓인 기간은 그대로)
 //   (컨디션 100이면 경기력 +10%, 50이면 ±0)
 // 다른 선수: 2부는 모두 합숙(해마다 성장 +25%, 경기력 −4%), 1부는 자기 집
@@ -83,7 +83,8 @@ const HOUSING = {
   dormTraining: 0.25,     // 합숙: 모든 훈련 효과 +25% (첫해) — 2026-10-07 +50%에서 줄임
   dormFatiguePerYear: 0.05, // 합숙 피로: 합숙 1년(52주)마다 보너스 −5%p
   dormTrainingMin: 0.05,  //   최소 +5%
-  dormConditionCap: 40,   // 합숙: 컨디션 상한 (2026-10-07 50 → 40, 경기력 ×0.98)
+  dormConditionCap: 100,  // 합숙: 컨디션 상한 (238: 40 → 상한 없음, 대신 dormConditionLoss)
+  dormConditionLoss: 2,   // 합숙 생활: 매주 컨디션 −2 (238: 정한 안 −3은 2부에서 번아웃이 너무 잦아 사용자 결정으로 −2)
   npcDormPower: -0.04,    // 2부 다른 선수(합숙): 경기력 −4% (컨디션 상한)
   npcDormGrowth: 0.25,    // 2부 다른 선수(합숙): 해마다 스탯 성장 +25% (2026-10-07 +50%에서 줄임 — 리그 전력 인플레이션 완화)
   resale: 0.9,            // 산 집을 팔면 산 값의 90%

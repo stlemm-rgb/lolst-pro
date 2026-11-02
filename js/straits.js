@@ -77,7 +77,7 @@ function sTraitsOnTitle(teamId, champKey) {
   if (!team) return; // 해외 팀
   const st = starters(teamId);
   POSITION_IDS.map(function (pos) { return st[pos]; }).forEach(function (id) { // 주전만 (후보·2군은 제외)
-    if (!id || (id === USER_ID && state.benched)) return;
+    if (!id || (id === USER_ID && userSidelined())) return;
     const rec = recOf(id);
     if (!rec) return;
     if (champKey === "worlds") {

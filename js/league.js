@@ -363,7 +363,7 @@ function placeUser(chosenId) {
 function starterAt(teamId, pos) {
   const team = findTeam(teamId);
   // 내 선수는 후보(2군행)가 아니면 주전
-  if (team.roster.indexOf(USER_ID) !== -1 && state.player.position === pos && !state.benched) return USER_ID;
+  if (team.roster.indexOf(USER_ID) !== -1 && state.player.position === pos && !userSidelined()) return USER_ID; // 부상이면 후보가 대신 (js/health.js)
   let best = null, bestScore = -1;
   team.roster.forEach(function (id) {
     if (id === USER_ID || playerPos(id) !== pos) return;
@@ -384,7 +384,7 @@ function starters(teamId) {
   });
   POSITION_IDS.forEach(function (pos) {
     if (result[pos]) return;
-    const rest = team.roster.filter(function (id) { return used.indexOf(id) === -1; })
+    const rest = team.roster.filter(function (id) { return used.indexOf(id) === -1 && !(id === USER_ID && userSidelined()); }) // 후보·부상인 내 선수는 빈자리에도 안 들어감
       .sort(function (a, b) { return playerScore(b) - playerScore(a); });
     if (rest.length) { result[pos] = rest[0]; used.push(rest[0]); }
   });

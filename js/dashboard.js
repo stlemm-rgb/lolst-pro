@@ -309,8 +309,8 @@ function conditionBarHTML() {
 function homeLineHTML() {
   if (inDorm()) {
     return '<div class="sum-sub home-line tip" tabindex="0" data-tip="집이 없어서 팀 합숙 중이에요. 모든 훈련 효과 +' + Math.round(dormRate() * 100) +
-      '%, 대신 컨디션이 ' + HOUSING.dormConditionCap + '을 못 넘어서 경기력이 조금 깎여요(컨디션 100이면 +10%, 40이면 −2%). 합숙이 길어질수록 훈련 보너스가 줄어요. [상점] → 🏠 거주지에서 집을 구하면 합숙에서 나와요.">🛏️ 합숙 중 · 훈련 +' +
-      Math.round(dormRate() * 100) + "% · 컨디션 최대 " + HOUSING.dormConditionCap + "</div>";
+      '%, 대신 합숙 생활로 매주 컨디션이 ' + HOUSING.dormConditionLoss + '씩 깎여요(컨디션 100이면 경기력 +10%, 50이면 ±0). 휴식·승리로 컨디션을 챙겨요. 합숙이 길어질수록 훈련 보너스가 줄어요. [상점] → 🏠 거주지에서 집을 구하면 합숙에서 나와요.">🛏️ 합숙 중 · 훈련 +' +
+      Math.round(dormRate() * 100) + "% · 컨디션 매주 −" + HOUSING.dormConditionLoss + "</div>";
   }
   const h = currentHome();
   return '<div class="sum-sub home-line muted">' + h.icon + " " + h.name + (conditionCap() < 100 ? " · 컨디션 최대 " + conditionCap() : "") + "</div>";
@@ -560,7 +560,7 @@ function matchCardHTML(m, mine, opp, big) {
   const hint = gap >= 4 ? "우리가 강해요" : gap <= -4 ? "상대가 강해요" : "해볼 만해요";
   return '<div class="mcard' + (big ? " big" : "") + '">' +
     '<div class="mcard-top"><span class="rep-tag win">경기</span>' + (big ? bigGameTagHTML(big) : "") + "<span>" + escapeHTML(m.label) + " · " + m.bo + "판 " + Math.ceil(m.bo / 2) + "선승</span>" +
-      (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : "") + "</div>" +
+      (state.benched ? ' <span class="down small">후보라서 출전 안 함</span>' : isInjured() ? ' <span class="down small">🩹 부상이라 출전 안 함</span>' : "") + "</div>" +
     '<div class="mcard-vs">' +
       '<div class="mside"><span class="pf-frame">' + portraitImg(USER_ID, { scale: 2 }) + "</span><div><b>" + sw(ua) + escapeHTML(mine.name) + '</b><div class="muted small">우리 팀</div></div></div>' + // 203: 우리 전력은 '이번 주' 제목에 한 번
       '<div class="mvs">VS<div class="muted small">' + hint + "</div></div>" +

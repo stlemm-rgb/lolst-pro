@@ -33,6 +33,17 @@
 `--set 경로=값` (여러 번 가능). 경로는 `data/*.js` 상수: `FOCUS_RULES.userPerS=0.2`, `SLUMP_RULES.chance=0.7`, `TRAIT_FIT.offMult=0.4`, `LEAGUE.veterans.chancePerTeam=1`
 값 후보 비교는 `--variant "이름:경로=값;경로=값"`를 여러 번 (measure_seasons). 틀린 경로면 바로 오류.
 
+## 0) 체력·컨디션 — measure_health.cjs (Node만, 브라우저 없이 약 1.5분, 238)
+
+플레이 방식 3가지(기본 30↓ 휴식 / 안 쉼 솔랭만 / 관리 50↓ 휴식) × 2부 2012·1부 2017 미드 × 씨앗 3 × 2시즌 → 체력·컨디션·부상·번아웃·성장·세트 승률.
+세트 승률은 판 수가 적어 오차가 큼(±15%p) — 체력·컨디션·부상·번아웃 칸으로 판단할 것. 예전 measure_fatigue.py(Playwright)와 같은 방식.
+
+```
+node tools/measure_health.cjs                                     # 지금 코드
+node tools/measure_health.cjs . "HOUSING.dormConditionLoss=3"     # 숫자 바꿔 끼우기 (여러 개 가능)
+git worktree add ../base HEAD && node tools/measure_health.cjs ../base   # 예전 코드와 비교
+```
+
 ## 1) 특성 효과 — measure_traits.py (5포지션 × 8특성 × 500경기 ≈ 3~4분, --jobs 2)
 
 ```

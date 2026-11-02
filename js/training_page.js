@@ -126,7 +126,7 @@ function trainForecastHTML(t, exp) {
   if (exp.condition) parts.push("컨디션 <b class=\"up\">+" + fmt1(exp.condition) + "</b>");
   const after = Math.max(0, Math.min(state.staminaMax, Math.round(state.stamina + exp.stamina)));
   const wk = userWeekMatches(state.week);
-  const hasMatch = wk.matches.length + wk.preview.length > 0 && !state.benched;
+  const hasMatch = wk.matches.length + wk.preview.length > 0 && !userSidelined();
   return '<div class="card tpanel"><h2>🔮 이번 주 예상 <span class="muted small">' + escapeHTML(t.name) + "</span></h2>" +
     (exp.tired ? '<p class="down small">⚠️ 체력이 ' + TIRED_LIMIT + " 아래라 효과가 절반이에요. 휴식을 먼저 고려해 보세요.</p>" : "") +
     '<p class="tforecast">' + (parts.join(" · ") || '<span class="muted">스탯 변화 없음</span>') + "</p>" +

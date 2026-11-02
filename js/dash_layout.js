@@ -30,7 +30,7 @@ function dashMatchRowsHTML(w) {
     const wt = findWorldTeam(opp), os = wt ? worldStarters(wt) : findTeam(opp) ? starters(opp) : null;
     const mate = os && os[state.player.position];
     const sum = '<span class="rep-tag win">경기</span><span class="dm-mt"><b>' + escapeHTML(w.mine.name) + " vs " + escapeHTML(teamName(opp)) + "</b>" +
-      "<small>" + (big ? "🔥 빅게임 · " : "") + escapeHTML(m.label) + " · 전력 " + strengthOf(opp).toFixed(1) + (mate ? " · 맞수 " + escapeHTML(playerName(mate)) : "") + "</small></span>" +
+      "<small>" + (isInjured() ? "🩹 부상이라 결장 · " : "") + (big ? "🔥 빅게임 · " : "") + escapeHTML(m.label) + " · 전력 " + strengthOf(opp).toFixed(1) + (mate ? " · 맞수 " + escapeHTML(playerName(mate)) : "") + "</small></span>" +
       '<span class="dm-arr">준비 ▾</span>';
     return dashDetails("m" + i, "dm-match", sum, matchCardHTML(m, w.mine, opp, big));
   }).join("") +

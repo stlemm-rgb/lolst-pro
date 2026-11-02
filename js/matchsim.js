@@ -87,6 +87,7 @@ function userMatchContext(match, target, used) {
   const m = matchPower(rollBans(used), target, used); // 세트마다 밴 수·대상이 달라짐, 조합 성향 반영
   let mult = TEAM_MATCH.conditionBase + Math.min(state.condition, conditionCap()) / TEAM_MATCH.conditionDiv; // 합숙이면 컨디션 상한 (js/shop.js)
   if (state.stamina < TEAM_MATCH.lowStaminaLimit) mult *= 1 - TEAM_MATCH.lowStaminaCut;
+  mult *= burnoutPowerMult(); // 번아웃 경기력 −5% (js/health.js)
   mult *= 1 + (state.matchBoost || 0); // 이벤트 보너스 (한 경기만)
   mult *= 1 + activityMatchBoost(match); // 라이벌 선언한 팀과 경기 (js/events.js)
   mult *= 1 + chemistryBonus(); // 주전 동료와의 관계 (js/friends.js)
@@ -280,7 +281,7 @@ function playSet(a, b, userCtx, setCtx) {
 // 한 경기(시리즈) 진행
 function playMatch(m) {
   const mine = myTeam();
-  const userIn = mine && (m.a === mine.id || m.b === mine.id) && !state.benched; // 후보면 출전 안 함
+  const userIn = mine && (m.a === mine.id || m.b === mine.id) && !userSidelined(); // 후보·부상이면 출전 안 함 (js/health.js)
   // 조합 전략 (경기마다): 메타 따라가기 / 메타 카운터 / 자유 (js/comps.js)
   const plans = { a: scoutedPlan(m, m.a) || teamCompPlan(m.a), b: scoutedPlan(m, m.b) || teamCompPlan(m.b) }; // 분석 리포트로 미리 정한 상대 계획 (js/staff.js)
   const myTarget = userIn ? (m.a === mine.id ? plans.a : plans.b).target : null;
@@ -597,7 +598,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
   const mine = myTeam();
   if (mine && f.winner === mine.id) {
     state.career.finalsWon = (state.career.finalsWon || 0) + 1;
-    if (!state.benched) titleFans(champKey); // 우승 팬 보너스 (js/fame.js, 출전했을 때)
+    if (!userSidelined()) titleFans(champKey); // 우승 팬 보너스 (js/fame.js, 출전했을 때)
     addMoment("🏆", mine.name + " " + { cup: "LCK 컵 우승", playoffs: "리그 우승", worlds: "월드 챔피언십 우승", firststand: "First Stand 우승", msi: "MSI 우승" }[champKey]);
     if (state.weekCtx) state.weekCtx.champion = title;
   }

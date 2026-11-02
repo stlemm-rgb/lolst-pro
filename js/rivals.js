@@ -123,7 +123,7 @@ function h2hPreviewHTML(oppId) {
   const wt = findWorldTeam(oppId);
   const os = wt ? worldStarters(wt) : findTeam(oppId) ? starters(oppId) : null;
   const oppMate = os && os[state.player.position];
-  if (oppMate && !state.benched) {
+  if (oppMate && !userSidelined()) {
     const me = h2hMe(oppMate);
     parts.push("⚔️ 맞수 " + portraitImg(oppMate, { face: true, size: 18 }) + " " + escapeHTML(playerName(oppMate)) + (me ? " 세트 " + me.s[0] + "승 " + me.s[1] + "패 · 라인전 " + me.l[0] + ":" + me.l[1] : " (첫 맞대결)"));
   }
@@ -244,7 +244,7 @@ function bigGameWeek() {
 
 // 빅게임 퀘스트: 그 주에만 (퀘스트 2개 제한과 별도). 후보면 안 줌
 function giveBigGameQuest(g, opp) {
-  if (state.benched) return;
+  if (userSidelined()) return;
   const tpl = findQuest(BIG_GAME_RULES.quest);
   if (!tpl) return;
   if (!state.quests) state.quests = [];

@@ -495,6 +495,7 @@ function renderTopbar() {
 
 // 상단바: 지금 고른 훈련 ([다음 주로 진행]을 누르면 할 훈련). 누르면 훈련 화면으로
 function planBadgeHTML() {
+  if (isInjured()) return '<button id="plan-badge" class="plan-badge tip" data-tip="부상이 나을 때까지 고른 훈련 대신 재활(체력·컨디션 회복)을 해요">🩹 재활 중</button>'; // js/health.js
   if (!state.plan) return '<button id="plan-badge" class="plan-badge none">🏋️ 훈련 미선택</button>';
   const t = findTraining(state.plan);
   let extra = "";
@@ -512,10 +513,10 @@ function staminaBadgeHTML() {
   const low = state.stamina < TIRED_LIMIT;
   const warn = state.stamina < TEAM_MATCH.lowStaminaLimit;
   const cls = low ? "down" : warn ? "warn" : "";
-  const tip = low ? "체력이 너무 낮아요! 훈련 효과가 절반이에요. 휴식을 추천해요."
+  const tip = low ? "체력이 너무 낮아요! 훈련 효과가 절반이고, 20 아래로 주가 끝나면 부상 위험(10%)이 있어요. 휴식을 추천해요."
     : warn ? "체력이 " + TEAM_MATCH.lowStaminaLimit + " 미만이면 경기력이 떨어져요."
     : "훈련·경기로 줄고 휴식으로 회복";
-  return '<span class="stamina-badge tip ' + cls + '" tabindex="0" data-tip="' + tip + '">💪 체력 <b>' + state.stamina + "</b>/" + state.staminaMax + "</span>";
+  return '<span class="stamina-badge tip ' + cls + '" tabindex="0" data-tip="' + tip + '">💪 체력 <b>' + state.stamina + "</b>/" + state.staminaMax + "</span>" + healthBadgeHTML(); // 부상·번아웃 (js/health.js)
 }
 
 // ===== 우측 본문 =====
@@ -644,7 +645,7 @@ function nextWeek(restWeek) {
   restWeek = restWeek === true;
   if (state.retired) return; // 은퇴한 뒤에는 진행 없음
   // 훈련을 안 골랐으면 훈련 화면으로 안내
-  if (!state.plan && !state.skipTraining && !restWeek) {
+  if (!state.plan && !state.skipTraining && !restWeek && !isInjured()) {
     state.currentMenu = "training";
     state.notice = "이번 주 훈련을 먼저 골라 주세요.";
     renderAll();
@@ -656,10 +657,12 @@ function nextWeek(restWeek) {
   const growthBase = { stats: Object.assign({}, state.stats), traits: state.player.traits.slice(), score: playerScore(USER_ID), money: state.money, pop: state.popularity }; // money·pop: 이번 주 요약 창 (js/dash_plus.js)
 
   // 훈련 효과 적용 (이벤트로 "쉰다"를 골랐으면 이번 주는 휴식)
-  const training = (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
+  // 부상 중이면 고른 훈련 대신 재활 (js/health.js)
+  const training = isInjured() ? rehabTraining() : (state.skipTraining || restWeek) ? findTraining("rest") : findTraining(state.plan);
   state.skipTraining = false;
   state.weekCtx.training = training.id; // 선수 SNS용 (이번 주 훈련 글)
   const tired = state.stamina < TIRED_LIMIT; // 훈련 전 체력이 너무 낮으면 효과 절반
+  const burnMult = burnoutTrainingMult(); // 번아웃: 훈련 효과 −40% (js/health.js)
   const great = rollGreat(training); // 훈련 대성공: 오른 스탯·숙련도 2배 (js/great.js)
   const changes = {};
   Object.keys(training.effects).forEach(function (id) {
@@ -690,7 +693,7 @@ function nextWeek(restWeek) {
       // 챔피언 집중 연습: 고른 챔피언 1명만 크게
       const name = focusChamp();
       const now = state.mastery[name];
-      let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
+      let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125) * burnMult;
       if (tired) gain *= 0.5;
         if (great) gain *= GREAT_RULES.mult; // 훈련 대성공 (js/great.js)
       state.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
@@ -701,7 +704,7 @@ function nextWeek(restWeek) {
         .sort(function (a, b) { return state.mastery[a] - state.mastery[b]; })[0];
       if (name) {
         const now = state.mastery[name];
-        let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125);
+        let gain = amount * masteryGrowthMultiplier(name) * Math.max(0.3, 1 - now / 125) * burnMult;
         if (tired) gain *= 0.5;
         if (great) gain *= GREAT_RULES.mult; // 훈련 대성공 (js/great.js)
         state.mastery[name] = Math.min(MASTERY.max, now + roundRandom(gain));
@@ -709,7 +712,7 @@ function nextWeek(restWeek) {
       }
     } else if (id === "mastery") {
       // 챔피언 숙련도: 고른 챔피언(또는 자동으로 고른 챔피언)들에게
-      const gained = practiceChampions(range, tired, great ? GREAT_RULES.mult : 1);
+      const gained = practiceChampions(range, tired, (great ? GREAT_RULES.mult : 1) * burnMult);
       Object.keys(gained).forEach(function (name) { changes["m:" + name] = gained[name]; });
     } else if (state.stats[id] !== undefined) {
       // 실력 스탯: 오를 때만 보너스(가산점·유형·특성)를 붙임
@@ -717,6 +720,7 @@ function nextWeek(restWeek) {
         let boosted = amount * (1 + trainingBonusFor(id)) * growthMultiplier(state.stats[id], state.player.traits, id) * agingTrainingMultiplier(id) * USER_TRAINING_SCALE; // 높은 스탯일수록 덜 오름, 노화하면 손 스탯 덜 오름, 내 선수 훈련 배율 (201)
         if (tired) boosted *= 0.5;
         if (great) boosted *= GREAT_RULES.mult; // 훈련 대성공 (js/great.js)
+        boosted *= burnMult;
         amount = roundRandom(Math.max(0, boosted));
       }
       before = state.stats[id];
@@ -728,6 +732,7 @@ function nextWeek(restWeek) {
   let message = pick(training.messages);
   const gainsStats = Object.keys(training.effects).some(function (id) { return state.stats[id] !== undefined || id === "mastery"; });
   if (tired && gainsStats) message += " (너무 지쳐서 훈련 효과가 절반이었다.)";
+  if (burnMult < 1 && gainsStats) message += " (번아웃이라 집중이 안 됐다.)";
   if (great) message = "🔥 대성공! " + message;
 
   // 결과 기록 (최근 10개만 보관)
@@ -894,6 +899,7 @@ function nextWeek(restWeek) {
   staffWeekly(); // 구단 스태프: 분석 리포트·인사 추천권·시설 체력 회복 (js/staff.js)
   state.log = state.log.slice(0, 30);
   enforceConditionCap(); // 이벤트로 오른 컨디션도 상한까지만 (js/shop.js)
+  healthWeekEnd(training); // 이번 주 끝 체력·컨디션으로 부상·번아웃 (js/health.js)
   state.currentMenu = "dashboard";
   state.notice = state.newMentions
     ? '<span class="notice-go no-link" data-gosns="social" tabindex="0" title="눌러서 선수 SNS 보기">📣 선수 SNS에서 ' + escapeHTML(state.player.name) + " 선수를 언급한 글이 " + state.newMentions + '개 올라왔어요. <b>💬 선수 SNS 보기 ▶</b></span>'

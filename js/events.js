@@ -466,6 +466,7 @@ function postSocial() {
   if (w.training) cats.push("train_" + w.training);
   if (w.patch) cats.push("patch");
   if (state.benched) cats.push("benched");
+  if (isInjured()) cats.push("injured"); // 부상 중 (js/health.js)
   if (state.popularity >= 70) cats.push("popular");
   if (state.player.age <= 18) cats.push("rookie");
   if (state.player.age >= 29) cats.push("veteran");

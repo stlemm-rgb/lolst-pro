@@ -69,7 +69,9 @@ function coachTipWhen(when) {
   switch (when) {
     case "benched": return !!state.benched;
     case "tired": return state.stamina < TIRED_LIMIT;
-    case "matchWeek": { const wk = userWeekMatches(state.week); return !state.benched && wk.matches.length + wk.preview.length > 0; }
+    case "injured": return isInjured();
+    case "burnout": return isBurnedOut();
+    case "matchWeek": { const wk = userWeekMatches(state.week); return !userSidelined() && wk.matches.length + wk.preview.length > 0; }
     case "inbox": return state.inbox.some(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; });
     case "quest": return (state.quests || []).length > 0;
     case "patch": return !!state.weekReport && MASTERY.patchWeeks.indexOf(state.week) !== -1;
@@ -242,7 +244,7 @@ let adviceActions = [];
 function weekAdvice(noQuest) {
   const list = [];
   const wk = userWeekMatches(state.week);
-  const hasMatch = wk.matches.length + wk.preview.length > 0 && !state.benched;
+  const hasMatch = wk.matches.length + wk.preview.length > 0 && !userSidelined();
   // 1) 훈련을 안 골랐음
   if (!state.plan) list.push({ text: "이번 주 훈련을 아직 안 골랐어요.", label: "훈련 고르기", act: { go: "training" } });
   // 2) 체력

@@ -6,7 +6,7 @@
 |---|---|---|---|
 | `data/menus.js` | 2 | 좌측 메뉴 (2026-10-06 정리: 묶음 4개 + 맨 아래 설정) |  |
 | `data/shop.js` | 8 | 상점 ([상점] 메뉴) — 모은 돈을 쓰는 곳 |  |
-| `data/guide.js` | 24 | 초보자 도움 (js/guide.js) |  |
+| `data/guide.js` | 25 | 초보자 도움 (js/guide.js) |  |
 | `data/player.js` | 16 | 내 선수 기본 규칙: 스탯·성장 곡선·포지션·유형·커리어 | stats.js, growth.js, positions.js, archetypes.js, career.js |
 | `data/traits.js` | 28 | 특성 목록 |  |
 | `data/champions.js` | 9 | 챔피언 목록 (리그 오브 레전드 실제 챔피언, 2026년 6월 기준 173명) |  |
@@ -19,8 +19,8 @@
 | `data/events_story.js` | 26 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/events_life.js` | 11 | 받은 연락 리뉴얼 ② 선수 생활·인생 · 동료·라이벌 관계 (2026-10-08) |  |
 | `data/friends.js` | 40 | 친구 시스템 데이터 (분기 활동 · 단계 이야기 · 친구 연락) |  |
-| `data/social_posts.js` | 82 | 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭) |  |
-| `data/social_posts_pro.js` | 80 | 프로 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭, 🎮 선수 표시가 붙는 글) |  |
+| `data/social_posts.js` | 83 | 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭) |  |
+| `data/social_posts_pro.js` | 81 | 프로 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭, 🎮 선수 표시가 붙는 글) |  |
 | `data/mishaps.js` | 13 | 웃긴 해프닝 (2026-11-02) — 게임 결과와 관계없는 우스꽝스러운 사건사고 |  |
 | `data/contracts.js` | 13 | 연봉·계약·이적 규칙 (5단계) |  |
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
@@ -29,6 +29,7 @@
 | `data/ui.js` | 13 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/room.js` | 11 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
+| `data/health.js` | 2 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |
 | `data/replay.js` | 2 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
 | `data/boxscore.js` | 1 | 경기 기록(박스 스코어) 만들기 규칙 |  |
@@ -46,9 +47,9 @@
 | `js/league.js` | 26 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
-| `js/matchsim.js` | 43 | 경기 판정과 주간 일정 진행 |  |
+| `js/matchsim.js` | 44 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 11 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 54 | 게임 상태 |  |
+| `js/main.js` | 55 | 게임 상태 |  |
 | `js/training_page.js` | 20 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 19 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 37 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
@@ -87,6 +88,7 @@
 | `js/replay.js` | 24 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
 | `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
+| `js/health.js` | 4 | 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
 | `js/dash_plus.js` | 12 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
 | `js/room.js` | 15 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |
