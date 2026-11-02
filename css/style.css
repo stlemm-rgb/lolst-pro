@@ -30,6 +30,7 @@
  *  32. 휴대폰 앱: 앱 바 · SNS 피드 · 알림 · 내 프로필 (231, js/sns_page.js)
  *  33. 대시보드 PC · 휴대폰 따로 (232, js/dash_layout.js) · 긴 글자 한 줄 규칙
  *  34. 휴대폰 대시보드 바로가기 아이콘 · 빠른 선택 창 · 미니 스탯 · 위쪽 막대 한 줄 (235)
+ *  35. PC 대시보드 바로가기 6칸 · 미니 스탯 4줄 · 빈틈 없이 쌓기 (240, 시안 26 A)
  *  25. 시작 화면 · 선수 등록증 (212, 시안 18 나) · 캐릭터 생성 단계 (213, 시안 19 가) — js/creation.js
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
@@ -2091,3 +2092,15 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .qs-opt .q { font-size: 12px; color: var(--gold); white-space: nowrap; }
 .qs-opt .pr { width: 80px; flex: none; display: flex; flex-direction: column; gap: 2px; align-items: flex-end; } .qs-opt .pr .bar { width: 100%; }
 .qs-more { display: block; width: 100%; margin-top: 12px; background: none; border: 0; box-shadow: none; color: var(--muted); font-size: 12px; text-decoration: underline; }
+/* ===== 35. PC 대시보드 바로가기 6칸 · 미니 스탯 4줄 · 빈틈 없이 쌓기 (240, 시안 26 A · js/dash_layout.js) ===== */
+.dq-bar { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin: 6px 0 10px; }
+.dq { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 8px; border-radius: 14px; border: 1px solid rgba(var(--accent-rgb), 0.45); background: rgba(var(--accent-rgb), 0.07); color: var(--text); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.dq .i { font-size: 22px; line-height: 1; }
+.dq em { position: absolute; top: -6px; right: -4px; background: var(--bad); color: #fff; font-style: normal; font-size: 11px; font-weight: 800; line-height: 17px; padding: 0 5px; border-radius: 999px; }
+.wc .dm-stats { margin: 10px 0 8px; }
+.wc .dm-stats .g { grid-template-columns: repeat(4, minmax(0, 1fr)); font-size: 13px; gap: 5px 18px; }
+.wc .dm-quests { margin: 0 0 8px; }
+.dmas { columns: 3 340px; column-gap: 16px; }
+.dmas > * { break-inside: avoid; margin: 0 0 16px; display: block; width: 100%; }
+.qs-sheet .cchips { margin-top: 8px; }
+@media (max-width: 1100px) { .dq-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

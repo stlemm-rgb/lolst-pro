@@ -1,6 +1,7 @@
 // ===== 대시보드 PC · 휴대폰 따로 (232, 시안 24 ② · Codex 토론) =====
 // 휴대폰(760px 이하): 행동 그림 → 📱 새 연락 알림 → 이번 주 경기 한 줄 → 상태 4칸 → 지금 필요한 경고 → 퀘스트 → [더 보기]
-// PC: [이번 주 칸: 행동 그림 + 할 일 + 경기 한 줄 | 📱 내 휴대폰 + 내 선수 카드] → 지난주·퀘스트·챔피언 → 조합 전략·최근 경기·솔랭 → 스탯
+// PC (240, 시안 26 A): [이번 주 칸: 행동 그림 + 훈련·체력 + 바로가기 6칸 + 경기 한 줄 + 미니 스탯 + 퀘스트 | 내 선수 카드]
+//   → 지난주·챔피언·솔랭·조합 전략·최근 경기·유형 스탯을 빈틈 없이 쌓기 (휴대폰 칸·언급 알림 줄·진행 버튼·스탯 12개 큰 칸은 겹쳐서 뺌)
 // 보이는 쪽 하나만 그림 (폭이 760px을 넘나들면 다시 그림). 조각은 js/dashboard.js·dash_plus.js·room.js·sns_page.js 것을 그대로 씀
 // 화면만 바꿈: 게임 결과 그대로 (Math.random 안 씀)
 const dashOpen = {}; // 펼쳐 둔 칸 (다시 그려도 유지): 경기 m0·m1 · 더 보기 more
@@ -143,29 +144,36 @@ function dashWeekCardPcHTML(w) {
   return '<div class="card upcoming wc"><div class="wc-hd"><b>▶ ' + state.year + "년 " + week + '주차 · 이번 주</b><span class="muted small">' +
       (w.matches.length ? "경기 " + w.matches.length + "개 · 우리 팀 전력 " + teamStrength(mine.id).toFixed(1) : escapeHTML(scheduleOfWeek(week).name)) + "</span></div>" +
     '<div class="dp-wk">' + roomBlockHTML(w.matches.length) + // 이번 주 행동 그림 (js/room.js)
-      '<div class="dp-side"><div class="wc-box"><span class="muted small">이번 주 훈련</span><b>' + (t ? escapeHTML(t.name) : '<span class="down">아직 안 골랐어요</span>') + "</b>" +
-        '<button class="small-btn" data-go="training">훈련 바꾸기</button></div>' +
+      '<div class="dp-side"><div class="wc-box"><span class="muted small">이번 주 훈련</span><b>' + (isInjured() ? "🩹 재활 중" : t ? escapeHTML(t.name) : '<span class="down">아직 안 골랐어요</span>') + "</b></div>" + // 240: 바꾸기는 바로가기 🏋️·위쪽 막대 배지
         '<div class="wc-box">' + miniBarHTML("체력", state.stamina, state.staminaMax, low ? "neg" : warn ? "warn" : "") + conditionBarHTML() + "</div></div></div>" +
+    dashPcBarHTML() +
     dashMatchRowsHTML(w) +
-    adviceRowsHTML(true, true) + // 💡 이번 주 추천 (js/guide.js) — 퀘스트는 아래 퀘스트 칸
-    ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고
-    '<div class="wc-go"><button data-dashgo="rest">휴식 주 💤</button><button class="primary" data-dashgo="next">다음 주로 진행 ▶</button></div>' +
+    dashMiniStatsHTML() + dashQuestLinesHTML() + // 휴대폰과 같은 미니 스탯 · 퀘스트 한 줄씩
+    adviceRowsHTML(true, true) + // 💡 이번 주 추천 (js/guide.js)
+    ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고 — 휴식 주·다음 주로 진행은 위쪽 막대에 (240)
   "</div>";
 }
+// PC 바로가기 6칸 (240): 📱 휴대폰 · 🏋️ 훈련 · ⚔️ 챔피언 연습 · 🛌 휴식 주 · 🏠 집·고용 · 📰 지난 신문 (data/ui.js QUICK_ACTIONS.pcIcons)
+function dashPcBarHTML() {
+  const n = { phone: deckMessages().length + unreadCount("social"), train: state.plan ? 0 : "!", rest: state.stamina < TIRED_LIMIT ? "!" : 0, paper: unreadCount("news") };
+  return '<div class="dq-bar">' + QUICK_ACTIONS.pcIcons.map(function (x) {
+    return '<button class="dq" data-pcq="' + x[0] + '"><span class="i">' + x[1] + "</span>" + x[2] + (n[x[0]] ? "<em>" + n[x[0]] + "</em>" : "") + "</button>";
+  }).join("") + "</div>";
+}
+// 유형 스탯 칸 (240): 스탯 12개는 이번 주 칸 미니 스탯에 있어서 PC 아래쪽은 유형 스탯만
+function typeStatsCardHTML() {
+  return '<div class="card"><h2>' + QUICK_ACTIONS.typeTitle + ' <button class="small-btn" data-go="career" data-ptabgo="ability">' + QUICK_ACTIONS.typeMore + "</button></h2>" +
+    '<p class="muted small">' + QUICK_ACTIONS.typeSub + '</p><div class="stat-columns type-stats">' + typeScoresHTML() + "</div></div>";
+}
 function dashPcHTML() {
-  const w = dashWeek(), deck = deckMessages().length, men = unreadCount("social");
+  const w = dashWeek();
   return '<h1 class="dash-title">대시보드' + trophyShelfHTML() + "</h1>" + // 우승 트로피 진열장 (js/history_pages.js)
     dashGoalsHTML() + // 다음 일정 · 계약 만료 · 다음 패치 (js/dash_plus.js)
     rookieCardsHTML() + // 새 시즌 대형 신인 카드 (js/ui.js)
     '<div class="d2-top"><div class="d2-week">' + dashWeekCardPcHTML(w) + "</div>" +
-      '<div class="d2-me dp-stack"><div class="card dp-phone"><div class="dp-ph-hd"><b>📱 내 휴대폰</b><span class="muted small">메시지 ' + deck + " · SNS 언급 " + men + "</span></div>" + dashPhoneHTML() + "</div>" +
-        heroCardHTML(true) + "</div></div>" +
-    '<div class="d2-row">' + weekReportHTML() + questPanelHTML() + championCardHTML() + "</div>" +
-    '<div class="dash">' +
-      '<div class="dash-main"><div class="card">' + compPlanHTML() + "</div>" + recentMatchesHTML() + "</div>" +
-      '<div class="dash-side">' + leagueLadderHTML() + "</div>" +
-    "</div>" +
-    statsCardHTML();
+      '<div class="d2-me dp-stack">' + heroCardHTML(true) + "</div></div>" + // 240: 📱 휴대폰 칸은 바로가기 📱로
+    '<div class="dmas">' + weekReportHTML() + '<div class="card">' + compPlanHTML() + "</div>" + // 빈틈 없이 쌓기 (css columns, 세 줄 높이가 비슷한 순서)
+      recentMatchesHTML() + championCardHTML() + leagueLadderHTML() + typeStatsCardHTML() + "</div>";
 }
 
 // ----- 빠른 선택 창 (235, 시안 25): 🏋️ 훈련 · 📋 퀘스트를 다른 화면으로 가지 않고 이름만 보고 고르기 (아래에서 올라옴) -----
@@ -207,10 +215,11 @@ function renderQuick(opening) {
     el.addEventListener("click", function (e) { if (e.target === el) closeQuick(); });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && quickKind) closeQuick(); });
   }
-  const train = quickKind === "train";
-  el.innerHTML = '<div class="qs-sheet' + (opening ? " qs-anim" : "") + '" role="dialog" aria-label="' + (train ? QUICK_ACTIONS.trainTitle : QUICK_ACTIONS.questTitle) + '"><div class="qs-grip"></div>' +
-    '<div class="qs-hd"><b>' + (train ? QUICK_ACTIONS.trainTitle : QUICK_ACTIONS.questTitle) + "</b><span>" + (train ? QUICK_ACTIONS.trainSub : QUICK_ACTIONS.questSub) + "</span></div>" +
-    (train ? quickTrainHTML() : quickQuestHTML()) + "</div>";
+  const train = quickKind === "train", champ = quickKind === "champ"; // champ (240): 챔피언 연습 대상 고르기 (js/training_page.js champChipsHTML)
+  const title = train ? QUICK_ACTIONS.trainTitle : champ ? QUICK_ACTIONS.champTitle : QUICK_ACTIONS.questTitle;
+  el.innerHTML = '<div class="qs-sheet' + (opening ? " qs-anim" : "") + '" role="dialog" aria-label="' + title + '"><div class="qs-grip"></div>' +
+    '<div class="qs-hd"><b>' + title + "</b><span>" + (train ? QUICK_ACTIONS.trainSub : champ ? QUICK_ACTIONS.champSub : QUICK_ACTIONS.questSub) + "</span></div>" +
+    (train ? quickTrainHTML() : champ ? champChipsHTML("practice") + '<button class="qs-more" data-qsgo="training">' + QUICK_ACTIONS.trainMore + "</button>" : quickQuestHTML()) + "</div>";
   el.hidden = false;
   el.querySelectorAll("[data-qsplan]").forEach(function (b) {
     b.onclick = function () { state.plan = b.getAttribute("data-qsplan"); state.notice = ""; closeQuick(); renderAll(); };
@@ -226,6 +235,12 @@ function renderQuick(opening) {
       state.notice = ""; closeQuick(); renderAll();
     };
   });
+  el.querySelectorAll("[data-practice]").forEach(function (b) {
+    b.onclick = function () { state.practiceChamp = b.getAttribute("data-practice"); state.plan = "champion"; state.notice = ""; closeQuick(); renderAll(); };
+  });
+  el.querySelectorAll("[data-practicesel]").forEach(function (s) {
+    s.onchange = function () { if (s.value) { state.practiceChamp = s.value; state.plan = "champion"; state.notice = ""; closeQuick(); renderAll(); } };
+  });
   el.querySelectorAll("[data-qsgo]").forEach(function (b) { b.onclick = function () { closeQuick(); selectMenu(b.getAttribute("data-qsgo")); }; });
 }
 
@@ -236,6 +251,16 @@ function bindDashLayout(page) {
   });
   page.querySelectorAll("[data-quick]").forEach(function (b) {
     b.onclick = function () { const k = b.getAttribute("data-quick"); if (k === "phone") openPhone(); else openQuick(k); };
+  });
+  page.querySelectorAll("[data-pcq]").forEach(function (b) { // PC 바로가기 (240)
+    b.onclick = function () {
+      const k = b.getAttribute("data-pcq");
+      if (k === "phone") openPhone();
+      else if (k === "train" || k === "champ") openQuick(k);
+      else if (k === "rest") advanceWeek(true);
+      else if (k === "home") { shopTab = "home"; selectMenu("shop"); }
+      else if (k === "paper") { snsTab = "news"; openMsgId = null; selectMenu("sns"); }
+    };
   });
   page.querySelectorAll("[data-ptabgo]").forEach(function (b) { // 미니 스탯 → [선수 정보] 능력 탭 (data-go보다 먼저)
     b.addEventListener("click", function () { playerTab = b.getAttribute("data-ptabgo"); });

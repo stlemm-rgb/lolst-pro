@@ -136,6 +136,10 @@ const QUICK_ACTIONS = {
   questTitle: "퀘스트", questSub: "누르면 그 퀘스트 훈련으로", questMore: "보상 · 자세한 내용은 훈련 화면 퀘스트 칸에서 ›",
   questEmpty: "지금 받은 퀘스트가 없어요.", questTag: "📋 퀘스트",
   statsTitle: "📊 내 스탯", statsMore: "누르면 자세히 ›",
+  // PC 대시보드 바로가기 줄 (240, 시안 26 A): 왼쪽 메뉴에 이미 있는 화면은 넣지 않음 [id, 아이콘, 이름]
+  pcIcons: [["phone", "📱", "휴대폰"], ["train", "🏋️", "훈련 고르기"], ["champ", "⚔️", "챔피언 연습"], ["rest", "🛌", "휴식 주"], ["home", "🏠", "집·고용"], ["paper", "📰", "지난 신문"]],
+  champTitle: "챔피언 연습", champSub: "누르면 '챔피언 연습' 훈련으로 이 챔피언을 연습해요",
+  typeTitle: "🧬 유형 스탯", typeSub: "높을수록 그 유형 챔피언 숙련도가 잘 올라요 (괄호 = 숙련도 성장 보너스)", typeMore: "스탯 12개 자세히 ›",
 };
 
 // ----- 휴대폰 앱 (231, 시안 24): 아래 앱 바 💬 메시지 · 📸 SNS · 🔔 알림, SNS 머리의 내 얼굴 = 내 프로필 (js/sns_page.js) -----
