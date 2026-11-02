@@ -1164,6 +1164,8 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .fcard.ticket .fc-back { border-color: var(--gold); box-shadow: 0 0 22px rgba(var(--gold-rgb), 0.35), inset 0 0 30px rgba(var(--gold-rgb), 0.12); }
 .fcard.ticket .fc-q { color: var(--gold); }
 .fcard.ticket .fc-back::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 240, 180, 0.35) 48%, transparent 66%); animation: fcSweep 2.2s infinite; }
+/* 아이폰 사파리: 뒤집혀 숨은 면이 손가락 누름을 가로채서 [이 사람으로]가 안 눌림 → 숨은 면은 누름을 받지 않게 */
+.fcard:not(.flip) .fc-front, .fcard.flip .fc-back { pointer-events: none; }
 .fc-front { transform: rotateY(180deg); background: radial-gradient(circle at 50% 30%, #2a2650, #12121f 70%); display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 12px; text-align: center; }
 .fc-front > * { position: relative; z-index: 1; }
 .fc-grade { position: absolute !important; top: 8px; left: 10px; font-size: 30px; font-weight: 900; line-height: 1; }
@@ -1481,6 +1483,7 @@ table.standings th, table.standings td { white-space: nowrap; }
 .no-motion .po-wrap { animation: none; }
 @media (max-width: 860px) { #phone-overlay { padding: 0; align-items: stretch; } .po-wrap { width: 100%; } .po-wrap .ph-scr { height: 100vh; border-radius: 0; } .po-close { right: 10px; top: 10px; } .po-wrap .ph-hd { padding-right: 56px; } }
 .ph-note { font-size: 12px; color: var(--gold); background: rgba(var(--gold-rgb), 0.08); border: 1px solid rgba(var(--gold-rgb), 0.3); border-radius: 12px; padding: 7px 10px; }
+.ph-note.ph-staff { display: block; width: 100%; text-align: left; font: inherit; font-size: 12px; cursor: pointer; } .ph-note.ph-staff:hover { border-color: var(--gold); }
 .ph-bub .salary-details { margin-top: 6px; white-space: normal; }
 /* 218 (시안 20 가 '메신저 앱'): 휴대폰 몸체 + 상태 줄 + 앱 머리 + 말풍선 + 아래 답장 칸 */
 .phone {

@@ -116,7 +116,7 @@ const NEWS_PAPER = {
 
 const MSG_DECK = {
   skipKinds: ["staffPick"],      // 휴대폰에 안 보여 주는 연락 (인사 카드 뒤집기는 오른쪽 목록에서). 220: 계약 제안·은퇴도 휴대폰으로
-  staffNote: "🧑‍💼 인사 후보 카드가 와 있어요. 오른쪽 목록에서 골라요.",
+  staffNote: "🧑‍💼 인사 후보 카드가 와 있어요. 여기를 눌러 골라요 ›", // 휴대폰 화면에서는 지난 연락이 아래에 있어서, 누르면 그 카드로 바로 이동
   title: "답장 대기",
   pastTitle: "지난 연락",
   phoneTitle: "받은 연락",
