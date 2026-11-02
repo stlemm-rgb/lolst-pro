@@ -1,5 +1,5 @@
 // ===== 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js =====
-// state.health = { fatigue: 피로 누적(숨은 값), burnout: null 또는 { weeks }, injury: null 또는 { left, total, heavy } }
+// state.health = { fatigue: 피로 누적(숨은 값), burnout: null 또는 { weeks }, injury: null 또는 { left, total, heavy }, floor: 컨디션 바닥 반등 중 }
 
 function healthState() {
   if (!state.health || typeof state.health !== "object") state.health = { fatigue: 0, burnout: null, injury: null };
@@ -22,6 +22,15 @@ function rehabTraining() {
 function burnoutTrainingMult() { return isBurnedOut() ? 1 - HEALTH_RULES.burnout.trainingCut : 1; }
 // 번아웃이면 경기력 배율 (matchsim.js userMatchContext)
 function burnoutPowerMult() { return isBurnedOut() ? 1 - HEALTH_RULES.burnout.powerCut : 1; }
+
+// 바닥 반등 (239): 컨디션이 30 아래면 매주 +4 (main.js nextWeek, 집 효과 다음). 처음 떨어질 때만 소식
+function conditionFloorWeek() {
+  const F = HEALTH_RULES.conditionFloor, H = healthState();
+  if (state.condition >= F.below) { H.floor = false; return; }
+  state.condition = clamp(state.condition + F.regen);
+  if (!H.floor) addNews("바닥 반등", HEALTH_TEXTS.floorStart.replace("{below}", F.below).replace("{regen}", F.regen));
+  H.floor = true;
+}
 
 // 이번 주 끝 체력으로 부상 확률
 function injuryChance() {

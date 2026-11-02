@@ -769,7 +769,8 @@ function nextWeek(restWeek) {
   // 회복력: 매주 체력 자연 회복
   const regen = traitEffectSum("staminaRegen");
   if (regen) state.stamina = Math.min(state.staminaMax, state.stamina + regen);
-  applyHousingWeek(); // 집 효과: 컨디션 회복 + 컨디션 상한 (합숙 40)
+  applyHousingWeek(); // 집 효과: 컨디션 회복 + 합숙 매주 컨디션 −2 (js/shop.js)
+  conditionFloorWeek(); // 컨디션 30 아래면 매주 +4 바닥 반등 (js/health.js)
 
   // 주 넘기기. 고른 훈련은 다음 주에도 그대로 유지됩니다.
   const finalLadderBoard = isPrePatchWeek(state.week) ? leagueLadder() : null;

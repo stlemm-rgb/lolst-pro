@@ -2,6 +2,7 @@
 // 플레이 방식 3가지(기본 30↓ 휴식 / 안 쉼 솔랭만 / 관리 50↓ 휴식) × 2부 2012·1부 2017 미드 × 씨앗 3 × 2시즌
 // 실행: node tools/measure_health.cjs [게임 폴더(기본: 이 저장소)] [숫자 바꿔 끼우기...]   (약 1~2분)
 //   숫자 바꿔 끼우기 예: node tools/measure_health.cjs . "HOUSING.dormConditionLoss=1" "HEALTH_RULES.burnout.conditionAdd=0"
+//   식 그대로: "js:findTraining('rest').effects.condition=[10,15]"   상황 하나만: SCN=꼴찌 node tools/measure_health.cjs
 //   예전 코드와 비교: git worktree add <폴더> HEAD → node tools/measure_health.cjs <폴더>
 const fs = require("fs"), vm = require("vm"), path = require("path");
 const root = path.resolve(process.argv[2] || path.join(__dirname, "..")) + "/";
@@ -18,7 +19,7 @@ function create(seed) {
     localStorage: { getItem() { return null; }, setItem() {}, removeItem() {} }, navigator: { userAgent: "node" }, location: { href: "" } });
   ctx.window.document = ctx.document;
   for (const s of scripts) vm.runInContext(fs.readFileSync(root + s, "utf8"), ctx, { filename: s });
-  SETS.forEach(kv => { const i = kv.indexOf("="); vm.runInContext(kv.slice(0, i) + " = " + kv.slice(i + 1), ctx); });
+  SETS.forEach(kv => { if (kv.indexOf("js:") === 0) return vm.runInContext(kv.slice(3), ctx); const i = kv.indexOf("="); vm.runInContext(kv.slice(0, i) + " = " + kv.slice(i + 1), ctx); }); // "js:식" = 그대로 실행
   return ctx;
 }
 
@@ -27,15 +28,19 @@ const POL = {
   "안 쉼(솔랭만)": "'solo_rank'",
   "관리(50↓ 휴식)": "state.stamina < 50 ? 'rest' : (state.week % 2 ? 'scrim' : 'replay')",
 };
-const SC = [["2부 2012 미드", 2012, "tier2"], ["1부 2017 미드", 2017, "tier1-mid"]];
+const SC = [["2부 2012 미드", 2012, "tier2"], ["2부 2012 약팀", 2012, "tier2-weak"], ["2부 2012 꼴찌팀", 2012, "tier2-bottom"], ["1부 2017 미드", 2017, "tier1-mid"]]
+  .filter(s => !process.env.SCN || s[0].indexOf(process.env.SCN) !== -1); // SCN=약팀 처럼 상황 하나만
 const SEEDS = [11, 22, 33], WEEKS = 104;
 
 const RUN = `(function (pol, weeks, year, team) {
   linkifyNames = function () {}; renderMenu = function () {}; renderTopbar = function () {}; renderPage = function () {};
   state = createNewState(); draft = newDraft(); draft.name = "측정"; draft.position = "mid"; draft.startYear = year; draft.teams = makeTeamDefs(year);
   const t1 = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1), t2 = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 2);
-  draft.teamChoice = team === "tier2" ? t2[0][1] : t1[Math.floor(t1.length / 2)][1];
+  const weak = t2.slice().sort((a, b) => a[0].shift - b[0].shift)[0]; // 2부에서 전력 보정이 가장 낮은 팀
+  draft.teamChoice = (team === "tier2" || team === "tier2-bottom") ? t2[0][1] : team === "tier2-weak" ? weak[1] : t1[Math.floor(t1.length / 2)][1];
   startCareer(true); state.settings.autoSave = false;
+  // 꼴찌팀: 동료 4명 스탯 −15 → 연패가 잦은 팀 (컨디션 바닥 재현)
+  if (team === "tier2-bottom") myTeam().roster.forEach(id => { if (id === USER_ID) return; const p = findPlayer(id); Object.keys(p.stats).forEach(k => { p.stats[k] = Math.max(1, p.stats[k] - 15); }); });
   const sets = [], wk = []; let injuries = 0, burnouts = 0;
   const orig = userMatchContext;
   userMatchContext = function (a, b, c) { const r = orig(a, b, c); sets.push([state.stamina, state.condition]); return r; };
@@ -67,7 +72,8 @@ for (const [scn, yr, team] of SC) {
     const wk = agg.flatMap(a => a.wk), sets = agg.flatMap(a => a.sets);
     const row = {
       "체력평균": Math.round(mean(wk.map(w => w[0]))), "체력<20 주%": pct(wk, w => w[0] < 20), "쉰 주%": pct(wk, w => w[2] === 1),
-      "컨디션평균": Math.round(mean(wk.map(w => w[1]))), "컨디션<30 주%": pct(wk, w => w[1] < 30),
+      "컨디션평균": Math.round(mean(wk.map(w => w[1]))), "컨디션<30 주%": pct(wk, w => w[1] < 30), "컨디션≤10 주%": pct(wk, w => w[1] <= 10),
+      "30↓ 최장 연속(주)": Math.round(mean(agg.map(a => { let m = 0, k = 0; a.wk.forEach(w => { k = w[1] < 30 ? k + 1 : 0; m = Math.max(m, k); }); return m; }))),
       "부상(2시즌)": +mean(agg.map(a => a.injuries)).toFixed(1), "부상 주%": pct(wk, w => w[3] === 1),
       "번아웃(2시즌)": +mean(agg.map(a => a.burnouts)).toFixed(1), "번아웃 주%": pct(wk, w => w[4] === 1),
       "출전 세트": Math.round(sets.length / agg.length), "2시즌 성장": +mean(agg.map(a => a.growth)).toFixed(1), "세트승률%": +(100 * mean(agg.map(a => a.swr))).toFixed(1),

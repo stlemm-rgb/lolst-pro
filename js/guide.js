@@ -71,6 +71,7 @@ function coachTipWhen(when) {
     case "tired": return state.stamina < TIRED_LIMIT;
     case "injured": return isInjured();
     case "burnout": return isBurnedOut();
+    case "lowCond": return state.condition < HEALTH_RULES.conditionFloor.below;
     case "matchWeek": { const wk = userWeekMatches(state.week); return !userSidelined() && wk.matches.length + wk.preview.length > 0; }
     case "inbox": return state.inbox.some(function (m) { return m.tab === "inbox" && m.choices && m.answered === null; });
     case "quest": return (state.quests || []).length > 0;
