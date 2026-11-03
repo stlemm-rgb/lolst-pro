@@ -409,6 +409,11 @@ function afterUserMatch(m, ctx, lanes, myPerf) {
   before = state.condition;
   state.condition = clamp(state.condition + cond);
   changes.condition = state.condition - before;
+  if (rule.mental) { // 실전 경험: 경기에 나가면 멘탈 (245, data/league.js LEAGUE.afterWin/afterLoss.mental)
+    before = state.stats.mental;
+    state.stats.mental = capRise(before, clamp(before + roundRandom(randInt(rule.mental[0], rule.mental[1]) * USER_TRAINING_SCALE * (LEAGUE.matchMentalPos[state.player.position] || 1))), userStatCap("mental"));
+    if (state.stats.mental !== before) changes.mental = state.stats.mental - before;
+  }
 
   const pop = roundRandom((randInt(rule.popularity[0], rule.popularity[1]) + (won ? traitEffectSum("winPopularity") : 0)) * popularityMultiplier());
   before = state.popularity;

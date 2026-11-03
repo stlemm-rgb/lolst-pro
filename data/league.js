@@ -39,8 +39,10 @@ const LEAGUE = {
   },
 
   // 경기 후 내 선수 변화
-  afterWin:  { condition: [3, 6],  popularity: [1, 2] },
-  afterLoss: { condition: [-6, -3], popularity: [0, 0] },
+  // mental (245): 실전 경험 — 경기에 나가면 멘탈 +0~1 (내 선수 훈련 배율 USER_TRAINING_SCALE 적용, 평균 약 0.25). 휴식만으로는 멘탈이 다른 스탯의 3/4 속도라서
+  afterWin:  { condition: [3, 6],  popularity: [1, 2], mental: [0, 1] },
+  afterLoss: { condition: [-6, -3], popularity: [0, 0], mental: [0, 1] },
+  matchMentalPos: { top: 2 },  // 실전 경험 멘탈 포지션 배율 (탑: 외딴 라인에서 혼자 버티는 포지션, 멘탈이 가산점 스탯 — 사용자 요청 245)
 };
 
 // ===== 다른 선수 플레이 스타일 (js/league.js) =====

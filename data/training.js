@@ -158,7 +158,7 @@ const TRAININGS = [
     effects: {
       stamina:   [25, 35],
       condition: [5, 10],
-      mental:    [0, 1],
+      mental:    [1, 2],   // 245: 0~1 → 1~2 (멘탈을 꾸준히 올릴 방법이 휴식뿐인데 너무 작아서, 사용자 선택 B)
     },
     messages: [
       "오랜만에 늦잠을 자고 산책을 했다. 머리가 맑아졌다.",
