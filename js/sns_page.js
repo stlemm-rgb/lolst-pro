@@ -186,7 +186,8 @@ function msgDeckHTML(deck) {
   } else {
     chat = '<div class="ph-empty"><b>📭</b>' + MSG_DECK.empty + "</div>";
   }
-  if (!lastOk && state.inbox.some(function (x) { return x.kind === "staffPick" && x.answered === null; })) chat = '<div class="ph-note">' + MSG_DECK.staffNote + "</div>" + chat;
+  const sp = !lastOk && state.inbox.find(function (x) { return x.kind === "staffPick" && x.answered === null; });
+  if (sp) chat = '<button class="ph-note ph-staff" data-staffopen="' + sp.id + '">' + MSG_DECK.staffNote + "</button>" + chat; // 누르면 지난 연락의 인사 카드로 이동
   const back = !listView && !lastOk && deck.length > 1 ? '<button class="ph-back" data-deckback="1" title="대화 목록">‹</button>' : "";
   const who = listView ? '<span class="ph-who"><b>' + MSG_DECK.phoneTitle + "</b><span>답할 연락 " + deck.length + "개" + (offers.length ? " · 계약 제안 " + offers.length + "개" : "") + "</span></span>"
     : shown ? avHTML(shown) + '<span class="ph-who"><b>' + escapeHTML(msgAvatar(shown).title) + "</b><span>" + (lastOk ? "답장함" : deck.length > 1 ? deck.length + "개 중 " + (deck.indexOf(shown) + 1) + "번째 연락" : MSG_DECK.phoneTitle) + "</span></span>"
@@ -320,6 +321,9 @@ function bindPhoneDeck(root) {
   root.querySelectorAll("[data-deckopen]").forEach(function (el) { // 223: 대화 목록·비교표에서 열기
     el.onclick = function () { deckOpenId = Number(el.getAttribute("data-deckopen")); deckLastId = null; renderPage(); };
   });
+  root.querySelectorAll("[data-staffopen]").forEach(function (btn) { // 인사 후보 카드 연락을 펼치고 그 자리로 (휴대폰 창에서도)
+    btn.onclick = function () { openStaffPick(Number(btn.getAttribute("data-staffopen"))); };
+  });
   root.querySelectorAll("[data-deckback]").forEach(function (btn) { // 223: ‹ 대화 목록으로
     btn.onclick = function () { deckOpenId = null; deckLastId = null; renderPage(); };
   });
@@ -334,6 +338,17 @@ function bindPhoneDeck(root) {
     };
   });
   bindPhoneApps(root); // 231: 앱 바 · SNS · 알림 · 프로필
+}
+
+// 인사 후보 카드 연락 열기: SNS 받은 연락으로 가서 지난 연락 목록의 그 연락을 펼치고, 카드가 보이게 스크롤
+function openStaffPick(id) {
+  const m = state.inbox.find(function (x) { return x.id === id; });
+  if (m) m.read = true;
+  openMsgId = id; inboxFilter = "all"; snsTab = "inbox"; deckLastId = null;
+  if (phoneOpen) { phoneOpen = false; const ov = document.getElementById("phone-overlay"); if (ov) { ov.hidden = true; ov.innerHTML = ""; } }
+  selectMenu("sns");
+  const el = document.getElementById("spdeck" + id);
+  if (el) el.scrollIntoView({ block: "center" });
 }
 
 // ----- 휴대폰 창 (221): 대시보드 등에서 [📱 휴대폰 열기] → SNS 메뉴로 가지 않고 그 자리에서 답하기 -----
