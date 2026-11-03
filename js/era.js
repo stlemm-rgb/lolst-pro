@@ -37,7 +37,7 @@ function scheduleDesc(s, year) {
 function scheduleName(s, year) {
   const n = eraNames(year);
   const map = { cup: n.cup && n.cup + " 그룹 배틀", cup_po: n.cup && n.cup + " 플레이오프", split1: n.split1, split2: n.split2, playoffs: n.playoffs,
-    road_to_msi: rtmsiOn(year) ? null : msiOn(year) ? "MSI 선발 (" + n.split1 + " 1·2위)" : null };
+    road_to_msi: rtmsiOn(year) ? null : msiOn(year) ? "MSI 선발 (" + n.split1 + " 1·2위)" : null, promotion: n.promotion };
   return map[s.id] || s.name;
 }
 function msiOn(year) { const y = eraYear(year); return y >= ERA.msiFrom && (ERA.msiSkip || []).indexOf(y) === -1; } // 249: 실제로 취소된 해는 빼고
@@ -83,7 +83,7 @@ function expandLeague(lastSeason) {
 // 신생 구단 하나 만들기 (2부)
 function foundClub() {
   const L = state.league;
-  const usedShort = L.teams.map(function (t) { return t.short; });
+  const usedShort = L.teams.map(function (t) { return t.org || t.short; }); // 251: 구단 열쇠도
   const usedBrand = L.teams.map(function (t) { return t.name.split(" ").slice(1).join(" "); });
   let short = TIER1_ORGS.find(function (o) { return usedShort.indexOf(o) === -1; }); // 아직 안 나온 기업 먼저
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -93,6 +93,7 @@ function foundClub() {
   let n = L.teams.length + 1;
   while (findTeam("T" + n)) n++;
   const team = { id: "T" + n, name: short + " " + brand, short: short, tier: 2, roster: [], founded: state.year };
+  if (TIER1_ORGS.indexOf(short) !== -1) { team.org = short; const r = realTeamName(short, state.year); if (r) { team.name = r[1]; team.short = r[2]; } } // 251: 실제 구단이면 그해 이름
   // 지금 2부 주전 평균보다 2 낮게 (리그가 성장해 있어서 고정값 대신 지금 수준에 맞춤)
   const scores = [];
   tierTeams(2).forEach(function (t) { const s = starters(t.id); Object.keys(s).forEach(function (p) { if (s[p] && s[p] !== USER_ID) scores.push(playerScore(s[p])); }); });

@@ -227,10 +227,12 @@ function makeTeamDefs(year) {
   const defs = [];
   const count = eraTeams(year);
   TIER1_ORGS.slice(0, count[1]).forEach(function (org) {
-    defs.push({ name: org + " " + brands.pop(), short: org, tier: 1, shift: teamShiftRoll(1) });
+    const brand = brands.pop();
+    const real = realTeamName(org, year); // 251: 그해 실제 이름 (없으면 예전처럼 약자 + 별명)
+    defs.push({ name: real ? real[1] : org + " " + brand, short: real ? real[2] : org, org: org, tier: 1, shift: teamShiftRoll(1) });
   });
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const taken = TIER1_ORGS.slice();
+  const taken = TIER1_ORGS.concat(Object.keys(REAL_TEAM_NAMES).reduce(function (a, k) { return a.concat(REAL_TEAM_NAMES[k].map(function (r) { return r[2]; })); }, [])); // 251: 실제 구단 짧은 이름과 안 겹치게
   for (let i = 0; i < count[2]; i++) {
     let tag;
     do { tag = letters[randInt(0, 25)] + letters[randInt(0, 25)]; } while (taken.indexOf(tag) !== -1);
@@ -259,6 +261,7 @@ function makeLeague(defs, chosenIndex) {
   names.forEach(function (n, i) {
     const tier = n.tier;
     const team = { id: "T" + (i + 1), name: n.name, short: n.short, tier: tier, roster: [] };
+    if (n.org) team.org = n.org; // 251: 구단 열쇠 (실제 이름 표 REAL_TEAM_NAMES)
     const npc = LEAGUE.npc;
     // 주전 5명 (포지션마다 1명)
     POSITION_IDS.forEach(function (pos) {
@@ -284,6 +287,32 @@ function makeLeague(defs, chosenIndex) {
   fillRosters(); // 내 선수·레전드 배치 뒤 후보 구성 정리 (js/contracts.js 후보 구성 규칙)
   startSeason();
   initContracts(); // 선수들 연봉·계약 기간, 내 첫 계약 (2년)
+}
+
+// ----- 구단 실제 이름 (251, data/names.js REAL_TEAM_NAMES) -----
+// 구단 열쇠 org의 그해 [시작 연도, 이름, 짧은 이름] (표에 없으면 null)
+function realTeamName(org, year) {
+  const rows = REAL_TEAM_NAMES[org];
+  if (!rows) return null;
+  let row = null;
+  rows.forEach(function (r) { if (r[0] <= year) row = r; });
+  return row;
+}
+function teamOrg(t) { return t.org || (TIER1_ORGS.indexOf(t.short) !== -1 ? t.short : null); } // 예전 세이브: 약자가 구단 열쇠
+// 모든 구단 이름을 그해 이름으로 (새 게임·새 시즌·불러오기). 돌려주는 값: 이름이 바뀐 소식 글
+function applyRealTeamNames(year) {
+  const news = [];
+  (state.league.teams || []).forEach(function (t) {
+    const org = teamOrg(t);
+    if (!org) return;
+    t.org = org;
+    const r = realTeamName(org, year);
+    if (!r || (t.name === r[1] && t.short === r[2])) return;
+    if (t.name.indexOf(org + " ") !== 0) news.push("🏷️ 구단 이름 변경: " + t.name + " → " + r[1]); // 예전 별명 이름(T1 CYCLONE)에서 바뀌는 건 소식 없이
+    t.name = r[1];
+    t.short = r[2];
+  });
+  return news;
 }
 
 // ----- 레전드 선수 (244, data/names.js LEGENDS): 실제로 활동한 해에만 등장 -----
@@ -374,10 +403,10 @@ function legendTeamFor(n, target) {
     if (legends.length >= LEGEND_RULES.maxPerTeam || legends.some(function (p) { return p.pos === n.pos; })) return false;
     if (target === null) return true;
     const st = starterAt(t.id, n.pos);
-    return !st || st === USER_ID ? st !== USER_ID : playerScore(st) < target + (t.short === n.team ? LEGEND_RULES.realBoost : 0);
+    return !st || st === USER_ID ? st !== USER_ID : playerScore(st) < target + ((t.org || t.short) === n.team ? LEGEND_RULES.realBoost : 0);
   };
   const byStrength = function (a, b) { return teamStrength(b.id) - teamStrength(a.id); };
-  const real = n.team && state.league.teams.find(function (t) { return t.short === n.team; });
+  const real = n.team && state.league.teams.find(function (t) { return (t.org || t.short) === n.team; }); // 251: 구단 열쇠
   if (real && ok(real)) return real;
   return tierTeams(1).filter(ok).sort(byStrength)[0] || tierTeams(2).filter(ok).sort(byStrength)[0] || null;
 }

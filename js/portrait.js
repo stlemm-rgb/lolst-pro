@@ -34,7 +34,7 @@ function uniformByShort(short) {
 function uniformOfTeam(teamId) {
   if (!teamId) return FREE_AGENT_UNIFORM;
   const t = findTeam(teamId);
-  if (t) return uniformByShort(t.short);
+  if (t) return uniformByShort(t.org || t.short); // 251: 이름이 바뀌어도 구단 색은 그대로
   const w = findWorldTeam(teamId);
   const reg = w ? w.region : null;
   const list = REGION_UNIFORMS[reg] || UNIFORM_POOL;

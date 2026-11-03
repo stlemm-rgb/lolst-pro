@@ -632,15 +632,16 @@ function koFinal(comp, label, week, bo, champKey, title) {
 function promoMatch(week, tier1Index, tier2Index) {
   const t1 = seasonOf().finalOrder[tier1Index];
   const t2 = standings(["tier2", "tier2b"], tier2Ids())[tier2Index].id;
-  const m = schedule(week, "promotion", "승강전", t1, t2, LEAGUE.bestOf.promotion);
+  const pname = eraNames(seasonOf().year).promotion; // 251: 2012~14 = 챔피언스 예선
+  const m = schedule(week, "promotion", pname, t1, t2, LEAGUE.bestOf.promotion);
   playMatch(m);
   seasonOf().promo.push({ tier1: t1, tier2: t2, winner: m.winner });
   const mine = myTeam();
   const who = mine && mine.id === t2 ? (m.winner === t2 ? "myUp" : "myFail") : mine && mine.id === t1 ? (m.winner === t1 ? "myStay" : "myDown") : (m.winner === t2 ? "up" : "stay");
   queueHeadline("promotion", who, { tier1: teamName(t1), tier2: teamName(t2), winner: teamName(m.winner),
     score: Math.max(m.score[0], m.score[1]) + ":" + Math.min(m.score[0], m.score[1]) }); // 화면 뉴스
-  addNews("승강전", m.winner === t2
-    ? teamName(t2) + "이(가) " + teamName(t1) + "을(를) 꺾고 다음 시즌 1부 승격!"
+  addNews(pname, m.winner === t2
+    ? teamName(t2) + "이(가) " + teamName(t1) + "을(를) 꺾고 " + (pname === "승강전" ? "다음 시즌 1부 승격!" : pname + " 통과, 다음 시즌 " + eraNames(seasonOf().year + 1).league + " 진출!")
     : teamName(t1) + "이(가) 1부 잔류에 성공했다.");
 }
 
@@ -734,7 +735,7 @@ function koPreview(week) {
     const t2 = standings(["tier2", "tier2b"], tier2Ids());
     const i = week === 39 ? 0 : 1;
     const n1 = tier1Ids().length;
-    return [{ comp: "promotion", label: "승강전", a: o[week === 39 ? n1 - 1 : n1 - 2], b: t2[i].id, bo: B.promotion }];
+    return [{ comp: "promotion", label: eraNames(s.year).promotion, a: o[week === 39 ? n1 - 1 : n1 - 2], b: t2[i].id, bo: B.promotion }];
   }
   if (week === 44) {
     if (!s.worlds || s.matches.some(function (m) { return m.comp === "worlds_group" && !m.winner; })) return [];

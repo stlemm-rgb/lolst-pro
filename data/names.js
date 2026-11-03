@@ -5,6 +5,24 @@
 // - 1부 기업명 10개는 고정이에요. 서브 브랜드는 새 게임마다 무작위로 붙어요.
 // - 2부 구단은 영문 2글자 기업명(무작위) + 서브 브랜드
 const TIER1_ORGS = ["GEN.G", "Hanwha", "T1", "Dplus", "KT", "BNK", "BRION", "NS", "KW", "DN"];
+// 251 (② P3, 사용자 확인): 구단 열쇠(위 약자, 팀의 t.org) → 연도별 실제 LCK 이름 [시작 연도, 이름, 짧은 이름]. 그해 이하 중 가장 최근 줄
+//   조사·결정: Claude outputs/구단_이름_후보.md (위키백과 계보 확인, 빈 칸은 그해 실제로 있던 팀으로 채움 — 계보가 꼭 맞지 않을 수 있음)
+//   새 게임·새 시즌·불러오기 때 팀 이름(t.name·t.short)을 그해 이름으로 (js/league.js applyRealTeamNames)
+const REAL_TEAM_NAMES = {
+  "T1":     [[2012, "SK Telecom T1", "SKT"], [2020, "T1", "T1"]],
+  "GEN.G":  [[2012, "MVP Ozone", "MVP"], [2013, "Samsung Galaxy", "SSG"], [2018, "Gen.G", "GEN"]],
+  "KT":     [[2012, "KT Rolster", "KT"]],
+  "Hanwha": [[2012, "Azubu Frost", "AZF"], [2013, "CJ Entus Frost", "CJF"], [2015, "KOO Tigers", "KOO"], [2016, "ROX Tigers", "ROX"], [2018, "Hanwha Life Esports", "HLE"]],
+  "Dplus":  [[2012, "Azubu Blaze", "AZB"], [2013, "CJ Entus Blaze", "CJB"], [2015, "CJ Entus", "CJ"], [2017, "Kongdoo Monster", "KDM"], [2018, "Griffin", "GRF"],
+             [2019, "DAMWON Gaming", "DWG"], [2021, "DWG KIA", "DK"], [2023, "Dplus KIA", "DK"]],
+  "BNK":    [[2012, "StarTale", "STL"], [2013, "KT Rolster Arrows", "KTA"], [2015, "Sbenu Sonicboom", "SBENU"], [2016, "ESC Ever", "EVER"], [2017, "MVP", "MVP"],
+             [2019, "SANDBOX Gaming", "SB"], [2021, "Liiv SANDBOX", "LSB"], [2024, "FearX", "FOX"], [2025, "BNK FearX", "BFX"]],
+  "BRION":  [[2012, "NaJin Sword", "NJS"], [2013, "NaJin Black Sword", "NJS"], [2015, "NaJin e-mFire", "NJE"], [2017, "bbq Olivers", "BBQ"], [2019, "Griffin", "GRF"],
+             [2020, "SeolHaeOne Prince", "SP"], [2021, "Fredit BRION", "BRO"], [2023, "OKSavingsBank BRION", "BRO"], [2026, "Hanjin BRION", "BRO"]],
+  "NS":     [[2012, "Xenics Storm", "XNC"], [2013, "Jin Air Green Wings", "JAG"], [2020, "Team Dynamics", "DYN"], [2021, "Nongshim RedForce", "NS"]],
+  "KW":     [[2012, "SK Telecom T1 S", "SKS"], [2015, "Rebels Anarchy", "RA"], [2016, "Afreeca Freecs", "AF"], [2022, "Kwangdong Freecs", "KDF"], [2025, "DN Freecs", "DNF"], [2026, "DN SOOPers", "DNS"]],
+  "DN":     [[2012, "Incredible Miracle", "IM"], [2016, "Longzhu Gaming", "LZ"], [2018, "Kingzone DragonX", "KZ"], [2020, "DRX", "DRX"], [2026, "Kiwoom DRX", "DRX"]],
+};
 
 // 기존 세이브의 고정 구단만 개명 (무작위 2부 구단의 같은 약칭은 유지).
 const TEAM_ORG_RENAMES = [

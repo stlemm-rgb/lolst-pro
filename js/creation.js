@@ -251,7 +251,7 @@ function stepStatHTML() {
 function stepTeamHTML(myScore) {
   const teamBtn = function (def, i) {
     const n = teamStarCount(def);
-    const uni = uniformByShort(def.short);
+    const uni = uniformByShort(def.org || def.short); // 251: 구단 열쇠로 색
     return '<div class="choice team-choice' + (draft.teamChoice === i ? " selected" : "") + '" data-cteam="' + i + '">' +
       '<span class="pf-frame">' + portraitHTMLFrom(draft.look, uni, { scale: 2, mood: draft.teamChoice === i ? "win" : "normal" }) + "</span>" +
       '<div class="team-choice-text"><b>' + escapeHTML(def.name) + "</b>" +

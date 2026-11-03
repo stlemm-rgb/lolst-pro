@@ -203,7 +203,8 @@ function h2hDetailLineHTML(id) {
 function bigGameOf(x, y) {
   const a = findTeam(x), b = findTeam(y);
   if (!a || !b) return null;
-  return BIG_GAMES.find(function (g) { return (g.a === a.short && g.b === b.short) || (g.a === b.short && g.b === a.short); }) || null;
+  const ka = a.org || a.short, kb = b.org || b.short; // 251: 구단 열쇠 (이름이 시대마다 바뀜)
+  return BIG_GAMES.find(function (g) { return (g.a === ka && g.b === kb) || (g.a === kb && g.b === ka); }) || null;
 }
 function bigGameTagHTML(g) {
   return '<span class="rep-tag biggame" title="빅게임: 이기면 인기도 보너스">🔥 ' + escapeHTML(g.name) + "</span> ";
