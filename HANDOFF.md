@@ -199,7 +199,7 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 | 2~4 | ✅ 레전드 30명 (244) | 사용자가 20 → 30명. data/names.js LEGENDS·LEGEND_RULES, js/league.js placeLegends·legendTeamFor·legendRetireRule·retireOldNamed |
 | 4-2 | ✅ 리그 전체 스탯 낮추기 (246, G1+L) | 레전드를 넣으니 6년차 상위 10명 중 4~7명·상위 30명 중 14~18명이 레전드. 무엇을 낮출지(NPC 시작 수준 LEAGUE.npc·해마다 성장 LEAGUE.npcGrowth·1부 평균 상승) 측정 → 숫자 비교 → 선택지. 내 선수 성장 목표(8장)와 같이 보기 |
 | 5 | ✅ 검사 (243~246에서 매번) | 정답지·예전 세이브·화면(⭐ 레전드)·measure_league |
-| 6 | **다음: 유형 균형 (사용자 요청 2026-11-03)** | 노력형이 유망주보다 훨씬 빨리 큼 (리그 미드 순위 5년차 1.7위 vs 3.7위, 7년차 86점 vs 81점). 유형 4개(유망주·노력형·레전드·살아있는 레전드, data/player.js ARCHETYPES) 비교 측정 → 선택지. ARCH=grinder node tools/measure_league.cjs |
+| 6 | ✅ 유형 균형 측정 (247) — 그대로 두기로 | 노력형이 유망주보다 훨씬 빨리 큼 (리그 미드 순위 5년차 1.7위 vs 3.7위, 7년차 86점 vs 81점). 유형 4개(유망주·노력형·레전드·살아있는 레전드, data/player.js ARCHETYPES) 비교 측정 → 선택지. ARCH=grinder node tools/measure_league.cjs |
 
 - 지금 규칙: 실제 리그 결과를 게임 일정에 맞추지 않음 (레전드가 실제 우승한 해에 우승하도록 하지 않음), 2027년 이후 가짜 역사 금지. 단, 바로 다음 ②에서 '실제 LoL 역사에 맞춘 진행'으로 바꿀 예정이니 ①의 네임드 배치·나이는 ②와 같이 생각하기 (예: 레전드가 실제로 활동한 해에 등장).
 
@@ -231,7 +231,8 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 
 - 내 선수 성장(201): 훈련 스탯 ×0.5 (USER_TRAINING_SCALE), 유망주 +15%. 목표 = 유망주 80은 20~21세, 90은 23~25세. 성장 측정은 /tmp 스크립트 방식(유망주 2부 2012 × 씨앗 3, 가장 높은 스탯 3개 평균).
 
-- 1부 평균 전력 2013 약 64.8 → 2026 약 74.4 (사용자 수용).
+- 1부 평균 전력 2013 약 64.8 → 2026 약 74.4 (사용자 수용). 246 뒤 7년차 1부 평균 약 68.7.
+- 247 유형 측정(node tools/measure_archetypes.cjs): 같은 나이면 노력형 ≈ 유망주 (노력형은 2살 많게 시작해서 같은 해엔 앞섬). 어느 유형이든 5~9년 뒤 리그 미드 1위 → 85~91점까지 계속 오름 (리그 1위 약 79). 사용자: 지금은 그대로. 후반이 쉽다는 피드백이 오면 여기부터 (높은 스탯 성장 둔화·노화·레전드·라이벌).
 - 국제대회: 169 뒤 세트 70.0%, 월드 국내 우승 80%, 같은 해외 팀 연속 우승 0/18 (목표 70~80%). 너무 국내 쪽이라는 피드백이 오면 지역 수준 0.93 또는 OVERSEAS_DYNASTY.moves 1을 먼저 측정.
 - 숙련도 20→100 = 세트 승률 +19.7%p, 메타 위주 vs 비메타 +8.9%p. 조절은 data/match.js CHAMP_EV.pow·metaPowerBonus·metaPenaltyDiv·jokerPowerBonus.
 - 국내 리그 외국인 선수 6시즌 동안 7~10명에서 안정.
@@ -243,4 +244,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 1. **`git pull` 먼저** (다른 PC에서 올린 커밋 받기) → `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
    - 새 PC에서 측정·정답지 도구를 쓰려면: `python -m pip install playwright` → `python -m playwright install chromium` (Windows는 `python`, 출력 글자 때문에 `PYTHONIOENCODING=utf-8`). 브라우저 없이 빠른 체력·컨디션 측정은 `node tools/measure_health.cjs`.
 2. 새 사용자 요청 우선. 없으면 7장 순서대로: ① 네임드 선수 정리(대형 신인 측정부터) → ② 실제 LoL 역사 → ③ 시간 진행 이벤트 → ④ 포지션 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱. 해외 진출은 보류.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 247**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 248**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

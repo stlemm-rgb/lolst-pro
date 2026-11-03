@@ -52,6 +52,10 @@ git worktree add ../base HEAD && node tools/measure_health.cjs ../base   # 예�
 
 후보 값별 1부 평균(1·7년차)·1위·10위 점수, 상위 10·30명 안 레전드·대형 신인 수, 내 선수(미드) 리그 미드 순위 3·5·7년차. `ARCH=grinder`(내 선수 유형, 기본 = 유망주) · `ONLY=지금,G1+L`(후보 일부만).
 
+## 0-4) 시작 유형 — measure_archetypes.cjs (Node만, 약 20분, 247)
+
+유형 4개 × 3판 × 12시즌: 해마다 내 선수 나이·종합 능력·리그 미드 순위를 '같은 해'와 '같은 나이'로. `ONLY=prospect,grinder` · `SEASONS=12` · `SET="식"`(모든 유형에 같은 값 바꾸기).
+
 ## 1) 특성 효과 — measure_traits.py (5포지션 × 8특성 × 500경기 ≈ 3~4분, --jobs 2)
 
 ```
