@@ -63,6 +63,12 @@ function roomPoly(rs, pts, col) {
   }
 }
 
+// 동작 바꿔 끼우기 (요약 창, 시안 27): cx.pose = function(이름, 누구(-1 = 나), 장) → 그림 또는 없음(원래 그림). 대시보드는 cx.pose 없음 = 그대로
+function roomSpr(name, cx, who) {
+  const p = cx.pose && cx.pose(name, who, cx.f);
+  return p || ROOM_SPRITES[name];
+}
+
 // ----- 한 장 그리기 -----
 function roomDrawFrame(scene, cx) {
   const R = ROOM_RULES, W = R.roomW, H = R.roomH;
@@ -113,7 +119,7 @@ function roomDrawFrame(scene, cx) {
     else if (k === "wallR") wallR(op[1], op[2], op[3], op[4], op[5]);
     else if (k === "box") box(op[1], op[2], op[3], op[4], op[5], op[6], op[7], op[8]);
     else if (k === "breath") { if (R.breath[cx.f]) box(op[1], op[2], op[3], op[4], op[5], op[6], op[7]); }
-    else if (k === "me") { if (!cx.empty) me = sprite(ROOM_SPRITES[op[1]], op[2], op[3], op[4], cx.me, op[5] && op[5].still); }
+    else if (k === "me") { if (!cx.empty) me = sprite(roomSpr(op[1], cx, -1), op[2], op[3], op[4], cx.me, op[5] && op[5].still); }
     else if (k === "trophies") {
       cx.trophies.slice(0, op[1].length).forEach(function (t, i) {
         const T = ROOM_TROPHIES[t], r = ROOM_RAMP[T.ramp].c, s = op[1][i];
@@ -146,7 +152,7 @@ function roomDrawFrame(scene, cx) {
         const mid = Math.floor(op[1].length / 2);
         const colors = i === mid ? cx.me : cx.mates[i < mid ? i : i - 1];
         const keep = cx.f; cx.f = (keep + i * 4) % R.frames; // 숨쉬기를 서로 다르게
-        const a = sprite(ROOM_SPRITES.front, x, op[2], op[3], colors);
+        const a = sprite(roomSpr("front", cx, i === mid ? -1 : i), x, op[2], op[3], colors);
         cx.f = keep;
         if (i === mid) me = a;
       });
@@ -276,4 +282,139 @@ function roomBlockHTML(matchCount, capHTML) {
   return '<div class="room-block"><div class="room-pic" role="img" aria-label="' + escapeHTML(caption) + '" style="width:' + w + "px;height:" + h + "px;background-image:url(" + url + ");background-size:" + (w * R.frames) + "px " + h + "px;--room-end:-" + (w * R.frames) +
     "px;animation-duration:" + (R.frames * R.frameMs) + "ms;animation-timing-function:steps(" + R.frames + ')"></div>' +
     '<div class="room-cap">' + (capHTML || escapeHTML(caption)) + "</div></div>";
+}
+
+// ===== 이번 주 요약 창 그림 (시안 27, 2026-11-04) — 데이터: data/room.js ROOM_POSES · ROOM_FX · ROOM_FONT =====
+// 지난주에 한 일 → 장면: 우승(무대 불꽃 / 국제 대회 클로즈업) > 경기(마지막 경기 승·패) > 휴식·재활(집) > 훈련(대성공이면 불꽃 빛)
+// 게임 결과용 무작위 안 씀 — 색종이·불꽃은 자리·장 번호로 정함 (같은 상황 = 같은 그림)
+function roomWeekKind(r) {
+  if (r.title) return ROOM_FX.bigTitles.indexOf(r.title.key) !== -1 ? "titleBig" : "titleLeague";
+  const lines = r.teamLines || [];
+  if (lines.length) return lines[lines.length - 1].won ? "win" : "lose";
+  if (r.training && (r.training.id === "rest" || r.training.id === "rehab")) return "rest";
+  return r.great ? "great" : "train";
+}
+function roomWHash(i, k) { const v = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); }
+function roomWIso(x, y, z) {
+  const R = ROOM_RULES, W = R.roomW, oy = R.roomH + 3, ox = W + 2 + Math.floor((R.w - (2 * W + 2)) / 2);
+  return [ox + (x - y), oy + (x + y) / 2 - z];
+}
+// 도트 그림 붙이기 (k배), 아래 가운데 = (bx, by)
+function roomWBlit(rs, spr, bx, by, colors, k, lift) {
+  const rows = spr.rows, w = rows[0].length, h = rows.length, x0 = Math.round(bx - w * k / 2), y0 = Math.round(by - h * k) - (lift || 0);
+  rows.forEach(function (row, ry) {
+    row.split("").forEach(function (ch, rx) {
+      if (ch === "." || !colors[ch]) return;
+      for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) roomPx(rs, x0 + rx * k + a, y0 + ry * k + b, colors[ch]);
+    });
+  });
+}
+function roomWConfetti(rs, f, n, seed, cx) {
+  const H = rs.h + 8, F = ROOM_RULES.frames, cols = ROOM_FX.confetti.map(function (c) { return roomColor(c, cx); });
+  for (let i = 0; i < n; i++) {
+    const x = Math.floor(roomWHash(i, seed) * rs.w + Math.sin((f / F) * 6.283 + i) * 2), sp = 1 + Math.floor(roomWHash(i, seed + 1) * 3);
+    const y = Math.floor((roomWHash(i, seed + 2) * H + f * sp * H / F) % H) - 4, c = cols[i % cols.length];
+    roomPx(rs, x, y, c);
+    if ((f + i) % 3) roomPx(rs, x + 1, y, c); else roomPx(rs, x, y + 1, c);
+  }
+}
+function roomWPyro(rs, x, by, f, ph) {
+  const cols = ROOM_FX.pyro, hgt = 10 + Math.round(6 * Math.abs(Math.sin((f + ph) * 0.9)));
+  for (let y = 0; y < hgt; y++) {
+    const w = y < 3 ? 2 : 1, c = cols[Math.min(cols.length - 1, Math.floor(y / hgt * cols.length))];
+    for (let d = -w; d <= w; d++) if (d === 0 || roomWHash(x * 31 + y + d, f) > 0.25) roomPx(rs, x + d, by - y, c);
+  }
+  for (let i = 0; i < 4; i++) roomPx(rs, x + Math.round((roomWHash(i, f + ph) - 0.5) * 8), by - hgt - 1 - Math.floor(roomWHash(i + 9, f + ph) * 5), cols[i % 3]);
+}
+function roomWWord(rs, y, f) {
+  const str = ROOM_FX.word.split(""), ws = str.map(function (ch) { return ROOM_FONT[ch][0].length; });
+  let x0 = Math.floor((rs.w - ws.reduce(function (a, b) { return a + b + 1; }, -1)) / 2);
+  str.forEach(function (ch, i) {
+    ROOM_FONT[ch].forEach(function (row, ry) {
+      row.split("").forEach(function (c, rx) {
+        if (c !== "#") return;
+        roomPx(rs, x0 + rx + 1, y + ry + 1, ROOM_FX.wordShadow);
+        roomPx(rs, x0 + rx, y + ry, (f % 10) === i ? "#ffffff" : ROOM_FX.wordRamp[ry]);
+      });
+    });
+    x0 += ws[i] + 1;
+  });
+}
+// 대성공: 캐릭터 둘레 1칸에 불꽃 점 (내가 없는 그림과 비교해 캐릭터 자리를 찾음)
+function roomWFire(rs, empty, f) {
+  const W = rs.w, H = rs.h, me = new Uint8Array(W * H), cols = ROOM_FX.fire.map(roomRGB);
+  for (let i = 0; i < W * H; i++) { const j = i * 4; if (rs.d[j] !== empty.d[j] || rs.d[j + 1] !== empty.d[j + 1] || rs.d[j + 2] !== empty.d[j + 2]) me[i] = 1; }
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x;
+    if (me[i] || !(me[i - 1] || me[i + 1] || me[i - W] || me[i + W] || me[i + W - 1] || me[i + W + 1]) || (x * 7 + y * 3 + f) % 4 === 0) continue;
+    const up = me[i + W] || me[i + W - 1] || me[i + W + 1], c = cols[(x + y + f) % cols.length], j = i * 4;
+    rs.d[j] = c[0]; rs.d[j + 1] = up ? Math.min(255, c[1] + 40) : c[1]; rs.d[j + 2] = c[2]; rs.d[j + 3] = 255;
+    if (up && (x + f) % 5 === 0 && y > 2) { const k = (i - 2 * W) * 4; rs.d[k] = 255; rs.d[k + 1] = 220; rs.d[k + 2] = 90; rs.d[k + 3] = 255; }
+  }
+}
+// 국제 대회 우승: 금빛 햇살 줄기 + 크게 그린 나
+function roomWCloseup(cx, f) {
+  const R = ROOM_RULES, X = ROOM_FX, rs = roomCanvas(R.w, R.h), c0 = [R.w / 2, R.h * 0.6], step = Math.PI * 2 / X.rays.n;
+  for (let y = 0; y < R.h; y++) for (let x = 0; x < R.w; x++) {
+    const a = Math.atan2(y - c0[1], x - c0[0]) + f * (Math.PI * 2 * X.rays.turn) / R.frames;
+    const ray = ((Math.floor((a + 2 * Math.PI) / step) % 2) + 2) % 2, base = ray ? X.rays.light : X.rays.dark;
+    const fade = Math.max(0.25, 1 - Math.hypot(x - c0[0], (y - c0[1]) * 1.3) / 70), j = (y * R.w + x) * 4;
+    rs.d[j] = base[0] * fade + 20; rs.d[j + 1] = base[1] * fade + 10; rs.d[j + 2] = base[2] * fade + 30; rs.d[j + 3] = 255;
+  }
+  const fy = R.h - 4;
+  for (let x = 0; x < R.w; x++) for (let y = fy; y < R.h; y++) roomPx(rs, x, y, y === fy ? X.floor[0] : X.floor[1]);
+  roomWBlit(rs, roomWTrophy(f), R.w / 2, fy, cx.me, X.closeScale, R.breath[f] ? 1 : 0);
+  for (let i = 0; i < 10; i++) { // 반짝이 별
+    const t = (f + i * 2) % 10;
+    if (t > 4) continue;
+    const x = Math.floor(roomWHash(i, 3) * (R.w - 6)) + 3, y = Math.floor(roomWHash(i, 4) * 44) + 9, r = t < 3 ? t : 4 - t;
+    roomPx(rs, x, y, "#ffffff");
+    for (let d = 1; d <= r; d++) { roomPx(rs, x + d, y, "#fff4bc"); roomPx(rs, x - d, y, "#fff4bc"); roomPx(rs, x, y + d, "#fff4bc"); roomPx(rs, x, y - d, "#fff4bc"); }
+  }
+  roomWConfetti(rs, f, X.confettiN.big, 11, cx);
+  roomWWord(rs, 1, f);
+  return rs;
+}
+function roomWTrophy(f) { return f % (ROOM_FX.trophyBlink * 2) < ROOM_FX.trophyBlink ? ROOM_POSES.trophyA : ROOM_POSES.trophyB; }
+
+// 요약 창 그림 띠 (20장) → 그림 주소. kind = roomWeekKind 값
+function roomWeekStripURL(kind) {
+  const key = kind === "rest" ? roomHomeKey() : (kind === "train" || kind === "great") ? "train" : "match";
+  const cx = roomContext(key);
+  cx.empty = false;
+  cx.me = Object.assign({}, cx.me, ROOM_FX.trophyColors);
+  if (kind === "train" || kind === "great") cx.pose = function (name, who, f) { return name === "sitL" ? (f % (ROOM_FX.typeEvery * 2) < ROOM_FX.typeEvery ? ROOM_POSES.typeA : ROOM_POSES.typeB) : null; };
+  if (kind === "win") cx.pose = function (name) { return name === "front" ? ROOM_POSES.cheer : null; };
+  if (kind === "lose") cx.pose = function (name) { return name === "front" ? ROOM_POSES.slump : null; };
+  if (kind === "titleLeague") cx.pose = function (name, who, f) { return name === "front" ? (who === -1 ? roomWTrophy(f) : ROOM_POSES.cheer) : null; };
+  const ck = JSON.stringify(["week", kind, key, cx.me, cx.team, cx.mates, cx.trophies, cx.prop || ""]);
+  if (ROOM_CACHE[ck] !== undefined) return ROOM_CACHE[ck];
+  let url = "";
+  try {
+    const R = ROOM_RULES, cv = document.createElement("canvas");
+    cv.width = R.w * R.frames; cv.height = R.h;
+    const g = cv.getContext && cv.getContext("2d");
+    if (g && typeof ImageData !== "undefined") {
+      for (let f = 0; f < R.frames; f++) {
+        cx.f = f;
+        let rs;
+        if (kind === "titleBig") rs = roomWCloseup(cx, f);
+        else {
+          rs = roomDrawFrame(ROOM_SCENES[key], cx);
+          if (kind === "great") roomWFire(rs, roomDrawFrame(ROOM_SCENES[key], Object.assign({}, cx, { empty: true })), f);
+          if (kind === "lose") for (let i = 0; i < rs.d.length; i += 4) { rs.d[i] *= ROOM_FX.loseDim[0]; rs.d[i + 1] *= ROOM_FX.loseDim[1]; rs.d[i + 2] *= ROOM_FX.loseDim[2]; }
+          if (kind === "titleLeague") {
+            ROOM_FX.pyroAt.forEach(function (p, i) { const q = roomWIso(p[0], p[1], 0); roomWPyro(rs, q[0] + (i ? -2 : 2), q[1] - 1, f, i * 3); });
+            roomWConfetti(rs, f, ROOM_FX.confettiN.league, 1, cx);
+            roomWWord(rs, 3, f);
+          }
+        }
+        g.putImageData(new ImageData(rs.d, R.w, R.h), f * R.w, 0);
+      }
+      url = cv.toDataURL();
+    }
+  } catch (e) { url = ""; }
+  if (roomCacheSize > 40) { Object.keys(ROOM_CACHE).forEach(function (k) { delete ROOM_CACHE[k]; }); roomCacheSize = 0; }
+  ROOM_CACHE[ck] = url; roomCacheSize++;
+  return url;
 }

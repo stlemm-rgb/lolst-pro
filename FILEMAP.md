@@ -26,8 +26,8 @@
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
 | `data/news.js` | 42 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
-| `data/ui.js` | 14 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
-| `data/room.js` | 11 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
+| `data/ui.js` | 15 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
+| `data/room.js` | 14 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/health.js` | 3 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |
 | `data/replay.js` | 2 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
@@ -47,9 +47,9 @@
 | `js/league.js` | 33 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
-| `js/matchsim.js` | 45 | 경기 판정과 주간 일정 진행 |  |
+| `js/matchsim.js` | 46 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 12 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 56 | 게임 상태 |  |
+| `js/main.js` | 57 | 게임 상태 |  |
 | `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 20 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 37 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
@@ -91,8 +91,8 @@
 | `js/health.js` | 4 | 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js |  |
 | `js/franchise.js` | 7 | 프랜차이즈 (253, ② P5 · 사용자 결정 2026-11-03) — 실제 LCK처럼 2021년부터 |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
-| `js/dash_plus.js` | 12 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
-| `js/room.js` | 15 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |
+| `js/dash_plus.js` | 23 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
+| `js/room.js` | 23 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |
 | `js/dash_layout.js` | 20 | 대시보드 PC · 휴대폰 따로 (232, 시안 24 ② · Codex 토론) |  |
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |

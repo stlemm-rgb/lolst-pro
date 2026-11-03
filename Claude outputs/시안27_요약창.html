@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시안 27 · 이번 주 요약 창 리뉴얼</title>
+<style>
+:root { --bg:#07070d; --panel:#11111c; --panel-2:#181828; --text:#f1f1f7; --muted:#8a8aa6; --border:#26263d; --accent:#00e0ff; --accent2:#b44dff; --gold:#ffd23f; --good:#2bff9e; --bad:#ff3d71; --side-a:#00e0ff; --side-b:#ff5fa2; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #000; color: var(--text); font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
+/* 시안 조작 막대 (게임에는 없음) */
+.bar { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 10px 14px; background: #15152a; border-bottom: 1px solid var(--border); font-size: 13px; }
+.bar .grp { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.bar .grp > span { color: var(--muted); margin-right: 2px; }
+.bar button { background: #1d1d33; color: var(--text); border: 1px solid #34345a; border-radius: 8px; padding: 5px 9px; font: inherit; cursor: pointer; }
+.bar button.on { border-color: var(--accent); background: rgba(0,224,255,.15); color: #bff6ff; }
+.bar .replay { background: linear-gradient(90deg,#8b3dff,#00b8e6); border: 0; font-weight: 700; }
+/* 게임 화면 자리 */
+.stagewrap { display: flex; justify-content: center; padding: 16px; }
+#stage { position: relative; width: 1280px; height: 720px; background: var(--bg); overflow: hidden; border: 1px solid var(--border); }
+#stage.m { width: 390px; height: 844px; }
+.fake { position: absolute; inset: 0; padding: 18px; display: grid; grid-template-columns: 160px 1fr 1fr 1fr; gap: 14px; opacity: .55; }
+#stage.m .fake { grid-template-columns: 1fr; }
+.fake div { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; }
+.fake .side { grid-row: span 3; }
+#stage.m .fake .side { display: none; }
+.dim { position: absolute; inset: 0; background: rgba(4,4,10,.72); backdrop-filter: blur(2px); }
+.reopen { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); padding: 12px 18px; border-radius: 12px; border: 1px solid var(--accent); background: #10202a; color: #bff6ff; font: inherit; font-weight: 700; cursor: pointer; }
+
+/* ===== 요약 창 공통 ===== */
+.ws { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) scale(.92); opacity: 0; background: linear-gradient(180deg,#1a1a2e,#12121f); border: 1px solid #34345a; border-radius: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(0,224,255,.08); padding: 16px; max-width: calc(100% - 24px); max-height: calc(100% - 24px); overflow: hidden; cursor: pointer; }
+.ws.open { transform: translate(-50%,-50%) scale(1); opacity: 1; transition: transform .2s cubic-bezier(.2,1.4,.4,1), opacity .15s; }
+.ws-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.ws-head b { font-size: 20px; }
+.ws-head span { color: var(--muted); font-size: 12px; }
+.pic { position: relative; image-rendering: pixelated; background-repeat: no-repeat; border-radius: 10px; flex: none; animation-name: play; animation-iteration-count: infinite; }
+@keyframes play { from { background-position: 0 0; } to { background-position: var(--end) 0; } }
+.picbox { position: relative; display: inline-block; }
+.cap { text-align: center; font-size: 13px; font-weight: 700; margin-top: 6px; }
+.cap small { color: var(--muted); font-weight: 400; }
+.rows > * { opacity: 0; transform: translateY(6px); }
+.rows > .in { opacity: 1; transform: none; transition: opacity .15s, transform .2s cubic-bezier(.2,1.5,.4,1); }
+.instant .rows > .in, .instant .ws, .instant * { transition: none !important; animation-duration: 0s !important; }
+.instant .pic { animation-duration: 4s !important; }
+
+/* 경기 줄 */
+.mrow { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--border); margin-bottom: 6px; font-size: 13px; }
+.mrow.win { border-color: rgba(0,224,255,.55); background: rgba(0,224,255,.09); }
+.mrow.lose { border-color: rgba(255,95,162,.45); background: rgba(255,95,162,.07); }
+.mrow .mtxt { flex: 1; min-width: 0; }
+.mrow .res { font-weight: 800; white-space: nowrap; }
+.win .res { color: var(--side-a); } .lose .res { color: var(--side-b); }
+/* 가: 점수판 넘기기 */
+.flip { display: inline-flex; align-items: center; gap: 3px; font-family: Consolas, monospace; }
+.flip .d { display: inline-block; width: 22px; height: 28px; line-height: 28px; text-align: center; font-size: 19px; font-weight: 800; background: #0b0b16; border: 1px solid #3a3a5c; border-radius: 5px; position: relative; overflow: hidden; }
+.flip .d::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(0,0,0,.6); }
+.flip .d.tick { animation: tick .08s linear; }
+@keyframes tick { 0% { transform: rotateX(70deg); } 100% { transform: none; } }
+.win .flip .d { color: var(--side-a); border-color: rgba(0,224,255,.6); }
+.lose .flip .d { color: var(--side-b); border-color: rgba(255,95,162,.5); }
+/* 나: 넥서스 */
+.nex { position: relative; display: inline-flex; gap: 6px; align-items: center; width: 58px; height: 28px; }
+.nex canvas { width: 26px; height: 26px; image-rendering: pixelated; }
+.frag { position: absolute; width: 4px; height: 4px; pointer-events: none; }
+.slide { display: inline-block; transform: translateX(-12px); opacity: 0; }
+.slide.in { transform: none; opacity: 1; transition: all .2s ease-out; }
+/* 다: 경기 채팅 */
+.chat { font-family: Consolas, "Malgun Gothic", monospace; font-size: 12.5px; }
+.chat .who { color: var(--side-a); }
+.lose .chat { color: #9a9ab4; } .lose .chat .who { color: #9a9ab4; }
+.bubble { position: absolute; transform: translate(-50%,-100%) scale(0); background: #fff; color: #111; font-weight: 900; font-size: 14px; padding: 1px 7px; border-radius: 8px; transition: transform .18s cubic-bezier(.2,1.6,.4,1); white-space: nowrap; }
+.bubble::after { content: ""; position: absolute; left: 50%; bottom: -5px; margin-left: -4px; border: 4px solid transparent; border-top-color: #fff; border-bottom: 0; }
+.bubble.show { transform: translate(-50%,-100%) scale(1); }
+.bubble.sad { background: #3a3a55; color: #cfcfe6; } .bubble.sad::after { border-top-color: #3a3a55; }
+
+/* 스탯 칩 · 숫자 · 막대 */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 2px 0 8px; }
+.chip { font-size: 12.5px; padding: 4px 9px; border-radius: 999px; background: rgba(43,255,158,.08); border: 1px solid rgba(43,255,158,.35); transform: scale(0); }
+.chip b { color: var(--good); }
+.chip.in { transform: scale(1); transition: transform .18s cubic-bezier(.2,1.8,.4,1); }
+.chip.big { border-color: #fff; background: rgba(255,255,255,.12); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; font-size: 13px; align-items: center; }
+.kv > div:nth-child(odd) { color: var(--muted); }
+.kv > div:nth-child(even) { text-align: right; font-weight: 700; }
+.up { color: var(--good); } .down { color: var(--bad); }
+.barl { display: grid; grid-template-columns: 52px 1fr 40px; align-items: center; gap: 8px; font-size: 12.5px; margin-bottom: 5px; }
+.barl .t { height: 8px; border-radius: 99px; background: #23233a; overflow: hidden; }
+.barl .f { height: 100%; border-radius: 99px; background: linear-gradient(90deg,#8b3dff,#00e0ff); transition: width .35s ease-out; }
+.barl.cd .f { background: linear-gradient(90deg,#b44dff,#ff7ad9); }
+.barl .n { text-align: right; font-weight: 700; }
+.special { margin-top: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid #fff; background: radial-gradient(circle at 20% 50%, rgba(255,255,255,.22), rgba(255,255,255,.04)); font-weight: 800; font-size: 15px; display: flex; gap: 10px; align-items: center; }
+.special .ic { font-size: 22px; }
+.foot { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.foot button { border: 0; border-radius: 12px; padding: 11px; font: inherit; font-weight: 800; color: #fff; background: linear-gradient(90deg,#8b3dff,#00b8e6); cursor: pointer; }
+.foot .hint { text-align: center; color: var(--muted); font-size: 11.5px; }
+.skiphint { position: absolute; right: 14px; bottom: 10px; font-size: 11px; color: var(--muted); }
+
+/* 큰 점수판 (경기 결과가 그림 위에 크게 → 작아지며 줄로) */
+.bigres { position: absolute; z-index: 20; transform: translate(-50%,-50%); padding: 12px 26px 14px; border-radius: 16px; background: rgba(8,8,18,.92); border: 2px solid #3a3a5c; box-shadow: 0 10px 40px rgba(0,0,0,.7); text-align: center; pointer-events: none; white-space: nowrap; }
+.bigres .bl { font-size: 13px; color: #cfcfe6; margin-bottom: 8px; }
+.bigres .flip { gap: 8px; font-size: 0; }
+.bigres .flip > span { font-size: 34px; font-weight: 900; color: #fff; }
+.bigres .flip .d { width: 58px; height: 72px; line-height: 72px; font-size: 52px; border-radius: 10px; border-width: 2px; }
+.bigres .bw { height: 30px; margin-top: 6px; font-size: 24px; font-weight: 900; letter-spacing: 4px; }
+.bigres.win { border-color: var(--side-a); box-shadow: 0 0 30px rgba(0,224,255,.45), 0 10px 40px rgba(0,0,0,.7); }
+.bigres.lose { border-color: var(--side-b); box-shadow: 0 0 30px rgba(255,95,162,.35), 0 10px 40px rgba(0,0,0,.7); }
+.bigres.win .d, .bigres.win .bw { color: var(--side-a); border-color: rgba(0,224,255,.7); }
+.bigres.lose .d, .bigres.lose .bw { color: var(--side-b); border-color: rgba(255,95,162,.6); }
+/* 하얀 반짝임 */
+.flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; border-radius: 18px; }
+.flash.go { animation: flash .15s ease-out; }
+@keyframes flash { 0% { opacity: .95; } 100% { opacity: 0; } }
+.star { position: absolute; width: 6px; height: 6px; background: #fff; pointer-events: none; box-shadow: 0 0 6px #fff; }
+.star::before, .star::after { content: ""; position: absolute; background: #fff; }
+.star::before { left: 2px; top: -4px; width: 2px; height: 14px; } .star::after { top: 2px; left: -4px; height: 2px; width: 14px; }
+.glow { filter: drop-shadow(0 0 6px rgba(255,255,255,.9)); }
+.fire { filter: drop-shadow(0 0 5px rgba(255,150,40,.95)); animation-name: play, firepulse; }
+@keyframes firepulse { 0%,100% { filter: drop-shadow(0 0 3px rgba(255,150,40,.7)); } 50% { filter: drop-shadow(0 0 9px rgba(255,120,20,1)); } }
+
+/* ===== A. 세로 카드 ===== */
+.ws.A { width: 400px; }
+.ws.A .picbox { display: block; width: max-content; margin: 0 auto 10px; }
+/* ===== B. 무대 (그림 왼쪽 크게) ===== */
+.ws.B { width: 780px; }
+.ws.B .body { display: flex; gap: 16px; align-items: flex-start; }
+.ws.B .right { flex: 1; min-width: 0; }
+#stage.m .ws.B { width: 366px; }
+#stage.m .ws.B .body { flex-direction: column; align-items: center; }
+#stage.m .ws.B .right { width: 100%; }
+/* ===== C. 중계 화면 (그림 위에 자막) ===== */
+.ws.C { width: 600px; padding: 0; }
+.ws.C .screen { position: relative; }
+.ws.C .pic { border-radius: 18px 18px 0 0; }
+.ws.C .ws-head { position: absolute; left: 12px; top: 10px; right: 12px; margin: 0; text-shadow: 0 2px 4px #000; }
+.ws.C .lower { position: absolute; left: 0; right: 0; bottom: 8px; padding: 0 10px; }
+.ws.C .lower .mrow { background: rgba(10,10,22,.88); backdrop-filter: blur(2px); transform: translateX(-30px); }
+.ws.C .lower .mrow.in { transform: none; }
+.ws.C .rest { padding: 12px 16px 14px; }
+.ws.C .chips { position: absolute; right: 10px; top: 40px; flex-direction: column; align-items: flex-end; }
+#stage.m .ws.C { width: 366px; }
+/* ===== D. 중계 화면 2 (스탯은 그림 위 오른쪽, 경기 결과는 그림 아래) — 사용자 선택 ===== */
+.ws.D { width: 520px; padding: 0; }
+.ws.D .screen { position: relative; display: flex; justify-content: center; background: radial-gradient(ellipse at 50% 60%, #1c1c34, #0d0d18 70%); border-radius: 18px 18px 0 0; padding-top: 6px; }
+.ws.D .ws-head { position: absolute; left: 14px; top: 10px; right: 14px; margin: 0; text-shadow: 0 2px 4px #000; }
+.ws.D .ovl { position: absolute; right: 10px; top: 42px; }
+.ws.D .ovl .chips { flex-direction: column; align-items: flex-end; }
+.ws.D .chip { background: rgba(8,20,16,.85); }
+.ws.D .cap { position: absolute; left: 0; right: 0; bottom: 6px; text-shadow: 0 1px 3px #000; }
+.ws.D .rest { padding: 12px 16px 14px; }
+.ws.D .two { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; align-items: start; }
+#stage.m .ws.D { width: 366px; }
+.ws.D.champ .screen { padding-top: 40px; }
+#stage.m .ws.D .two { grid-template-columns: 1fr; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="grp" id="g-sc"><span>상황</span></div>
+  <div class="grp" id="g-lay"><span>창 모양</span></div>
+  <div class="grp" id="g-rv"><span>승패 연출</span></div>
+  <div class="grp" id="g-tw"><span>우승 그림</span></div>
+  <div class="grp" id="g-sp"><span>빠르기</span></div>
+  <div class="grp" id="g-dev"><span>화면</span></div>
+  <button class="replay" id="replay">▶ 다시 재생</button>
+</div>
+<div class="stagewrap"><div id="stage"></div></div>
+
+<!-- 게임의 진짜 그림 코드 (대시보드 '이번 주 행동 그림') -->
+<script src="../data/ui.js"></script>
+<script src="../data/room.js"></script>
+<script src="../js/room.js"></script>
+<script>
+// ===== 시안 전용: 새 동작 그림 (적용 때 data/room.js ROOM_SPRITES로 옮길 것) =====
+const NEW_SPR = {
+  typeA: { split: 6, rows: ["..HHHH.", "..ESHH.", "..SSSH.", "..SSS..", "..UUUU.", "SSUVUU.", "..UVUU.", "..UUUU.", "PPPPP..", "P...P..", "K...K.."] },
+  typeB: { split: 6, rows: ["..HHHH.", "..ESHH.", "..SSSH.", "..SSS..", "..UUUU.", ".SUVUU.", "S.UVUU.", "..UUUU.", "PPPPP..", "P...P..", "K...K.."] },
+  cheer: { split: 11, rows: ["S.HHHH.S", "S.HSSH.S", "U.ESSE.U", "UUSSSSUU", ".UUUUUU.", "..UVVU..", "..UUUU..", "..UUUU..", "..PPPP..", "..P..P..", "..K..K.."] },
+  slump: { split: 0, rows: [".HHHH.", ".HHHH.", ".UDDU.", "SUUUUS", "SUVVUS", "SUUUUS", ".UUUU.", ".PPPP.", ".P..P.", ".K..K."] }, // 고개 + 어깨 처짐 (키 1칸 작게)
+  trophyA: { split: 16, rows: ["..TTTTTT..", ".T.TGGT.T.", "..TTTTTT..", "...TTTT...", "....GG....", "..STTTTS..", "..SHHHHS..", "..SHSSHS..", "..UESSEU..", "..USSSSU..", "..UUUUUU..", "...UVVU...", "...UUUU...", "...PPPP...", "...P..P...", "...K..K..."] },
+  trophyB: { split: 16, rows: ["W.TTTTTT..", ".T.TWGT.T.", "..TTTTTT.W", "...TTTT...", "....GG....", "..STTTTS..", "..SHHHHS..", "..SHSSHS..", "..UESSEU..", "..USSSSU..", "..UUUUUU..", "...UVVU...", "...UUUU...", "...PPPP...", "...P..P...", "...K..K..."] }, // 금빛 반짝 (하얀 점)
+};
+const UNI = ["#e4002b", "#f4f4f8"];
+function person(skin, hair) { return roomPersonColors({ skin: skin, hairC: hair }, UNI); }
+const ME = Object.assign(person(1, 0), { T: "#ffd23f", G: "#a97c1d", W: "#ffffff" });
+const MATES = [person(0, 2), person(2, 1), person(1, 3), person(0, 4)];
+
+// 장면 → 20장 띠 (게임 roomDrawFrame을 그대로 쓰고, 동작만 바꿔 끼움)
+const STRIPS = {};
+function strip(scene, pose) {
+  if (pose === "title" && cur.tw !== "base") return titleStrip(cur.tw);
+  const key = scene + "|" + pose;
+  if (STRIPS[key]) return STRIPS[key];
+  const R = ROOM_RULES, cv = document.createElement("canvas");
+  cv.width = R.w * R.frames; cv.height = R.h;
+  const g = cv.getContext("2d");
+  const keepFront = ROOM_SPRITES.front, keepSit = ROOM_SPRITES.sitL;
+  const cx = { f: 0, empty: false, team: UNI, me: ME, mates: MATES, trophies: scene.indexOf("rest") === 0 ? ["worlds", "playoffs", "msi"] : [] };
+  for (let f = 0; f < R.frames; f++) {
+    cx.f = f;
+    let n = 0;
+    if (pose === "type" || pose === "fire") ROOM_SPRITES.sitL = f % 4 < 2 ? NEW_SPR.typeA : NEW_SPR.typeB;
+    if (pose === "win" || pose === "title") Object.defineProperty(ROOM_SPRITES, "front", { configurable: true, get: function () { n++; return pose === "title" && n === 3 ? (f % 6 < 3 ? NEW_SPR.trophyA : NEW_SPR.trophyB) : NEW_SPR.cheer; } });
+    if (pose === "lose") Object.defineProperty(ROOM_SPRITES, "front", { configurable: true, get: function () { return NEW_SPR.slump; } });
+    const rs = roomDrawFrame(ROOM_SCENES[scene], cx);
+    if (pose === "fire") fireAround(rs, roomDrawFrame(ROOM_SCENES[scene], Object.assign({}, cx, { empty: true })), f);
+    if (pose === "lose") for (let i = 0; i < rs.d.length; i += 4) { rs.d[i] *= 0.62; rs.d[i + 1] *= 0.62; rs.d[i + 2] *= 0.7; }
+    g.putImageData(new ImageData(rs.d, R.w, R.h), f * R.w, 0);
+    Object.defineProperty(ROOM_SPRITES, "front", { configurable: true, writable: true, value: keepFront });
+    ROOM_SPRITES.sitL = keepSit;
+  }
+  return (STRIPS[key] = cv.toDataURL());
+}
+// ===== 우승 그림 3가지 (시안) =====
+function hsh(i, k) { const v = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return v - Math.floor(v); }
+function isoP(x, y, z) { const R = ROOM_RULES, W = R.roomW, H = R.roomH, oy = H + 3, ox = W + 2 + Math.floor((R.w - (2 * W + 2)) / 2); return [ox + (x - y), oy + (x + y) / 2 - z]; }
+// 그림 한 장 위에 도트 그림 붙이기 (k배 블록). 아래 가운데 = (bx, by)
+function blit(rs, spr, bx, by, colors, k, lift) {
+  k = k || 1;
+  const rows = spr.rows, w = rows[0].length, h = rows.length, x0 = Math.round(bx - w * k / 2), y0 = Math.round(by - h * k) - (lift || 0);
+  rows.forEach(function (r, ry) {
+    r.split("").forEach(function (ch, rx) {
+      if (ch === "." || !colors[ch]) return;
+      for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) roomPx(rs, x0 + rx * k + a, y0 + ry * k + b, colors[ch]);
+    });
+  });
+}
+const CONF = ["#e4002b", "#ffffff", "#ffd23f", "#00e0ff", "#ff8fc8"];
+// 위에서 떨어지며 팔랑이는 색종이 (장 번호로만 정함 → 20장마다 자연스럽게 이어짐)
+function confetti(rs, f, n, seed) {
+  const H = rs.h + 8;
+  for (let i = 0; i < n; i++) {
+    const x = Math.floor(hsh(i, seed) * rs.w + Math.sin((f / 20) * 6.283 + i) * 2), sp = 1 + Math.floor(hsh(i, seed + 1) * 3);
+    const y = Math.floor((hsh(i, seed + 2) * H + f * sp * H / 20) % H) - 4;
+    const c = CONF[i % CONF.length];
+    roomPx(rs, x, y, c);
+    if ((f + i) % 3) roomPx(rs, x + 1, y, c); else roomPx(rs, x, y + 1, c);
+  }
+}
+// 불꽃 기둥: 높이가 출렁이고 꼭대기에서 불씨가 튐
+function pyro(rs, x, by, f, ph) {
+  const hgt = 10 + Math.round(6 * Math.abs(Math.sin((f + ph) * 0.9))), cols = ["#ffffff", "#fff0a0", "#ffd23f", "#ff9a2e", "#ff5a1f"];
+  for (let y = 0; y < hgt; y++) {
+    const w = y < 3 ? 2 : 1, c = cols[Math.min(4, Math.floor(y / hgt * 5))];
+    for (let d = -w; d <= w; d++) if (d === 0 || hsh(x * 31 + y + d, f) > 0.25) roomPx(rs, x + d, by - y, c);
+  }
+  for (let i = 0; i < 4; i++) roomPx(rs, x + Math.round((hsh(i, f + ph) - 0.5) * 8), by - hgt - 1 - Math.floor(hsh(i + 9, f + ph) * 5), cols[i % 3]);
+}
+const FONT3 = { C: ["###", "#..", "#..", "#..", "###"], H: ["#.#", "#.#", "###", "#.#", "#.#"], A: [".#.", "#.#", "###", "#.#", "#.#"], M: ["#...#", "##.##", "#.#.#", "#...#", "#...#"], P: ["##.", "#.#", "##.", "#..", "#.."], I: ["###", ".#.", ".#.", ".#.", "###"], O: ["###", "#.#", "#.#", "#.#", "###"], N: ["#..#", "##.#", "#.##", "#..#", "#..#"], S: ["###", "#..", "###", "..#", "###"] };
+// 금색 도트 글자 + 그림자, 한 글자씩 하얗게 반짝
+function word(rs, str, y, f) {
+  const ws2 = str.split("").map(function (ch) { return FONT3[ch][0].length; }), w = ws2.reduce(function (a, b) { return a + b + 1; }, -1);
+  const ramp = ["#fff4bc", "#ffde5e", "#ffd23f", "#dba92b", "#a97c1d"];
+  let x0 = Math.floor((rs.w - w) / 2);
+  str.split("").forEach(function (ch, i) {
+    FONT3[ch].forEach(function (r, ry) {
+      r.split("").forEach(function (c, rx) {
+        if (c !== "#") return;
+        roomPx(rs, x0 + rx + 1, y + ry + 1, "#2a1405");
+        roomPx(rs, x0 + rx, y + ry, (f % 10) === i ? "#ffffff" : ramp[ry]);
+      });
+    });
+    x0 += ws2[i] + 1;
+  });
+}
+// 픽셀 밝기 곱하기 (빛기둥 안 = 밝게, 밖 = 어둡게)
+function lighten(rs, fn) {
+  for (let y = 0; y < rs.h; y++) for (let x = 0; x < rs.w; x++) {
+    const k = fn(x, y); if (k === 1) continue;
+    const j = (y * rs.w + x) * 4;
+    for (let c = 0; c < 3; c++) rs.d[j + c] = Math.min(255, rs.d[j + c] * k + (k > 1 ? 12 : 0));
+  }
+}
+const PODIUM = { name: "시상대", pal: "stage", ops: [
+  ["led", 2, 34, 3, 20], ["crowd", 18], ["floor", 4, 6, 34, 30, "stage0"],
+  ["box", 9, 15, 0, 6, 6, 3, "silver2"], ["box", 21, 15, 0, 6, 6, 2, "wood2"], ["box", 15, 15, 0, 6, 6, 5, "gold2", { top: "gold1" }],
+  ["me", "trophyNow", 18, 18, 5],
+] };
+function titleStrip(tw) {
+  const key = "title|" + tw;
+  if (STRIPS[key]) return STRIPS[key];
+  const R = ROOM_RULES, cv = document.createElement("canvas");
+  cv.width = R.w * R.frames; cv.height = R.h;
+  const g = cv.getContext("2d"), keepFront = ROOM_SPRITES.front;
+  const cx = { f: 0, empty: false, team: UNI, me: ME, mates: MATES, trophies: [] };
+  for (let f = 0; f < R.frames; f++) {
+    cx.f = f;
+    let rs, n = 0;
+    const tro = f % 6 < 3 ? NEW_SPR.trophyA : NEW_SPR.trophyB, up = R.breath[f];
+    if (tw === "A") { // 가: 무대 + 불꽃 기둥 + 색종이 + CHAMPIONS
+      Object.defineProperty(ROOM_SPRITES, "front", { configurable: true, get: function () { n++; return n === 3 ? tro : NEW_SPR.cheer; } });
+      rs = roomDrawFrame(ROOM_SCENES.match, cx);
+      Object.defineProperty(ROOM_SPRITES, "front", { configurable: true, writable: true, value: keepFront });
+      const L = isoP(4, 30, 0), Rr = isoP(34, 6, 0);
+      pyro(rs, L[0] + 2, L[1] - 1, f, 0); pyro(rs, Rr[0] - 2, Rr[1] - 1, f, 3);
+      confetti(rs, f, 46, 1); word(rs, "CHAMPIONS", 3, f);
+    } else if (tw === "B") { // 나: 시상대 + 스포트라이트
+      ROOM_SPRITES.trophyNow = tro;
+      rs = roomDrawFrame(PODIUM, cx);
+      [[10, 32, 0], [24, 32, 1], [32, 24, 2], [34, 12, 3]].forEach(function (m, i) {
+        const q = isoP(m[0], m[1], 0);
+        blit(rs, NEW_SPR.cheer, q[0], q[1], MATES[m[2]], 1, R.breath[(f + i * 4) % R.frames]);
+      });
+      const top = isoP(18, 18, 5);
+      lighten(rs, function (x, y) { const half = 3 + (y / top[1]) * 13; if (y > top[1] + 4) return 0.85; return Math.abs(x - top[0]) < half ? 1.22 : 0.72; });
+      confetti(rs, f, 34, 7);
+    } else { // 다: 클로즈업 — 금빛 햇살 줄기 + 큰 나 + 반짝이
+      rs = roomCanvas(R.w, R.h);
+      const c0 = [48, 38];
+      for (let y = 0; y < R.h; y++) for (let x = 0; x < R.w; x++) {
+        const a = Math.atan2(y - c0[1], x - c0[0]) + f * (Math.PI / 4) / R.frames;
+        const ray = ((Math.floor((a + 2 * Math.PI) / (Math.PI / 8)) % 2) + 2) % 2, dist = Math.hypot(x - c0[0], (y - c0[1]) * 1.3);
+        const base = ray ? [120, 70, 14] : [60, 30, 10], fade = Math.max(0.25, 1 - dist / 70), j = (y * R.w + x) * 4;
+        rs.d[j] = base[0] * fade + 20; rs.d[j + 1] = base[1] * fade + 10; rs.d[j + 2] = base[2] * fade + 30; rs.d[j + 3] = 255;
+      }
+      for (let x = 0; x < R.w; x++) for (let y = 60; y < R.h; y++) roomPx(rs, x, y, y === 60 ? "#6f5320" : "#2a1d10");
+      blit(rs, tro, 48, 60, ME, 3, up ? 1 : 0);
+      for (let i = 0; i < 10; i++) {
+        const t = (f + i * 2) % 10; if (t > 4) continue;
+        const x = Math.floor(hsh(i, 3) * 90) + 3, y = Math.floor(hsh(i, 4) * 44) + 9, r = t < 3 ? t : 4 - t;
+        roomPx(rs, x, y, "#ffffff");
+        for (let d = 1; d <= r; d++) { roomPx(rs, x + d, y, "#fff4bc"); roomPx(rs, x - d, y, "#fff4bc"); roomPx(rs, x, y + d, "#fff4bc"); roomPx(rs, x, y - d, "#fff4bc"); }
+      }
+      confetti(rs, f, 30, 11); word(rs, "CHAMPIONS", 1, f);
+    }
+    g.putImageData(new ImageData(rs.d, R.w, R.h), f * R.w, 0);
+  }
+  return (STRIPS[key] = cv.toDataURL());
+}
+// 캐릭터 둘레 1칸에 주황·노랑 불꽃 점이 깜빡이며 위로 (fx 무작위 대신 자리·장 번호로 정함)
+function fireAround(rs, empty, f) {
+  const W = rs.w, H = rs.h, me = new Uint8Array(W * H);
+  for (let i = 0; i < W * H; i++) { const j = i * 4; if (rs.d[j] !== empty.d[j] || rs.d[j + 1] !== empty.d[j + 1] || rs.d[j + 2] !== empty.d[j + 2]) me[i] = 1; }
+  const cols = [[255, 154, 46], [255, 210, 63], [255, 110, 30]];
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const i = y * W + x; if (me[i]) continue;
+    const near = me[i - 1] || me[i + 1] || me[i - W] || me[i + W] || me[i + W - 1] || me[i + W + 1];
+    if (!near || ((x * 7 + y * 3 + f) % 4) === 0) continue;
+    const up = me[i + W] || me[i + W - 1] || me[i + W + 1]; // 위쪽 가장자리는 더 밝게
+    const c = cols[(x + y + f) % 3], j = i * 4;
+    rs.d[j] = c[0]; rs.d[j + 1] = up ? Math.min(255, c[1] + 40) : c[1]; rs.d[j + 2] = c[2]; rs.d[j + 3] = 255;
+    if (up && (x + f) % 5 === 0 && y > 2) { const k = (i - 2 * W) * 4; rs.d[k] = 255; rs.d[k + 1] = 220; rs.d[k + 2] = 90; rs.d[k + 3] = 255; } // 튀는 불씨
+  }
+}
+// 그림 안 내 캐릭터 머리 위치 (말풍선 자리) — js/room.js roomDrawFrame의 P와 같은 계산
+function headAt(scene) {
+  const W = ROOM_RULES.roomW, H = ROOM_RULES.roomH, oy = H + 3, ox = W + 2 + Math.floor((ROOM_RULES.w - (2 * W + 2)) / 2);
+  const at = scene === "match" ? [19, 13, 2, 11] : [12, 18, 3, 11];
+  return [ox + (at[0] - at[1]), oy + (at[0] + at[1]) / 2 - at[2] - at[3] - 1];
+}
+
+// ===== 상황 6가지 (가짜 숫자) =====
+const SC = {
+  normal: { name: "평범한 훈련 주", week: 4, scene: "train", pose: "type", cap: "🏋️ 팀 스크림", matches: [], stats: [["라인전", 1], ["한타", 1]], score: [41.4, 41.8], st: [58, 49], cd: [73, 70], money: 100000, pop: [7, 7], msgs: 1 },
+  win: { name: "승리 주 (2경기)", week: 9, scene: "match", pose: "win", cap: "⚔️ 경기 2번 · 2승", matches: [{ opp: "KT Rolster", s: [2, 1] }, { opp: "DRX", s: [2, 0] }], stats: [["운영", 1], ["오더", 1], ["멘탈", 1]], score: [44.0, 44.6], st: [61, 40], cd: [70, 84], money: 140000, pop: [9, 12], msgs: 2 },
+  lose: { name: "패배 주", week: 10, scene: "match", pose: "lose", cap: "⚔️ 경기 1번 · 1패", matches: [{ opp: "Gen.G", s: [0, 2] }], stats: [["멘탈", 1]], score: [44.6, 44.8], st: [40, 31], cd: [84, 72], money: 100000, pop: [12, 11], msgs: 1 },
+  title: { name: "우승 주", week: 21, scene: "match", pose: "title", cap: "🏆 결승 · LCK 스프링", matches: [{ opp: "T1", s: [3, 2], label: "결승" }], stats: [["한타", 2], ["멘탈", 1]], score: [47.1, 47.6], st: [55, 41], cd: [80, 100], money: 2400000, pop: [15, 24], msgs: 4, special: { ic: "🏆", t: "LCK 스프링 우승!" } },
+  great: { name: "훈련 대성공 주", week: 6, scene: "train", pose: "fire", cap: "🏋️ 솔로 랭크 · 🔥 대성공", matches: [], stats: [["라인전", 4], ["반응속도", 2], ["입력 정확도", 2]], score: [42.0, 43.4], st: [70, 58], cd: [66, 70], money: 100000, pop: [8, 8], msgs: 0, special: { ic: "🔥", t: "훈련 대성공 · 오른 스탯 ×2" }, achv: "업적 「첫 대성공」" },
+  rest: { name: "휴식 주", week: 12, scene: "restRoom", pose: "rest", cap: "💤 휴식 · 원룸", matches: [], stats: [], score: [44.8, 44.8], st: [22, 62], cd: [48, 63], money: -50000, pop: [11, 11], msgs: 0 },
+};
+const LAYOUTS = { D: "C2 중계 (결과는 그림 아래) ★", A: "A 세로 카드", B: "B 무대", C: "C 중계 (예전)" };
+const REVEALS = { flip: "가 점수판 넘기기", nexus: "나 넥서스 부서짐", chat: "다 경기 채팅" };
+const SPEEDS = { 1: "보통", 0.5: "빠르게" };
+const TITLE_WAYS = { base: "지금", A: "가 불꽃+색종이", B: "나 시상대+조명", C: "다 클로즈업+금빛" };
+const cur = { sc: "win", lay: "D", rv: "flip", sp: 1, dev: "pc", tw: "A" };
+
+function buttons(id, map, keyName) {
+  const g = document.getElementById(id);
+  Object.keys(map).forEach(function (k) {
+    const b = document.createElement("button"); b.textContent = map[k].name || map[k]; b.dataset.k = k;
+    b.onclick = function () { cur[keyName] = keyName === "sp" ? +k : k; mark(); run(); };
+    g.appendChild(b);
+  });
+}
+function mark() {
+  [["g-sc", "sc"], ["g-tw", "tw"], ["g-lay", "lay"], ["g-rv", "rv"], ["g-sp", "sp"], ["g-dev", "dev"]].forEach(function (p) {
+    document.querySelectorAll("#" + p[0] + " button").forEach(function (b) { b.classList.toggle("on", String(cur[p[1]]) === b.dataset.k); });
+  });
+}
+buttons("g-sc", SC, "sc"); buttons("g-lay", LAYOUTS, "lay"); buttons("g-rv", REVEALS, "rv"); buttons("g-tw", TITLE_WAYS, "tw"); buttons("g-sp", SPEEDS, "sp"); buttons("g-dev", { pc: "PC 1280", m: "휴대폰 390" }, "dev");
+document.getElementById("replay").onclick = run;
+
+// ===== 만들기 =====
+const stageEl = document.getElementById("stage");
+let timers = [], steps = [], stepAt = 0, done = false, ws = null;
+function money(v) { const a = Math.abs(v); return (v >= 0 ? "+" : "−") + (a >= 10000 ? Math.round(a / 10000) + "만" : a.toLocaleString()); }
+function picScale() { if (cur.dev === "m") return 3; return cur.lay === "B" ? 4 : cur.lay === "C" ? 6 : cur.lay === "D" ? 5 : 3; }
+
+function build(s) {
+  const k = picScale(), R = ROOM_RULES, w = Math.round(R.w * k), h = Math.round(R.h * k);
+  const pic = '<div class="picbox"><div class="pic' + (s.fire ? " fire" : "") + '" style="width:' + w + "px;height:" + h + "px;background-image:url(" + strip(s.scene, s.pose) + ");background-size:" + (w * R.frames) + "px " + h + "px;--end:-" + (w * R.frames) + "px;animation-duration:" + (R.frames * R.frameMs) + "ms;animation-timing-function:steps(" + R.frames + ')"></div></div>';
+  const head = '<div class="ws-head"><b>' + s.week + '주차 정리</b><span>2017년 · LCK 스프링</span></div>';
+  const cap = '<div class="cap">' + s.cap + "</div>";
+  // 경기 줄은 처음부터 내용을 채워 둠 (보이지만 않게) → 결과가 들어와도 창 높이가 안 바뀜
+  const matches = s.matches.map(function (m, i) { return '<div class="mrow" data-m="' + i + '"><span class="flip"><b class="d">0</b><span>:</span><b class="d">0</b></span><span class="mtxt">vs ' + m.opp + '</span><span class="res"></span></div>'; }).join("");
+  const chips = '<div class="chips">' + s.stats.map(function (x) { return '<span class="chip' + (x[1] >= 3 ? " big" : "") + '">' + x[0] + " <b>+" + x[1] + "</b></span>"; }).join("") + "</div>";
+  const bars = '<div class="barl st" data-bar="st"><span>체력</span><div class="t"><div class="f" style="width:' + s.st[0] + '%"></div></div><span class="n">' + s.st[0] + '</span></div>' +
+    '<div class="barl cd" data-bar="cd"><span>컨디션</span><div class="t"><div class="f" style="width:' + s.cd[0] + '%"></div></div><span class="n">' + s.cd[0] + "</span></div>";
+  const dScore = Math.round((s.score[1] - s.score[0]) * 10) / 10, dPop = s.pop[1] - s.pop[0];
+  const kv = '<div class="kv"><div>종합 능력</div><div class="' + (dScore > 0 ? "up" : "") + '">' + s.score[0].toFixed(1) + " → " + s.score[1].toFixed(1) + (dScore > 0 ? " ▲" + dScore : "") + "</div>" +
+    "<div>돈 · 인기도</div><div><span class=\"" + (s.money > 0 ? "up" : "down") + '">' + money(s.money) + '</span> · ' + s.pop[1] + (dPop ? ' <span class="' + (dPop > 0 ? 'up">+' : 'down">') + dPop + "</span>" : "") + "</div>" +
+    "<div>새 연락</div><div>" + s.msgs + "개</div></div>";
+  const special = s.special ? '<div class="special"><span class="ic">' + s.special.ic + "</span><div>" + s.special.t + (s.achv ? '<div style="font-size:12px;font-weight:400;color:#d9d9ec;margin-top:2px">🏅 ' + s.achv + "</div>" : "") + "</div></div>" : "";
+  const foot = '<div class="foot">' + (s.matches.length ? "<button>경기 재생 보기 ▶</button>" : "<button>확인</button>") + '<div class="hint">클릭·Space = 바로 끝까지 · 한 번 더 = 닫기</div></div>';
+  const noMatch = s.matches.length ? "" : '<div class="mrow" style="color:var(--muted)">경기가 없는 주예요</div>';
+  let html;
+  if (cur.lay === "A") html = head + pic + cap + '<div class="rows">' + (matches || noMatch) + chips + bars + kv + special + foot + "</div>";
+  else if (cur.lay === "B") html = '<div class="body"><div>' + pic + cap + '</div><div class="right">' + head + '<div class="rows">' + (matches || noMatch) + chips + bars + kv + special + foot + "</div></div></div>";
+  else if (cur.lay === "D") html = '<div class="screen">' + pic + head + cap + '<div class="rows ovl">' + chips + '</div></div><div class="rest rows">' + (matches || noMatch) + '<div class="two"><div>' + bars + "</div>" + kv + "</div>" + special + foot + "</div>";
+  else html = '<div class="screen">' + pic + head + '<div class="rows">' + chips + '</div><div class="lower rows">' + matches + '</div></div><div class="rest rows">' + bars + kv + special + foot + "</div>";
+  return html + '<div class="flash"></div><span class="skiphint">클릭하면 바로 끝</span>';
+}
+
+// ===== 다다닥 순서 =====
+function later(ms, fn) { steps.push({ at: ms, fn: fn }); }
+function show(el) { if (el) el.classList.add("in"); }
+function run() {
+  timers.forEach(clearTimeout); timers = []; steps = []; done = false; finals = [];
+  stageEl.className = cur.dev === "m" ? "m" : "";
+  stageEl.innerHTML = '<div class="fake"><div class="side"></div><div></div><div></div><div></div><div></div><div></div><div></div></div><div class="dim"></div>';
+  const s = SC[cur.sc], k = cur.sp;
+  ws = document.createElement("div"); ws.className = "ws " + cur.lay + (s.pose === "title" && cur.tw !== "base" ? " champ" : ""); ws.innerHTML = build(s); stageEl.appendChild(ws);
+  requestAnimationFrame(function () { ws.classList.add("open"); });
+  let t = 200 * k;
+  // ① 그림은 창과 같이 · ② 스탯 칩 하나씩
+  const chipBox = ws.querySelector(".chips"); later(t, function () { show(chipBox); });
+  ws.querySelectorAll(".chip").forEach(function (c) { later(t, function () { show(c); }); t += 150 * k; });
+  // ③ 경기 결과 (가: 그림 위 큰 점수판 → 작아지며 자기 줄로)
+  s.matches.forEach(function (m, i) {
+    const row = ws.querySelector('[data-m="' + i + '"]'), won = m.s[0] > m.s[1];
+    later(t, function () { if (cur.rv === "flip") bigReveal(row, m, won, k); else { revealMatch(row, m, won, s, k); show(row); } });
+    t += (cur.rv === "flip" ? bigTime(m) : cur.rv === "nexus" ? 550 : 420) * k;
+  });
+  if (!s.matches.length) { const r = ws.querySelector(".rows > .mrow"); later(t, function () { show(r); }); t += 150 * k; }
+  // ④ 종합 수치
+  // 막대
+  ws.querySelectorAll(".barl").forEach(function (b) { later(t, function () { show(b); show(b.closest(".two")); const to = b.dataset.bar === "st" ? s.st[1] : s.cd[1]; b.querySelector(".f").style.width = to + "%"; countTo(b.querySelector(".n"), to, 300 * k); }); });
+  t += 300 * k;
+  // 돈·인기도·연락
+  const kvEl = ws.querySelector(".kv"); later(t, function () { show(kvEl); }); t += 200 * k;
+  // 특별한 일 = 하얀 반짝임
+  const sp = ws.querySelector(".special");
+  if (sp) { t += 150 * k; later(t, function () { show(sp); sparkle(); }); t += 1100 * k; }
+  const foot = ws.querySelector(".foot"); later(t, function () { show(foot); finish(); });
+  steps.forEach(function (st) { timers.push(setTimeout(function () { if (!done) st.fn(); st.ran = true; }, st.at)); });
+  ws.addEventListener("click", skipOrClose);
+}
+// 큰 점수판: 뜸 0.15초 → 숫자 넘김 (세트마다 0.09초) → 멈춤 0.25초 → 줄로 들어감 0.3초
+const BIG = { pop: 150, tick: 90, hold: 250, fly: 300 };
+function bigTime(m) { return BIG.pop + Math.max(m.s[0], m.s[1]) * BIG.tick + 60 + BIG.hold + BIG.fly + 80; }
+let finals = []; // 건너뛰기 때 바로 끝낼 일
+function rowFinal(row, m, won) {
+  const vs = '<span class="mtxt">' + (m.label ? m.label + " · " : "") + "vs " + m.opp + "</span>";
+  row.innerHTML = '<span class="flip"><b class="d">' + m.s[0] + '</b><span>:</span><b class="d">' + m.s[1] + "</b></span>" + vs + '<span class="res">' + (won ? "승리" : "패배") + "</span>";
+  row.classList.add(won ? "win" : "lose"); show(row);
+}
+function bigReveal(row, m, won, k) {
+  if (ws.classList.contains("instant")) { rowFinal(row, m, won); return; }
+  const box = ws.querySelector(".picbox"), wr = ws.getBoundingClientRect(), pr = box.getBoundingClientRect();
+  const el = document.createElement("div"); el.className = "bigres";
+  el.innerHTML = '<div class="bl">' + (m.label ? m.label + " · " : "") + "vs " + m.opp + '</div><div class="flip"><b class="d">0</b><span>:</span><b class="d">0</b></div><div class="bw"></div>';
+  el.style.left = (pr.left - wr.left + pr.width / 2) + "px"; el.style.top = (pr.top - wr.top + pr.height / 2) + "px";
+  ws.appendChild(el);
+  let over = false;
+  const end = function () { if (over) return; over = true; el.remove(); rowFinal(row, m, won); finals = finals.filter(function (f) { return f !== end; }); };
+  finals.push(end);
+  el.animate([{ transform: "translate(-50%,-50%) scale(1.4)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1)", opacity: 1 }], { duration: BIG.pop * k, easing: "cubic-bezier(.2,1.4,.4,1)", fill: "forwards" });
+  const ds = el.querySelectorAll(".d"), t0 = BIG.pop;
+  [0, 1].forEach(function (j) {
+    for (let v = 1; v <= m.s[j]; v++) timers.push(setTimeout(function () { ds[j].textContent = v; ds[j].classList.remove("tick"); void ds[j].offsetWidth; ds[j].classList.add("tick"); }, (t0 + v * BIG.tick) * k));
+  });
+  const tWin = t0 + Math.max(m.s[0], m.s[1]) * BIG.tick + 60;
+  timers.push(setTimeout(function () { el.classList.add(won ? "win" : "lose"); el.querySelector(".bw").textContent = won ? "승리" : "패배"; }, tWin * k));
+  timers.push(setTimeout(function () {
+    // 줄 자리로: 줄을 미리 채워 위치를 재고(보이지 않게), 큰 판을 그 자리·크기로 줄임
+    rowFinal(row, m, won); row.style.visibility = "hidden";
+    const a = el.getBoundingClientRect(), b = row.getBoundingClientRect();
+    const dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2), sc = Math.max(0.35, b.height / a.height);
+    el.animate([{ transform: "translate(-50%,-50%) scale(1)", opacity: 1 }, { transform: "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) scale(" + sc + ")", opacity: 0.25 }], { duration: BIG.fly * k, easing: "cubic-bezier(.5,0,.8,.6)", fill: "forwards" });
+    timers.push(setTimeout(function () { row.style.visibility = ""; row.animate([{ transform: "scale(1.04)", filter: "brightness(1.8)" }, { transform: "none", filter: "none" }], { duration: 220 }); end(); }, BIG.fly * k));
+  }, (tWin + BIG.hold) * k));
+}
+function finish() { done = true; const h = ws.querySelector(".skiphint"); if (h) h.remove(); }
+function skipOrClose() {
+  if (!done) { ws.classList.add("instant"); timers.forEach(clearTimeout); finals.slice().forEach(function (f) { f(); }); ws.querySelectorAll(".mrow").forEach(function (r) { r.style.visibility = ""; }); steps.forEach(function (st) { if (!st.ran) { st.fn(); st.ran = true; } }); ws.querySelectorAll(".rows > *, .chip").forEach(show); finish(); return; }
+  ws.remove(); const b = document.createElement("button"); b.className = "reopen"; b.textContent = "닫힘 · ▶ 다시 재생"; b.onclick = run; stageEl.appendChild(b);
+}
+document.addEventListener("keydown", function (e) { if (e.code === "Space" && ws && ws.isConnected) { e.preventDefault(); skipOrClose(); } });
+function countTo(el, to, ms) { const from = +el.textContent; const t0 = performance.now(); (function f(now) { const u = Math.min(1, (now - t0) / ms); el.textContent = Math.round(from + (to - from) * u); if (u < 1 && !ws.classList.contains("instant")) requestAnimationFrame(f); else el.textContent = to; })(t0); }
+
+// ----- 승패 연출 3가지 -----
+function revealMatch(row, m, won, s, k) {
+  const vs = '<span class="mtxt">' + (m.label ? m.label + " · " : "") + "vs " + m.opp + "</span>";
+  if (cur.rv === "flip") {
+    row.innerHTML = '<span class="flip"><b class="d">0</b><span>:</span><b class="d">0</b></span>' + vs + '<span class="res"></span>';
+    const ds = row.querySelectorAll(".d");
+    [0, 1].forEach(function (j) {
+      for (let v = 1; v <= m.s[j]; v++) timers.push(setTimeout(function () { ds[j].textContent = v; ds[j].classList.remove("tick"); void ds[j].offsetWidth; ds[j].classList.add("tick"); }, v * 90 * k));
+    });
+    timers.push(setTimeout(function () { row.classList.add(won ? "win" : "lose"); row.querySelector(".res").textContent = won ? "승리" : "패배"; }, (Math.max(m.s[0], m.s[1]) * 90 + 60) * k));
+  } else if (cur.rv === "nexus") {
+    row.innerHTML = '<span class="nex"><canvas width="13" height="13"></canvas><canvas width="13" height="13"></canvas></span>' + vs + '<span class="res slide"></span>';
+    const cvs = row.querySelectorAll("canvas"); nexus(cvs[0], "#00e0ff", "#bff6ff"); nexus(cvs[1], "#ff5fa2", "#ffd0e6");
+    timers.push(setTimeout(function () { shatter(row.querySelector(".nex"), cvs[won ? 1 : 0], won ? "#ff5fa2" : "#00e0ff"); }, 120 * k));
+    timers.push(setTimeout(function () { row.classList.add(won ? "win" : "lose"); const r = row.querySelector(".res"); r.textContent = (won ? "승리 " : "패배 ") + m.s[0] + ":" + m.s[1]; r.classList.add("in"); }, 380 * k));
+  } else {
+    row.innerHTML = '<span class="chat mtxt"></span><span class="res"></span>';
+    const line = won ? '<span class="who">[전체] 테스트:</span> GG WP' : '<span class="who">[전체] 테스트:</span> gg';
+    const c = row.querySelector(".chat"); typeHTML(c, line, k);
+    timers.push(setTimeout(function () { row.classList.add(won ? "win" : "lose"); row.querySelector(".res").textContent = m.s[0] + " : " + m.s[1] + (won ? " 승리" : " 패배"); bubble(won ? "!" : "…", !won, s); }, 300 * k));
+  }
+}
+function nexus(cv, a, b) { // 13×13 도트 넥서스 (다이아몬드 수정 + 받침)
+  const g = cv.getContext("2d"), rows = ["......b......", ".....bab.....", "....baaab....", "...baaaaab...", "....baaab....", ".....bab.....", "......b......", "....kkkkk....", "...kkkkkkk...", "..kkkkkkkkk..", "..kk.....kk..", "..kk.....kk..", "............."];
+  rows.forEach(function (r, y) { r.split("").forEach(function (ch, x) { if (ch === ".") return; g.fillStyle = ch === "a" ? a : ch === "b" ? b : "#3a3a5a"; g.fillRect(x, y, 1, 1); }); });
+}
+function shatter(box, cv, color) {
+  const x0 = cv.offsetLeft + 13, y0 = cv.offsetTop + 8;
+  cv.style.opacity = "0.15";
+  for (let i = 0; i < 12; i++) {
+    const f = document.createElement("span"); f.className = "frag"; f.style.background = i % 3 ? color : "#fff"; f.style.left = x0 + "px"; f.style.top = y0 + "px"; box.appendChild(f);
+    const ang = Math.random() * Math.PI * 2, d = 14 + Math.random() * 18;
+    f.animate([{ transform: "translate(0,0)", opacity: 1 }, { transform: "translate(" + Math.cos(ang) * d + "px," + (Math.sin(ang) * d + 8) + "px)", opacity: 0 }], { duration: 450 * cur.sp, easing: "cubic-bezier(.2,.8,.4,1)", fill: "forwards" });
+  }
+}
+function typeHTML(el, html, k) { // 글자가 타닥 (태그는 한 번에)
+  const parts = html.split(/(<[^>]+>)/); let out = "", i = 0, delay = 0;
+  parts.forEach(function (p) { if (p.charAt(0) === "<") { out += p; return; } p.split("").forEach(function (ch) { delay += 18 * k; const snap = out + ch; out = snap; timers.push(setTimeout(function () { el.innerHTML = snap + (snap.split("<span").length > snap.split("</span>").length ? "</span>" : ""); }, delay)); }); });
+}
+function bubble(text, sad, s) {
+  const box = ws.querySelector(".picbox"); if (!box || box.querySelector(".bubble")) return;
+  const k = picScale(), p = headAt(s.scene), b = document.createElement("span");
+  b.className = "bubble" + (sad ? " sad" : ""); b.textContent = text; b.style.left = p[0] * k + "px"; b.style.top = p[1] * k + "px";
+  box.appendChild(b); requestAnimationFrame(function () { b.classList.add("show"); });
+}
+// 하얀 반짝임: 창 전체 번쩍 0.15초 → 그림 둘레 하얀 별 반짝이며 흩어짐 0.8초
+function sparkle() {
+  const fl = ws.querySelector(".flash"); fl.classList.remove("go"); void fl.offsetWidth; fl.classList.add("go");
+  const box = ws.querySelector(".picbox"), pic = box.querySelector(".pic"); pic.classList.add("glow");
+  const w = pic.offsetWidth, h = pic.offsetHeight;
+  for (let i = 0; i < 16; i++) {
+    const st = document.createElement("span"); st.className = "star";
+    const side = i % 4, u = Math.random();
+    const x = side === 0 ? u * w : side === 1 ? w : side === 2 ? u * w : 0, y = side === 0 ? 0 : side === 1 ? u * h : side === 2 ? h : u * h;
+    st.style.left = x + "px"; st.style.top = y + "px"; box.appendChild(st);
+    const dx = (x - w / 2) * 0.15, dy = (y - h / 2) * 0.15;
+    st.animate([{ transform: "scale(0)", opacity: 0 }, { transform: "scale(1)", opacity: 1, offset: 0.3 }, { transform: "translate(" + dx + "px," + dy + "px) scale(0)", opacity: 0 }], { duration: 800 * cur.sp, delay: i * 25 * cur.sp, fill: "forwards" });
+  }
+  timers.push(setTimeout(function () { pic.classList.remove("glow"); }, 900 * cur.sp));
+}
+mark(); run();
+</script>
+</body>
+</html>

@@ -123,7 +123,7 @@ function playLadder(training) {
 function startWeekReport(training, message, changes, ladder) {
   state.weekReport = {
     when: state.year + "년 " + state.week + "주차",
-    training: { name: training.name, message: message, changes: changes },
+    training: { id: training.id, name: training.name, message: message, changes: changes }, // id: 요약 창 그림 (휴식이면 집)
     ladder: ladder,
     userLines: [],   // 내가 뛴 경기 (afterUserMatch에서 채움)
     questLines: [],  // 퀘스트 진행·완료
@@ -145,7 +145,7 @@ function finishWeekReport(playedWeek, seasonMatches) {
     const opp = m.a === mine.id ? m.b : m.a;
     const my = m.a === mine.id ? m.score[0] : m.score[1];
     const their = m.a === mine.id ? m.score[1] : m.score[0];
-    return { won: won, matchKey: matchKey(m), text: m.label + " · vs " + teamName(opp) + " " + my + ":" + their };
+    return { won: won, matchKey: matchKey(m), text: m.label + " · vs " + teamName(opp) + " " + my + ":" + their, label: m.label, opp: teamName(opp), my: my, their: their }; // label~their: 요약 창 점수판
   });
 }
 

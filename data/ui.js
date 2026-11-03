@@ -69,12 +69,28 @@ const PAGE_HEADS = {
 
 // ━━━━━ 대시보드·진행 개선 (196, 시안 10: ① 요약 창 · ② 다음 목표 · ③ 성장 그래프 · ④ 칭호) ━━━━━
 // 화면만 바꿈 (게임 결과·밸런스 그대로). 코드는 js/dash_plus.js
+// 이번 주 요약 창 (시안 27, 2026-11-04): 가운데 창 · 그림 위 오른 스탯 · 큰 점수판(가) → 자기 줄로 · 하얀 반짝임 — js/dash_plus.js, 그림 js/room.js roomWeekStripURL
 const WEEK_SUMMARY = {
   maxMatches: 4,                    // 요약 창에 보이는 경기 줄 최대
-  closeHint: "A(ㅁ)·Enter·Esc 또는 바깥을 누르면 닫혀요 · 자세히는 대시보드 '지난주 결과'",
+  closeHint: "클릭·Space·A(ㅁ)·Enter = 바로 끝까지, 한 번 더 = 닫기 · Esc = 닫기",
+  skipHint: "클릭하면 바로 끝",
   replayBtn: "경기 재생 보기 ▶",
   okBtn: "확인",
   settingText: "진행 직후 '이번 주 요약' 창",
+  speeds: [["normal", "보통"], ["fast", "빠르게"], ["off", "끄기"]], // 설정 (끄기 = settings.weekSummary false)
+  fast: 0.5,                        // 빠르게 = 시간 × 0.5
+  scale: 5, scaleNarrow: 3, narrowAt: 560, // 그림 몇 배 (화면 폭 560px 아래는 3배)
+  maxChips: 6, bigChip: 3,          // 오른 스탯 칩 최대 개수 · 이만큼 오르면 하얀 테두리
+  ms: { start: 200, chip: 150, bar: 300, kv: 200, noMatch: 150, specialGap: 150, special: 1100 }, // 다다닥 간격 (밀리초)
+  big: { pop: 150, tick: 90, flipEnd: 60, hold: 250, fly: 300, gap: 80 },  // 큰 점수판: 뜸 · 세트마다 숫자 · 끝 · 멈춤 · 줄로 들어감 · 다음 경기까지
+  stars: 16,                        // 하얀 별 개수
+  noMatch: "경기가 없는 주예요",
+  benched: "후보",
+  greatText: "훈련 대성공 · 오른 스탯 ×2",
+  caps: {                           // 그림 아래 한 줄
+    train: "🏋️ {training}", great: "🏋️ {training} · 🔥 대성공", rest: "💤 {training}",
+    win: "⚔️ 경기 {n}번 · {w}승 {l}패", lose: "⚔️ 경기 {n}번 · {w}승 {l}패", titleLeague: "🏆 {title}", titleBig: "🏆 {title}",
+  },
 };
 const DASH_GOALS = {
   // 다음 일정으로 보여 줄 일정 id (data/schedule.js SCHEDULE). 준비·휴식 주는 뺌

@@ -613,6 +613,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
     if (!userSidelined()) titleFans(champKey); // 우승 팬 보너스 (js/fame.js, 출전했을 때)
     addMoment("🏆", mine.name + " " + { cup: (eraNames(seasonOf().year).cup || "LCK 컵") + " 우승", playoffs: eraNames(seasonOf().year).league + " 우승", worlds: "월드 챔피언십 우승", firststand: "First Stand 우승", msi: "MSI 우승" }[champKey]);
     if (state.weekCtx) { state.weekCtx.champion = title; state.weekCtx.championKey = champKey; } // 250: 큰 우승 판단은 이름표로 (이름이 시대마다 달라서)
+    if (state.weekReport) state.weekReport.title = { key: champKey, name: title }; // 요약 창 우승 그림 (시안 27)
   }
   if (champKey === "playoffs") {
     // 월드 진출: 결승 두 팀 + 4강 패자 중 정규 시즌 순위가 높은 팀 (MSI 우승 시 남은 4강 패자도) — js/intl.js worldsSeedCount

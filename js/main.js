@@ -658,7 +658,7 @@ function nextWeek(restWeek) {
 
   resetWeekCtx(); // 이번 주에 일어난 일 기록 시작 (이벤트 조건용)
   // 대시보드 종합 능력 칸 '이번 주 변화': 진행 전 스탯·특성 (js/dashboard.js weekGrowthHTML)
-  const growthBase = { stats: Object.assign({}, state.stats), traits: state.player.traits.slice(), score: playerScore(USER_ID), money: state.money, pop: state.popularity }; // money·pop: 이번 주 요약 창 (js/dash_plus.js)
+  const growthBase = { stats: Object.assign({}, state.stats), traits: state.player.traits.slice(), score: playerScore(USER_ID), money: state.money, pop: state.popularity, st: state.stamina, cd: state.condition }; // money·pop·st·cd: 이번 주 요약 창 (js/dash_plus.js)
 
   // 훈련 효과 적용 (이벤트로 "쉰다"를 골랐으면 이번 주는 휴식)
   // 부상 중이면 고른 훈련 대신 재활 (js/health.js)
@@ -994,5 +994,6 @@ function advanceWeek(rest) {
   wsBusy = true; // 211: 요약 창 먼저, 신문은 그 뒤 (js/dash_plus.js)
   nextWeek(rest);
   // 훈련 대성공이면 연출을 먼저 보고 → 이번 주 요약 창 → 닫으면 경기 자동 재생 (js/great.js, js/dash_plus.js, js/replay.js)
+  if (weekSummaryOn() && state.weekReport && state.weekReport.great) state.weekReport.great.seen = true; // 시안 27: 요약 창이 켜져 있으면 대성공은 요약 창 안(불꽃 빛·하얀 반짝임)에서
   showGreat(function () { showWeekSummary(afterWeekReplay); });
 }

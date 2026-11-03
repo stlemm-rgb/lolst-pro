@@ -155,3 +155,36 @@ const ROOM_TEXT = {
   noPlan: "🏋️ 이번 주 훈련을 골라 주세요",
   rest: { restDorm: "💤 휴식 · 합숙소", restRoom: "💤 휴식 · {home}", restApt: "💤 휴식 · {home}" },
 };
+
+// ===== 이번 주 요약 창 그림 (시안 27, 2026-11-04) — 그리는 코드는 js/room.js roomWeekStripURL =====
+// 대시보드 그림과 같은 방·무대에 동작만 바꿔 끼움. 장면 종류: 훈련(타닥타닥) · 대성공(불꽃 빛) · 휴식(집) · 승리(만세) · 패배(고개 숙임·어두움)
+//   우승: 리그·컵·2부 = 무대 + 불꽃 기둥 + 색종이 + CHAMPIONS / 국제 대회(bigTitles) = 클로즈업 + 금빛 햇살 줄기
+// 글자: H 머리 · S 피부 · E 눈 · D 그늘 · U·V 유니폼 · P 바지 · K 신발 · T·G 트로피(밝은·어두운) · W 반짝
+const ROOM_POSES = {
+  typeA:   { split: 6, rows: ["..HHHH.", "..ESHH.", "..SSSH.", "..SSS..", "..UUUU.", "SSUVUU.", "..UVUU.", "..UUUU.", "PPPPP..", "P...P..", "K...K.."] },
+  typeB:   { split: 6, rows: ["..HHHH.", "..ESHH.", "..SSSH.", "..SSS..", "..UUUU.", ".SUVUU.", "S.UVUU.", "..UUUU.", "PPPPP..", "P...P..", "K...K.."] },
+  cheer:   { split: 11, rows: ["S.HHHH.S", "S.HSSH.S", "U.ESSE.U", "UUSSSSUU", ".UUUUUU.", "..UVVU..", "..UUUU..", "..UUUU..", "..PPPP..", "..P..P..", "..K..K.."] },
+  slump:   { split: 0, rows: [".HHHH.", ".HHHH.", ".UDDU.", "SUUUUS", "SUVVUS", "SUUUUS", ".UUUU.", ".PPPP.", ".P..P.", ".K..K."] },
+  trophyA: { split: 16, rows: ["..TTTTTT..", ".T.TGGT.T.", "..TTTTTT..", "...TTTT...", "....GG....", "..STTTTS..", "..SHHHHS..", "..SHSSHS..", "..UESSEU..", "..USSSSU..", "..UUUUUU..", "...UVVU...", "...UUUU...", "...PPPP...", "...P..P...", "...K..K..."] },
+  trophyB: { split: 16, rows: ["W.TTTTTT..", ".T.TWGT.T.", "..TTTTTT.W", "...TTTT...", "....GG....", "..STTTTS..", "..SHHHHS..", "..SHSSHS..", "..UESSEU..", "..USSSSU..", "..UUUUUU..", "...UVVU...", "...UUUU...", "...PPPP...", "...P..P...", "...K..K..."] },
+};
+const ROOM_FX = {
+  trophyColors: { T: "#ffd23f", G: "#a97c1d", W: "#ffffff" },
+  typeEvery: 2,                                   // 타닥타닥: 이 장마다 손 바꿈
+  trophyBlink: 3,                                 // 트로피 반짝: 이 장마다 바꿈
+  loseDim: [0.62, 0.62, 0.7],                     // 패배: 조명 어둡게 (빨강·초록·파랑 곱하기)
+  fire: ["#ff9a2e", "#ffd23f", "#ff6e1e"],        // 대성공: 캐릭터 둘레 불꽃 점
+  confetti: ["team0", "#ffffff", "#ffd23f", "#00e0ff", "#ff8fc8"], // 색종이 (team0 = 우리 팀 색)
+  confettiN: { league: 46, big: 30 },
+  pyro: ["#ffffff", "#fff0a0", "#ffd23f", "#ff9a2e", "#ff5a1f"], // 불꽃 기둥 아래 → 위
+  pyroAt: [[4, 30], [34, 6]],                     // 무대 앞 왼쪽·오른쪽 모서리 (칸)
+  word: "CHAMPIONS",
+  wordRamp: ["#fff4bc", "#ffde5e", "#ffd23f", "#dba92b", "#a97c1d"],
+  wordShadow: "#2a1405",
+  bigTitles: ["worlds", "msi", "firststand"],     // 클로즈업 그림으로 축하할 우승 (나머지는 무대)
+  rays: { light: [120, 70, 14], dark: [60, 30, 10], n: 16, turn: 0.25 }, // 금빛 햇살 줄기: 색 · 줄 수 · 20장 동안 도는 양(바퀴)
+  floor: ["#6f5320", "#2a1d10"],
+  closeScale: 3,                                  // 클로즈업 캐릭터 몇 배
+};
+// 도트 글자 (CHAMPIONS용, 5줄)
+const ROOM_FONT = { C: ["###", "#..", "#..", "#..", "###"], H: ["#.#", "#.#", "###", "#.#", "#.#"], A: [".#.", "#.#", "###", "#.#", "#.#"], M: ["#...#", "##.##", "#.#.#", "#...#", "#...#"], P: ["##.", "#.#", "##.", "#..", "#.."], I: ["###", ".#.", ".#.", ".#.", "###"], O: ["###", "#.#", "#.#", "#.#", "###"], N: ["#..#", "##.#", "#.##", "#..#", "#..#"], S: ["###", "#..", "###", "..#", "###"] };
