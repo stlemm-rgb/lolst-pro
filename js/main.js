@@ -180,7 +180,10 @@ function masteryRowHTML(name, pos) {
 // 올해 열리지 않는 일정 (연도·1부 팀 수에 따라): 이유 글자, 열리면 "" — 일정·대회 일정 화면에서 반투명
 function scheduleOffReason(id) {
   if (id === "first_stand" || id === "firststand") return firstStandOn(state.year) ? "" : ERA.firstStandFrom + "년부터";
-  if (id === "road_to_msi" || id === "msi" || id === "rtmsi") return msiOn(state.year) ? "" : state.year >= ERA.msiFrom ? state.year + "년은 열리지 않음" : ERA.msiFrom + "년부터"; // 249: 2020 취소
+  if (id === "road_to_msi") return msiOn(state.year) ? "" : state.year < ERA.msiFrom ? ERA.msiFrom + "년부터" : state.year + "년은 MSI가 열리지 않음"; // 250: 2025년 전엔 'MSI 선발'(전반기 1·2위)로 표시
+  if (id === "rtmsi") return rtmsiOn(state.year) ? "" : ERA.roadToMsiFrom + "년부터"; // 250: Road to MSI 대진표
+  if (id === "msi") return msiOn(state.year) ? "" : state.year >= ERA.msiFrom ? state.year + "년은 열리지 않음" : ERA.msiFrom + "년부터"; // 249: 2020 취소
+  if (id === "cup" || id === "cup_po") return cupOn(state.year) ? "" : "이 시대엔 없음"; // 250: 2021~2024
   if (id === "playin") return playinOn() ? "" : "1부 10팀일 때만";
   return "";
 }
@@ -197,8 +200,8 @@ pages.schedule = function () {
     return (
       '<tr class="' + (now ? "now" : "") + (state.week > s.to ? " past" : "") + (off ? " off" : "") + '">' +
         "<td>" + weeks + "</td>" +
-        "<td><b>" + s.name + "</b>" + tag + patch + (now ? ' <span class="now-tag">지금</span>' : "") + offTagHTML(off) + "</td>" +
-        '<td class="muted">' + s.desc + "</td>" +
+        "<td><b>" + scheduleName(s, state.year) + "</b>" + tag + patch + (now ? ' <span class="now-tag">지금</span>' : "") + offTagHTML(off) + "</td>" +
+        '<td class="muted">' + scheduleDesc(s, state.year) + "</td>" +
       "</tr>"
     );
   }).join("");

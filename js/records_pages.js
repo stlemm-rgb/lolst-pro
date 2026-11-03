@@ -15,7 +15,7 @@ function careerRecordParts() {
   rows.forEach(function (r) {
     sets += r.sets; setWins += r.setWins; ratingSum += r.rating * r.sets; solo += r.solo; pog += r.pog;
     series += r.series; seriesWins += r.seriesWins;
-    r.titles.forEach(function (t) { titles.push(r.year + " " + t); });
+    r.titles.forEach(function (t) { titles.push(r.year + " " + eraTitle(t, r.year)); }); // 250: 그해 대회 이름으로 (저장 글자는 그대로)
   });
   const years = state.year - c.debut.year + 1;
   const awardChips = (c.awards || []).map(function (a) { return '<span class="chip good">' + a.year + " " + escapeHTML(a.title) + "</span>"; }).join("") || '<span class="muted">아직 없음</span>';

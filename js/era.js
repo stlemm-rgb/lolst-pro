@@ -18,6 +18,28 @@ function eraYear(year) { return year || (typeof state !== "undefined" && state &
 function eraMoney(year) { return eraRow(ERA.money, eraYear(year))[1]; }
 function eraPop(year) { return eraRow(ERA.popularity, eraYear(year))[1]; }
 function eraTeams(year) { const r = eraRow(ERA.teams, eraYear(year)); return { 1: r[1], 2: r[2] }; }
+function cupOn(year) { const y = eraYear(year), r = ERA.cupOff; return !r || y < r[0] || y > r[1]; } // 250: 연초 컵 (2021~2024 없음)
+function rtmsiOn(year) { return msiOn(year) && eraYear(year) >= ERA.roadToMsiFrom; } // 250: Road to MSI (2025~, 그 전엔 전반기 1·2위가 MSI)
+function eraNames(year) { return eraRow(ERA.names, eraYear(year))[1]; } // 250: 시대별 대회 이름
+// 저장된 우승 글자(예: '2013 LCK 컵 우승')를 그해 이름으로 보여 줄 때 (저장 글자는 그대로 — 우승 세기에 씀)
+function eraTitle(text, year) {
+  const n = eraNames(year);
+  let t = String(text);
+  if (n.cup) t = t.replace("LCK 컵", n.cup);
+  return t.replace(/^리그 우승/, n.league + " 우승");
+}
+// 일정 표의 설명: 2025년 전 23~24주는 Road to MSI 대신 전반기 1·2위가 바로 MSI
+function scheduleDesc(s, year) {
+  if (s.id === "road_to_msi" && msiOn(year) && !rtmsiOn(year)) return eraNames(year).split1 + " 1·2위가 바로 MSI에 나가요. (Road to MSI는 " + ERA.roadToMsiFrom + "년부터)";
+  return s.desc;
+}
+// 일정 표의 대회 이름 (data/schedule.js SCHEDULE id → 그해 이름). 이 시대에 없는 대회는 원래 이름
+function scheduleName(s, year) {
+  const n = eraNames(year);
+  const map = { cup: n.cup && n.cup + " 그룹 배틀", cup_po: n.cup && n.cup + " 플레이오프", split1: n.split1, split2: n.split2, playoffs: n.playoffs,
+    road_to_msi: rtmsiOn(year) ? null : msiOn(year) ? "MSI 선발 (" + n.split1 + " 1·2위)" : null };
+  return map[s.id] || s.name;
+}
 function msiOn(year) { const y = eraYear(year); return y >= ERA.msiFrom && (ERA.msiSkip || []).indexOf(y) === -1; } // 249: 실제로 취소된 해는 빼고
 function firstStandOn(year) { return eraYear(year) >= ERA.firstStandFrom; }
 

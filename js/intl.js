@@ -118,6 +118,12 @@ const RTMSI_LABELS = { r1: "Road to MSI 1라운드", r2: "Road to MSI 2라운드
 
 function roadToMsiWeek1() {
   if (!msiOn(seasonOf().year)) return; // MSI는 2015년부터 (data/era.js)
+  if (!rtmsiOn(seasonOf().year)) { // 250: 2025년 전 = Road to MSI 없이 전반기 1·2위가 바로 MSI
+    const s = seasonOf();
+    s.msiTeams = standings("split1", tier1Ids()).slice(0, 2).map(function (r) { return r.id; });
+    addNews("MSI", eraNames(s.year).split1 + " 1위 " + teamName(s.msiTeams[0]) + "·2위 " + teamName(s.msiTeams[1]) + "이(가) MSI에 나간다.");
+    return;
+  }
   const sd = rtmsiSeeds();
   const bo = INTL.roadToMsi.bo;
   const r1 = schedule(23, "rtmsi", RTMSI_LABELS.r1, sd[4], sd[5], bo);
@@ -127,7 +133,7 @@ function roadToMsiWeek1() {
 
 function roadToMsiWeek2() {
   const s = seasonOf();
-  if (!msiOn(s.year) || !s.rtmsiSeeds) return;
+  if (!rtmsiOn(s.year) || !s.rtmsiSeeds) return;
   const sd = rtmsiSeeds();
   const bo = INTL.roadToMsi.bo;
   const r2 = rtmsiMatch("2라운드");
@@ -214,7 +220,7 @@ function intlPreview(week) {
     return [{ comp: "fs_ko", label: "First Stand 4강", a: t[0], b: t[3], bo: INTL.firstStand.koBo },
             { comp: "fs_ko", label: "First Stand 4강", a: t[1], b: t[2], bo: INTL.firstStand.koBo }];
   }
-  if (week === 23 && msiOn(s.year) && allPlayed(of("split1"))) {
+  if (week === 23 && rtmsiOn(s.year) && allPlayed(of("split1"))) {
     const sd = standings("split1", tier1Ids()).slice(0, 6).map(function (r) { return r.id; });
     return [{ comp: "rtmsi", label: RTMSI_LABELS.r1, a: sd[4], b: sd[5], bo: INTL.roadToMsi.bo },
             { comp: "rtmsi", label: RTMSI_LABELS.r2 + " (1라운드 승자와)", a: sd[3], b: null, bo: INTL.roadToMsi.bo }];

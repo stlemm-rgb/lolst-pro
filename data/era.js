@@ -60,7 +60,18 @@ const ERA = {
   teams: [[2012, 8, 6], [2014, 10, 6], [2016, 10, 8]],
   // 국제대회 시작 연도 (그 전에는 그 주에 리그 경기가 없어요)
   msiFrom: 2015,        // Road to MSI · MSI
-  msiSkip: [2020],      // 249: 실제로 열리지 않은 해 (2020 MSI는 코로나19로 취소, MSC로 대체 — 시대 기사 2020)
+  msiSkip: [2020],
+  // 250 (사용자 결정): 시대별 실제 일정 — 연초 컵은 2021~2024년엔 실제로 없어서 안 열림, Road to MSI는 2025년부터 (그 전엔 전반기 1·2위가 바로 MSI)
+  cupOff: [2021, 2024],  // [처음, 끝] 이 사이 해엔 연초 컵 없음
+  roadToMsiFrom: 2025,
+  // 250: 시대별 대회 이름 (형식은 그대로, 이름만). [시작 연도, 이름표] — 그해 이하 중 가장 최근 줄
+  //   league 1부 리그 · cup 연초 컵(null = 그 시대엔 없음) · split1 전반기 · split2 후반기 · playoffs 플레이오프 · tier2 2부 리그
+  names: [
+    [2012, { league: "OGN 챔피언스", cup: "챔피언스 윈터", split1: "챔피언스 스프링", split2: "챔피언스 서머", playoffs: "챔피언스 서머 플레이오프", tier2: "NLB" }],
+    [2015, { league: "LCK", cup: "KeSPA 컵", split1: "LCK 스프링", split2: "LCK 서머", playoffs: "LCK 서머 플레이오프", tier2: "챌린저스 코리아" }],
+    [2021, { league: "LCK", cup: null, split1: "LCK 스프링", split2: "LCK 서머", playoffs: "LCK 서머 플레이오프", tier2: "LCK CL" }],
+    [2025, { league: "LCK", cup: "LCK 컵", split1: "LCK 전반기", split2: "LCK 후반기", playoffs: "LCK 플레이오프", tier2: "LCK CL" }],
+  ],      // 249: 실제로 열리지 않은 해 (2020 MSI는 코로나19로 취소, MSC로 대체 — 시대 기사 2020)
   firstStandFrom: 2025, // First Stand
 };
 

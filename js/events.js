@@ -513,7 +513,8 @@ function postSocial() {
     return mention;
   };
   // 리그 우승·월드 우승 주에는 우승 글을 2~3개 꼭 올림 (한 주 최대 개수와 따로)
-  if (w.champion && R.bigTitleWords && R.bigTitleWords.some(function (t) { return w.champion.indexOf(t) !== -1; })) {
+  const bigTitle = !w.champion ? false : w.championKey ? R.bigTitleKeys.indexOf(w.championKey) !== -1 : R.bigTitleWords && R.bigTitleWords.some(function (t) { return w.champion.indexOf(t) !== -1; }); // 250: 이름표로 (예전 주는 글자로)
+  if (w.champion && bigTitle) {
     const count = randInt(R.bigTitlePosts[0], R.bigTitlePosts[1]);
     const used = [];
     for (let i = 0; i < count; i++) {

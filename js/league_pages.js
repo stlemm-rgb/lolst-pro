@@ -116,7 +116,8 @@ function standingsTableHTML(rows, notes) {
 
 pages.standings = function () {
   const season = seasonOf();
-  const tabs = [["tier1", "1부 정규 시즌"], ["cup", "LCK 컵"], ["tier2", "2부 리그"], ["worlds", "월드 조별 리그"]];
+  const N = eraNames(state.year); // 250: 시대별 이름
+  const tabs = [["tier1", N.league + " 정규 시즌"], ["cup", N.cup || "연초 컵"], ["tier2", N.tier2], ["worlds", "월드 조별 리그"]];
   const tabHTML = tabs.map(function (t) {
     return '<button data-stab="' + t[0] + '"' + (standingsTab === t[0] ? ' class="primary"' : "") + ">" + t[1] + "</button>";
   }).join("");
@@ -158,7 +159,8 @@ pages.standings = function () {
 pages.tournament = function () {
   const season = seasonOf();
   const champ = season.champions;
-  const champHTML = [["cup", "LCK 컵"], ["firststand", "First Stand 🌏"], ["msi", "MSI 🌏"], ["playoffs", "리그 (플레이오프)"], ["worlds", "월드 챔피언십 🌏"]].map(function (c) {
+  const N2 = eraNames(state.year);
+  const champHTML = [["cup", N2.cup || "연초 컵"], ["firststand", "First Stand 🌏"], ["msi", "MSI 🌏"], ["playoffs", N2.league + " (" + N2.playoffs + ")"], ["worlds", "월드 챔피언십 🌏"]].map(function (c) {
     const off = scheduleOffReason(c[0]); // 올해 안 열리는 대회는 반투명 (js/main.js)
     return '<tr' + (off ? ' class="off"' : "") + "><td>" + c[1] + offTagHTML(off) + "</td><td>" + (champ[c[0]] ? "🏆 " + teamLabel(champ[c[0]]) : '<span class="muted">' + (off ? "-" : "미정") + "</span>") + "</td></tr>";
   }).join("");

@@ -1260,6 +1260,7 @@ const SOCIAL_RULES = {
   recentAvoid: 40,      // 234: 최근 이만큼의 글과 같은 문장은 피해서 고름 (게임 결과와 관계없음, js/events.js postSocial)
   // 리그 우승·월드 우승 주: 우승(champion) 글을 이만큼 꼭 올림 (최대 개수와 따로). 컵 대회는 해당 없음
   bigTitleWords: ["리그", "월드", "MSI"],
+  bigTitleKeys: ["playoffs", "worlds", "msi"], // 250: 대회 이름표 (리그 이름이 시대마다 달라서 글자 대신)
   bigTitlePosts: [2, 3],
   proAuthorRate: 0.5,   // 글쓴이가 다른 프로 선수일 확률 (나머지는 팬)
   // 내 선수 언급({name})이 얼마나 나오는지: 인기도가 낮으면 언급 없는 글 위주 (2026-10-06)
