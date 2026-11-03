@@ -13,8 +13,8 @@
 | `data/match.js` | 9 | 경기력 계산 규칙 (밴픽 + 메타 페널티) |  |
 | `data/match_events.js` | 23 | 경기 이벤트 (세트마다 일어나는 사건: 스틸·슈퍼플레이·실수·심리) — js/match_events.js |  |
 | `data/schedule.js` | 5 | 한 시즌(52주) 일정표 |  |
-| `data/league.js` | 6 | 리그 규칙 (3단계) |  |
-| `data/names.js` | 9 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
+| `data/league.js` | 7 | 리그 규칙 (3단계) |  |
+| `data/names.js` | 12 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
 | `data/events.js` | 52 | 이벤트 (SNS로 오는 연락과 소식) |  |
 | `data/events_story.js` | 26 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/events_life.js` | 11 | 받은 연락 리뉴얼 ② 선수 생활·인생 · 동료·라이벌 관계 (2026-10-08) |  |
@@ -24,7 +24,7 @@
 | `data/mishaps.js` | 13 | 웃긴 해프닝 (2026-11-02) — 게임 결과와 관계없는 우스꽝스러운 사건사고 |  |
 | `data/contracts.js` | 13 | 연봉·계약·이적 규칙 (5단계) |  |
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
-| `data/news.js` | 43 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
+| `data/news.js` | 42 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
 | `data/ui.js` | 14 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/room.js` | 11 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
@@ -34,7 +34,7 @@
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
 | `data/boxscore.js` | 1 | 경기 기록(박스 스코어) 만들기 규칙 |  |
 | `data/comps.js` | 7 | 챔피언 조합 성향 (밴픽 상성·시너지) |  |
-| `data/era.js` | 16 | 시대: 대격변 패치·시대·해외 리그·시대별 경기 환경 | shakeup.js, era.js, era_match.js |
+| `data/era.js` | 24 | 시대: 대격변 패치·시대·해외 리그·시대별 경기 환경 | shakeup.js, era.js, era_match.js |
 | `data/fame.js` | 9 | 인기도 · 평판 (js/fame.js) — 2026-10-07 |  |
 | `data/collection.js` | 9 | 수집·강화 (js/collection.js) — 2026-10-08 |  |
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
@@ -44,14 +44,14 @@
 | `js/champions.js` | 18 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 38 | 캐릭터 생성 |  |
 | `js/save.js` | 22 | 저장 / 불러오기 |  |
-| `js/league.js` | 31 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
+| `js/league.js` | 33 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
-| `js/matchsim.js` | 44 | 경기 판정과 주간 일정 진행 |  |
-| `js/intl.js` | 11 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 55 | 게임 상태 |  |
+| `js/matchsim.js` | 45 | 경기 판정과 주간 일정 진행 |  |
+| `js/intl.js` | 12 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
+| `js/main.js` | 56 | 게임 상태 |  |
 | `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
-| `js/league_pages.js` | 19 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
+| `js/league_pages.js` | 20 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 37 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
 | `js/sns_page.js` | 39 | SNS 화면 |  |
 | `js/contracts.js` | 33 | 연봉 · 계약 · 2군행 · 이적 |  |
@@ -73,7 +73,7 @@
 | `js/match_detail.js` | 23 | [경기 결과] 화면: 경기 요약 · 세트별 분석 · 선수 기록 |  |
 | `js/history_pages.js` | 15 | 역사관·리그 생태계·트로피 진열장 | history_pages.js, trophies.js |
 | `js/shakeup.js` | 7 | 대격변 패치 (값: data/era.js) |  |
-| `js/era.js` | 26 | 시대·해외 리그·시대별 경기 환경 | era.js, era_match.js |
+| `js/era.js` | 29 | 시대·해외 리그·시대별 경기 환경 | era.js, era_match.js |
 | `js/fame.js` | 14 | 인기도 · 평판 (값: data/fame.js) |  |
 | `js/collection.js` | 21 | 시그니처 픽·업적·컬렉션 | signature.js, collection.js |
 | `js/friends.js` | 30 | 선수 관계 이야기·친구 | stories.js, friends.js |
@@ -89,6 +89,7 @@
 | `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
 | `js/health.js` | 4 | 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js |  |
+| `js/franchise.js` | 7 | 프랜차이즈 (253, ② P5 · 사용자 결정 2026-11-03) — 실제 LCK처럼 2021년부터 |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
 | `js/dash_plus.js` | 12 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
 | `js/room.js` | 15 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |

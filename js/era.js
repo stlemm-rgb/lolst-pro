@@ -60,6 +60,7 @@ function minSalaryNow(year) {
 // 1부가 목표보다 적으면: 지난 시즌 2부 순위 높은 팀부터 확장 승격 (이번 승강전에서 강등된 팀은 빼고)
 // 2부가 목표보다 적으면: 신생 구단 창단 (선수 7명, 지금 2부 주전 평균보다 조금 약하게)
 function expandLeague(lastSeason) {
+  if (franchiseActive()) return []; // 253: 프랜차이즈 뒤엔 구단 수 고정 (1부 10 + 2군 10)
   const target = eraTeams(state.year);
   const news = [];
   const relegated = (lastSeason.promo || []).filter(function (p) { return p.winner === p.tier2; }).map(function (p) { return p.tier1; });

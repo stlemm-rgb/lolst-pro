@@ -231,6 +231,10 @@ function currentGoal() {
     const rival = benchRival();
     return Object.assign(fill(GOAL_TEXT.bench, { score: score, rival: rival ? playerName(rival) + " " + playerScore(rival).toFixed(1) : "-" }), { step: 0 });
   }
+  if (team.tier === 2 && team.academyOf && findTeam(team.parent)) { // 253: 프랜차이즈 2군 — 콜업이 목표
+    const st = starterAt(team.parent, state.player.position);
+    return Object.assign(fill(GOAL_TEXT.tier2Academy, { parent: findTeam(team.parent).name, rival: st ? playerName(st) + " " + playerScore(st).toFixed(1) : "-", score: score }), { step: 1 });
+  }
   if (team.tier === 2) return Object.assign(fill(GOAL_TEXT.tier2, { rank: rank }), { step: 1 });
   const sum = careerSummary(true);
   if (!sum.titles.playoffs) step = 2;

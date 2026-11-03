@@ -8,6 +8,13 @@ const TIER1_ORGS = ["GEN.G", "Hanwha", "T1", "Dplus", "KT", "BNK", "BRION", "NS"
 // 251 (② P3, 사용자 확인): 구단 열쇠(위 약자, 팀의 t.org) → 연도별 실제 LCK 이름 [시작 연도, 이름, 짧은 이름]. 그해 이하 중 가장 최근 줄
 //   조사·결정: Claude outputs/구단_이름_후보.md (위키백과 계보 확인, 빈 칸은 그해 실제로 있던 팀으로 채움 — 계보가 꼭 맞지 않을 수 있음)
 //   새 게임·새 시즌·불러오기 때 팀 이름(t.name·t.short)을 그해 이름으로 (js/league.js applyRealTeamNames)
+// 253: 2군(LCK CL) 이름 [시작 연도, 이름, 짧은 이름]. 표에 없는 구단은 '1군 그해 이름 + Challengers' (js/franchise.js academyName)
+const ACADEMY_NAMES = {
+  "T1":    [[2021, "T1 Esports Academy", "T1A"]],
+  "GEN.G": [[2021, "Gen.G Global Academy", "GGA"]],
+  "NS":    [[2021, "Nongshim Esports Academy", "NSA"]],
+  "BNK":   [[2021, "Liiv SANDBOX Challengers", "LSBC"], [2024, "FearX Youth", "FOXY"], [2025, "BNK FearX Youth", "BFXY"]],
+};
 const REAL_TEAM_NAMES = {
   "T1":     [[2012, "SK Telecom T1", "SKT"], [2020, "T1", "T1"]],
   "GEN.G":  [[2012, "MVP Ozone", "MVP"], [2013, "Samsung Galaxy", "SSG"], [2018, "Gen.G", "GEN"]],

@@ -184,6 +184,7 @@ function scheduleOffReason(id) {
   if (id === "rtmsi") return rtmsiOn(state.year) ? "" : ERA.roadToMsiFrom + "년부터"; // 250: Road to MSI 대진표
   if (id === "msi") return msiOn(state.year) ? "" : state.year >= ERA.msiFrom ? state.year + "년은 열리지 않음" : ERA.msiFrom + "년부터"; // 249: 2020 취소
   if (id === "cup" || id === "cup_po") return cupOn(state.year) ? "" : "이 시대엔 없음"; // 250: 2021~2024
+  if (id === "promotion") return franchiseActive() ? "프랜차이즈 (" + ERA.franchiseFrom + "년부터 없음)" : ""; // 253
   if (id === "playin") return playinOn() ? "" : "1부 10팀일 때만";
   return "";
 }
@@ -797,13 +798,13 @@ function nextWeek(restWeek) {
     state.player.age += 1;
     applyAging(); // 27세부터 노화 (js/retire.js)
     expireStartTrait(); // 유망주 전용 특성: 3년차부터 사라짐 (js/creation.js)
-    const leagueNews = applyRealTeamNames(state.year).concat(newSeasonLeague()).concat(contractsNewSeason()).concat(addBigRookies()).concat(placeLegends("season")); // 대형 신인 · 올해 데뷔하는 레전드 (js/league.js)
+    const leagueNews = applyRealTeamNames(state.year).concat(newSeasonLeague()).concat(convertToFranchise()).concat(contractsNewSeason()) // 253: 2021 프랜차이즈 전환 (js/franchise.js).concat(addBigRookies()).concat(placeLegends("season")); // 대형 신인 · 올해 데뷔하는 레전드 (js/league.js)
     initContracts(); // 새로 들어온 신인들 계약
     fillRosters(); // 은퇴·신인·이적이 다 끝난 뒤 후보 구성 다시 정리 (js/contracts.js 후보 구성 규칙)
     refillRivalAces(); // 은퇴한 🔥 리그의 에이스 자리 채우기 (js/straits.js)
     addNews("새 시즌", state.year + "년 시즌이 시작됐다. " + escapeHTML(state.player.name) + " 선수는 이제 " + state.player.age + "세. 소속: " + myTeam().name + " (" + tierName(myTeam().tier) + ")");
-    const NEWS_TAGS = { "🔁": "이적 시장", "🌟": "대형 신인", "📈": "리그 확장", "🆕": "신생 구단", "🌏": "해외 리그", "🏷️": "구단 이름" };
-    const ARTICLE_TAGS = ["📈", "🆕", "🌏", "🌟", "🏷️"]; // 승강·리그 크기·해외 리그·대형 신인은 신년 신문 기사 하나로 (소식 줄이기)
+    const NEWS_TAGS = { "🔁": "이적 시장", "🌟": "대형 신인", "📈": "리그 확장", "🆕": "신생 구단", "🌏": "해외 리그", "🏷️": "구단 이름", "🏛️": "프랜차이즈" };
+    const ARTICLE_TAGS = ["📈", "🆕", "🌏", "🌟", "🏷️", "🏛️"]; // 승강·리그 크기·해외 리그·대형 신인은 신년 신문 기사 하나로 (소식 줄이기)
     const article = [];
     leagueNews.forEach(function (text) {
       const tag = Object.keys(NEWS_TAGS).find(function (k) { return text.indexOf(k) === 0; });
@@ -883,6 +884,7 @@ function nextWeek(restWeek) {
 
   // 2군행/승격 판정, 비시즌 시작이면 재계약·영입 제안
   checkBench();
+  callupWeekly(); // 253: 2군 → 1군 콜업 (js/franchise.js)
   if (state.week === ALL_STAR.week) runAllStar(); // 올스타전 팬 투표 (js/fame.js)
   if (state.week === SUMMER_MARKET.start) startSummerWindow(); // 여름 이적 기간 (js/club_market.js)
   if (state.week === SUMMER_MARKET.applyWeek) summerMarket().forEach(function (text) { addNews(text.indexOf("🤝") === 0 ? "임대" : "여름 이적 시장", text.replace(/^(🔁|🤝) /, "")); });

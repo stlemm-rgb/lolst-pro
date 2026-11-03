@@ -220,7 +220,7 @@ function clubRosterHTML(teamId) {
 // ----- 이적 목록 (js/club_market.js logTransfer) -----
 let tlogYear = 0;      // 0 = 올해, 1 = 작년
 let tlogFilter = "all"; // all · t1 · mine
-const TLOG_KIND = { buy: "🔁 보강", star: "💥 주전 이적", depth: "🧩 경쟁 후보", loan: "🤝 임대", leave: "💸 연봉 문제로 FA", import: "🌏 해외 선수 영입", abroad: "✈️ 해외 진출", return: "🏠 국내 복귀", retire: "🎓 은퇴" };
+const TLOG_KIND = { buy: "🔁 보강", star: "💥 주전 이적", depth: "🧩 경쟁 후보", loan: "🤝 임대", leave: "💸 연봉 문제로 FA", import: "🌏 해외 선수 영입", abroad: "✈️ 해외 진출", return: "🏠 국내 복귀", retire: "🎓 은퇴", callup: "⬆️ 1군 콜업", senddown: "⬇️ 2군행" }; // 253: 프랜차이즈 2군
 // 은퇴 사유 표시 (js/retirement.js logRetire tag)
 const TLOG_TAG = { meta: { name: "메타 적응 불가", tip: "바뀐 메타를 따라가지 못해 이적 시장 도중 은퇴했다" } };
 function transferLogCardHTML() {

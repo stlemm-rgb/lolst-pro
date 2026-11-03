@@ -9,7 +9,7 @@
 const USER_ID = "USER";
 
 function findTeam(id) {
-  return state.league.teams.find(function (t) { return t.id === id; });
+  return state.league.teams.find(function (t) { return t.id === id; }) || (state.league.oldTeams || []).find(function (t) { return t.id === id; }); // 253: 해체한 팀도 이름은 찾음
 }
 
 function findPlayer(id) {
@@ -233,6 +233,13 @@ function makeTeamDefs(year) {
   });
   const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const taken = TIER1_ORGS.concat(Object.keys(REAL_TEAM_NAMES).reduce(function (a, k) { return a.concat(REAL_TEAM_NAMES[k].map(function (r) { return r[2]; })); }, [])); // 251: 실제 구단 짧은 이름과 안 겹치게
+  if (franchiseOn(year)) { // 253: 프랜차이즈 시대 새 게임 — 2부 = 10개 구단의 2군
+    TIER1_ORGS.slice(0, count[1]).forEach(function (org) {
+      const nm = academyName(org, year);
+      defs.push({ name: nm[0], short: nm[1], academyOf: org, tier: 2, shift: teamShiftRoll(2) });
+    });
+    return defs;
+  }
   for (let i = 0; i < count[2]; i++) {
     let tag;
     do { tag = letters[randInt(0, 25)] + letters[randInt(0, 25)]; } while (taken.indexOf(tag) !== -1);
@@ -262,6 +269,7 @@ function makeLeague(defs, chosenIndex) {
     const tier = n.tier;
     const team = { id: "T" + (i + 1), name: n.name, short: n.short, tier: tier, roster: [] };
     if (n.org) team.org = n.org; // 251: 구단 열쇠 (실제 이름 표 REAL_TEAM_NAMES)
+    if (n.academyOf) team.academyOf = n.academyOf; // 253: 2군
     const npc = LEAGUE.npc;
     // 주전 5명 (포지션마다 1명)
     POSITION_IDS.forEach(function (pos) {
@@ -281,6 +289,12 @@ function makeLeague(defs, chosenIndex) {
     }
     state.league.teams.push(team);
   });
+  state.league.teams.forEach(function (t) { // 253: 2군 → 1군 연결
+    if (!t.academyOf) return;
+    const p = state.league.teams.find(function (x) { return x.org === t.academyOf; });
+    if (p) t.parent = p.id;
+  });
+  if (franchiseOn(state.year)) state.league.franchise = state.year;
   placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
   placeLegends("start"); // 레전드 선수: 시작 해에 활동 중인 선수 (244, data/names.js LEGENDS)
   addVeterans(); // 나이 많은 선수 몇 명 (세대교체, js/retirement.js)
@@ -303,6 +317,7 @@ function teamOrg(t) { return t.org || (TIER1_ORGS.indexOf(t.short) !== -1 ? t.sh
 function applyRealTeamNames(year) {
   const news = [];
   (state.league.teams || []).forEach(function (t) {
+    if (t.academyOf) { const nm = academyName(t.academyOf, year); t.name = nm[0]; t.short = nm[1]; return; } // 253: 2군
     const org = teamOrg(t);
     if (!org) return;
     t.org = org;

@@ -129,7 +129,7 @@ pages.standings = function () {
       const low = standings(["split1", "split2"], season.groups.rise);
       const n1 = top.length + low.length;
       const tags = []; // 최종 순위별 표시 (1부 10팀: 1~4 직행·5~8 플레이인 / 8팀: 1~6 직행)
-      for (let i = 0; i < n1; i++) tags.push(i >= n1 - 2 ? "승강전" : playinOn() ? (i < 4 ? "플레이오프" : "플레이인") : "플레이오프");
+      for (let i = 0; i < n1; i++) tags.push(i >= n1 - 2 && !franchiseActive() ? "승강전" : i >= n1 - 2 ? "" : playinOn() ? (i < 4 ? "플레이오프" : "플레이인") : "플레이오프");
       body = '<p class="muted small">전반기 + 후반기 합산. ' + (playinOn() ? "최종 1~4위는 플레이오프 직행, 5~8위는 플레이인." : "1부 " + n1 + "팀이라 플레이인 없이 최종 1~6위가 플레이오프.") + " 최종 " + (n1 - 1) + "·" + n1 + "위는 승강전.</p>" +
         "<h2 class=\"sub\">상위 그룹</h2>" + standingsTableHTML(top, tags.slice(0, top.length)) +
         "<h2 class=\"sub\">하위 그룹</h2>" + standingsTableHTML(low, tags.slice(top.length));
@@ -141,7 +141,8 @@ pages.standings = function () {
     body = '<p class="muted small">그룹 배틀 전체 성적 상위 6팀이 LCK 컵 플레이오프에 진출해요.</p>' +
       standingsTableHTML(standings("cup", tier1Ids()), ["플레이오프", "플레이오프", "플레이오프", "플레이오프", "플레이오프", "플레이오프"]);
   } else if (standingsTab === "tier2") {
-    body = '<p class="muted small">전반기 + 후반기 합산. 1·2위는 승강전에 나가요.</p>' +
+    body = franchiseActive() ? '<p class="muted small">전반기 + 후반기 합산. 1부 10개 구단의 2군 리그예요 — 승강전은 없고, 1군 주전보다 강해지면 1군으로 콜업돼요.</p>' +
+      standingsTableHTML(standings(["tier2", "tier2b"], tier2Ids()), []) : '<p class="muted small">전반기 + 후반기 합산. 1·2위는 승강전에 나가요.</p>' +
       standingsTableHTML(standings(["tier2", "tier2b"], tier2Ids()), ["승강전", "승강전"]);
   } else {
     if (!season.worlds) {

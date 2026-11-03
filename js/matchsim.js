@@ -511,8 +511,8 @@ const WEEK_EVENTS = {
   37: [function () { koSemis("playoffs", eraNames(seasonOf().year).playoffs + " 4강", seasonOf().seeds, 36, 37, LEAGUE.bestOf.playoffs); }],
   38: [function () { koFinal("playoffs", eraNames(seasonOf().year).playoffs + " 결승", 38, LEAGUE.bestOf.playoffs, "playoffs", eraNames(seasonOf().year).league + " 우승"); }, function () { worldSeasonStory(); }], // 해외 리그 결산 (js/era.js)
   // 승강전: 1부 꼴찌 vs 2부 1위, 1부 끝에서 2번째 vs 2부 2위
-  39: [function () { promoMatch(39, tier1Ids().length - 1, 0); }],
-  40: [function () { promoMatch(40, tier1Ids().length - 2, 1); }],
+  39: [function () { if (!franchiseActive()) promoMatch(39, tier1Ids().length - 1, 0); }], // 253: 프랜차이즈면 승강전 없음
+  40: [function () { if (!franchiseActive()) promoMatch(40, tier1Ids().length - 2, 1); }],
   41: [setupWorlds],
   44: [function () {
     const g = seasonOf().worlds.groups;
@@ -632,7 +632,7 @@ function koFinal(comp, label, week, bo, champKey, title) {
 function promoMatch(week, tier1Index, tier2Index) {
   const t1 = seasonOf().finalOrder[tier1Index];
   const t2 = standings(["tier2", "tier2b"], tier2Ids())[tier2Index].id;
-  const pname = eraNames(seasonOf().year).promotion; // 251: 2012~14 = 챔피언스 예선
+  const pname = eraNames(seasonOf().year).promotion || "승강전"; // 251: 2012~14 = 챔피언스 예선 (253: 2021~는 프랜차이즈 전 예전 세이브만)
   const m = schedule(week, "promotion", pname, t1, t2, LEAGUE.bestOf.promotion);
   playMatch(m);
   seasonOf().promo.push({ tier1: t1, tier2: t2, winner: m.winner });
@@ -729,13 +729,14 @@ function koPreview(week) {
   }
   if (week === 37) return semisFrom("playoffs", N.playoffs + " 4강", s.seeds, done("playoffs", 36), B.playoffs);
   if (week === 38) return finalFrom("playoffs", N.playoffs + " 결승", done("playoffs", 37), B.playoffs);
+  if ((week === 39 || week === 40) && franchiseActive()) return []; // 253
   if (week === 39 || week === 40) {
     const o = s.finalOrder;
     if (!o) return [];
     const t2 = standings(["tier2", "tier2b"], tier2Ids());
     const i = week === 39 ? 0 : 1;
     const n1 = tier1Ids().length;
-    return [{ comp: "promotion", label: eraNames(s.year).promotion, a: o[week === 39 ? n1 - 1 : n1 - 2], b: t2[i].id, bo: B.promotion }];
+    return [{ comp: "promotion", label: eraNames(s.year).promotion || "승강전", a: o[week === 39 ? n1 - 1 : n1 - 2], b: t2[i].id, bo: B.promotion }];
   }
   if (week === 44) {
     if (!s.worlds || s.matches.some(function (m) { return m.comp === "worlds_group" && !m.winner; })) return [];
