@@ -6,8 +6,9 @@
 
 // ----- 예상 상승치 -----
 function trainingExpect(t) {
+  if (isInjured()) t = rehabTraining(); // 242: 부상 중이면 어떤 훈련을 골라도 실제로는 재활 (js/health.js, main.js nextWeek와 같게)
   const tired = state.stamina < TIRED_LIMIT && t.id !== "rest";
-  const half = tired ? 0.5 : 1;
+  const half = (tired ? 0.5 : 1) * burnoutTrainingMult(); // 번아웃 −40%도 (242)
   const avg = function (r) { return (r[0] + r[1]) / 2; };
   const out = { stats: {}, mastery: [], masteryTotal: 0, stamina: 0, condition: 0, tired: tired, ladder: t.ladderGames || 0 };
   const masteryGain = function (name, amount, share) {
@@ -87,6 +88,9 @@ function trainingBadges() {
   }
   // 솔랭 마감 (패치 전 주)
   if (isPrePatchWeek(state.week)) add("solo_rank", { text: "👑 솔랭 마감", tip: "이번 주가 끝나면 솔로 랭크 초기화" });
+  // 부상·번아웃 (242)
+  if (isInjured()) TRAININGS.forEach(function (t) { add(t.id, { text: "🩹 재활만", tip: "부상 중이라 어떤 훈련을 골라도 재활(체력·컨디션 회복)만 해요", cls: "warn" }); });
+  else if (isBurnedOut()) TRAININGS.forEach(function (t) { if (t.id !== "rest") add(t.id, { text: "🥵 효과 −" + Math.round(HEALTH_RULES.burnout.trainingCut * 100) + "%", tip: "번아웃이라 훈련 효과가 줄고 대성공이 없어요. 쉬면 풀려요", cls: "warn" }); });
   // 체력
   if (state.stamina < TIRED_LIMIT) {
     add("rest", { text: "💤 체력 위험", tip: "체력 " + state.stamina + " → " + TIRED_LIMIT + " 아래라 훈련 효과가 절반", cls: "warn" });

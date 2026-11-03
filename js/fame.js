@@ -209,7 +209,7 @@ function runAllStar() {
       const id = starters(t.id)[pos];
       if (id && id !== USER_ID) cands.push({ id: id, fan: npcFanScore(id, avg) });
     });
-    if (state.player.position === pos && !state.benched) cands.push({ id: USER_ID, fan: state.popularity });
+    if (state.player.position === pos && !userSidelined()) cands.push({ id: USER_ID, fan: state.popularity }); // 후보·부상이면 올스타 후보 아님 (242, js/health.js)
     cands.forEach(function (c) { c.votes = Math.round(c.fan * c.fan * ALL_STAR.votesPer * randFloat(0.9, 1.1)); });
     picks[pos] = cands.sort(function (a, b) { return b.votes - a.votes; }).slice(0, 2);
   });
