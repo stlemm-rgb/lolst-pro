@@ -304,9 +304,9 @@ function historicalNewsLines() {
   const s = state.league.season;
   if (!Array.isArray(s.historicalNewsSent)) s.historicalNewsSent = [];
   due.forEach(function (e) { s.historicalNewsSent.push(e.id); });
-  return [HISTORICAL_NEWS_NOTE].concat(due.map(function (e) {
+  return due.map(function (e) { // 248: 맨 앞 안내문(실제 역사와 게임 규칙이 다르다는 글)은 사용자 요청으로 뺌
     return "📜 " + e.title + "\n" + e.body;
-  }));
+  });
 }
 function historicalNewsForWeek(saveAfter) {
   const lines = historicalNewsLines();
