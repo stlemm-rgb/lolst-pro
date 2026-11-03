@@ -34,6 +34,8 @@ git push
 - PC에서 **Claude Code도 같이 쓴다** → 작업 전 `git status`/`git diff`로 최신 상태를 보고 파일을 다시 읽기.
 - **PC 연결이 끊기면 채팅에 파일을 첨부하지 않는다** (사용자가 받아 저장하면 '-1' 사본이 커밋됨). 다시 연결될 때까지 기다리거나 그렇게 알리기.
 - 다른 AI의 검토 결과를 붙여 주면 코드로 확인해서 답한다.
+- 웹(claude.ai) Claude 세션도 같은 저장소를 고침 (241: PR #1). 시작 전 `git fetch` → 새 브랜치·PR이 있는지 확인. 웹 세션 push가 403이면 claude.ai/connect-github 재연결 또는 패치 파일.
+- Codex CLI: 이 PC는 VS Code 확장 안 `%USERPROFILE%\.vscode\extensions\openai.chatgpt-*in\windows-x86_64\codex.exe` (PATH에 없음).
 - 밸런스 측정은 두 단계: ① 후보를 넓게 씨앗 2개(3연도 × 2)로 거르기 → ② 유력 2~3개 + '지금'만 180시즌(3연도 × 씨앗 6, 오차 ±3.5%p).
 
 ### ⭐ '작업완료' 규칙
@@ -204,4 +206,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 1. **`git pull` 먼저** (다른 PC에서 올린 커밋 받기) → `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
    - 새 PC에서 측정·정답지 도구를 쓰려면: `python -m pip install playwright` → `python -m playwright install chromium` (Windows는 `python`, 출력 글자 때문에 `PYTHONIOENCODING=utf-8`). 브라우저 없이 빠른 체력·컨디션 측정은 `node tools/measure_health.cjs`.
 2. 새 사용자 요청 우선. 없으면 7장의 해외 진출 (선택지로 묻기부터).
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 241**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 242**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
