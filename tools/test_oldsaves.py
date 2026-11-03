@@ -32,7 +32,7 @@ def v10(save):
     drop(s["career"], ["moments", "deepRuns", "rec", "statLog", "socialSnap", "ev"])
     L = s["league"]
     drop(L, ["h2h", "titleStreaks", "worldsSkins", "sTraitLog", "rookieCards", "transferLog", "history", "lastChamps",
-             "namedDone", "namedAdded", "lockedDone", "rivalYearDone", "marketSnap", "scouted"])
+             "namedDone", "namedAdded", "legendDone", "legendsV2", "lockedDone", "rivalYearDone", "marketSnap", "scouted"])
     for t in L["teams"]:
         drop(t, ["staff", "incomeLog", "money"])
     for p in L["players"].values():

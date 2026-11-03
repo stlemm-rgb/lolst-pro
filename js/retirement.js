@@ -9,10 +9,9 @@
 function addVeterans() {
   const V = LEAGUE.veterans;
   if (!V) return;
-  const named = NAMED_PLAYERS.map(function (n) { return n.name; });
   state.league.teams.forEach(function (t) {
     if (Math.random() >= V.chancePerTeam) return;
-    const pool = t.roster.filter(function (id) { const p = state.league.players[id]; return id !== USER_ID && p && named.indexOf(p.name) === -1; });
+    const pool = t.roster.filter(function (id) { const p = state.league.players[id]; return id !== USER_ID && p && !p.named; }); // 레전드는 빼고 (244)
     if (!pool.length) return;
     state.league.players[pick(pool)].age = randInt(V.ageRange[0], V.ageRange[1]);
   });

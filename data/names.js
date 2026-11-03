@@ -581,30 +581,59 @@ Yuca
 `.trim().split("\n").map(function (s) { return s.trim(); }).filter(Boolean);
 
 // ━━━━━ (예전 data/named_players.js) ━━━━━
-// ===== 네임드 선수: 새 게임마다 항상 등장하는 선수 (js/league.js placeNamedPlayers) =====
-// - 1부 강팀의 주전으로 들어가요 (내 팀 제외, 되도록 서로 다른 팀. 팀이 모자라면 같은 포지션 네임드가 없는 팀에)
-// - 나이: 내 선수 나이 ± ageGap 사이 (17~27세 안으로)
-// - 실력(종합 능력): 나이에 따라 score 범위에서 정해요. 어릴수록 낮게 시작해서 성장해요
-// - 좋은 특성 traits개 (다른 선수가 가질 수 있는 특성 중 무작위). 나쁜 특성은 없음
-// - 다른 선수처럼 성장하고 늙고 은퇴해요
-// - 예전 세이브를 불러와도 한 번은 들어와요 (목록에 새로 넣은 선수도 다음에 불러올 때 들어와요)
-const NAMED_PLAYERS = [
-  { name: "Ego",     pos: "top" },
-  { name: "Chen",    pos: "jungle" },
-  { name: "Sking",   pos: "mid" },
-  { name: "Hwansam", pos: "adc" },
-  { name: "Runa",    pos: "support" },
-  { name: "Jimul",   pos: "adc" },      // v1.1 추가
-  { name: "Kibai",   pos: "top" },      // v1.1 추가
-];
+// ===== 레전드 선수 (244, 사용자 결정 2026-11-03 — 예전 네임드 7명 대신, js/league.js placeLegends) =====
+// - 실제 LCK 레전드를 닉네임 1글자만 바꿔서. 후보·결정 기록: Claude outputs/레전드_후보.md
+// - 실제로 활동한 해에만 등장: 시작 해가 활동 기간 안 → 첫해부터 실제 나이로 / 데뷔 전 → 데뷔 해 새 시즌에 '레전드 신인' / 은퇴 뒤 → 등장 안 함
+// - 처음 소속 = 실제 데뷔 팀(team: 게임 구단 약자, 게임에 있으면). 없거나 꽉 찼으면 같은 포지션 레전드가 없는 1부 강팀
+// - 은퇴: retire 해까지는 은퇴 안 함, 그다음 새 시즌에 은퇴. retire null(현역) = LEGEND_RULES.activeUntil까지 보호, 그 뒤 일반 규칙
+// - 연도·팀은 기억 기준이라 1~2년 틀릴 수 있음 (후보 표의 ⚠️)
+// [게임 이름, 포지션, 출생, 데뷔, 은퇴(null = 현역), 데뷔 팀(null = 게임에 없음), 등급 S/A]
+const LEGENDS = [
+  // 2012~15 데뷔
+  ["Fakar",     "mid",     1996, 2013, null, "T1",    "S"], // Faker
+  ["Bengo",     "jungle",  1993, 2013, 2017, "T1",    "S"], // Bengi
+  ["Scorn",     "jungle",  1992, 2013, 2020, "KT",    "A"], // Score
+  ["PawM",      "mid",     1995, 2013, 2019, "GEN.G", "S"], // PawN (Samsung)
+  ["Deff",      "adc",     1996, 2013, 2022, null,    "S"], // Deft (CJ)
+  ["MadLive",   "support", 1993, 2012, 2017, null,    "A"], // MadLife (CJ)
+  ["Wolv",      "support", 1996, 2013, 2020, "T1",    "S"], // Wolf
+  ["Smab",      "top",     1995, 2014, 2020, null,    "S"], // Smeb (IM)
+  ["Bung",      "adc",     1995, 2013, 2021, "T1",    "S"], // Bang
+  ["PreY",      "adc",     1993, 2012, 2019, null,    "A"], // PraY (NaJin)
+  ["GorillO",   "support", 1994, 2012, 2021, null,    "A"], // GorillA (NaJin)
+  ["Maka",      "support", 1994, 2013, 2018, "GEN.G", "S"], // Mata (Samsung)
+  ["Doke",      "top",     1994, 2014, 2021, null,    "S"], // Duke (NaJin)
+  ["Peanat",    "jungle",  1998, 2015, 2024, null,    "S"], // Peanut (NaJin)
+  // 2016~19 데뷔
+  ["Kiim",      "top",     1999, 2016, null, "KW",    "A"], // Kiin (Afreeca)
+  ["Kham",      "top",     1995, 2016, 2019, null,    "A"], // Khan (Longzhu)
+  ["Canyan",    "jungle",  2001, 2018, null, null,    "S"], // Canyon (Jin Air)
+  ["ShowMakar", "mid",     2000, 2017, null, "Dplus", "S"], // ShowMaker (DAMWON)
+  ["Chovi",     "mid",     2001, 2018, null, null,    "S"], // Chovy (Griffin)
+  ["Rulor",     "adc",     1998, 2016, null, "GEN.G", "S"], // Ruler (Samsung)
+  ["Lehands",   "support", 1998, 2018, null, null,    "A"], // Lehends (Griffin)
+  ["Vipor",     "adc",     2000, 2018, null, null,    "S"], // Viper (Griffin)
+  ["Taddy",     "adc",     1998, 2016, null, null,    "A"], // Teddy (Jin Air)
+  ["Doron",     "top",     2000, 2019, null, null,    "A"], // Doran (Griffin)
+  // 2020~ 데뷔
+  ["Zeos",      "top",     2004, 2021, null, "T1",    "S"], // Zeus
+  ["Omer",      "jungle",  2002, 2021, null, "T1",    "S"], // Oner
+  ["Gumayasi",  "adc",     2002, 2020, null, "T1",    "S"], // Gumayusi
+  ["Kerio",     "support", 2002, 2020, null, null,    "S"], // Keria (DRX)
+  ["Peys",      "adc",     2005, 2023, null, "GEN.G", "A"], // Peyz
+  ["Zeko",      "mid",     2002, 2021, null, "BNK",   "A"], // Zeka (Liiv SANDBOX)
+].map(function (r) { return { name: r[0], pos: r[1], born: r[2], debut: r[3], retire: r[4], team: r[5], grade: r[6] }; });
 
-const NAMED_RULES = {
-  ageGap: [1, 3],              // 내 선수와 1~3살 차이 (위·아래 무작위)
-  score: [                     // [이 나이까지, [최소, 최대]]
-    [18, [66, 70]],
-    [21, [70, 74]],
-    [99, [73, 78]],
-  ],
-  traits: 2,
-  teamPool: 6,                 // 1부 전력 상위 몇 팀 중에서 고를지
+// 예전 네임드 (v1.0~1.2): 예전 세이브를 불러오면 한 번 일반 선수(새 이름)로 바꿈 (js/league.js retireOldNamed)
+const OLD_NAMED = ["Ego", "Chen", "Sking", "Hwansam", "Runa", "Jimul", "Kibai"];
+
+const LEGEND_RULES = {
+  // 종합 능력 = 1부 주전 평균 + 등급 보너스 + 데뷔 몇 년째 보정 (그 뒤는 다른 선수처럼 성장·노화)
+  gradeBonus: { S: 5, A: 2 },
+  rookieRamp: [-4, -2, 0],     // 데뷔 해 −4, 2년째 −2, 3년째부터 0
+  traits: 2,                   // 좋은 특성 (다른 선수가 가질 수 있는 것 중 무작위)
+  maxPerTeam: 3,               // 한 팀에 동시에 활동하는 레전드 최대 (T1 데뷔 6명 쏠림 막기)
+  realBoost: 6,                // 시즌 중 데뷔: 실제 데뷔 팀 주전이 이보다 덜 강하면 그 주전보다 살짝 높게 맞춰 실제 팀 주전으로 (더 강하면 주전이 되는 다른 팀)
+  activeUntil: 2026,           // 현역(retire null) 레전드는 이 해까지 은퇴 안 함
+  contractYears: [2, 3],       // 시즌 중 데뷔할 때 계약
 };

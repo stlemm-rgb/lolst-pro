@@ -279,59 +279,126 @@ function makeLeague(defs, chosenIndex) {
     state.league.teams.push(team);
   });
   placeUser(chosenIndex >= 0 ? "T" + (chosenIndex + 1) : null);
-  placeNamedPlayers(); // 네임드 선수 (data/names.js)
+  placeLegends("start"); // 레전드 선수: 시작 해에 활동 중인 선수 (244, data/names.js LEGENDS)
   addVeterans(); // 나이 많은 선수 몇 명 (세대교체, js/retirement.js)
-  fillRosters(); // 내 선수·네임드 배치 뒤 후보 구성 정리 (js/contracts.js 후보 구성 규칙)
+  fillRosters(); // 내 선수·레전드 배치 뒤 후보 구성 정리 (js/contracts.js 후보 구성 규칙)
   startSeason();
   initContracts(); // 선수들 연봉·계약 기간, 내 첫 계약 (2년)
 }
 
-// ----- 네임드 선수 (data/names.js): 1부 강팀 주전 자리에 넣기 -----
-// 그 자리에 있던 선수를 네임드 선수로 바꿔요 (이름·나이·스탯·특성). 선수마다 한 번만 (state.league.namedDone)
-// 목록에 나중에 추가한 선수는 예전 세이브를 불러올 때 들어와요
-function placeNamedPlayers() {
-  const L = state.league;
-  if (!L.namedDone) L.namedDone = L.namedAdded ? ["Ego", "Chen", "Sking", "Hwansam"] : []; // 이전 버전(4명) 세이브
-  L.namedAdded = true;
-  const todo = NAMED_PLAYERS.filter(function (n) { return L.namedDone.indexOf(n.name) === -1; });
-  if (!todo.length) return;
-  const mine = myTeam();
-  const pool = tierTeams(1).filter(function (t) { return !mine || t.id !== mine.id; })
-    .sort(function (a, b) { return teamStrength(b.id) - teamStrength(a.id); }).slice(0, NAMED_RULES.teamPool);
-  const teams = shuffled(pool);
-  // 네임드 선수가 적은 팀부터, 같은 포지션 네임드가 이미 있는 팀은 빼고 (v1.1: 7명이라 강팀 수보다 많을 수 있음)
-  const namedIn = function (t) { return t.roster.filter(function (id) { const p = findPlayer(id); return p && p.named; }); };
+// ----- 레전드 선수 (244, data/names.js LEGENDS): 실제로 활동한 해에만 등장 -----
+// state.league.legendDone = [이름]: 이미 처리한 레전드 (등장했거나, 은퇴 뒤라 등장 안 하기로 한 것)
+// mode "start" = 새 게임: 그 팀 같은 포지션 주전을 레전드로 바꿈 (게임 시작 전이라 자연스러움)
+// mode "season"(새 시즌)·"load"(불러오기) = 팀에 새로 입단, 후보 구성 규칙대로 1명 내보냄. 돌려주는 값: 소식 글
+function placeLegends(mode) {
+  const L = state.league, R = LEGEND_RULES, year = state.year, news = [];
+  if (!L.legendDone) L.legendDone = [];
+  L.legendsV2 = true;
+  const todo = LEGENDS.filter(function (n) { return L.legendDone.indexOf(n.name) === -1 && n.debut <= year; });
+  if (!todo.length) return news;
+  const avg = tier1StarterAvg();
   todo.forEach(function (n) {
-    L.namedDone.push(n.name);
-    const team = teams.filter(function (t) { return !namedIn(t).some(function (id) { return findPlayer(id).pos === n.pos; }); })
-      .sort(function (a, b) { return namedIn(a).length - namedIn(b).length; })[0];
+    L.legendDone.push(n.name);
+    if (n.retire !== null && n.retire < year) return; // 시작 해에 이미 은퇴 → 등장 안 함
+    let target = avg + R.gradeBonus[n.grade] + R.rookieRamp[Math.min(year - n.debut, R.rookieRamp.length - 1)];
+    const team = legendTeamFor(n, mode === "start" ? null : target);
     if (!team) return;
-    const id = starterAt(team.id, n.pos);
-    const p = id && id !== USER_ID ? findPlayer(id) : null;
-    if (!p) return;
+    if (mode !== "start") { // 실제 데뷔 팀 주전보다 조금 약하면(realBoost 안) 그 주전보다 살짝 높게 → 실제 팀의 주전으로
+      const st = starterAt(team.id, n.pos);
+      if (st && st !== USER_ID && playerScore(st) >= target) target = playerScore(st) + 0.5;
+    }
+    let p;
+    if (mode === "start") {
+      const id = starterAt(team.id, n.pos);
+      p = id && id !== USER_ID ? findPlayer(id) : null;
+      if (!p) return;
+    } else {
+      p = makeNpc(n.pos, { avg: Math.round(avg), spread: 0 }, [17, 17]);
+      p.teamId = team.id;
+      team.roster.push(p.id);
+    }
     // 같은 이름을 쓰던 다른 선수는 이름을 바꿔 줌
-    Object.keys(state.league.players).forEach(function (oid) {
-      const o = state.league.players[oid];
-      if (o !== p && o.name === n.name) o.name = takeName();
-    });
-    if (state.league.usedNames.indexOf(n.name) === -1) state.league.usedNames.push(n.name);
-    const gap = randInt(NAMED_RULES.ageGap[0], NAMED_RULES.ageGap[1]) * (Math.random() < 0.5 ? -1 : 1);
+    Object.keys(L.players).forEach(function (oid) { if (L.players[oid] !== p && L.players[oid].name === n.name) L.players[oid].name = takeName(); });
+    if (L.usedNames.indexOf(n.name) === -1) L.usedNames.push(n.name);
     p.name = n.name;
-    p.named = true;
-    p.age = Math.max(17, Math.min(27, state.player.age + gap));
-    const range = NAMED_RULES.score.find(function (r) { return p.age <= r[0]; })[1];
-    const target = randInt(range[0], range[1]);
-    // 스탯: 고르게 만든 뒤 목표 종합 능력에 맞게 한꺼번에 올리거나 내림
+    p.named = true; // ⭐ 표시·인기도 (예전 네임드와 같은 칸)
+    p.legend = n.name;
+    p.age = year - n.born;
+    // 스탯: 고르게 만든 뒤 목표 종합 능력에 맞게 한꺼번에 올리거나 내림 (스타일·포지션 가산점 유지)
     const bonus = findPosition(n.pos).bonus;
-    STATS.forEach(function (st) { p.stats[st.id] = target + randInt(-5, 5) + (bonus.indexOf(st.id) !== -1 ? 4 : 0); });
-    p.style = n.style || pickStyle(n.pos); // 네임드 선수도 플레이 스타일
+    STATS.forEach(function (st) { p.stats[st.id] = Math.round(target) + randInt(-5, 5) + (bonus.indexOf(st.id) !== -1 ? 4 : 0); });
+    p.style = pickStyle(n.pos);
     applyStyle(p);
-    const shift = Math.round(target - statScoreFor(p.stats, n.pos));
-    STATS.forEach(function (st) { p.stats[st.id] = Math.max(1, Math.min(90, p.stats[st.id] + shift)); });
-    // 좋은 특성 (다른 선수가 가질 수 있는 것 중 무작위)
-    p.traits = shuffled(TRAITS.filter(function (t) { return t.npc && t.type === "good"; })).slice(0, NAMED_RULES.traits).map(function (t) { return t.id; });
+    for (let k = 0; k < 3; k++) {
+      const shift = Math.round(target - statScoreFor(p.stats, n.pos));
+      if (!shift) break;
+      STATS.forEach(function (st) { p.stats[st.id] = Math.max(1, Math.min(90, p.stats[st.id] + shift)); });
+    }
+    p.traits = shuffled(TRAITS.filter(function (t) { return t.npc && t.type === "good"; })).slice(0, R.traits).map(function (t) { return t.id; });
     npcMasteryInit(p); // 바뀐 스탯(챔피언 폭)에 맞게 숙련도 다시
+    if (mode === "start") return;
+    p.salary = salaryFor(statScoreFor(p.stats, n.pos), team.tier, 0);
+    p.contractEnd = year - 1 + randInt(R.contractYears[0], R.contractYears[1]);
+    let out = surplusPlayer(team.id, p.id); // 후보 구성 규칙 (js/contracts.js)
+    if (out && findPlayer(out).legend) { // 다른 레전드는 내보내지 않음 → 레전드가 아닌 가장 약한 후보 (없으면 아무도 안 내보냄)
+      const st = starters(team.id), starterIds = Object.keys(st).map(function (k) { return st[k]; });
+      out = team.roster.filter(function (id) { const q = findPlayer(id); return id !== USER_ID && id !== p.id && q && !q.legend && starterIds.indexOf(id) === -1; })
+        .sort(function (x, y) { return playerScore(x) - playerScore(y); })[0] || null;
+    }
+    if (out) releaseToFA(out);
+    if (L.rookieCards && L.rookieCards.year === year) L.rookieCards.ids.push(p.id); // 대시보드 대형 신인 카드에 같이
+    news.push("🌟 " + (year === n.debut ? "레전드 신인 " : "레전드 ") + p.name + "(" + findPosition(n.pos).name + ", " + p.age + "세, 종합 능력 " + Math.round(playerScore(p.id)) + ") " +
+      team.name + " 입단" + (out ? " · " + playerName(out) + " 자유 계약" : ""));
   });
+  return news;
+}
+
+// 1부 주전 평균 종합 능력 (내 선수 제외) — 대형 신인·레전드 실력 기준
+function tier1StarterAvg() {
+  const scores = [];
+  tierTeams(1).forEach(function (t) {
+    const st = starters(t.id);
+    Object.keys(st).forEach(function (pos) { if (st[pos] && st[pos] !== USER_ID) scores.push(playerScore(st[pos])); });
+  });
+  return scores.length ? scores.reduce(function (a, b) { return a + b; }, 0) / scores.length : 0;
+}
+
+// 레전드가 들어갈 팀: 실제 데뷔 팀 → 안 되면 1부 강팀 순서 → 그래도 없으면 2부 강팀 순서
+// 내 팀 제외, 같은 포지션 레전드가 있거나 레전드 maxPerTeam명이면 다음 팀
+// target(시즌 중 입단일 때): 그 팀 같은 포지션 주전보다 강해서 주전이 되는 팀만 (후보면 시즌 시작 후보 정리에서 밀려남)
+function legendTeamFor(n, target) {
+  const mine = myTeam() ? myTeam().id : null;
+  const ok = function (t) {
+    if (t.id === mine) return false;
+    const legends = t.roster.map(findPlayer).filter(function (p) { return p && p.legend; });
+    if (legends.length >= LEGEND_RULES.maxPerTeam || legends.some(function (p) { return p.pos === n.pos; })) return false;
+    if (target === null) return true;
+    const st = starterAt(t.id, n.pos);
+    return !st || st === USER_ID ? st !== USER_ID : playerScore(st) < target + (t.short === n.team ? LEGEND_RULES.realBoost : 0);
+  };
+  const byStrength = function (a, b) { return teamStrength(b.id) - teamStrength(a.id); };
+  const real = n.team && state.league.teams.find(function (t) { return t.short === n.team; });
+  if (real && ok(real)) return real;
+  return tierTeams(1).filter(ok).sort(byStrength)[0] || tierTeams(2).filter(ok).sort(byStrength)[0] || null;
+}
+
+// 새 시즌 은퇴 판정 앞 (newSeasonLeague): "stay" = 은퇴 안 함, "now" = 은퇴, null = 일반 규칙
+function legendRetireRule(p) {
+  const n = p.legend && LEGENDS.find(function (x) { return x.name === p.legend; });
+  if (!n) return null;
+  if (n.retire !== null) return state.year > n.retire ? "now" : "stay";
+  return state.year <= LEGEND_RULES.activeUntil ? "stay" : null;
+}
+
+// 예전 세이브 (244 전): 옛 네임드 7명(OLD_NAMED)을 새 이름의 일반 선수로 (실력·나이·팀은 그대로 → 팀 구성 유지). 한 번만
+function retireOldNamed() {
+  const L = state.league;
+  if (!L || L.legendsV2) return;
+  const fix = function (p) { if (p && OLD_NAMED.indexOf(p.name) !== -1) { p.name = takeName(); delete p.named; } };
+  Object.keys(L.players).forEach(function (id) { fix(L.players[id]); });
+  if (state.world && state.world.players) Object.keys(state.world.players).forEach(function (id) { fix(state.world.players[id]); }); // 해외로 간 선수
+  delete L.namedDone; delete L.namedAdded;
+  L.legendDone = [];
 }
 
 // 내 선수를 구단에 넣기. 그 팀의 같은 포지션 주전은 자유 계약으로
@@ -485,8 +552,10 @@ function newSeasonLeague() {
     p.age += 1;
     const ov = retireOverride(p); // 은퇴 상담 결과: 한 시즌 더 / 은퇴 (js/retirement.js)
     if (ov === "stay") return;
+    const lg = legendRetireRule(p); // 레전드: 실제 은퇴 해까지 보호, 지나면 은퇴 (244)
+    if (lg === "stay") return;
     const retireAge = LEAGUE.retireFromAge + traitSumOf(tr, "agingDelay") + traitSumOf(tr, "maxAgeBonus");
-    if (ov === "now" || (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear)) {
+    if (ov === "now" || lg === "now" || (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear)) {
       retirePlayer(p);
     }
   });

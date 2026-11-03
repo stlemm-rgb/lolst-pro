@@ -382,7 +382,7 @@ function showNotice(text) {
 // 게임 상태를 통째로 바꾸기 (불러오기, 새 게임 등)
 function replaceState(newState, menu, message) {
   state = newState;
-  if (state.league && state.player) placeNamedPlayers(); // 예전 세이브에도 네임드 선수 추가 (선수마다 한 번)
+  if (state.league && state.player) { retireOldNamed(); placeLegends("load"); } // 예전 세이브: 옛 네임드 7명 → 일반 선수, 활동 중인 레전드 입단 (244, js/league.js)
   state.currentMenu = menu;
   state.notice = message;
   renderAll();
@@ -794,7 +794,7 @@ function nextWeek(restWeek) {
     state.player.age += 1;
     applyAging(); // 27세부터 노화 (js/retire.js)
     expireStartTrait(); // 유망주 전용 특성: 3년차부터 사라짐 (js/creation.js)
-    const leagueNews = newSeasonLeague().concat(contractsNewSeason()).concat(addBigRookies()); // 대형 신인 (js/league.js)
+    const leagueNews = newSeasonLeague().concat(contractsNewSeason()).concat(addBigRookies()).concat(placeLegends("season")); // 대형 신인 · 올해 데뷔하는 레전드 (js/league.js)
     initContracts(); // 새로 들어온 신인들 계약
     fillRosters(); // 은퇴·신인·이적이 다 끝난 뒤 후보 구성 다시 정리 (js/contracts.js 후보 구성 규칙)
     refillRivalAces(); // 은퇴한 🔥 리그의 에이스 자리 채우기 (js/straits.js)

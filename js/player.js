@@ -159,7 +159,7 @@ function traitChipsMini(id) {
     return order[findTrait(a).type] - order[findTrait(b).type];
   });
   const p = id !== USER_ID ? findPlayer(id) : null;
-  const named = p && p.named ? '<span class="chip named tip" tabindex="0" data-tip="네임드 선수: 새 게임마다 항상 등장하는 스타">⭐ 네임드</span>' : "";
+  const named = p && p.named ? '<span class="chip named tip" tabindex="0" data-tip="레전드: 실제로 활동한 해에 등장하는 스타">⭐ 레전드</span>' : "";
   return list.length || named ? ' <span class="mini-chips">' + named + list.map(traitChipHTML).join("") + "</span>" : "";
 }
 

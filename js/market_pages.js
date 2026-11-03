@@ -77,7 +77,7 @@ pages.search = function () {
     const wt = !team && id !== USER_ID && state.world && state.world.players[id] ? findWorldTeam(worldTeamIdOf(id)) : null; // 해외 리그 선수
     return (
       '<tr class="click' + (id === USER_ID ? " me" : "") + (selectedPlayer === id ? " sel" : "") + '" data-player="' + id + '">' + faceTd(id) + // 얼굴 (js/portrait.js)
-        "<td>" + escapeHTML(p.name) + (id !== USER_ID && findPlayer(id) && findPlayer(id).named ? ' <span title="네임드 선수">⭐</span>' : "") +
+        "<td>" + escapeHTML(p.name) + (id !== USER_ID && findPlayer(id) && findPlayer(id).named ? ' <span title="레전드">⭐</span>' : "") +
           (id !== USER_ID && findPlayer(id) && findPlayer(id).bigRookie ? ' <span title="' + findPlayer(id).bigRookie + '년 대형 신인">🌟</span>' : "") + "</td>" +
         "<td>" + findPosition(p.pos).name + "</td>" +
         "<td>" + originCellHTML(p) + "</td>" +

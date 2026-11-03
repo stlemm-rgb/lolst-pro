@@ -14,7 +14,7 @@
 | `data/match_events.js` | 23 | 경기 이벤트 (세트마다 일어나는 사건: 스틸·슈퍼플레이·실수·심리) — js/match_events.js |  |
 | `data/schedule.js` | 5 | 한 시즌(52주) 일정표 |  |
 | `data/league.js` | 6 | 리그 규칙 (3단계) |  |
-| `data/names.js` | 6 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
+| `data/names.js` | 9 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
 | `data/events.js` | 52 | 이벤트 (SNS로 오는 연락과 소식) |  |
 | `data/events_story.js` | 26 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/events_life.js` | 11 | 받은 연락 리뉴얼 ② 선수 생활·인생 · 동료·라이벌 관계 (2026-10-08) |  |
@@ -44,16 +44,16 @@
 | `js/champions.js` | 18 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 38 | 캐릭터 생성 |  |
 | `js/save.js` | 22 | 저장 / 불러오기 |  |
-| `js/league.js` | 26 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
+| `js/league.js` | 31 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
 | `js/matchsim.js` | 44 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 11 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
 | `js/main.js` | 55 | 게임 상태 |  |
-| `js/training_page.js` | 20 | 훈련 화면 (pages.training) |  |
+| `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 19 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 37 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
-| `js/sns_page.js` | 38 | SNS 화면 |  |
+| `js/sns_page.js` | 39 | SNS 화면 |  |
 | `js/contracts.js` | 33 | 연봉 · 계약 · 2군행 · 이적 |  |
 | `js/club_market.js` | 29 | 구단 이적 시장·여름 이적 | club_market.js, summer_market.js |
 | `js/market_pages.js` | 26 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
