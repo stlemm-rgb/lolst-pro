@@ -16,7 +16,7 @@
 | `data/league.js` | 7 | 리그 규칙 (3단계) |  |
 | `data/names.js` | 12 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
 | `data/events.js` | 52 | 이벤트 (SNS로 오는 연락과 소식) |  |
-| `data/events_story.js` | 26 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
+| `data/events_story.js` | 32 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/events_life.js` | 11 | 받은 연락 리뉴얼 ② 선수 생활·인생 · 동료·라이벌 관계 (2026-10-08) |  |
 | `data/friends.js` | 40 | 친구 시스템 데이터 (분기 활동 · 단계 이야기 · 친구 연락) |  |
 | `data/social_posts.js` | 83 | 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭) |  |
@@ -76,7 +76,7 @@
 | `js/era.js` | 29 | 시대·해외 리그·시대별 경기 환경 | era.js, era_match.js |
 | `js/fame.js` | 14 | 인기도 · 평판 (값: data/fame.js) |  |
 | `js/collection.js` | 21 | 시그니처 픽·업적·컬렉션 | signature.js, collection.js |
-| `js/friends.js` | 30 | 선수 관계 이야기·친구 | stories.js, friends.js |
+| `js/friends.js` | 34 | 선수 관계 이야기·친구 | stories.js, friends.js |
 | `js/retirement.js` | 8 | 은퇴·세대교체 (122) — 값: data/league.js LEAGUE.veterans · RETIRE_RULES, 글: data/retire_stories.j |  |
 | `js/standing.js` | 17 | 팀 내 입지 (126) — 값·글: data/standing.js |  |
 | `js/romance.js` | 12 | 연애 요소 (128) — 규칙 data/romance.js, 대상·대사·연락 data/romance.js |  |

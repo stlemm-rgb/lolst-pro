@@ -147,6 +147,65 @@ function storyTriggerContext(trigger) {
     case "seasonReview": return w === CONTRACT.windowStart ? {} : null;
     case "offseasonPlan": return w === 50 ? {} : null;
     case "birthday": return w === birthWeek() ? { age: state.player.age } : null;
+    default: return timeTriggerContext(trigger);
+  }
+}
+
+// ----- 6) 시간 진행 트리거 (254 ③ A 시대 변화 · B 내 기록 회상, 연락: data/events_story.js) -----
+// 기억: state.flags.timeMem = { cur 지금 팀 id, teams: {팀 id: 처음 뛴 해}, title: {year, team, name, mates[]} } (flags는 통째로 저장)
+// 예전 세이브: 팀 기억은 불러온 뒤부터, 첫 우승은 지난 시즌 기록(career.seasons)으로 채움 (그때 동료는 모름)
+function timeMem() {
+  if (!state.flags) state.flags = {};
+  if (!state.flags.timeMem) state.flags.timeMem = { cur: null, teams: {}, title: null };
+  return state.flags.timeMem;
+}
+// 매주 연락 처리 전에 (js/events.js runWeeklyEvents)
+function timeMemWeekly() {
+  const M = timeMem(), t = myTeam(), w = state.weekCtx || {};
+  if (t && M.cur !== t.id) { if (M.cur && !M.teams[M.cur]) M.teams[M.cur] = state.year; M.cur = t.id; }
+  if (t && !M.teams[t.id]) M.teams[t.id] = state.year;
+  if (!M.title && t && w.champion) {
+    const s = starters(t.id);
+    M.title = { year: state.year, team: t.name, name: String(w.champion).replace(/ ?우승$/, ""),
+      mates: Object.keys(s).map(function (k) { return s[k]; }).filter(function (id) { return id && id !== USER_ID; }) };
+  }
+  if (!M.title) {
+    const old = (state.career.seasons || []).find(function (r) { return r.titles && r.titles.length; });
+    if (old) M.title = { year: old.year, team: old.team, name: String(old.titles[0]).replace(/ ?우승$/, ""), mates: [] };
+  }
+}
+function debutYear() { return state.career.debut ? state.career.debut.year : state.year; }
+function timeTriggerContext(trigger) {
+  const w = state.week, y = state.year, M = timeMem();
+  switch (trigger) {
+    case "eraLeague": return y === 2015 && w === 2 && debutYear() < 2015 ? {} : null;
+    case "eraEmpty": return y === 2020 && w === 8 ? {} : null;
+    case "eraFranchise": return y === ERA.franchiseFrom && w === 2 && franchiseActive() && debutYear() < ERA.franchiseFrom ? {} : null;
+    case "careerAnniv": {
+      const n = careerYears(), d = state.career.debut;
+      if (w !== 3 || !d || (n !== 5 && n !== 10)) return null;
+      return { years: n, debutYear: d.year, debutTeam: d.team, debutAge: d.age, debutScore: Math.round(d.score), nowScore: Math.round(playerScore(USER_ID)) };
+    }
+    case "titleAnniv": {
+      if (w !== 5 || !M.title || y !== M.title.year + 3) return null;
+      const P = state.league.players;
+      const mate = M.title.mates.filter(function (id) { return P[id]; }).sort(function (a, b) { return relationOf(b) - relationOf(a); })[0];
+      const ctx = { titleYear: M.title.year, titleTeam: M.title.team, titleName: M.title.name };
+      if (mate) { ctx.pid = mate; ctx.player = playerName(mate); }
+      return ctx;
+    }
+    case "homeTeam": {
+      const m = nextUserMatch(), t = myTeam();
+      if (!m || !t || m.week !== w) return null;
+      const opp = m.a === t.id ? m.b : m.a;
+      if (opp === t.id || !M.teams[opp] || !findTeam(opp)) return null;
+      const ctx = { oldteam: teamName(opp), sinceYear: M.teams[opp] };
+      const ex = (state.friends && state.friends.exMates) || {};
+      const mate = (findTeam(opp).roster || []).filter(function (id) { return ex[id]; }).sort(function (a, b) { return relationOf(b) - relationOf(a); })[0];
+      if (!mate) return null; // 옛 동료가 없는 친정팀이면 안 옴 (선택지가 옛 동료 이야기라서)
+      ctx.pid = mate; ctx.player = playerName(mate);
+      return ctx;
+    }
     default: return null;
   }
 }

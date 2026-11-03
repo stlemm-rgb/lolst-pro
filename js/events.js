@@ -348,6 +348,7 @@ function traitWeight(ev) {
 // 매주 한 번: 조건 이벤트 → 무작위 이벤트 → 특성 얻기 → 선수 SNS → 답 안 한 연락 정리
 function runWeeklyEvents() {
   // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/friends.js) → 조건 연락 → 무작위
+  timeMemWeekly(); // 예전 팀·첫 우승 기억 (254, js/friends.js)
   let inboxFired = friendWeekly(); // 분기 친구 활동 · 친구 트리거 (js/friends.js)
   inboxFired = retirementWeekly() || inboxFired;
   inboxFired = standingWeekly() || inboxFired; // 팀 내 입지: 주장 제안·영입 후보·조기 재계약 (js/standing.js) // 메타 적응 은퇴 기사 · 은퇴 상담 · 코치→감독 (js/retirement.js)

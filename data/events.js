@@ -63,6 +63,9 @@
 // - trigger 추가 (js/friends.js): mediaDay(12주) · seasonGoal(2주) · msiDepart(25주) · worldsDepart(42주) · promotion(39주) · contractYear(30주)
 //     allStarVote(48주) · seasonReview(47주) · offseasonPlan(50주) · birthday(생일 주)
 //     rivalSigned(경쟁자 합류) · fameUp(스타 등급 상승) · skinMade(우승 스킨) · benchedNow(2군행) · friendLeft(친한 동료 이적)
+// - trigger 추가 (254 시간 진행, js/friends.js timeTriggerContext): eraLeague(2015년 2주, 2014년 이전 데뷔) · eraEmpty(2020년 8주)
+//     eraFranchise(2021년 2주, 2020년 이전 데뷔, need.tier로 1군·2군 글) · careerAnniv(데뷔 5·10년차 3주: {years} {debutYear} {debutTeam} {debutAge} {debutScore} {nowScore})
+//     titleAnniv(첫 우승 3년 뒤 5주: {titleYear} {titleTeam} {titleName}, {player} = 그때 동료) · homeTeam(예전 팀과 경기하는 주, 그 팀에 옛 동료가 있을 때: {oldteam} {sinceYear} {player})
 const EVENT_RULES = {
   seasonMax: 1,         // 같은 연락은 한 시즌에 1번까지 (데이터 seasonMax로 바꿀 수 있음)
   inboxPerSeason: 10,   // 한 시즌 받은 연락 상한 (always 연락·후속 연락은 빼고 셈 → 전체는 1년 약 15~18개)

@@ -320,3 +320,77 @@ EVENTS.push(
     ],
   },
 );
+
+// ===== 254 ③ 시간 진행: A 시대 변화가 내 진로에 · B 내 기록 회상 (always: 연락 수 상한 밖, 트리거: js/friends.js timeTriggerContext) =====
+EVENTS.push(
+  // A1. 2015 리그제 (2014년 이전 데뷔)
+  {
+    id: "era_league_2015", tab: "inbox", trigger: "eraLeague", always: true,
+    title: "📅 단판에서 리그로",
+    text: "토너먼트 몇 판으로 끝나던 시즌이 이제 매주 경기를 치르는 리그가 됐다. 코치가 새 일정표를 붙이며 말했다. \"이제 한 번 잘하는 걸로는 안 돼. 일 년 내내 잘해야 한다.\"",
+    choices: [
+      { label: "긴 시즌에 맞춰 체력 관리 루틴을 짠다", effects: { stamina: 10 }, result: "수면 시간, 식사, 스트레칭. 화이트보드 한쪽이 내 생활 계획표로 채워졌다." },
+      { label: "매주 상대 분석 노트를 쓰기로 한다", effects: { masteryMetaOne: 2, stamina: -4 }, result: "노트 첫 장에 다음 주 상대 팀 이름을 적었다. 이제 이게 매주 반복된다." },
+    ],
+  },
+  // A2. 2020 무관중 경기
+  {
+    id: "era_empty_2020", tab: "inbox", trigger: "eraEmpty", always: true,
+    title: "🏟️ 관중석이 비었다",
+    text: "팬데믹으로 경기장에 관중이 들어오지 못하게 됐다. 함성이 사라진 경기장에는 키보드 소리와 팀 보이스만 울린다.",
+    choices: [
+      { label: "개인 방송으로 팬들과 소통한다", effects: { popularity: 2, stamina: -2 }, result: "\"경기장 대신 채팅으로 응원할게요!\" 채팅창이 응원 문구로 가득 찼다." },
+      { label: "조용한 경기장에 맞춰 팀 보이스를 연습한다", effects: { teamRelation: 2 }, result: "함성에 묻히던 콜이 이제 또렷하게 들린다. 서로 말끝을 맞추는 연습을 했다." },
+      { label: "하던 대로 한다", effects: { condition: 5 }, result: "관중이 있든 없든 협곡은 똑같다. 마음이 오히려 편하다." },
+    ],
+  },
+  // A3. 2021 프랜차이즈 — 2군(콜업) / 1군 두 가지 글
+  {
+    id: "era_franchise_academy", tab: "inbox", trigger: "eraFranchise", always: true, need: { tier: 2 },
+    title: "🔼 이제 올라가는 길은 콜업",
+    text: "승강전이 사라졌다. 우리 팀은 이제 1군 구단의 2군이다. 코치가 1군의 같은 포지션 선수 자료를 건넸다. \"이제 올라가는 길은 이쪽이다. 저 자리보다 잘하면 부른다.\"",
+    choices: [
+      { label: "1군 경기를 집중해서 분석한다", effects: { masteryMetaOne: 2, stamina: -4 }, result: "1군 경기 다시 보기를 틀었다. 내가 저 자리에 있었다면 어떻게 했을지 적어 봤다." },
+      { label: "2군 동료들과 호흡부터 맞춘다", effects: { teamRelation: 3 }, result: "\"어차피 올라갈 거면 같이 잘해서 올라가자.\" 처음 보는 동료들과 늦게까지 스크림을 돌렸다." },
+    ],
+  },
+  {
+    id: "era_franchise_main", tab: "inbox", trigger: "eraFranchise", always: true, need: { tier: 1 },
+    title: "🏛️ 강등 없는 리그",
+    text: "프랜차이즈 시대가 열렸다. 이제 성적이 나빠도 떨어지지 않는다. 대신 각 구단 2군에서 누가 치고 올라올지 모른다.",
+    choices: [
+      { label: "몇 년짜리 긴 계획을 세운다", effects: { mental: 1 }, result: "올해만 보지 않기로 했다. 노트에 3년 뒤의 나를 적어 봤다." },
+      { label: "2군 선수들 경기도 챙겨 본다", effects: { condition: 5 }, result: "2군 경기에 같은 포지션 신인이 보였다. 아직 거칠지만 손이 빠르다. 긴장을 늦추면 안 되겠다." },
+    ],
+  },
+  // B1. 데뷔 5년차 · 10년차
+  {
+    id: "career_anniv", tab: "inbox", trigger: "careerAnniv", always: true,
+    title: "🎂 데뷔 {years}년차",
+    text: "{debutYear}년 {debutTeam}, {debutAge}세. 프로 무대에 처음 섰던 그날로부터 {years}번째 시즌이다. 그때 점수 {debutScore}, 지금 {nowScore}.",
+    choices: [
+      { label: "데뷔 때 경기 영상을 다시 본다", effects: { mental: 1 }, result: "어설픈 동선, 떨리던 손. 그래도 그때의 나는 겁이 없었다." },
+      { label: "팬들에게 그때 이야기를 남긴다", effects: { popularity: 1 }, result: "\"처음부터 봤어요\"라는 댓글이 생각보다 많았다." },
+    ],
+  },
+  // B2. 첫 우승 3년 뒤
+  {
+    id: "title_anniv", tab: "inbox", trigger: "titleAnniv", always: true,
+    title: "📸 첫 우승에서 3년",
+    text: "구단이 {titleYear}년 {titleTeam}의 {titleName} 우승 사진을 보내왔다. 트로피를 든 다섯 명. 지금은 다른 유니폼을 입은 사람도 있다.",
+    choices: [
+      { label: "그때 동료들 단톡방에 사진을 올린다", effects: { relation: 3 }, result: "\"누구 머리 저게 뭐냐\" \"너 그날 울었잖아\" 오랜만에 단톡방이 시끄러웠다." },
+      { label: "혼자 간직한다", effects: { condition: 5 }, result: "사진을 휴대폰 배경 화면으로 바꿨다. 다시 저 자리에 서고 싶다." },
+    ],
+  },
+  // B3. 친정팀과 경기하는 주 (옛 동료가 그 팀에 있을 때, 1년에 한 번쯤)
+  {
+    id: "home_team", tab: "inbox", trigger: "homeTeam", always: true, cooldown: 52,
+    title: "🏠 친정팀과 다시",
+    text: "이번 주 상대는 {sinceYear}년부터 뛰었던 {oldteam}. 숙소 가는 길도, 연습실 자리도 아직 기억난다. 거기엔 {player}이(가) 아직 있다.",
+    choices: [
+      { label: "경기 전 {player}에게 연락한다", effects: { relation: 2 }, result: "\"오늘 지면 밥 사라\" \"너나 지갑 챙겨 와라\" 짧은 메시지 끝에 내기가 걸렸다." },
+      { label: "말없이 경기로 보여 준다", effects: { condition: 3 }, result: "연락은 경기 끝나고 해도 된다. 오늘은 이기는 게 먼저다." },
+    ],
+  },
+);
