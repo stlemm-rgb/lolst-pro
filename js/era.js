@@ -122,6 +122,26 @@ function activeRegions(year) {
   const y = eraYear(year);
   return WORLD_REGIONS.filter(function (r) { return r.from <= y; });
 }
+// 252: 국제대회에 나가는 지역 (실제로 못 나간 해·끝난 지역 빼고)
+function intlRegions(year) {
+  const y = eraYear(year);
+  return activeRegions(y).filter(function (r) { return (r.skip || []).indexOf(y) === -1 && (!r.until || y <= r.until); });
+}
+function regionLeague(id, year) { const rows = REGION_LEAGUES[id]; return rows ? eraRow(rows, eraYear(year))[1] : (findRegion(id) || {}).name || id; } // 252: 그해 리그 이름
+// 252: 해외 팀 이름을 그해 실제 이름으로 (자리 = team.slot, 표가 없는 자리는 그대로). 새 게임·새 시즌·불러오기 (ensureWorld)
+function applyWorldTeamNames(year) {
+  if (!state.world) return;
+  const y = eraYear(year), count = {};
+  state.world.teams.forEach(function (t) {
+    if (t.slot === undefined) { count[t.region] = count[t.region] || 0; t.slot = count[t.region]++; } // 예전 세이브: 만든 순서
+    const rows = (WORLD_REAL_TEAMS[t.region] || [])[t.slot];
+    if (!rows) return;
+    let row = rows[0];
+    rows.forEach(function (r) { if (r[0] <= y) row = r; });
+    t.name = row[1];
+    t.short = row[2];
+  });
+}
 function findRegion(id) { return WORLD_REGIONS.find(function (r) { return r.id === id; }) || null; }
 function findWorldTeam(id) { return state.world ? state.world.teams.find(function (t) { return t.id === id; }) || null : null; }
 function worldPlayer(id) { return state.world ? state.world.players[id] || null : null; }
@@ -190,7 +210,7 @@ function addWorldRegion(region) {
     const goal = base * region.strength * (WORLD_RULES.topBonus[i] || 0.9);
     const name = names[i] || (region.name + " " + (i + 1));
     W.tseq = (W.tseq || 0) + 1;
-    const team = { id: "O" + W.tseq, name: name, short: name.split(" ").map(function (w) { return w[0]; }).join("").toUpperCase().slice(0, 3), region: region.id, roster: [] };
+    const team = { id: "O" + W.tseq, name: name, short: name.split(" ").map(function (w) { return w[0]; }).join("").toUpperCase().slice(0, 3), region: region.id, slot: i, roster: [] };
     POSITION_IDS.forEach(function (pos) { team.roster.push(makeWorldPlayer(pos, goal, LEAGUE.npc.ageRange, region.id).id); });
     for (let k = 0; k < WORLD_RULES.rosterSize - 5; k++) team.roster.push(makeWorldPlayer(pick(POSITION_IDS), goal - 6, LEAGUE.npc.ageRange, region.id).id);
     // 목표 전력과 차이만큼 모든 선수 스탯을 조금 옮김
@@ -210,9 +230,10 @@ function ensureWorld() {
   activeRegions().forEach(function (r) {
     if (have[r.id]) return;
     addWorldRegion(r);
-    if (state.world.started) news.push("🌏 " + r.name + " 지역이 올해부터 국제대회에 참가한다.");
+    if (state.world.started) news.push("🌏 " + r.name + "(" + regionLeague(r.id) + ") 지역이 올해부터 국제대회에 참가한다.");
   });
   state.world.started = true;
+  applyWorldTeamNames(); // 252: 그해 실제 팀 이름
   return news;
 }
 
@@ -421,7 +442,8 @@ pages.world = function () {
            : '<p class="muted small">🏆 올해 지역 우승팀은 38주차(우리 리그 결승 주)에 정해져요.</p>') +
       (stars ? '<p class="small">⭐ 스타 선수: ' + stars + "</p>" : "") +
       (hist.filter(function (e) { return e !== cur; }).length ? '<p class="muted small">📜 역대 우승: ' + hist.filter(function (e) { return e !== cur; }).slice(0, 6).map(function (e) { return e.y + " " + escapeHTML(e.team) + (e.mvp ? " (MVP " + escapeHTML(e.mvp) + ")" : ""); }).join(" · ") + "</p>" : "");
-    return '<div class="card"><h2>' + escapeHTML(r.name) + ' <span class="muted small">' + r.from + "년부터 참가 · " + teams.length + "팀</span></h2>" + story +
+    const off = intlRegions().indexOf(r) === -1 ? " · 올해 국제대회 불참" : ""; // 252
+    return '<div class="card"><h2>' + escapeHTML(r.name) + " · " + escapeHTML(regionLeague(r.id)) + ' <span class="muted small">' + r.from + "년부터 참가 · " + teams.length + "팀" + off + "</span></h2>" + story +
       '<div class="table-wrap"><table class="roster"><tr><th class="r">순위</th><th>팀</th><th class="r">전력</th><th>주전 (탑 · 정글 · 미드 · 원딜 · 서포트)</th></tr>' + rows + "</table></div></div>";
   }).join("");
   const domestic = domesticBase();

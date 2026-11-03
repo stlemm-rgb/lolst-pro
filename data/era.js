@@ -135,19 +135,20 @@ const LANG_RULES = {
 // 월드 챔피언십 지역 (우리 리그 = 한국은 여기 없음). from: 처음 참가하는 해
 // strength: 우리 리그 1부 평균 대비 전력 (1.0 = 같음), teams: 그 지역 팀 수 (선수 명단을 가진 가상 팀)
 //   v1.1 (사용자 결정): 3단계 — 우리 리그(LCK) 1.0 > 중국·북미·유럽 0.92 (168에서 0.94 → 0.92, 해외 월드 우승이 너무 잦아서) > 나머지 0.86. 해마다 새해에 이 수준 쪽으로 반쯤 맞춤 (WORLD_RULES.tierPull)
+//   252 (사용자 결정): from = 실제 첫 월즈 출전 해 (위키백과), skip = 실제로 국제대회에 못 나간 해, until = 이 해까지만 국제대회 (CIS 2022~ 불참)
 // 월드 자리: 강한 지역 1위부터 자리를 받고(전력 순 자리 openSlots개는 남겨 둠 → 약한 지역은 못 나갈 수도), 나머지는 전력 순
 const WORLD_REGIONS = [
   { id: "na",  name: "북미",       from: 2012, strength: 0.92, teams: 8 },
   { id: "eu",  name: "유럽",       from: 2012, strength: 0.92, teams: 8 },
-  { id: "cn",  name: "중국",       from: 2013, strength: 0.92, teams: 8 },
-  { id: "tw",  name: "대만·홍콩",  from: 2013, strength: 0.86, teams: 6 },
-  { id: "sea", name: "동남아시아", from: 2014, strength: 0.86, teams: 4 },
-  { id: "br",  name: "브라질",     from: 2015, strength: 0.86, teams: 4 },
-  { id: "tr",  name: "터키",       from: 2015, strength: 0.86, teams: 4 },
-  { id: "cis", name: "CIS",        from: 2016, strength: 0.86, teams: 4 },
-  { id: "jp",  name: "일본",       from: 2016, strength: 0.86, teams: 4 },
-  { id: "lat", name: "중남미",     from: 2016, strength: 0.86, teams: 4 },
-  { id: "vn",  name: "베트남",     from: 2017, strength: 0.86, teams: 4 },
+  { id: "cn",  name: "중국",       from: 2012, strength: 0.92, teams: 8 },
+  { id: "tw",  name: "대만·홍콩",  from: 2012, strength: 0.86, teams: 6 },
+  { id: "sea", name: "동남아시아", from: 2012, strength: 0.86, teams: 4 },
+  { id: "br",  name: "브라질",     from: 2014, strength: 0.86, teams: 4 },
+  { id: "tr",  name: "터키",       from: 2014, strength: 0.86, teams: 4 },
+  { id: "cis", name: "CIS",        from: 2013, strength: 0.86, teams: 4, until: 2021 },
+  { id: "jp",  name: "일본",       from: 2017, strength: 0.86, teams: 4 },
+  { id: "lat", name: "중남미",     from: 2017, strength: 0.86, teams: 4 },
+  { id: "vn",  name: "베트남",     from: 2017, strength: 0.86, teams: 4, skip: [2020, 2021] },
   { id: "oce", name: "오세아니아", from: 2017, strength: 0.86, teams: 4 },
 ];
 
@@ -162,7 +163,104 @@ const WORLD_RULES = {
   tierPull: 0.5,          // 새해마다 '그 지역 출신' 주전 평균을 '1부 평균 × strength' 쪽으로 차이의 이만큼 옮김 (다른 출신 선수는 그대로)
 };
 
-// 해외 팀 이름 (지역마다 앞에서부터 사용, 모자라면 공용 목록) — 모두 가상의 이름
+// 252 (② P4, 사용자 결정): 해외 리그 실제 이름 — 출처: 위키백과 2012~2025 월즈 문서 (출전 팀·지역)
+// 지역별 리그 이름 [시작 연도, 이름] (그해 이하 중 가장 최근 줄). 국제대회 팀 이름 옆 '(LPL)'처럼 나옴
+const REGION_LEAGUES = {
+  cn:  [[2012, "LPL"]],
+  na:  [[2012, "NA LCS"], [2019, "LCS"], [2025, "LTA 북부"], [2026, "LCS"]],
+  eu:  [[2012, "EU LCS"], [2019, "LEC"]],
+  tw:  [[2012, "GPL"], [2015, "LMS"], [2020, "PCS"], [2025, "LCP"]],
+  sea: [[2012, "GPL"], [2018, "LST"], [2020, "PCS"], [2025, "LCP"]],
+  vn:  [[2012, "VCS"], [2025, "LCP"]],
+  br:  [[2012, "CBLOL"], [2025, "LTA 남부"], [2026, "CBLOL"]],
+  tr:  [[2012, "TCL"]],
+  cis: [[2012, "LCL"]],
+  jp:  [[2012, "LJL"], [2025, "LCP"]],
+  lat: [[2012, "LLN·CLS"], [2019, "LLA"], [2025, "LTA 남부"]],
+  oce: [[2012, "OPL"], [2021, "LCO"], [2025, "LCP"]],
+};
+
+// 지역 자리별 실제 팀 이름 [시작 연도, 이름, 짧은 이름] — 자리 = 그 지역 팀 순서(team.slot). 표가 없는 자리는 게임용 이름 그대로
+//   큰 지역(중국·북미·유럽·대만)은 자리마다 그 시대 강팀, 작은 지역은 월즈에 나온 대표 팀 1~4자리만. 계보가 꼭 맞지는 않음 (⚠️는 2012~14 빈자리 채움)
+//   첫 줄보다 이른 해에는 첫 줄 이름
+const WORLD_REAL_TEAMS = {
+  cn: [
+    [[2012, "Team WE", "WE"], [2019, "FunPlus Phoenix", "FPX"], [2024, "Anyone's Legend", "AL"]],
+    [[2012, "Invictus Gaming", "IG"]],
+    [[2012, "Oh My God", "OMG"], [2018, "Suning", "SN"], [2022, "Weibo Gaming", "WBG"]],
+    [[2012, "Royal Club", "RYL"], [2014, "Star Horn Royal Club", "SHR"], [2015, "Royal Never Give Up", "RNG"], [2024, "Bilibili Gaming", "BLG"]],
+    [[2012, "Positive Energy", "PE"], [2014, "EDward Gaming", "EDG"]],
+    [[2012, "LGD Gaming", "LGD"], [2018, "Top Esports", "TES"]],
+    [[2012, "Team King", "KING"], [2014, "Snake eSports", "SS"], [2019, "LNG Esports", "LNG"]],
+    [[2012, "Spring Gaming", "SPG"], [2015, "Qiao Gu Reapers", "QG"], [2017, "JD Gaming", "JDG"]],
+  ],
+  na: [
+    [[2012, "Team SoloMid", "TSM"], [2024, "Shopify Rebellion", "SR"]],
+    [[2012, "Team Dignitas", "DIG"], [2013, "Cloud9", "C9"]],
+    [[2012, "Counter Logic Gaming", "CLG"], [2023, "NRG", "NRG"]],
+    [[2012, "Curse Gaming", "CRS"], [2015, "Team Liquid", "TL"]],
+    [[2012, "CLG Prime", "CLGP"], [2013, "Team Vulcun", "VUL"], [2014, "LMQ", "LMQ"], [2016, "Immortals", "IMT"], [2018, "100 Thieves", "100"]],
+    [[2012, "Team Coast", "CST"], [2016, "Echo Fox", "FOX"], [2019, "FlyQuest", "FLY"]],
+    [[2012, "Team MRN", "MRN"], [2014, "Team Dignitas", "DIG"], [2018, "Clutch Gaming", "CG"], [2020, "Evil Geniuses", "EG"], [2024, "Dignitas", "DIG"]],
+    [[2012, "Monomaniac", "MM"], [2018, "Golden Guardians", "GG"]],
+  ],
+  eu: [
+    [[2012, "Fnatic", "FNC"]],
+    [[2012, "Moscow Five", "M5"], [2013, "Gambit Gaming", "GMB"], [2015, "H2k-Gaming", "H2K"], [2019, "Rogue", "RGE"], [2023, "Team BDS", "BDS"]],
+    [[2012, "SK Gaming", "SK"], [2016, "Splyce", "SPY"], [2020, "MAD Lions", "MAD"], [2024, "MAD Lions KOI", "MDK"], [2025, "Movistar KOI", "MKOI"]],
+    [[2012, "CLG Europe", "CLGEU"], [2013, "Evil Geniuses", "EG"], [2014, "Alliance", "ALL"], [2015, "Elements", "EL"], [2016, "G2 Esports", "G2"]],
+    [[2012, "against All authority", "aAa"], [2013, "Lemondogs", "LD"], [2014, "Copenhagen Wolves", "CW"], [2015, "Origen", "OG"], [2018, "Team Vitality", "VIT"]],
+    [[2012, "Team Acer", "ACER"], [2014, "Team ROCCAT", "ROC"], [2017, "Misfits Gaming", "MSF"], [2023, "Team Heretics", "TH"]],
+    [[2012, "Curse EU", "CEU"], [2013, "Giants Gaming", "GIA"], [2015, "Unicorns of Love", "UOL"], [2018, "Schalke 04", "S04"], [2021, "Astralis", "AST"], [2024, "Karmine Corp", "KC"]],
+    [[2012, "Millenium", "MIL"], [2019, "Excel Esports", "XL"]],
+  ],
+  tw: [
+    [[2012, "Taipei Assassins", "TPA"], [2016, "J Team", "JT"], [2020, "Machi Esports", "MCX"], [2022, "CTBC Flying Oyster", "CFO"]],
+    [[2012, "ahq e-Sports Club", "AHQ"], [2020, "PSG Talon", "PSG"]],
+    [[2012, "Gamania Bears", "GAB"], [2015, "Flash Wolves", "FW"], [2020, "Beyond Gaming", "BYG"]],
+    [[2012, "Hong Kong Esports", "HKE"], [2016, "Hong Kong Attitude", "HKA"], [2021, "Frank Esports", "FAK"]],
+    [[2012, "Taipei Snipers", "TPS"], [2016, "MAD Team", "MAD"], [2023, "Deep Cross Gaming", "DCG"]],
+    [[2012, "Logitech Alliance", "LGA"], [2018, "G-Rex", "GRX"], [2024, "Fukuoka SoftBank Hawks", "SHG"]],
+  ],
+  sea: [
+    [[2012, "Saigon Jokers", "SAJ"], [2015, "Bangkok Titans", "BKT"], [2018, "Ascension Gaming", "ASC"], [2019, "MEGA Esports", "MEGA"]],
+    [[2012, "Mineski", "MSK"]],
+  ],
+  vn: [
+    [[2017, "GIGABYTE Marines", "GAM"], [2019, "GAM Esports", "GAM"]],
+    [[2017, "Young Generation", "YG"], [2018, "Phong Vũ Buffalo", "PVB"], [2022, "Saigon Buffalo", "SGB"]],
+    [[2017, "Team Flash", "FL"], [2023, "Team Whales", "TW"], [2025, "Secret Whales", "SW"]],
+    [[2017, "Lowkey Esports", "LK"], [2024, "Vikings Esports", "VKE"]],
+  ],
+  br: [
+    [[2014, "KaBuM! e-Sports", "KBM"], [2019, "Flamengo eSports", "FLA"], [2022, "LOUD", "LOUD"]],
+    [[2014, "paiN Gaming", "PNG"]],
+    [[2014, "INTZ", "ITZ"], [2021, "RED Canids", "RED"]],
+    [[2014, "Team oNe", "ONE"], [2025, "Vivo Keyd Stars", "VKS"]],
+  ],
+  tr: [
+    [[2014, "Dark Passage", "DP"], [2017, "1907 Fenerbahçe", "FB"], [2021, "Galatasaray Esports", "GS"]],
+    [[2014, "SuperMassive", "SUP"]],
+    [[2014, "Royal Youth", "RY"], [2022, "Istanbul Wildcats", "IW"]],
+  ],
+  cis: [
+    [[2013, "GamingGear.EU", "GG"], [2016, "Albus NoX Luna", "ANX"], [2017, "Gambit Esports", "GMB"], [2019, "Unicorns of Love", "UOL"]],
+  ],
+  jp: [
+    [[2017, "Rampage", "RPG"], [2018, "DetonatioN FocusMe", "DFM"]],
+    [[2017, "V3 Esports", "V3"]],
+  ],
+  lat: [
+    [[2017, "Lyon Gaming", "LYN"], [2019, "Isurus Gaming", "ISG"]],
+    [[2017, "Kaos Latin Gamers", "KLG"], [2020, "Rainbow7", "R7"], [2023, "Movistar R7", "R7"]],
+    [[2017, "Infinity Esports", "INF"]],
+  ],
+  oce: [
+    [[2017, "Dire Wolves", "DW"], [2019, "Mammoth", "MMM"], [2020, "Legacy Esports", "LGC"], [2021, "PEACE", "PCE"], [2022, "Chiefs Esports Club", "CHF"]],
+  ],
+};
+
+// 해외 팀 게임용 이름 (실제 이름 표 WORLD_REAL_TEAMS가 없는 자리, 지역마다 앞에서부터)
 const WORLD_TEAM_NAMES = {
   na:  ["Liberty Eagles", "Golden Coast", "Bay Titans", "Midwest Storm", "Lone Star", "Harbor Wolves", "Iron City", "Neon Vegas"],
   eu:  ["Royal Lions", "Nordic Wind", "Rhein Guard", "Iberia Sol", "Baltic Frost", "Alpine Peak", "Atlas Union", "Viking Crown"],

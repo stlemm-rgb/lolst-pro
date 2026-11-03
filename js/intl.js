@@ -12,12 +12,12 @@ function ensureOverseasPool() {
   if (s.overseas && s.overseas.length) return s.overseas;
   if (state.world && state.world.teams.length) {
     const list = [];
-    activeRegions(s.year).forEach(function (r) {
+    intlRegions(s.year).forEach(function (r) { // 252: 실제로 못 나간 해(베트남 2020·21, CIS 2022~)는 빼고
       state.world.teams.filter(function (t) { return t.region === r.id; })
         .map(function (t) { return { t: t, v: worldTeamStrength(t) + randFloat(-WORLD_RULES.rankNoise, WORLD_RULES.rankNoise) }; })
         .sort(function (a, b) { return b.v - a.v; })
         .forEach(function (x, i) {
-          list.push({ id: x.t.id, name: x.t.name + " (" + r.name + ")", short: x.t.short, region: r.name, regionId: r.id, rank: i + 1, strength: r.strength, power: 0 });
+          list.push({ id: x.t.id, name: x.t.name + " (" + regionLeague(r.id, s.year) + ")", short: x.t.short, region: r.name, regionId: r.id, rank: i + 1, strength: r.strength, power: 0 }); // 252: (LPL)처럼 리그 이름
         });
     });
     s.overseas = list;
