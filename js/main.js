@@ -180,7 +180,7 @@ function masteryRowHTML(name, pos) {
 // 올해 열리지 않는 일정 (연도·1부 팀 수에 따라): 이유 글자, 열리면 "" — 일정·대회 일정 화면에서 반투명
 function scheduleOffReason(id) {
   if (id === "first_stand" || id === "firststand") return firstStandOn(state.year) ? "" : ERA.firstStandFrom + "년부터";
-  if (id === "road_to_msi" || id === "msi" || id === "rtmsi") return msiOn(state.year) ? "" : ERA.msiFrom + "년부터";
+  if (id === "road_to_msi" || id === "msi" || id === "rtmsi") return msiOn(state.year) ? "" : state.year >= ERA.msiFrom ? state.year + "년은 열리지 않음" : ERA.msiFrom + "년부터"; // 249: 2020 취소
   if (id === "playin") return playinOn() ? "" : "1부 10팀일 때만";
   return "";
 }

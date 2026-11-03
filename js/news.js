@@ -236,7 +236,8 @@ function worldsMvpLines() {
 function makeWorldsFeature() {
   const s = state.league.season;
   if (s.worldsFeature) return s.worldsFeature;
-  const T = WORLDS_NEWS, host = state.year === 2012 ? T.firstHost : pick(worldsHostCandidates());
+  const T = WORLDS_NEWS, real = T.realHosts[state.year]; // 249: 실제 개최지가 있는 해는 그대로
+  const host = real ? { country: real[0], city: real[1] } : state.year === 2012 ? T.firstHost : pick(worldsHostCandidates());
   const previous = (state.league.history || []).find(function (h) { return h.year === state.year - 1; });
   const oldSong = previous && previous.worldsRecap && previous.worldsRecap.song;
   const songs = T.songs.filter(function (song) { return song !== oldSong; });

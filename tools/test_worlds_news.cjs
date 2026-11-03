@@ -47,7 +47,7 @@ const result=run(function(){
  while(state.week<41)step();
  const f2=state.league.season.worldsFeature;
  check(f2.song!==h.worldsRecap.song,'전년도 주제곡 연속 재사용 방지');
- check(worldsHostCandidates().some(h=>h.city===f2.host.city&&h.country===f2.host.country),'활성 리그 수도 후보에서 개최지 선정');
+ const realH=WORLDS_NEWS.realHosts[state.year]; check(realH?(f2.host.country===realH[0]&&f2.host.city===realH[1]):worldsHostCandidates().some(h=>h.city===f2.host.city&&h.country===f2.host.country),'실제 개최지(249) 또는 활성 리그 수도 후보에서 개최지 선정');
  check(f2.body.includes(h.champions.worlds)&&f2.body.includes(h.worldsRecap.scenes[0]),'2013 우승팀 리스펙·전년도 실제 장면');
  check(!f2.body.includes('undefined')&&!f2.body.includes('null')&&!/\{\w+\}/.test(f2.body),'기사 빈칸 없음');
  const before=JSON.stringify({money:state.money,popularity:state.popularity,fans:state.fame.fans,stats:state.stats});
@@ -64,7 +64,7 @@ for(const year of [2017,2022]){
   const f=state.league.season.worldsFeature;
   if(!f.body.includes('기록이 남아 있지 않아'))throw Error('Missing prior history fallback');
   if(!f.body.includes('수상 기록 없음'))throw Error('Missing MVP fallback');
-  if(!worldsHostCandidates().some(h=>h.city===f.host.city))throw Error('Invalid host');
+  const rh=WORLDS_NEWS.realHosts[state.year];if(!(rh?f.host.city===rh[1]:worldsHostCandidates().some(h=>h.city===f.host.city)))throw Error('Invalid host');
   const n=state.newsState.articles.length;renderAll();if(state.newsState.articles.length!==n)throw Error('Duplicate migrated preview');
   return {year:state.year,legacyPreview:true,noInventedHistory:true};
  })()`,ctx);

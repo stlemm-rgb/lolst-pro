@@ -18,7 +18,7 @@ function eraYear(year) { return year || (typeof state !== "undefined" && state &
 function eraMoney(year) { return eraRow(ERA.money, eraYear(year))[1]; }
 function eraPop(year) { return eraRow(ERA.popularity, eraYear(year))[1]; }
 function eraTeams(year) { const r = eraRow(ERA.teams, eraYear(year)); return { 1: r[1], 2: r[2] }; }
-function msiOn(year) { return eraYear(year) >= ERA.msiFrom; }
+function msiOn(year) { const y = eraYear(year); return y >= ERA.msiFrom && (ERA.msiSkip || []).indexOf(y) === -1; } // 249: 실제로 취소된 해는 빼고
 function firstStandOn(year) { return eraYear(year) >= ERA.firstStandFrom; }
 
 // 계약용 연도: 비시즌(47주~)에 맺는 계약은 다음 시즌 돈 기준

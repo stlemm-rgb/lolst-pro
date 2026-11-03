@@ -60,6 +60,7 @@ const ERA = {
   teams: [[2012, 8, 6], [2014, 10, 6], [2016, 10, 8]],
   // 국제대회 시작 연도 (그 전에는 그 주에 리그 경기가 없어요)
   msiFrom: 2015,        // Road to MSI · MSI
+  msiSkip: [2020],      // 249: 실제로 열리지 않은 해 (2020 MSI는 코로나19로 취소, MSC로 대체 — 시대 기사 2020)
   firstStandFrom: 2025, // First Stand
 };
 
