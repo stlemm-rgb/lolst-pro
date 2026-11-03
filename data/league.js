@@ -18,9 +18,11 @@ const LEAGUE = {
   userTier1Score: 55,
 
   // 시즌이 바뀔 때 NPC 성장/노화 (스탯마다 [최소, 최대] 변화)
+  // 246 (사용자 선택 G1+L, 2026-11-03): 21세 이하 +2~8 → +1~6, 22~25세 +0~5 → +0~4 (레전드를 넣은 뒤 리그 전체 수준 낮추기)
+  //   7년차 1부 주전 평균 71.7 → 68.7 (node tools/measure_league.cjs, 3판 × 7시즌)
   npcGrowth: [
-    { maxAge: 21, change: [2, 8] },
-    { maxAge: 25, change: [0, 5] },
+    { maxAge: 21, change: [1, 6] },
+    { maxAge: 25, change: [0, 4] },
     { maxAge: 28, change: [-2, 2] },
     { maxAge: 99, change: [-4, 0] },
   ],

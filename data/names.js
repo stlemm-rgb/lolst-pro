@@ -629,7 +629,7 @@ const OLD_NAMED = ["Ego", "Chen", "Sking", "Hwansam", "Runa", "Jimul", "Kibai"];
 
 const LEGEND_RULES = {
   // 종합 능력 = 1부 주전 평균 + 등급 보너스 + 데뷔 몇 년째 보정 (그 뒤는 다른 선수처럼 성장·노화)
-  gradeBonus: { S: 5, A: 2 },
+  gradeBonus: { S: 3, A: 1 },   // 246: S+5·A+2 → S+3·A+1 (6년차 리그 상위 10명 중 레전드 5.7 → 4명)
   rookieRamp: [-4, -2, 0],     // 데뷔 해 −4, 2년째 −2, 3년째부터 0
   traits: 2,                   // 좋은 특성 (다른 선수가 가질 수 있는 것 중 무작위)
   maxPerTeam: 3,               // 한 팀에 동시에 활동하는 레전드 최대 (T1 데뷔 6명 쏠림 막기)
