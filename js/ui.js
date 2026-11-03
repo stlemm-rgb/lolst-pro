@@ -70,7 +70,7 @@ function staffPickDeckHTML(m) {
 }
 
 // ----- 대형 신인 카드 (대시보드, 새 시즌 1~4주) -----
-const ROOKIE_CARD = { showWeeks: 1, sAbove: 3 }; // S급 = 1부 주전 평균보다 sAbove 이상. 222: 4주 → 새 시즌 첫 주만 (사용자 요청), [닫기]로 바로 숨김
+const ROOKIE_CARD = { showWeeks: 1, sAbove: 0 }; // S급 = 1부 주전 평균보다 sAbove 이상 (243: 대형 신인 입단 −2~0이라 3 → 0). 222: 4주 → 새 시즌 첫 주만 (사용자 요청), [닫기]로 바로 숨김
 function rookieCardsHTML() {
   const R = state.league && state.league.rookieCards;
   if (!R || R.year !== state.year || state.week > ROOKIE_CARD.showWeeks || !R.ids.length || R.closed) return "";

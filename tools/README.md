@@ -44,6 +44,10 @@ node tools/measure_health.cjs . "HOUSING.dormConditionLoss=3"     # 숫자 바�
 git worktree add ../base HEAD && node tools/measure_health.cjs ../base   # 예전 코드와 비교
 ```
 
+## 0-2) 대형 신인·리그 상위권 — measure_rookies.cjs (Node만, 약 6분, 243)
+
+후보 값별(파일 안 `V`) 대형 신인 입단·3년 뒤 점수(1부 주전 평균 대비), 7년차 리그 상위 30·10명 안 대형 신인 수, 1부 평균·1위 점수. 레전드(네임드) 넣은 뒤 리그가 너무 세지는지 볼 때도 씀.
+
 ## 1) 특성 효과 — measure_traits.py (5포지션 × 8특성 × 500경기 ≈ 3~4분, --jobs 2)
 
 ```
