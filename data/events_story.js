@@ -394,3 +394,64 @@ EVENTS.push(
     ],
   },
 );
+
+// ===== 257 ③ C 같은 사람이 다시 나옴 (always: 연락 수 상한 밖, 트리거: js/friends.js timeTriggerContext, 동료 기억 timeMatesWeekly) =====
+const TIME_EVENT_RULES = {
+  fullSeasonWeeks: 40,   // C3: 이만큼 같이 뛴 옛 동료만 (한 시즌쯤)
+  juniorAge: 20,         // C2: 같이 뛸 때 이 나이 이하 + 나보다 어린 후배
+  juniorTop: 30,         // C2: 리그 상위 몇 명에 들면
+  juniorWeeks: [3, 30],  // C2: 확인하는 주 (점수 순위를 매주 다 세지 않게)
+  homeCooldown: 52,      // 친정팀 연락 2가지가 같이 쉬는 주
+};
+EVENTS.push(
+  // C1. 다시 한 팀 (한 해 넘게 떨어져 있던 옛 동료가 같은 팀에)
+  {
+    id: "mate_back", tab: "inbox", trigger: "mateBack", always: true, cooldown: 4,
+    title: "🔁 다시 한 팀",
+    text: "{leftYear}년에 팀을 떠났던 {player}이(가) 다시 같은 유니폼을 입었다. 숙소 문을 열자마자 한마디. \"내 자리 아직 있냐?\"",
+    choices: [
+      { label: "환영 회식을 연다", effects: { teamRelation: 2, money: -200000 }, result: "고기 굽는 소리 사이로 옛날 얘기가 끝없이 나왔다. 처음 보는 동료들도 금방 웃었다." },
+      { label: "옛날처럼 듀오 랭크부터 돌린다", effects: { relation: 4, stamina: -2 }, result: "\"손은 안 녹슬었네.\" \"너는 그대로 못하네.\" 첫 판부터 내기가 걸렸다." },
+      { label: "\"주전 자리는 양보 못 해\"", effects: { focus: 1 }, result: "{player}이(가) 웃으며 엄지를 들었다. \"그래야 재밌지.\"" },
+    ],
+  },
+  // C2. 그 후배가 이렇게 컸다 (같이 뛸 때 20세 이하 후배가 다른 팀에서 리그 상위 30명) — 후배 멘토를 했으면 글이 다름
+  {
+    id: "junior_star", tab: "inbox", trigger: "juniorStar", always: true, cooldown: 4, need: { noFlag: "mentee" },
+    title: "🌱 그 후배가 이렇게 컸다",
+    text: "{togetherYear}년 같은 팀에서 {age}세 신인이던 {player}. 지금은 {pteam}의 주전으로 리그 상위 30명에 이름을 올렸다. 숙소 구석에서 라면 끓이던 모습이 아직 생생하다.",
+    choices: [
+      { label: "축하 메시지를 보낸다", effects: { relation: 3 }, result: "\"형도 보고 있었어요?\" \"밥은 이제 네가 사라.\" 답장이 바로 왔다." },
+      { label: "\"아직 멀었다\" 다음 맞대결을 기다린다", effects: { condition: 3 }, result: "기사 캡처를 단톡방에 올리고 한 줄 적었다. \"다음에 붙으면 보자.\"" },
+    ],
+  },
+  {
+    id: "junior_star_mentor", tab: "inbox", trigger: "juniorStar", always: true, cooldown: 4, need: { flag: "mentee" },
+    title: "🌱 그 후배가 이렇게 컸다",
+    text: "{togetherYear}년 같은 팀에서 {age}세 신인이던 {player}이(가) {pteam}의 주전으로 리그 상위 30명에 들었다. 인터뷰에서 이렇게 말했다. \"신인 때 {name} 선배가 복기를 같이 봐 줬어요.\"",
+    choices: [
+      { label: "인터뷰 기사를 공유하며 축하한다", effects: { relation: 3, popularity: 1 }, result: "\"선배 덕분이에요.\" 댓글에 팬들이 '사제 관계'라는 말을 붙였다." },
+      { label: "\"이제 배운 걸로 나를 이겨 봐\"", effects: { condition: 3, reputation: 1 }, result: "{player}이(가) 바로 답했다. \"이번 시즌에 꼭 이길게요.\"" },
+    ],
+  },
+  // C3. 옛 동료와 적으로 (친구가 아닌 옛 동료와 떠난 뒤 첫 맞대결)
+  {
+    id: "exmate_vs", tab: "inbox", trigger: "exMateVs", always: true, cooldown: 4,
+    title: "⚔️ 옛 동료와 적으로",
+    text: "이번 주 상대 {pteam}에는 {untilYear}년까지 같은 팀이던 {player}이(가) 있다. 같이 스크림을 돌리던 시절, 그 선수의 버릇은 누구보다 잘 안다.",
+    choices: [
+      { label: "경기 전에 인사를 건넨다", effects: { relation: 2 }, result: "\"오랜만이다. 봐주는 거 없다.\" \"나도.\" 짧은 메시지에 웃음이 났다." },
+      { label: "그 선수의 버릇을 분석한다", effects: { masteryMetaOne: 1 }, result: "예전 스크림 기록을 꺼냈다. 불리할 때마다 늘 같은 쪽으로 움직였다." },
+    ],
+  },
+  // C5. 친정팀 (옛 동료가 남아 있지 않을 때 — 있으면 home_team)
+  {
+    id: "home_team_solo", tab: "inbox", trigger: "homeTeamSolo", always: true, cooldown: 52,
+    title: "🏠 친정팀과 다시",
+    text: "이번 주 상대는 {sinceYear}년부터 뛰었던 {oldteam}. 아는 얼굴은 거의 남지 않았지만, 경기장 가는 길은 아직 익숙하다.",
+    choices: [
+      { label: "예전 팬들에게 인사 영상을 올린다", effects: { popularity: 1 }, result: "\"그때 응원해 주신 분들, 오늘은 조금만 덜 응원해 주세요.\" 댓글이 웃음으로 가득 찼다." },
+      { label: "말없이 경기로 보여 준다", effects: { condition: 3 }, result: "옛 팀과의 경기도 결국 한 경기다. 오늘은 이기는 게 먼저다." },
+    ],
+  },
+);

@@ -1,6 +1,7 @@
 // 254 ③ 시간 진행 연락 (A 시대 변화 · B 내 기록 회상) 검사: 브라우저 없이 Node로
 // 1) 2012 1부로 시작해 10시즌 진행 → 2015 리그제 · 2020 무관중 · 2021 프랜차이즈(1부) · 데뷔 5년차 연락이 실제로 오는지
 // 2) 상황을 직접 만들어 트리거 조건 확인 (2부 2군 콜업 글, 첫 우승 3년 뒤, 친정팀 경기, 2015 이후 데뷔면 리그제 연락 없음)
+// 3) ③ C (257): 다시 한 팀 · 후배가 컸다 · 옛 동료와 적으로 · 친정팀(옛 동료 없음)
 // 실행: node tools/test_time_events.cjs   (약 1분)
 const fs = require("fs"), vm = require("vm"), path = require("path");
 const src = fs.readFileSync(path.join(__dirname, "measure_health.cjs"), "utf8");
@@ -77,6 +78,48 @@ const SETUP = `linkifyNames = function () {}; renderMenu = function () {}; rende
   if (r.tier === 2) ok(!!g.era_franchise_academy && !g.era_franchise_main, "2부(2군) 2021 연락 = 콜업 글 — " + (g.era_franchise_academy || "안 옴"));
   else ok(!!g.era_franchise_main, "2017 2부 시작이 1부로 올라감 → 2021 연락 = 1부 글 — " + (g.era_franchise_main || "안 옴"));
   ok(!!g.era_empty_2020, "2020 무관중 — " + (g.era_empty_2020 || "안 옴"));
+}
+
+// 3) ③ C 같은 사람이 다시 나옴 (257): 상황을 직접 만들어 조건 확인
+{
+  const ctx = create(11);
+  vm.runInContext(SETUP, ctx);
+  const r = JSON.parse(vm.runInContext(`(function () {
+    const out = {};
+    begin(2017, 1); resetWeekCtx(); play(3, {});
+    const M = timeMem(), t = myTeam(), P = state.league.players;
+    // C1 다시 한 팀: 2년 전에 떠났던 동료로 기억 → 매주 기억 갱신 때 '다시 한 팀' 후보
+    const mate = t.roster.find(id => id !== USER_ID);
+    M.mates[mate] = [state.year - 3, state.year - 2, 20, 21, 50, state.year - 2]; M.back = null;
+    timeMemWeekly(); out.back = triggerContext("mateBack"); out.backTwice = !!triggerContext("mateBack");
+    // 같은 해 안에 잠깐 떨어진 동료(콜업 등)는 아님
+    M.mates[mate][5] = state.year; timeMemWeekly(); out.backSameYear = !!triggerContext("mateBack");
+    // C2 후배: 다른 팀 리그 1위 선수를 '같이 뛸 때 18세 후배'로 기억
+    const star = sortDescBy(Object.keys(P).filter(id => P[id].teamId && P[id].teamId !== t.id), playerScore)[0];
+    M.mates[star] = [2015, 2016, 18, 22, 60, 2016];
+    state.week = 4; out.juniorOff = !!triggerContext("juniorStar");
+    state.week = 3; out.junior = triggerContext("juniorStar"); out.juniorTwice = !!triggerContext("juniorStar");
+    // C3 옛 동료와 적으로: 이번 주 상대 팀 선수를 '한 시즌 같이 뛴 옛 동료'로 기억
+    state.week = 20; const m = nextUserMatch(); state.week = m.week;
+    const opp = m.a === t.id ? m.b : m.a, foe = findTeam(opp).roster[0];
+    M.mates[foe] = [2015, 2016, 22, 22, 30, 2016]; out.vsShort = !!triggerContext("exMateVs"); // 30주 = 짧음
+    M.mates[foe][4] = 45; out.vs = triggerContext("exMateVs"); out.vsTwice = !!triggerContext("exMateVs");
+    // C5 친정팀: 상대 팀을 예전 팀으로 기억, 옛 동료(exMates) 없음 → 글 없는 쪽
+    M.teams[opp] = 2015; M.vsYear = 0; delete M.seen["v" + foe];
+    out.vsHome = !!triggerContext("exMateVs"); // 친정팀이면 C3 대신 친정팀 연락
+    ensureFriends().exMates = {};
+    out.solo = triggerContext("homeTeamSolo"); out.homeWithMate = !!triggerContext("homeTeam");
+    state.eventCooldown.home_team = absWeek(); out.soloCool = !!triggerContext("homeTeamSolo"); // 옛 동료 있는 쪽을 막 받았으면 1년 같이 쉼
+    out.events = ["mate_back", "junior_star", "junior_star_mentor", "exmate_vs", "home_team_solo"].filter(id => findEvent(id)).length;
+    return JSON.stringify(out);
+  })()`, ctx));
+  ok(r.back && !!r.back.player && !r.backTwice, "C1 다시 한 팀 · " + (r.back && r.back.player + " (" + r.back.leftYear + "년에 떠남)"));
+  ok(!r.backSameYear, "C1 같은 해 안에 잠깐 떨어진 동료는 아님");
+  ok(!r.juniorOff && r.junior && r.junior.age === 18 && !r.juniorTwice, "C2 후배가 컸다 · " + (r.junior && r.junior.player + " · " + r.junior.pteam) + " (3·30주만, 한 사람 1번)");
+  ok(!r.vsShort && r.vs && r.vs.untilYear === 2016 && !r.vsTwice, "C3 옛 동료와 적으로 · " + (r.vs && r.vs.player + " · " + r.vs.pteam) + " (한 시즌 이상만, 시즌 1번)");
+  ok(!r.vsHome, "C3 친정팀 경기면 C3 대신 친정팀 연락");
+  ok(r.solo && !r.solo.player && !r.homeWithMate && !r.soloCool, "C5 친정팀 (옛 동료 없음) · " + (r.solo && r.solo.oldteam) + " · 1년 쉼");
+  ok(r.events === 5, "C 연락 데이터 5개");
 }
 
 console.log(fail ? "❌ 실패 " + fail + "개" : "✅ 통과");

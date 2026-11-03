@@ -23,7 +23,7 @@
 | `python3 tools/profile_week.py [ui\|fast]` | 10시즌 게임에서 한 주 진행 시간과 오래 걸리는 함수 순위 (R6) | 약 1분 |
 | `python3 tools/bundle.py [폴더]` | 공개 사이트용 묶음 만들기 (GitHub Actions가 push 때 자동 실행). `GAME_INDEX=폴더/index.html`을 붙이면 golden·shots·test_oldsaves가 묶음으로 검사 (R7) | 1초 |
 | `node tools/test_savepack.cjs` | 세이브 압축(js/save.js lzPack·lzUnpack)이 어떤 글자든 그대로 되돌리는지 (R5) | 1초 |
-| `node tools/test_time_events.cjs` | 시간 진행 연락(254: 2015 리그제·2020 무관중·2021 프랜차이즈·데뷔 5·10년차·첫 우승 3년 뒤·친정팀)이 실제로 오는지·조건이 맞는지 | 약 1분 |
+| `node tools/test_time_events.cjs` | 시간 진행 연락(254: 2015 리그제·2020 무관중·2021 프랜차이즈·데뷔 5·10년차·첫 우승 3년 뒤·친정팀, 257 C: 다시 한 팀·후배·옛 동료 맞대결·친정팀 옛 동료 없음)이 실제로 오는지·조건이 맞는지 | 약 1분 |
 | `node tools/test_css.cjs` | css/style.css에서 같은 폭 조건(@media) 안에 같은 선택자가 두 번 나오면 실패 (R4) | 1초 |
 | `node tools/test_names.cjs` | js·data 맨 바깥 이름(function·const·let·var)이 겹치면 실패 (183 막대 깨짐 같은 사고 막기) | 1초 |
 

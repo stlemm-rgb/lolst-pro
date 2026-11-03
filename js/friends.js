@@ -152,18 +152,23 @@ function storyTriggerContext(trigger) {
 }
 
 // ----- 6) 시간 진행 트리거 (254 ③ A 시대 변화 · B 내 기록 회상, 연락: data/events_story.js) -----
-// 기억: state.flags.timeMem = { cur 지금 팀 id, teams: {팀 id: 처음 뛴 해}, title: {year, team, name, mates[]} } (flags는 통째로 저장)
-// 예전 세이브: 팀 기억은 불러온 뒤부터, 첫 우승은 지난 시즌 기록(career.seasons)으로 채움 (그때 동료는 모름)
+// 기억: state.flags.timeMem = { cur 지금 팀 id, teams: {팀 id: 처음 뛴 해}, title: {year, team, name, mates[]},
+//   mates: {선수 id: [처음 해, 마지막 해, 그때 그 선수 나이, 그때 내 나이, 같이 뛴 주, 떠난 해(0 = 지금 같은 팀)]} (257 ③ C),
+//   back: {pid, leftYear} 다시 한 팀이 된 동료, seen: {"j"+id 후배 · "v"+id 옛 동료 맞대결: 1}, vsYear 옛 동료 맞대결 연락을 받은 해 } (flags는 통째로 저장)
+// 예전 세이브: 팀·동료 기억은 불러온 뒤부터, 첫 우승은 지난 시즌 기록(career.seasons)으로 채움 (그때 동료는 모름)
 function timeMem() {
   if (!state.flags) state.flags = {};
   if (!state.flags.timeMem) state.flags.timeMem = { cur: null, teams: {}, title: null };
-  return state.flags.timeMem;
+  const M = state.flags.timeMem;
+  if (!M.mates) { M.mates = {}; M.seen = {}; M.back = null; M.vsYear = 0; } // 255 세이브
+  return M;
 }
 // 매주 연락 처리 전에 (js/events.js runWeeklyEvents)
 function timeMemWeekly() {
   const M = timeMem(), t = myTeam(), w = state.weekCtx || {};
   if (t && M.cur !== t.id) { if (M.cur && !M.teams[M.cur]) M.teams[M.cur] = state.year; M.cur = t.id; }
   if (t && !M.teams[t.id]) M.teams[t.id] = state.year;
+  if (t) timeMatesWeekly(M, t);
   if (!M.title && t && w.champion) {
     const s = starters(t.id);
     M.title = { year: state.year, team: t.name, name: String(w.champion).replace(/ ?우승$/, ""),
@@ -173,6 +178,46 @@ function timeMemWeekly() {
     const old = (state.career.seasons || []).find(function (r) { return r.titles && r.titles.length; });
     if (old) M.title = { year: old.year, team: old.team, name: String(old.titles[0]).replace(/ ?우승$/, ""), mates: [] };
   }
+}
+// 같이 뛴 동료 기억 (③ C): 한 해 넘게 떨어져 있다가 다시 같은 팀이면 '다시 한 팀' 후보
+function timeMatesWeekly(M, t) {
+  const P = state.league.players, on = {};
+  t.roster.forEach(function (id) {
+    if (id === USER_ID || !P[id]) return;
+    on[id] = 1;
+    let m = M.mates[id];
+    if (!m) m = M.mates[id] = [state.year, state.year, P[id].age, state.player.age, 0, 0];
+    if (m[5] && state.year > m[5] && !M.back) M.back = { pid: id, leftYear: m[5] };
+    m[1] = state.year; m[4]++; m[5] = 0;
+  });
+  Object.keys(M.mates).forEach(function (id) {
+    const m = M.mates[id];
+    if (!on[id] && !m[5]) m[5] = state.year;
+    if (m[5] && !P[id] && state.week === 1) delete M.mates[id]; // 은퇴·해외로 떠난 선수는 새해에 지움 (세이브 크기)
+  });
+}
+// 같이 뛰던 후배 중 지금 다른 팀에서 리그 상위 N명에 든 선수 (아직 연락 안 한 선수 중 점수 1위)
+function timeJuniorStar(M) {
+  const R = TIME_EVENT_RULES, P = state.league.players, t = myTeam();
+  const cand = Object.keys(M.mates).filter(function (id) {
+    const m = M.mates[id];
+    return m[5] && m[2] <= R.juniorAge && m[2] < m[3] && !M.seen["j" + id] && P[id] && P[id].teamId && (!t || P[id].teamId !== t.id);
+  });
+  if (!cand.length) return null;
+  const top = sortDescBy(Object.keys(P).filter(function (id) { return P[id].teamId; }), playerScore).slice(0, R.juniorTop);
+  return sortDescBy(cand.filter(function (id) { return top.indexOf(id) !== -1; }), playerScore)[0] || null;
+}
+// 친정팀 경기 (B3 · C5): 옛 동료가 그 팀에 있으면 mate
+function timeHomeCtx(M) {
+  const m = nextUserMatch(), t = myTeam();
+  if (!m || !t || m.week !== state.week) return null;
+  const opp = m.a === t.id ? m.b : m.a;
+  if (opp === t.id || !M.teams[opp] || !findTeam(opp)) return null;
+  const ex = (state.friends && state.friends.exMates) || {};
+  const mate = sortDescBy((findTeam(opp).roster || []).filter(function (id) { return ex[id] && state.league.players[id]; }), relationOf)[0];
+  const ctx = { oldteam: teamName(opp), sinceYear: M.teams[opp] };
+  if (mate) { ctx.pid = mate; ctx.player = playerName(mate); }
+  return ctx;
 }
 function debutYear() { return state.career.debut ? state.career.debut.year : state.year; }
 function timeTriggerContext(trigger) {
@@ -194,17 +239,41 @@ function timeTriggerContext(trigger) {
       if (mate) { ctx.pid = mate; ctx.player = playerName(mate); }
       return ctx;
     }
-    case "homeTeam": {
+    case "homeTeam": case "homeTeamSolo": { // 옛 동료가 있으면 home_team, 없으면 home_team_solo (둘이 1년 쉬는 기간을 같이 씀)
+      const other = state.eventCooldown[trigger === "homeTeam" ? "home_team_solo" : "home_team"];
+      if (other !== undefined && absWeek() - other < TIME_EVENT_RULES.homeCooldown) return null;
+      const ctx = timeHomeCtx(M);
+      if (!ctx || (trigger === "homeTeam") !== !!ctx.pid) return null;
+      return ctx;
+    }
+    case "mateBack": { // C1 다시 한 팀
+      const b = M.back, t = myTeam();
+      M.back = null;
+      if (!b || !t || !state.league.players[b.pid] || t.roster.indexOf(b.pid) === -1) return null;
+      return { pid: b.pid, player: playerName(b.pid), leftYear: b.leftYear };
+    }
+    case "juniorStar": { // C2 그 후배가 이렇게 컸다 (need.flag mentee로 글 2가지)
+      if (TIME_EVENT_RULES.juniorWeeks.indexOf(w) === -1) return null;
+      const id = timeJuniorStar(M);
+      if (!id) return null;
+      M.seen["j" + id] = 1;
+      const m = M.mates[id];
+      return { pid: id, player: playerName(id), pteam: teamName(findPlayer(id).teamId), togetherYear: m[0], age: m[2] };
+    }
+    case "exMateVs": { // C3 옛 동료와 적으로 (친구가 아닌 옛 동료와 떠난 뒤 첫 맞대결, 시즌에 1번, 친정팀이면 home_team이 대신)
+      if (M.vsYear === y) return null;
       const m = nextUserMatch(), t = myTeam();
       if (!m || !t || m.week !== w) return null;
-      const opp = m.a === t.id ? m.b : m.a;
-      if (opp === t.id || !M.teams[opp] || !findTeam(opp)) return null;
-      const ctx = { oldteam: teamName(opp), sinceYear: M.teams[opp] };
-      const ex = (state.friends && state.friends.exMates) || {};
-      const mate = (findTeam(opp).roster || []).filter(function (id) { return ex[id]; }).sort(function (a, b) { return relationOf(b) - relationOf(a); })[0];
-      if (!mate) return null; // 옛 동료가 없는 친정팀이면 안 옴 (선택지가 옛 동료 이야기라서)
-      ctx.pid = mate; ctx.player = playerName(mate);
-      return ctx;
+      const opp = m.a === t.id ? m.b : m.a, ot = findTeam(opp);
+      if (opp === t.id || M.teams[opp] || !ot) return null;
+      const P = state.league.players;
+      const id = sortDescBy((ot.roster || []).filter(function (x) {
+        const q = M.mates[x];
+        return q && q[5] && q[4] >= TIME_EVENT_RULES.fullSeasonWeeks && !M.seen["v" + x] && P[x] && relationOf(x) < FRIEND_RULES.friendFrom;
+      }), function (x) { return M.mates[x][4]; })[0];
+      if (!id) return null;
+      M.seen["v" + id] = 1; M.vsYear = y;
+      return { pid: id, player: playerName(id), pteam: ot.name, untilYear: M.mates[id][1] };
     }
     default: return null;
   }
