@@ -45,6 +45,10 @@ node tools/measure_health.cjs . "HOUSING.dormConditionLoss=3"     # 숫자 바�
 git worktree add ../base HEAD && node tools/measure_health.cjs ../base   # 예전 코드와 비교
 ```
 
+## 0-1) 시즌 회고·연차별 연락 — measure_de.cjs (Node만, 약 1분, ③ D+E 측정)
+
+12시즌 × 3판(2012 2부·2012 1부·2017 1부, 시즌 목표 성장/즐겁게) → 시즌별 성장(점수 차)·부상 수·회고 글(review_*)·받은 연락 수·처음 보는 연락 수·팀 내 입지·주장. `node tools/measure_de.cjs`
+
 ## 0-2) 대형 신인·리그 상위권 — measure_rookies.cjs (Node만, 약 6분, 243)
 
 후보 값별(파일 안 `V`) 대형 신인 입단·3년 뒤 점수(1부 주전 평균 대비), 7년차 리그 상위 30·10명 안 대형 신인 수, 1부 평균·1위 점수. 레전드(네임드) 넣은 뒤 리그가 너무 세지는지 볼 때도 씀.
