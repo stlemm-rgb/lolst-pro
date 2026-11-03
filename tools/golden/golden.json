@@ -3,7 +3,7 @@
   "name": "A 미드 2017 1부",
   "snaps": [
    {
-    "strict": "97a8309f",
+    "strict": "8e5bf9df",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -48,7 +48,7 @@
       "great": 2
      },
      "league": {
-      "players": 134,
+      "players": 140,
       "teams": 18,
       "top10": [
        "P45:75.8",
@@ -68,9 +68,9 @@
        "JAG",
        "GEN",
        "SKT",
+       "GRF",
        "KT",
        "KZ",
-       "GRF",
        "HLE",
        "MVP"
       ],
@@ -89,37 +89,37 @@
     }
    },
    {
-    "strict": "2f063521",
+    "strict": "9e9dbc2d",
     "summary": {
      "year": 2019,
      "week": 1,
      "retired": false,
      "me": {
       "team": "SB",
-      "score": 58.9,
+      "score": 59.4,
       "stats": {
        "accuracy": 39,
        "laning": 46,
-       "teamfight": 67,
-       "macro": 68,
-       "vision": 73,
-       "shotcall": 69,
+       "teamfight": 68,
+       "macro": 67,
+       "vision": 72,
+       "shotcall": 67,
        "pool": 52,
-       "mental": 72,
-       "reaction": 56,
-       "spacing": 60,
+       "mental": 75,
+       "reaction": 55,
+       "spacing": 67,
        "adapt": 45,
-       "focus": 65
+       "focus": 66
       },
-      "money": 48900016,
-      "pop": 57,
-      "rep": 26,
+      "money": 52100016,
+      "pop": 56,
+      "rep": 32,
       "traits": [
        "god_hands",
        "negotiator",
        "support_sense"
       ],
-      "salary": 69000000,
+      "salary": 70000000,
       "benched": false,
       "seasons": [
        [
@@ -131,185 +131,86 @@
        [
         2018,
         8,
-        "8-15",
+        "11-20",
         ""
        ]
       ],
       "awards": 0,
-      "great": 5
+      "great": 4
      },
      "league": {
-      "players": 136,
+      "players": 146,
       "teams": 18,
       "top10": [
-       "P45:76.5",
-       "P37:73.9",
-       "P15:71.9",
-       "P59:71.6",
-       "P11:70.3",
-       "P1:70",
-       "P51:69.1",
-       "P17:69",
-       "P60:68.8",
-       "P32:68.6"
+       "P45:76.4",
+       "P37:73.7",
+       "P15:72",
+       "P59:71.4",
+       "P11:69.9",
+       "P1:69.8",
+       "P51:69.8",
+       "P60:69.2",
+       "P32:68.5",
+       "P17:68.4"
       ],
       "tier1": [
        "GRF",
        "AF",
-       "GEN",
-       "KZ",
-       "KT",
-       "SB",
+       "JAG",
        "HLE",
        "DWG",
-       "SKT",
-       "JAG"
+       "KZ",
+       "GEN",
+       "KT",
+       "SB",
+       "SKT"
       ],
       "awards": [],
-      "transfers": 49,
-      "history": "674414d5"
+      "transfers": 50,
+      "history": "40c8640f"
      },
      "world": {
       "teams": 62,
-      "hash": "af2dcc6f"
+      "hash": "87ef6815"
      },
      "news": {
       "articles": 22
      },
-     "inbox": 123
+     "inbox": 122
     }
    },
    {
-    "strict": "e9dcb9d0",
+    "strict": "446d17b8",
     "summary": {
      "year": 2020,
      "week": 1,
      "retired": false,
      "me": {
       "team": "SB",
-      "score": 63.6,
+      "score": 63.9,
       "stats": {
        "accuracy": 40,
        "laning": 47,
-       "teamfight": 75,
-       "macro": 77,
-       "vision": 78,
-       "shotcall": 78,
+       "teamfight": 79,
+       "macro": 74,
+       "vision": 79,
+       "shotcall": 72,
        "pool": 52,
-       "mental": 79,
-       "reaction": 57,
-       "spacing": 68,
-       "adapt": 47,
-       "focus": 74
-      },
-      "money": 116470012,
-      "pop": 97,
-      "rep": 36,
-      "traits": [
-       "god_hands",
-       "negotiator",
-       "star_power",
-       "support_sense"
-      ],
-      "salary": 96000000,
-      "benched": false,
-      "seasons": [
-       [
-        2017,
-        7,
-        "10-18",
-        ""
-       ],
-       [
-        2018,
-        8,
-        "8-15",
-        ""
-       ],
-       [
-        2019,
-        4,
-        "17-16",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 6
-     },
-     "league": {
-      "players": 139,
-      "teams": 18,
-      "top10": [
-       "P45:76.3",
-       "P15:72.7",
-       "P59:72.2",
-       "P1:71.3",
-       "P51:70.5",
-       "P17:70",
-       "P11:69.8",
-       "P32:69.2",
-       "P46:68.9",
-       "P19:68.8"
-      ],
-      "tier1": [
-       "AF",
-       "GEN",
-       "DYN",
-       "T1",
-       "HLE",
-       "SB",
-       "DRX",
-       "DWG",
-       "SP",
-       "KT"
-      ],
-      "awards": [],
-      "transfers": 61,
-      "history": "b85c2b7a"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "ed1255f9"
-     },
-     "news": {
-      "articles": 34
-     },
-     "inbox": 121
-    }
-   },
-   {
-    "strict": "732d4179",
-    "summary": {
-     "year": 2021,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "LSB",
-      "score": 67.4,
-      "stats": {
-       "accuracy": 41,
-       "laning": 48,
-       "teamfight": 85,
-       "macro": 80,
-       "vision": 84,
-       "shotcall": 85,
-       "pool": 52,
-       "mental": 89,
+       "mental": 83,
        "reaction": 58,
-       "spacing": 72,
-       "adapt": 49,
-       "focus": 78
+       "spacing": 71,
+       "adapt": 46,
+       "focus": 75
       },
-      "money": 229974020,
-      "pop": 99,
-      "rep": 48,
+      "money": 120700024,
+      "pop": 93,
+      "rep": 41,
       "traits": [
        "god_hands",
        "negotiator",
-       "star_power",
        "support_sense"
       ],
-      "salary": 105000000,
+      "salary": 95000000,
       "benched": false,
       "seasons": [
        [
@@ -321,19 +222,13 @@
        [
         2018,
         8,
-        "8-15",
+        "11-20",
         ""
        ],
        [
         2019,
-        4,
-        "17-16",
-        ""
-       ],
-       [
-        2020,
-        8,
-        "11-18",
+        9,
+        "12-19",
         ""
        ]
       ],
@@ -342,75 +237,177 @@
      },
      "league": {
       "players": 149,
-      "teams": 20,
+      "teams": 18,
       "top10": [
-       "P45:76",
-       "P15:73.2",
-       "P59:73.2",
-       "P1:72.3",
-       "P51:72",
-       "P17:70.8",
-       "P24:70",
-       "P65:69.7",
-       "P32:69.3",
-       "P46:69.2"
+       "P45:75.7",
+       "P37:73.1",
+       "P15:72.5",
+       "P59:72.2",
+       "P1:71.3",
+       "P51:71.2",
+       "P32:69.7",
+       "P17:69.3",
+       "P11:69.3",
+       "P43:69.2"
       ],
       "tier1": [
-       "DRX",
-       "KT",
-       "NS",
-       "BRO",
-       "LSB",
-       "T1",
-       "DK",
+       "SP",
+       "SB",
        "AF",
+       "DRX",
+       "DYN",
+       "DWG",
+       "HLE",
+       "T1",
        "GEN",
-       "HLE"
+       "BI"
       ],
       "awards": [],
-      "transfers": 71,
-      "history": "73a1aefe"
+      "transfers": 65,
+      "history": "7a45eb44"
      },
      "world": {
       "teams": 62,
-      "hash": "2bcbddab"
+      "hash": "4a3d638a"
+     },
+     "news": {
+      "articles": 34
+     },
+     "inbox": 121
+    }
+   },
+   {
+    "strict": "f40a0fb0",
+    "summary": {
+     "year": 2021,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "LSB",
+      "score": 67.1,
+      "stats": {
+       "accuracy": 41,
+       "laning": 48,
+       "teamfight": 85,
+       "macro": 82,
+       "vision": 80,
+       "shotcall": 77,
+       "pool": 52,
+       "mental": 94,
+       "reaction": 59,
+       "spacing": 75,
+       "adapt": 46,
+       "focus": 78
+      },
+      "money": 219900020,
+      "pop": 100,
+      "rep": 52,
+      "traits": [
+       "god_hands",
+       "negotiator",
+       "support_sense"
+      ],
+      "salary": 106000000,
+      "benched": false,
+      "seasons": [
+       [
+        2017,
+        7,
+        "10-18",
+        ""
+       ],
+       [
+        2018,
+        8,
+        "11-20",
+        ""
+       ],
+       [
+        2019,
+        9,
+        "12-19",
+        ""
+       ],
+       [
+        2020,
+        7,
+        "17-18",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 8
+     },
+     "league": {
+      "players": 154,
+      "teams": 20,
+      "top10": [
+       "P45:75",
+       "P15:73.2",
+       "P51:72.8",
+       "P59:72.8",
+       "P1:72.5",
+       "P17:70.5",
+       "P46:70",
+       "P65:69.8",
+       "P24:69.1",
+       "P57:69"
+      ],
+      "tier1": [
+       "DRX",
+       "HLE",
+       "DK",
+       "T1",
+       "NS",
+       "GEN",
+       "LSB",
+       "AF",
+       "BRO",
+       "KT"
+      ],
+      "awards": [],
+      "transfers": 72,
+      "history": "ed8920f3"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "368c0b49"
      },
      "news": {
       "articles": 46
      },
-     "inbox": 122
+     "inbox": 121
     }
    },
    {
-    "strict": "4081e0a5",
+    "strict": "41c7a8f7",
     "summary": {
      "year": 2022,
      "week": 1,
      "retired": false,
      "me": {
       "team": "LSB",
-      "score": 70,
+      "score": 69.8,
       "stats": {
        "accuracy": 42,
        "laning": 49,
        "teamfight": 87,
-       "macro": 84,
-       "vision": 86,
-       "shotcall": 88,
+       "macro": 85,
+       "vision": 84,
+       "shotcall": 78,
        "pool": 52,
-       "mental": 100,
-       "reaction": 59,
-       "spacing": 75,
-       "adapt": 51,
-       "focus": 82
+       "mental": 99,
+       "reaction": 60,
+       "spacing": 79,
+       "adapt": 48,
+       "focus": 88
       },
-      "money": 317674032,
-      "pop": 98,
-      "rep": 51,
+      "money": 376560044,
+      "pop": 100,
+      "rep": 46,
       "traits": [
        "god_hands",
        "negotiator",
-       "star_power",
        "support_sense"
       ],
       "salary": 110000000,
@@ -425,74 +422,74 @@
        [
         2018,
         8,
-        "8-15",
+        "11-20",
         ""
        ],
        [
         2019,
-        4,
-        "17-16",
+        9,
+        "12-19",
         ""
        ],
        [
         2020,
-        8,
-        "11-18",
+        7,
+        "17-18",
         ""
        ],
        [
         2021,
-        5,
-        "13-15",
+        8,
+        "11-17",
         ""
        ]
       ],
       "awards": 0,
-      "great": 8
+      "great": 10
      },
      "league": {
-      "players": 151,
+      "players": 152,
       "teams": 20,
       "top10": [
-       "P15:73.8",
+       "P45:74",
+       "P51:73.8",
        "P1:73.6",
-       "P51:73",
-       "P59:72.7",
-       "P17:70.9",
-       "P24:70.7",
-       "P65:70.7",
-       "P57:69.8",
-       "P67:69.2",
-       "P46:68.9"
+       "P15:73.6",
+       "P183:70.7",
+       "P17:70.5",
+       "P65:70.2",
+       "P57:70.2",
+       "P46:70.1",
+       "P148:70"
       ],
       "tier1": [
-       "DK",
        "T1",
-       "DRX",
-       "HLE",
-       "KT",
        "KDF",
+       "DK",
+       "KT",
+       "LSB",
+       "DRX",
        "BRO",
        "GEN",
        "NS",
-       "LSB"
+       "HLE"
       ],
       "awards": [],
-      "transfers": 71,
-      "history": "354bac11"
+      "transfers": 63,
+      "history": "c9c5f1fa"
      },
      "world": {
       "teams": 62,
-      "hash": "c8f4a925"
+      "hash": "79c4191b"
      },
      "news": {
-      "articles": 55
+      "articles": 54
      },
-     "inbox": 121
+     "inbox": 122
     }
    },
    {
-    "strict": "237363d6",
+    "strict": "cd95faa1",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -501,26 +498,25 @@
       "team": "LSB",
       "score": 71.8,
       "stats": {
-       "accuracy": 42,
-       "laning": 49,
+       "accuracy": 43,
+       "laning": 50,
        "teamfight": 90,
-       "macro": 87,
-       "vision": 88,
-       "shotcall": 91,
+       "macro": 86,
+       "vision": 87,
+       "shotcall": 85,
        "pool": 52,
        "mental": 100,
-       "reaction": 61,
-       "spacing": 80,
-       "adapt": 52,
-       "focus": 85
+       "reaction": 62,
+       "spacing": 82,
+       "adapt": 48,
+       "focus": 92
       },
-      "money": 429074052,
-      "pop": 99,
-      "rep": 59,
+      "money": 488160064,
+      "pop": 100,
+      "rep": 53,
       "traits": [
        "god_hands",
        "negotiator",
-       "star_power",
        "support_sense"
       ],
       "salary": 114000000,
@@ -535,71 +531,71 @@
        [
         2018,
         8,
-        "8-15",
+        "11-20",
         ""
        ],
        [
         2019,
-        4,
-        "17-16",
+        9,
+        "12-19",
         ""
        ],
        [
         2020,
-        8,
-        "11-18",
+        7,
+        "17-18",
         ""
        ],
        [
         2021,
-        5,
-        "13-15",
+        8,
+        "11-17",
         ""
        ],
        [
         2022,
-        10,
-        "6-20",
+        6,
+        "14-11",
         ""
        ]
       ],
       "awards": 0,
-      "great": 11
+      "great": 13
      },
      "league": {
-      "players": 156,
+      "players": 153,
       "teams": 20,
       "top10": [
-       "P1:74.7",
-       "P15:74.5",
-       "P51:73.5",
-       "P59:72.6",
-       "P24:71.9",
-       "P65:71.3",
-       "P17:71.1",
-       "P57:70.5",
-       "P67:70",
-       "P168:69.2"
+       "P1:75.2",
+       "P15:74.2",
+       "P225:72.8",
+       "P183:72.6",
+       "P65:71",
+       "P224:71",
+       "P148:70.9",
+       "P153:70.9",
+       "P57:70.8",
+       "P24:70.7"
       ],
       "tier1": [
-       "DK",
-       "BRO",
-       "GEN",
-       "LSB",
-       "T1",
-       "HLE",
        "KDF",
+       "T1",
+       "GEN",
        "KT",
+       "HLE",
+       "LSB",
+       "BRO",
        "NS",
+       "DK",
        "DRX"
       ],
       "awards": [],
-      "transfers": 62,
-      "history": "4d0368c1"
+      "transfers": 66,
+      "history": "d1012868"
      },
      "world": {
       "teams": 62,
-      "hash": "c9492fc8"
+      "hash": "b8666fcd"
      },
      "news": {
       "articles": 63
@@ -608,38 +604,37 @@
     }
    },
    {
-    "strict": "3b0e48d3",
+    "strict": "ef4198e4",
     "summary": {
      "year": 2024,
      "week": 1,
      "retired": false,
      "me": {
       "team": "FOX",
-      "score": 73.4,
+      "score": 72.7,
       "stats": {
-       "accuracy": 43,
-       "laning": 50,
-       "teamfight": 95,
-       "macro": 89,
-       "vision": 91,
-       "shotcall": 91,
+       "accuracy": 44,
+       "laning": 51,
+       "teamfight": 90,
+       "macro": 86,
+       "vision": 88,
+       "shotcall": 86,
        "pool": 52,
        "mental": 100,
-       "reaction": 62,
+       "reaction": 63,
        "spacing": 85,
-       "adapt": 52,
-       "focus": 87
+       "adapt": 50,
+       "focus": 93
       },
-      "money": 602414068,
-      "pop": 98,
-      "rep": 61,
+      "money": 656271615,
+      "pop": 100,
+      "rep": 53,
       "traits": [
        "god_hands",
        "negotiator",
-       "star_power",
        "support_sense"
       ],
-      "salary": 117000000,
+      "salary": 116000000,
       "benched": false,
       "seasons": [
        [
@@ -651,117 +646,116 @@
        [
         2018,
         8,
-        "8-15",
+        "11-20",
         ""
        ],
        [
         2019,
-        4,
-        "17-16",
+        9,
+        "12-19",
         ""
        ],
        [
         2020,
-        8,
-        "11-18",
+        7,
+        "17-18",
         ""
        ],
        [
         2021,
-        5,
-        "13-15",
+        8,
+        "11-17",
         ""
        ],
        [
         2022,
-        10,
-        "6-20",
+        6,
+        "14-11",
         ""
        ],
        [
         2023,
-        4,
-        "12-13",
+        8,
+        "9-16",
         ""
        ]
       ],
       "awards": 0,
-      "great": 12
+      "great": 14
      },
      "league": {
-      "players": 154,
+      "players": 156,
       "teams": 20,
       "top10": [
        "P1:75.6",
-       "P51:74.2",
-       "P15:73.7",
-       "P24:72.7",
-       "P65:72.1",
-       "P57:71.3",
-       "P17:71",
-       "P168:70.3",
-       "P67:70.2",
-       "P44:70"
+       "P15:74.2",
+       "P225:73.8",
+       "P183:73.3",
+       "P201:72.3",
+       "P65:72",
+       "P184:72",
+       "P153:71.9",
+       "P148:71.7",
+       "P151:71.6"
       ],
       "tier1": [
-       "BRO",
-       "NS",
-       "DK",
-       "T1",
-       "DRX",
-       "FOX",
        "KDF",
        "KT",
+       "GEN",
+       "DK",
+       "FOX",
        "HLE",
-       "GEN"
+       "DRX",
+       "BRO",
+       "NS",
+       "T1"
       ],
       "awards": [],
-      "transfers": 60,
-      "history": "6f062232"
+      "transfers": 55,
+      "history": "99617d00"
      },
      "world": {
       "teams": 62,
-      "hash": "9ab41c80"
+      "hash": "ca4de0e"
      },
      "news": {
-      "articles": 72
+      "articles": 71
      },
      "inbox": 121
     }
    },
    {
-    "strict": "fa42b913",
+    "strict": "aea24152",
     "summary": {
      "year": 2025,
      "week": 1,
      "retired": false,
      "me": {
       "team": "BFX",
-      "score": 74.4,
+      "score": 73.6,
       "stats": {
-       "accuracy": 44,
-       "laning": 51,
-       "teamfight": 95,
-       "macro": 92,
-       "vision": 92,
-       "shotcall": 91,
+       "accuracy": 45,
+       "laning": 52,
+       "teamfight": 91,
+       "macro": 87,
+       "vision": 89,
+       "shotcall": 88,
        "pool": 52,
        "mental": 100,
-       "reaction": 63,
-       "spacing": 88,
+       "reaction": 64,
+       "spacing": 86,
        "adapt": 52,
-       "focus": 90
+       "focus": 93
       },
-      "money": 748114068,
+      "money": 930711603,
       "pop": 100,
-      "rep": 67,
+      "rep": 57,
       "traits": [
        "god_hands",
        "negotiator",
-       "star_power",
        "support_sense"
       ],
-      "salary": 120000000,
+      "salary": 118000000,
       "benched": false,
       "seasons": [
        [
@@ -773,43 +767,43 @@
        [
         2018,
         8,
-        "8-15",
+        "11-20",
         ""
        ],
        [
         2019,
-        4,
-        "17-16",
+        9,
+        "12-19",
         ""
        ],
        [
         2020,
-        8,
-        "11-18",
+        7,
+        "17-18",
         ""
        ],
        [
         2021,
-        5,
-        "13-15",
+        8,
+        "11-17",
         ""
        ],
        [
         2022,
-        10,
-        "6-20",
+        6,
+        "14-11",
         ""
        ],
        [
         2023,
-        4,
-        "12-13",
+        8,
+        "9-16",
         ""
        ],
        [
         2024,
-        6,
-        "14-14",
+        5,
+        "13-15",
         ""
        ]
       ],
@@ -817,80 +811,79 @@
       "great": 17
      },
      "league": {
-      "players": 152,
+      "players": 157,
       "teams": 20,
       "top10": [
-       "P1:76",
-       "P24:73.8",
-       "P15:73.3",
-       "P65:72.5",
-       "P57:71",
-       "P49:71",
-       "P44:70.7",
-       "P207:70.2",
-       "P67:70",
-       "P17:69"
+       "P1:76.3",
+       "P183:74.2",
+       "P247:74",
+       "P184:73.8",
+       "P200:73.5",
+       "P201:73.2",
+       "P65:72.6",
+       "P153:72.6",
+       "P226:72.6",
+       "P151:72.5"
       ],
       "tier1": [
        "HLE",
-       "GEN",
-       "BFX",
-       "NS",
-       "DK",
-       "DNF",
+       "T1",
        "KT",
+       "DNF",
+       "NS",
+       "BFX",
        "DRX",
        "BRO",
-       "T1"
+       "DK",
+       "GEN"
       ],
       "awards": [],
-      "transfers": 66,
-      "history": "160d0019"
+      "transfers": 63,
+      "history": "8c5ade58"
      },
      "world": {
       "teams": 62,
-      "hash": "47daa593"
+      "hash": "f90b46c3"
      },
      "news": {
-      "articles": 79
+      "articles": 78
      },
-     "inbox": 121
+     "inbox": 120
     }
    },
    {
-    "strict": "32c27313",
+    "strict": "31f1c461",
     "summary": {
      "year": 2026,
      "week": 1,
      "retired": false,
      "me": {
       "team": "BFX",
-      "score": 75.2,
+      "score": 74.6,
       "stats": {
-       "accuracy": 45,
-       "laning": 52,
-       "teamfight": 96,
-       "macro": 92,
-       "vision": 92,
-       "shotcall": 93,
+       "accuracy": 46,
+       "laning": 53,
+       "teamfight": 92,
+       "macro": 90,
+       "vision": 90,
+       "shotcall": 90,
        "pool": 52,
        "mental": 100,
-       "reaction": 64,
+       "reaction": 65,
        "spacing": 88,
-       "adapt": 54,
-       "focus": 91
+       "adapt": 52,
+       "focus": 93
       },
-      "money": 903484052,
+      "money": 1072661615,
       "pop": 100,
-      "rep": 72,
+      "rep": 61,
       "traits": [
        "god_hands",
        "negotiator",
        "s_one_club",
-       "star_power",
        "support_sense"
       ],
-      "salary": 154000000,
+      "salary": 151000000,
       "benched": false,
       "seasons": [
        [
@@ -902,49 +895,189 @@
        [
         2018,
         8,
-        "8-15",
+        "11-20",
         ""
        ],
        [
         2019,
-        4,
-        "17-16",
+        9,
+        "12-19",
         ""
        ],
        [
         2020,
-        8,
-        "11-18",
+        7,
+        "17-18",
         ""
        ],
        [
         2021,
+        8,
+        "11-17",
+        ""
+       ],
+       [
+        2022,
+        6,
+        "14-11",
+        ""
+       ],
+       [
+        2023,
+        8,
+        "9-16",
+        ""
+       ],
+       [
+        2024,
         5,
         "13-15",
         ""
        ],
        [
+        2025,
+        4,
+        "15-16",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 19
+     },
+     "league": {
+      "players": 159,
+      "teams": 20,
+      "top10": [
+       "P183:75",
+       "P184:74.7",
+       "P200:74.5",
+       "P201:73.9",
+       "P151:73.7",
+       "P226:73.6",
+       "P166:73.6",
+       "P247:72.8",
+       "P148:72.7",
+       "P150:72.4"
+      ],
+      "tier1": [
+       "GEN",
+       "DNS",
+       "NS",
+       "DK",
+       "BRO",
+       "HLE",
+       "DRX",
+       "BFX",
+       "T1",
+       "KT"
+      ],
+      "awards": [],
+      "transfers": 69,
+      "history": "948b81ef"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "45af65e5"
+     },
+     "news": {
+      "articles": 90
+     },
+     "inbox": 121
+    }
+   },
+   {
+    "strict": "6ce13362",
+    "summary": {
+     "year": 2027,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "BFX",
+      "score": 75,
+      "stats": {
+       "accuracy": 46,
+       "laning": 54,
+       "teamfight": 94,
+       "macro": 91,
+       "vision": 90,
+       "shotcall": 90,
+       "pool": 52,
+       "mental": 100,
+       "reaction": 63,
+       "spacing": 89,
+       "adapt": 54,
+       "focus": 94
+      },
+      "money": 1230161607,
+      "pop": 100,
+      "rep": 71,
+      "traits": [
+       "god_hands",
+       "negotiator",
+       "s_one_club",
+       "support_sense"
+      ],
+      "salary": 153000000,
+      "benched": false,
+      "seasons": [
+       [
+        2017,
+        7,
+        "10-18",
+        ""
+       ],
+       [
+        2018,
+        8,
+        "11-20",
+        ""
+       ],
+       [
+        2019,
+        9,
+        "12-19",
+        ""
+       ],
+       [
+        2020,
+        7,
+        "17-18",
+        ""
+       ],
+       [
+        2021,
+        8,
+        "11-17",
+        ""
+       ],
+       [
         2022,
-        10,
-        "6-20",
+        6,
+        "14-11",
         ""
        ],
        [
         2023,
-        4,
-        "12-13",
+        8,
+        "9-16",
         ""
        ],
        [
         2024,
-        6,
-        "14-14",
+        5,
+        "13-15",
         ""
        ],
        [
         2025,
-        5,
-        "16-17",
+        4,
+        "15-16",
+        ""
+       ],
+       [
+        2026,
+        4,
+        "15-16",
         ""
        ]
       ],
@@ -952,185 +1085,44 @@
       "great": 20
      },
      "league": {
-      "players": 157,
+      "players": 156,
       "teams": 20,
       "top10": [
-       "P24:73.5",
-       "P15:73.1",
-       "P65:72",
-       "P49:71.1",
-       "P207:70.7",
-       "P44:70.6",
-       "P218:70.3",
-       "P20:69.2",
-       "P254:68.4",
-       "P2:68"
-      ],
-      "tier1": [
-       "T1",
-       "BRO",
-       "BFX",
-       "DRX",
-       "DNS",
-       "KT",
-       "DK",
-       "GEN",
-       "HLE",
-       "NS"
-      ],
-      "awards": [],
-      "transfers": 68,
-      "history": "2a7d6a06"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "fed1c701"
-     },
-     "news": {
-      "articles": 91
-     },
-     "inbox": 122
-    }
-   },
-   {
-    "strict": "872a46c9",
-    "summary": {
-     "year": 2027,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "BFX",
-      "score": 75.5,
-      "stats": {
-       "accuracy": 43,
-       "laning": 53,
-       "teamfight": 96,
-       "macro": 93,
-       "vision": 93,
-       "shotcall": 93,
-       "pool": 52,
-       "mental": 100,
-       "reaction": 62,
-       "spacing": 89,
-       "adapt": 57,
-       "focus": 94
-      },
-      "money": 1062784028,
-      "pop": 100,
-      "rep": 67,
-      "traits": [
-       "god_hands",
-       "negotiator",
-       "s_one_club",
-       "star_power",
-       "support_sense"
-      ],
-      "salary": 154000000,
-      "benched": false,
-      "seasons": [
-       [
-        2017,
-        7,
-        "10-18",
-        ""
-       ],
-       [
-        2018,
-        8,
-        "8-15",
-        ""
-       ],
-       [
-        2019,
-        4,
-        "17-16",
-        ""
-       ],
-       [
-        2020,
-        8,
-        "11-18",
-        ""
-       ],
-       [
-        2021,
-        5,
-        "13-15",
-        ""
-       ],
-       [
-        2022,
-        10,
-        "6-20",
-        ""
-       ],
-       [
-        2023,
-        4,
-        "12-13",
-        ""
-       ],
-       [
-        2024,
-        6,
-        "14-14",
-        ""
-       ],
-       [
-        2025,
-        5,
-        "16-17",
-        ""
-       ],
-       [
-        2026,
-        5,
-        "16-14",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 23
-     },
-     "league": {
-      "players": 158,
-      "teams": 20,
-      "top10": [
-       "P24:72.5",
-       "P65:71.7",
-       "P218:71.2",
-       "P49:70.9",
-       "P207:70.3",
-       "P15:70.2",
-       "P44:70.2",
-       "P20:70.1",
-       "P273:69.7",
-       "P271:68.6"
+       "P183:76",
+       "P200:75.7",
+       "P184:75.3",
+       "P274:74.9",
+       "P201:74.5",
+       "P226:74.3",
+       "P151:73.4",
+       "P166:73.2",
+       "P248:72.9",
+       "P250:72.6"
       ],
       "tier1": [
        "NS",
-       "HLE",
-       "DK",
-       "BFX",
-       "DRX",
-       "BRO",
-       "T1",
-       "KT",
        "DNS",
-       "GEN"
+       "BFX",
+       "BRO",
+       "GEN",
+       "KT",
+       "HLE",
+       "DRX",
+       "DK",
+       "T1"
       ],
       "awards": [],
-      "transfers": 65,
-      "history": "1fe43cbd"
+      "transfers": 60,
+      "history": "8f514e38"
      },
      "world": {
       "teams": 62,
-      "hash": "eba9a334"
+      "hash": "125e6463"
      },
      "news": {
       "articles": 102
      },
-     "inbox": 121
+     "inbox": 122
     }
    }
   ],
@@ -1140,7 +1132,7 @@
   "name": "B 탑 2012 1부 강팀 무작위 답",
   "snaps": [
    {
-    "strict": "b22530d8",
+    "strict": "fac1f9f1",
     "summary": {
      "year": 2013,
      "week": 1,
@@ -1185,7 +1177,7 @@
       "great": 1
      },
      "league": {
-      "players": 107,
+      "players": 117,
       "teams": 14,
       "top10": [
        "P15:76",
@@ -1197,15 +1189,15 @@
        "P25:71.4",
        "P37:71",
        "P51:67.9",
-       "P19:66.8"
+       "P123:67.7"
       ],
       "tier1": [
        "JAG",
        "KT",
-       "CJB",
        "NJS",
-       "KTA",
        "SKT",
+       "CJB",
+       "KTA",
        "CJF",
        "MP"
       ],
@@ -1220,41 +1212,41 @@
      "news": {
       "articles": 17
      },
-     "inbox": 120
+     "inbox": 121
     }
    },
    {
-    "strict": "33107ae0",
+    "strict": "3b73ea0d",
     "summary": {
      "year": 2014,
      "week": 1,
      "retired": false,
      "me": {
       "team": "JQ",
-      "score": 50.7,
+      "score": 51.2,
       "stats": {
        "accuracy": 28,
        "laning": 40,
-       "teamfight": 71,
-       "macro": 68,
-       "vision": 54,
-       "shotcall": 75,
+       "teamfight": 66,
+       "macro": 69,
+       "vision": 55,
+       "shotcall": 73,
        "pool": 34,
-       "mental": 63,
+       "mental": 68,
        "reaction": 36,
-       "spacing": 56,
+       "spacing": 57,
        "adapt": 29,
-       "focus": 54
+       "focus": 56
       },
       "money": 8399976,
-      "pop": 19,
-      "rep": 6,
+      "pop": 27,
+      "rep": 10,
       "traits": [
        "aggro_instinct",
        "born_leader",
        "fan_service"
       ],
-      "salary": 12000000,
+      "salary": 13000000,
       "benched": false,
       "seasons": [
        [
@@ -1265,8 +1257,8 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ]
       ],
@@ -1274,39 +1266,39 @@
       "great": 3
      },
      "league": {
-      "players": 124,
+      "players": 133,
       "teams": 16,
       "top10": [
-       "P15:76.7",
-       "P43:75.7",
-       "P29:74.1",
-       "P25:72.5",
-       "P37:72.4",
+       "P15:76.5",
+       "P43:75.6",
+       "P29:74.7",
+       "P25:72.7",
+       "P37:72.3",
        "P30:72.2",
-       "P54:71.7",
-       "P51:69",
-       "P19:67.8",
-       "P53:67.4"
+       "P54:72.1",
+       "P123:69.7",
+       "P19:67.5",
+       "P53:66.9"
       ],
       "tier1": [
+       "JAG",
+       "KTA",
+       "CJB",
        "KT",
        "SKT",
-       "JAG",
        "CJF",
-       "CJB",
+       "SSG",
        "NJS",
        "MP",
-       "KTA",
-       "SSG",
        "KB"
       ],
       "awards": [],
       "transfers": 46,
-      "history": "1c199a60"
+      "history": "366ccb07"
      },
      "world": {
       "teams": 46,
-      "hash": "1fc4f901"
+      "hash": "cb685285"
      },
      "news": {
       "articles": 29
@@ -1315,37 +1307,37 @@
     }
    },
    {
-    "strict": "392cd8a0",
+    "strict": "149834ef",
     "summary": {
      "year": 2015,
      "week": 1,
      "retired": false,
      "me": {
       "team": "JQ",
-      "score": 56.9,
+      "score": 57.2,
       "stats": {
        "accuracy": 29,
-       "laning": 43,
-       "teamfight": 76,
-       "macro": 77,
-       "vision": 67,
-       "shotcall": 81,
+       "laning": 41,
+       "teamfight": 78,
+       "macro": 76,
+       "vision": 65,
+       "shotcall": 79,
        "pool": 34,
-       "mental": 74,
+       "mental": 83,
        "reaction": 37,
        "spacing": 66,
        "adapt": 29,
-       "focus": 68
+       "focus": 64
       },
-      "money": 10699964,
-      "pop": 49,
-      "rep": 21,
+      "money": 16099976,
+      "pop": 57,
+      "rep": 1,
       "traits": [
        "aggro_instinct",
        "born_leader",
        "fan_service"
       ],
-      "salary": 30000000,
+      "salary": 44000000,
       "benched": false,
       "seasons": [
        [
@@ -1356,93 +1348,93 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ]
       ],
       "awards": 0,
-      "great": 6
+      "great": 4
      },
      "league": {
-      "players": 127,
+      "players": 133,
       "teams": 16,
       "top10": [
-       "P15:77.3",
-       "P43:76.3",
-       "P29:74.7",
-       "P37:73.8",
-       "P25:73.2",
-       "P54:71.5",
-       "P51:69.5",
-       "P53:68.8",
-       "P19:68.8",
-       "P2:68.2"
+       "P43:76.2",
+       "P29:75.5",
+       "P37:73.7",
+       "P25:73.5",
+       "P54:72",
+       "P123:71.7",
+       "P30:69.8",
+       "P118:68.9",
+       "P19:68.5",
+       "P125:67.8"
       ],
       "tier1": [
-       "SKT",
-       "SSG",
        "SBENU",
-       "KOO",
-       "JAG",
-       "MP",
-       "KB",
-       "CJ",
+       "SKT",
+       "KT",
        "NJE",
-       "KT"
+       "KOO",
+       "MP",
+       "CJ",
+       "SSG",
+       "JQ",
+       "JAG"
       ],
       "awards": [],
-      "transfers": 49,
-      "history": "72e53e65"
+      "transfers": 43,
+      "history": "31903562"
      },
      "world": {
       "teams": 46,
-      "hash": "981e9ace"
+      "hash": "aa70e591"
      },
      "news": {
       "articles": 40
      },
-     "inbox": 121
+     "inbox": 120
     }
    },
    {
-    "strict": "f04969b",
+    "strict": "b43480db",
     "summary": {
      "year": 2016,
      "week": 1,
      "retired": false,
      "me": {
       "team": "JQ",
-      "score": 61.3,
+      "score": 62,
       "stats": {
        "accuracy": 30,
-       "laning": 46,
-       "teamfight": 80,
-       "macro": 82,
-       "vision": 73,
-       "shotcall": 86,
+       "laning": 42,
+       "teamfight": 82,
+       "macro": 81,
+       "vision": 69,
+       "shotcall": 85,
        "pool": 34,
-       "mental": 84,
+       "mental": 100,
        "reaction": 38,
-       "spacing": 75,
+       "spacing": 72,
        "adapt": 29,
-       "focus": 75
+       "focus": 73
       },
-      "money": 32999960,
-      "pop": 81,
-      "rep": 31,
+      "money": 56299984,
+      "pop": 86,
+      "rep": 14,
       "traits": [
        "aggro_instinct",
        "born_leader",
        "fan_service"
       ],
-      "salary": 54000000,
+      "salary": 56000000,
       "benched": false,
       "seasons": [
        [
@@ -1453,99 +1445,99 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ],
        [
         2015,
-        5,
-        "7-8",
+        9,
+        "9-23",
         ""
        ]
       ],
       "awards": 0,
-      "great": 7
+      "great": 5
      },
      "league": {
-      "players": 143,
+      "players": 151,
       "teams": 18,
       "top10": [
-       "P15:77",
        "P43:76.9",
-       "P29:75.2",
-       "P37:74.5",
-       "P25:73.6",
-       "P17:70",
-       "P53:69.8",
-       "P19:69.6",
-       "P51:69.2",
-       "P2:68.9"
+       "P29:75.7",
+       "P25:74.5",
+       "P123:73.2",
+       "P118:70.4",
+       "P54:70.2",
+       "P19:69.2",
+       "P17:69",
+       "P125:69",
+       "P53:68.8"
       ],
       "tier1": [
-       "KT",
-       "SSG",
-       "EVER",
-       "CJ",
-       "KB",
-       "MP",
-       "JAG",
        "NJE",
        "ROX",
-       "SKT"
+       "SKT",
+       "KT",
+       "MP",
+       "EVER",
+       "KB",
+       "CJ",
+       "SSG",
+       "LZ"
       ],
       "awards": [],
-      "transfers": 52,
-      "history": "78944039"
+      "transfers": 58,
+      "history": "cdb0a5e7"
      },
      "world": {
       "teams": 46,
-      "hash": "d06821e6"
+      "hash": "b8535934"
      },
      "news": {
-      "articles": 51
+      "articles": 52
      },
-     "inbox": 121
+     "inbox": 122
     }
    },
    {
-    "strict": "1f927e0f",
+    "strict": "8a19499d",
     "summary": {
      "year": 2017,
      "week": 1,
      "retired": false,
      "me": {
       "team": "JQ",
-      "score": 65.5,
+      "score": 64.2,
       "stats": {
        "accuracy": 31,
-       "laning": 49,
-       "teamfight": 89,
-       "macro": 87,
-       "vision": 81,
-       "shotcall": 89,
+       "laning": 43,
+       "teamfight": 84,
+       "macro": 85,
+       "vision": 72,
+       "shotcall": 90,
        "pool": 34,
-       "mental": 94,
+       "mental": 100,
        "reaction": 39,
        "spacing": 79,
        "adapt": 29,
-       "focus": 79
+       "focus": 77
       },
-      "money": 102319984,
+      "money": 112499980,
       "pop": 97,
-      "rep": 29,
+      "rep": 34,
       "traits": [
        "aggro_instinct",
        "born_leader",
        "fan_service"
       ],
-      "salary": 74000000,
+      "salary": 72000000,
       "benched": false,
       "seasons": [
        [
@@ -1556,66 +1548,66 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ],
        [
         2015,
-        5,
-        "7-8",
+        9,
+        "9-23",
         ""
        ],
        [
         2016,
-        3,
+        4,
         "12-9",
         ""
        ]
       ],
       "awards": 0,
-      "great": 10
+      "great": 9
      },
      "league": {
-      "players": 147,
+      "players": 149,
       "teams": 18,
       "top10": [
-       "P43:78",
-       "P37:75.3",
-       "P25:74.7",
-       "P29:74.5",
-       "P17:71",
-       "P19:70.5",
-       "P46:69.9",
-       "P2:69.5",
-       "P33:69.4",
-       "P53:69.1"
+       "P43:77.4",
+       "P25:75.3",
+       "P29:75.3",
+       "P123:74.6",
+       "P118:71.7",
+       "P17:70.1",
+       "P125:70",
+       "P48:70",
+       "P19:69.7",
+       "P33:69.5"
       ],
       "tier1": [
+       "KB",
+       "KDM",
+       "MVP",
+       "KT",
+       "BBQ",
+       "SKT",
        "SSG",
        "MP",
-       "KDM",
-       "KB",
-       "KT",
-       "MVP",
-       "BBQ",
        "ROX",
-       "JAG",
-       "SKT"
+       "NB"
       ],
       "awards": [],
-      "transfers": 57,
-      "history": "ad6ff6c6"
+      "transfers": 58,
+      "history": "c25d7823"
      },
      "world": {
       "teams": 62,
-      "hash": "f9944bc9"
+      "hash": "ed9e8795"
      },
      "news": {
       "articles": 63
@@ -1624,37 +1616,37 @@
     }
    },
    {
-    "strict": "154b213d",
+    "strict": "8ca385cd",
     "summary": {
      "year": 2018,
      "week": 1,
      "retired": false,
      "me": {
       "team": "JQ",
-      "score": 68.1,
+      "score": 66.9,
       "stats": {
        "accuracy": 32,
-       "laning": 52,
+       "laning": 47,
        "teamfight": 90,
-       "macro": 91,
-       "vision": 85,
-       "shotcall": 91,
+       "macro": 86,
+       "vision": 78,
+       "shotcall": 92,
        "pool": 34,
        "mental": 100,
        "reaction": 40,
-       "spacing": 82,
-       "adapt": 29,
-       "focus": 83
+       "spacing": 85,
+       "adapt": 31,
+       "focus": 81
       },
-      "money": 167919988,
-      "pop": 96,
-      "rep": 25,
+      "money": 176399960,
+      "pop": 99,
+      "rep": 28,
       "traits": [
        "aggro_instinct",
        "born_leader",
        "fan_service"
       ],
-      "salary": 78000000,
+      "salary": 77000000,
       "benched": false,
       "seasons": [
        [
@@ -1665,32 +1657,32 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ],
        [
         2015,
-        5,
-        "7-8",
+        9,
+        "9-23",
         ""
        ],
        [
         2016,
-        3,
+        4,
         "12-9",
         ""
        ],
        [
         2017,
-        7,
-        "7-12",
+        4,
+        "12-9",
         ""
        ]
       ],
@@ -1698,39 +1690,39 @@
       "great": 10
      },
      "league": {
-      "players": 141,
+      "players": 149,
       "teams": 18,
       "top10": [
-       "P43:78.3",
-       "P37:75.9",
-       "P25:75.3",
-       "P29:74.2",
-       "P17:71.7",
-       "P46:70.6",
-       "P2:70.2",
-       "P19:69.9",
-       "P39:69.9",
-       "P1:69.4"
+       "P43:77.9",
+       "P25:75.8",
+       "P123:75.2",
+       "P29:75.1",
+       "P118:72.5",
+       "P125:71.7",
+       "P48:70.8",
+       "P17:70.7",
+       "P46:70.2",
+       "P153:70"
       ],
       "tier1": [
-       "SKT",
-       "MP",
-       "GRF",
-       "KT",
-       "MVP",
-       "KB",
-       "JAG",
-       "HLE",
        "BBQ",
-       "GEN"
+       "MVP",
+       "HLE",
+       "GEN",
+       "NB",
+       "GRF",
+       "MP",
+       "KT",
+       "KB",
+       "SKT"
       ],
       "awards": [],
-      "transfers": 65,
-      "history": "b589a72e"
+      "transfers": 66,
+      "history": "754744e5"
      },
      "world": {
       "teams": 62,
-      "hash": "938b5e14"
+      "hash": "5231a7c1"
      },
      "news": {
       "articles": 74
@@ -1739,31 +1731,31 @@
     }
    },
    {
-    "strict": "87009bc2",
+    "strict": "5be213e0",
     "summary": {
      "year": 2019,
      "week": 1,
      "retired": false,
      "me": {
       "team": "JQ",
-      "score": 69.5,
+      "score": 68.2,
       "stats": {
        "accuracy": 33,
-       "laning": 53,
-       "teamfight": 94,
-       "macro": 92,
-       "vision": 85,
-       "shotcall": 92,
+       "laning": 48,
+       "teamfight": 92,
+       "macro": 86,
+       "vision": 84,
+       "shotcall": 93,
        "pool": 34,
        "mental": 100,
-       "reaction": 41,
-       "spacing": 85,
-       "adapt": 29,
-       "focus": 89
+       "reaction": 38,
+       "spacing": 88,
+       "adapt": 31,
+       "focus": 86
       },
-      "money": 245719988,
-      "pop": 94,
-      "rep": 23,
+      "money": 250099948,
+      "pop": 97,
+      "rep": 37,
       "traits": [
        "aggro_instinct",
        "born_leader",
@@ -1780,111 +1772,111 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ],
        [
         2015,
-        5,
-        "7-8",
+        9,
+        "9-23",
         ""
        ],
        [
         2016,
-        3,
+        4,
         "12-9",
         ""
        ],
        [
         2017,
-        7,
-        "7-12",
+        4,
+        "12-9",
         ""
        ],
        [
         2018,
-        3,
-        "13-8",
+        6,
+        "9-12",
         ""
        ]
       ],
       "awards": 0,
-      "great": 12
+      "great": 11
      },
      "league": {
-      "players": 143,
+      "players": 151,
       "teams": 18,
       "top10": [
-       "P43:77.8",
-       "P37:76.4",
-       "P25:75.3",
-       "P29:73.8",
-       "P17:72.2",
-       "P39:71.3",
-       "P2:71.2",
-       "P1:70.8",
-       "P47:70.3",
-       "P46:70.2"
+       "P43:77.7",
+       "P25:76",
+       "P123:75.9",
+       "P29:74.7",
+       "P118:73.7",
+       "P17:71.8",
+       "P153:71.2",
+       "P116:70.9",
+       "P2:70.7",
+       "P48:70.6"
       ],
       "tier1": [
-       "SB",
-       "SKT",
-       "JAG",
-       "KT",
-       "GRF",
        "GEN",
-       "MP",
+       "SB",
        "HLE",
+       "KT",
+       "SKT",
+       "MP",
        "DWG",
-       "KB"
+       "GRF",
+       "NB",
+       "JAG"
       ],
       "awards": [],
-      "transfers": 71,
-      "history": "6d8ed16d"
+      "transfers": 59,
+      "history": "d58691ff"
      },
      "world": {
       "teams": 62,
-      "hash": "58713f3d"
+      "hash": "5a00f3f5"
      },
      "news": {
-      "articles": 84
+      "articles": 86
      },
-     "inbox": 121
+     "inbox": 122
     }
    },
    {
-    "strict": "37ae3ae2",
+    "strict": "de2e182e",
     "summary": {
      "year": 2020,
      "week": 1,
      "retired": false,
      "me": {
       "team": "JQ",
-      "score": 70.6,
+      "score": 69.6,
       "stats": {
        "accuracy": 34,
-       "laning": 54,
-       "teamfight": 94,
-       "macro": 94,
-       "vision": 89,
-       "shotcall": 93,
-       "pool": 34,
+       "laning": 49,
+       "teamfight": 92,
+       "macro": 89,
+       "vision": 85,
+       "shotcall": 94,
+       "pool": 35,
        "mental": 100,
-       "reaction": 42,
-       "spacing": 87,
-       "adapt": 29,
-       "focus": 91
+       "reaction": 39,
+       "spacing": 90,
+       "adapt": 34,
+       "focus": 89
       },
-      "money": 334751988,
+      "money": 403799948,
       "pop": 99,
-      "rep": 23,
+      "rep": 30,
       "traits": [
        "aggro_instinct",
        "born_leader",
@@ -1901,84 +1893,84 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ],
        [
         2015,
-        5,
-        "7-8",
+        9,
+        "9-23",
         ""
        ],
        [
         2016,
-        3,
+        4,
         "12-9",
         ""
        ],
        [
         2017,
-        7,
-        "7-12",
+        4,
+        "12-9",
         ""
        ],
        [
         2018,
-        3,
-        "13-8",
+        6,
+        "9-12",
         ""
        ],
        [
         2019,
-        4,
-        "11-10",
+        2,
+        "11-5",
         ""
        ]
       ],
       "awards": 0,
-      "great": 14
+      "great": 12
      },
      "league": {
-      "players": 140,
+      "players": 155,
       "teams": 18,
       "top10": [
-       "P43:77.4",
-       "P37:76",
-       "P25:74.9",
-       "P17:72.8",
-       "P1:72",
-       "P39:72",
-       "P2:70.7",
-       "P209:70.6",
-       "P134:69.8",
-       "P47:69.8"
+       "P43:77",
+       "P123:76.6",
+       "P25:75.6",
+       "P118:74.3",
+       "P17:72.6",
+       "P153:72.6",
+       "P208:72.5",
+       "P29:72.3",
+       "P192:71.9",
+       "P116:71.6"
       ],
       "tier1": [
-       "KT",
-       "SB",
-       "GEN",
-       "T1",
-       "HLE",
-       "SP",
-       "MP",
+       "DYN",
        "DWG",
-       "LH",
-       "DYN"
+       "KT",
+       "T1",
+       "NB",
+       "MP",
+       "HLE",
+       "GEN",
+       "SP",
+       "SB"
       ],
       "awards": [],
-      "transfers": 56,
-      "history": "7dd0339d"
+      "transfers": 69,
+      "history": "f3f07125"
      },
      "world": {
       "teams": 62,
-      "hash": "e48d8c01"
+      "hash": "f5d53ca8"
      },
      "news": {
       "articles": 97
@@ -1987,31 +1979,31 @@
     }
    },
    {
-    "strict": "6b842b79",
+    "strict": "5e8cf128",
     "summary": {
      "year": 2021,
      "week": 1,
      "retired": false,
      "me": {
-      "team": "NS",
-      "score": 71.6,
+      "team": "KT",
+      "score": 70.3,
       "stats": {
        "accuracy": 35,
-       "laning": 58,
-       "teamfight": 94,
-       "macro": 94,
-       "vision": 91,
-       "shotcall": 93,
-       "pool": 34,
+       "laning": 50,
+       "teamfight": 93,
+       "macro": 90,
+       "vision": 85,
+       "shotcall": 94,
+       "pool": 35,
        "mental": 100,
-       "reaction": 43,
-       "spacing": 89,
-       "adapt": 29,
-       "focus": 92
+       "reaction": 40,
+       "spacing": 90,
+       "adapt": 34,
+       "focus": 93
       },
-      "money": 408351984,
-      "pop": 93,
-      "rep": 28,
+      "money": 483599944,
+      "pop": 95,
+      "rep": 32,
       "traits": [
        "aggro_instinct",
        "born_leader",
@@ -2028,90 +2020,90 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ],
        [
         2015,
-        5,
-        "7-8",
+        9,
+        "9-23",
         ""
        ],
        [
         2016,
-        3,
+        4,
         "12-9",
         ""
        ],
        [
         2017,
-        7,
-        "7-12",
+        4,
+        "12-9",
         ""
        ],
        [
         2018,
-        3,
-        "13-8",
+        6,
+        "9-12",
         ""
        ],
        [
         2019,
-        4,
-        "11-10",
+        2,
+        "11-5",
         ""
        ],
        [
         2020,
-        4,
-        "10-11",
+        3,
+        "12-9",
         ""
        ]
       ],
       "awards": 0,
-      "great": 17
+      "great": 14
      },
      "league": {
-      "players": 150,
+      "players": 159,
       "teams": 20,
       "top10": [
-       "P43:77",
-       "P37:75.5",
-       "P25:74.7",
-       "P17:72.4",
-       "P209:72.2",
-       "P1:71.6",
-       "P39:71.2",
-       "P2:70.3",
-       "P196:69.8",
-       "P197:69.4"
+       "P43:76.6",
+       "P25:75.3",
+       "P118:75.3",
+       "P153:74.1",
+       "P208:73.7",
+       "P192:73.5",
+       "P246:72.3",
+       "P122:72.3",
+       "P117:72.2",
+       "P17:72.1"
       ],
       "tier1": [
-       "T1",
-       "NS",
-       "LSB",
-       "BRO",
-       "DK",
-       "HLE",
-       "GEN",
        "KT",
+       "BRO",
+       "LSB",
        "DRX",
-       "AF"
+       "GEN",
+       "HLE",
+       "DK",
+       "T1",
+       "AF",
+       "NS"
       ],
       "awards": [],
-      "transfers": 59,
-      "history": "cdbdd20c"
+      "transfers": 77,
+      "history": "e7d2d5d7"
      },
      "world": {
       "teams": 62,
-      "hash": "76800ca3"
+      "hash": "3687c562"
      },
      "news": {
       "articles": 109
@@ -2120,38 +2112,37 @@
     }
    },
    {
-    "strict": "a560d132",
+    "strict": "35535c53",
     "summary": {
      "year": 2022,
      "week": 1,
      "retired": false,
      "me": {
-      "team": "NS",
-      "score": 71.9,
+      "team": "KT",
+      "score": 70.7,
       "stats": {
-       "accuracy": 35,
-       "laning": 59,
-       "teamfight": 95,
-       "macro": 94,
-       "vision": 92,
-       "shotcall": 93,
-       "pool": 34,
+       "accuracy": 34,
+       "laning": 51,
+       "teamfight": 93,
+       "macro": 92,
+       "vision": 89,
+       "shotcall": 94,
+       "pool": 35,
        "mental": 100,
-       "reaction": 41,
+       "reaction": 39,
        "spacing": 90,
-       "adapt": 29,
+       "adapt": 34,
        "focus": 93
       },
-      "money": 537691964,
-      "pop": 100,
+      "money": 695419924,
+      "pop": 98,
       "rep": 37,
       "traits": [
        "aggro_instinct",
-       "big_stage",
        "born_leader",
        "fan_service"
       ],
-      "salary": 102000000,
+      "salary": 100000000,
       "benched": false,
       "seasons": [
        [
@@ -2162,99 +2153,99 @@
        ],
        [
         2013,
-        3,
-        "5-4",
+        6,
+        "4-11",
         ""
        ],
        [
         2014,
-        3,
-        "9-6",
+        1,
+        "13-3",
         ""
        ],
        [
         2015,
-        5,
-        "7-8",
+        9,
+        "9-23",
         ""
        ],
        [
         2016,
-        3,
+        4,
         "12-9",
         ""
        ],
        [
         2017,
-        7,
-        "7-12",
+        4,
+        "12-9",
         ""
        ],
        [
         2018,
-        3,
-        "13-8",
+        6,
+        "9-12",
         ""
        ],
        [
         2019,
-        4,
-        "11-10",
+        2,
+        "11-5",
         ""
        ],
        [
         2020,
-        4,
-        "10-11",
+        3,
+        "12-9",
         ""
        ],
        [
         2021,
         1,
-        "29-6",
-        "리그 우승/월드 우승"
+        "27-6",
+        ""
        ]
       ],
       "awards": 0,
-      "great": 19
+      "great": 15
      },
      "league": {
-      "players": 152,
+      "players": 159,
       "teams": 20,
       "top10": [
-       "P43:75.3",
-       "P209:72.5",
-       "P17:72",
-       "P39:70.8",
-       "P1:70.8",
-       "P196:70.6",
-       "P208:70.2",
-       "P2:69.8",
-       "P197:69.6",
-       "P42:68.9"
+       "P118:75.5",
+       "P153:74.5",
+       "P208:74.5",
+       "P192:74.3",
+       "P211:73.7",
+       "P246:73.6",
+       "P179:73.3",
+       "P244:73.2",
+       "P210:73.1",
+       "P191:72.7"
       ],
       "tier1": [
-       "T1",
-       "KDF",
-       "HLE",
-       "BRO",
-       "GEN",
-       "NS",
-       "LSB",
-       "KT",
        "DRX",
-       "DK"
+       "KT",
+       "LSB",
+       "GEN",
+       "T1",
+       "DK",
+       "NS",
+       "HLE",
+       "KDF",
+       "BRO"
       ],
       "awards": [],
-      "transfers": 73,
-      "history": "6a1f6e80"
+      "transfers": 69,
+      "history": "eed28b21"
      },
      "world": {
       "teams": 62,
-      "hash": "d10beaaa"
+      "hash": "ae66a885"
      },
      "news": {
-      "articles": 116
+      "articles": 125
      },
      "inbox": 121
     }
@@ -2266,7 +2257,7 @@
   "name": "C 원딜 2022 2부",
   "snaps": [
    {
-    "strict": "73b48317",
+    "strict": "c34682a9",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -2311,7 +2302,7 @@
       "great": 1
      },
      "league": {
-      "players": 146,
+      "players": 148,
       "teams": 20,
       "top10": [
        "P26:73.2",
@@ -2352,31 +2343,31 @@
     }
    },
    {
-    "strict": "4d338425",
+    "strict": "13bc7653",
     "summary": {
      "year": 2024,
      "week": 1,
      "retired": false,
      "me": {
       "team": "GEN",
-      "score": 67.7,
+      "score": 67.8,
       "stats": {
        "accuracy": 65,
        "laning": 57,
-       "teamfight": 78,
-       "macro": 80,
-       "vision": 72,
+       "teamfight": 75,
+       "macro": 77,
+       "vision": 75,
        "shotcall": 78,
        "pool": 50,
-       "mental": 74,
-       "reaction": 52,
-       "spacing": 81,
+       "mental": 75,
+       "reaction": 53,
+       "spacing": 80,
        "adapt": 46,
-       "focus": 74
+       "focus": 78
       },
-      "money": 84899984,
+      "money": 83599984,
       "pop": 98,
-      "rep": 24,
+      "rep": 22,
       "traits": [
        "battle_sense",
        "genius",
@@ -2393,87 +2384,87 @@
        ],
        [
         2023,
-        7,
-        "22-5",
+        5,
+        "25-2",
         ""
        ]
       ],
       "awards": 1,
-      "great": 5
+      "great": 4
      },
      "league": {
-      "players": 150,
+      "players": 153,
       "teams": 20,
       "top10": [
-       "P26:73.9",
-       "P31:73.3",
-       "P54:73.3",
-       "P9:72.1",
-       "P10:71.9",
-       "P36:71.9",
-       "P45:71.5",
-       "P5:69",
-       "P37:68.9",
-       "P38:68.5"
+       "P26:73.5",
+       "P31:73.5",
+       "P54:72.7",
+       "P9:71.6",
+       "P10:71.5",
+       "P45:71.3",
+       "P37:69",
+       "P5:68.8",
+       "P53:68.8",
+       "P38:68.6"
       ],
       "tier1": [
        "GEN",
+       "HLE",
        "KDF",
+       "DK",
        "FOX",
-       "T1",
+       "BRO",
        "NS",
        "DRX",
-       "BRO",
-       "DK",
-       "KT",
-       "HLE"
+       "T1",
+       "KT"
       ],
       "awards": [],
-      "transfers": 53,
-      "history": "1ff6bcd3"
+      "transfers": 56,
+      "history": "1357c4ea"
      },
      "world": {
       "teams": 62,
-      "hash": "792d2da6"
+      "hash": "dc752c8d"
      },
      "news": {
       "articles": 17
      },
-     "inbox": 121
+     "inbox": 122
     }
    },
    {
-    "strict": "84300418",
+    "strict": "b397f753",
     "summary": {
      "year": 2025,
      "week": 1,
      "retired": false,
      "me": {
       "team": "GEN",
-      "score": 72.8,
+      "score": 72.9,
       "stats": {
        "accuracy": 66,
        "laning": 58,
-       "teamfight": 88,
-       "macro": 85,
-       "vision": 78,
-       "shotcall": 87,
-       "pool": 51,
-       "mental": 88,
-       "reaction": 53,
-       "spacing": 86,
-       "adapt": 47,
-       "focus": 84
+       "teamfight": 83,
+       "macro": 84,
+       "vision": 81,
+       "shotcall": 85,
+       "pool": 50,
+       "mental": 92,
+       "reaction": 54,
+       "spacing": 85,
+       "adapt": 48,
+       "focus": 86
       },
-      "money": 193809968,
-      "pop": 100,
-      "rep": 34,
+      "money": 200469968,
+      "pop": 96,
+      "rep": 29,
       "traits": [
        "battle_sense",
        "genius",
        "macro_mind"
       ],
-      "salary": 104000000,
+      "salary": 102000000,
       "benched": false,
       "seasons": [
        [
@@ -2484,14 +2475,14 @@
        ],
        [
         2023,
-        7,
-        "22-5",
+        5,
+        "25-2",
         ""
        ],
        [
         2024,
         2,
-        "23-12",
+        "22-14",
         ""
        ]
       ],
@@ -2499,78 +2490,78 @@
       "great": 6
      },
      "league": {
-      "players": 150,
+      "players": 157,
       "teams": 20,
       "top10": [
-       "P54:75",
-       "P26:74.6",
-       "P31:74.5",
-       "P45:73",
-       "P9:72.9",
-       "P10:72.6",
-       "P37:70.3",
-       "P5:70",
-       "P36:69.7",
-       "P38:69.3"
+       "P31:74.9",
+       "P54:74.6",
+       "P26:74.3",
+       "P45:72.5",
+       "P10:72.4",
+       "P9:72.2",
+       "P37:70.1",
+       "P5:69.8",
+       "P38:69.6",
+       "P53:69.5"
       ],
       "tier1": [
-       "NS",
+       "BFX",
+       "DK",
        "GEN",
        "T1",
-       "BFX",
+       "NS",
+       "HLE",
        "KT",
-       "BRO",
        "DRX",
-       "DK",
-       "DNF",
-       "HLE"
+       "BRO",
+       "DNF"
       ],
       "awards": [],
-      "transfers": 57,
-      "history": "f732d431"
+      "transfers": 60,
+      "history": "d06351cc"
      },
      "world": {
       "teams": 62,
-      "hash": "2223cefb"
+      "hash": "5fa65936"
      },
      "news": {
-      "articles": 29
+      "articles": 30
      },
      "inbox": 120
     }
    },
    {
-    "strict": "be298838",
+    "strict": "17ca1f37",
     "summary": {
      "year": 2026,
      "week": 1,
      "retired": false,
      "me": {
       "team": "GEN",
-      "score": 76.3,
+      "score": 75.5,
       "stats": {
        "accuracy": 67,
-       "laning": 59,
-       "teamfight": 94,
-       "macro": 88,
-       "vision": 84,
-       "shotcall": 89,
-       "pool": 51,
+       "laning": 60,
+       "teamfight": 88,
+       "macro": 86,
+       "vision": 85,
+       "shotcall": 86,
+       "pool": 50,
        "mental": 100,
-       "reaction": 54,
-       "spacing": 92,
-       "adapt": 47,
-       "focus": 88
+       "reaction": 55,
+       "spacing": 89,
+       "adapt": 48,
+       "focus": 90
       },
-      "money": 327969968,
-      "pop": 99,
-      "rep": 53,
+      "money": 293669944,
+      "pop": 98,
+      "rep": 57,
       "traits": [
        "battle_sense",
        "genius",
        "macro_mind"
       ],
-      "salary": 111000000,
+      "salary": 110000000,
       "benched": false,
       "seasons": [
        [
@@ -2581,20 +2572,20 @@
        ],
        [
         2023,
-        7,
-        "22-5",
+        5,
+        "25-2",
         ""
        ],
        [
         2024,
         2,
-        "23-12",
+        "22-14",
         ""
        ],
        [
         2025,
         3,
-        "29-18",
+        "19-17",
         ""
        ]
       ],
@@ -2602,78 +2593,78 @@
       "great": 8
      },
      "league": {
-      "players": 150,
+      "players": 157,
       "teams": 20,
       "top10": [
-       "P54:75.8",
-       "P31:75.7",
-       "P26:74.2",
-       "P45:73.6",
+       "P31:75.9",
+       "P54:75.5",
+       "P26:74",
+       "P45:73.3",
        "P10:73.2",
-       "P9:72.7",
        "P37:71",
-       "P5:70.8",
-       "P50:70.3",
-       "P38:70"
+       "P53:70.7",
+       "P5:70.5",
+       "P38:70.5",
+       "P50:70.1"
       ],
       "tier1": [
-       "NS",
-       "DK",
-       "GEN",
        "T1",
+       "BFX",
+       "GEN",
+       "DK",
+       "NS",
+       "DNS",
        "KT",
-       "DRX",
        "BRO",
        "HLE",
-       "DNS",
-       "BFX"
+       "DRX"
       ],
       "awards": [],
-      "transfers": 69,
-      "history": "752e7c4c"
+      "transfers": 72,
+      "history": "f6e4fd04"
      },
      "world": {
       "teams": 62,
-      "hash": "4779984b"
+      "hash": "c89e8387"
      },
      "news": {
       "articles": 47
      },
-     "inbox": 121
+     "inbox": 122
     }
    },
    {
-    "strict": "48cfd2af",
+    "strict": "cf748d3f",
     "summary": {
      "year": 2027,
      "week": 1,
      "retired": false,
      "me": {
       "team": "GEN",
-      "score": 77.2,
+      "score": 77.5,
       "stats": {
-       "accuracy": 67,
-       "laning": 59,
-       "teamfight": 95,
-       "macro": 90,
-       "vision": 87,
-       "shotcall": 92,
-       "pool": 51,
+       "accuracy": 68,
+       "laning": 61,
+       "teamfight": 93,
+       "macro": 88,
+       "vision": 88,
+       "shotcall": 90,
+       "pool": 50,
        "mental": 100,
-       "reaction": 54,
+       "reaction": 56,
        "spacing": 93,
-       "adapt": 47,
-       "focus": 89
+       "adapt": 50,
+       "focus": 90
       },
-      "money": 502549948,
-      "pop": 94,
-      "rep": 64,
+      "money": 424779964,
+      "pop": 96,
+      "rep": 74,
       "traits": [
        "battle_sense",
        "genius",
        "macro_mind"
       ],
-      "salary": 112000000,
+      "salary": 114000000,
       "benched": false,
       "seasons": [
        [
@@ -2684,214 +2675,99 @@
        ],
        [
         2023,
-        7,
-        "22-5",
+        5,
+        "25-2",
         ""
        ],
        [
         2024,
         2,
-        "23-12",
+        "22-14",
         ""
        ],
        [
         2025,
         3,
-        "29-18",
+        "19-17",
         ""
        ],
        [
         2026,
-        10,
-        "9-23",
-        ""
+        4,
+        "17-20",
+        "리그 우승"
        ]
       ],
-      "awards": 1,
-      "great": 12
+      "awards": 2,
+      "great": 13
      },
      "league": {
-      "players": 150,
+      "players": 153,
       "teams": 20,
       "top10": [
-       "P54:76.7",
        "P31:76.3",
-       "P45:74.3",
-       "P10:73.9",
-       "P26:73.7",
-       "P9:72.3",
+       "P54:76.3",
+       "P10:74",
+       "P45:73.9",
+       "P26:73.3",
+       "P53:71.7",
        "P5:71.7",
-       "P50:70.8",
-       "P37:70.8",
-       "P30:70.2"
+       "P155:71.6",
+       "P15:70.8",
+       "P50:70.8"
       ],
       "tier1": [
-       "GEN",
-       "HLE",
-       "NS",
-       "DK",
-       "DRX",
-       "T1",
-       "BRO",
-       "KT",
        "BFX",
-       "DNS"
+       "T1",
+       "NS",
+       "DNS",
+       "HLE",
+       "GEN",
+       "DK",
+       "KT",
+       "BRO",
+       "DRX"
       ],
       "awards": [],
-      "transfers": 63,
-      "history": "7312fbc8"
+      "transfers": 62,
+      "history": "fa51cbd0"
      },
      "world": {
       "teams": 62,
-      "hash": "d4115e1a"
+      "hash": "eaf0832b"
      },
      "news": {
-      "articles": 63
+      "articles": 65
      },
      "inbox": 122
     }
    },
    {
-    "strict": "9d01ad7a",
+    "strict": "50e3825f",
     "summary": {
      "year": 2028,
      "week": 1,
      "retired": false,
      "me": {
       "team": "GEN",
-      "score": 78,
-      "stats": {
-       "accuracy": 68,
-       "laning": 60,
-       "teamfight": 95,
-       "macro": 91,
-       "vision": 88,
-       "shotcall": 92,
-       "pool": 51,
-       "mental": 100,
-       "reaction": 55,
-       "spacing": 94,
-       "adapt": 47,
-       "focus": 92
-      },
-      "money": 626809940,
-      "pop": 99,
-      "rep": 61,
-      "traits": [
-       "battle_sense",
-       "genius",
-       "macro_mind"
-      ],
-      "salary": 115000000,
-      "benched": false,
-      "seasons": [
-       [
-        2022,
-        9,
-        "8-15",
-        ""
-       ],
-       [
-        2023,
-        7,
-        "22-5",
-        ""
-       ],
-       [
-        2024,
-        2,
-        "23-12",
-        ""
-       ],
-       [
-        2025,
-        3,
-        "29-18",
-        ""
-       ],
-       [
-        2026,
-        10,
-        "9-23",
-        ""
-       ],
-       [
-        2027,
-        6,
-        "18-20",
-        ""
-       ]
-      ],
-      "awards": 1,
-      "great": 13
-     },
-     "league": {
-      "players": 150,
-      "teams": 20,
-      "top10": [
-       "P31:77",
-       "P45:74.9",
-       "P10:74.4",
-       "P9:72.4",
-       "P50:72",
-       "P5:71.9",
-       "P216:71.4",
-       "P42:71.3",
-       "P40:70.8",
-       "P37:70.8"
-      ],
-      "tier1": [
-       "GEN",
-       "DNS",
-       "BFX",
-       "DK",
-       "HLE",
-       "KT",
-       "NS",
-       "BRO",
-       "DRX",
-       "T1"
-      ],
-      "awards": [],
-      "transfers": 69,
-      "history": "7e00dc8d"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "71f1737b"
-     },
-     "news": {
-      "articles": 78
-     },
-     "inbox": 121
-    }
-   },
-   {
-    "strict": "c7a4cd1",
-    "summary": {
-     "year": 2029,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "GEN",
-      "score": 78.7,
+      "score": 78.4,
       "stats": {
        "accuracy": 69,
-       "laning": 61,
-       "teamfight": 96,
-       "macro": 92,
+       "laning": 62,
+       "teamfight": 93,
+       "macro": 90,
        "vision": 90,
-       "shotcall": 92,
-       "pool": 51,
+       "shotcall": 91,
+       "pool": 50,
        "mental": 100,
-       "reaction": 56,
-       "spacing": 94,
-       "adapt": 47,
+       "reaction": 57,
+       "spacing": 93,
+       "adapt": 50,
        "focus": 93
       },
-      "money": 733779916,
+      "money": 599175980,
       "pop": 99,
-      "rep": 65,
+      "rep": 71,
       "traits": [
        "battle_sense",
        "genius",
@@ -2908,111 +2784,105 @@
        ],
        [
         2023,
-        7,
-        "22-5",
+        5,
+        "25-2",
         ""
        ],
        [
         2024,
         2,
-        "23-12",
+        "22-14",
         ""
        ],
        [
         2025,
         3,
-        "29-18",
+        "19-17",
         ""
        ],
        [
         2026,
-        10,
-        "9-23",
-        ""
+        4,
+        "17-20",
+        "리그 우승"
        ],
        [
         2027,
-        6,
-        "18-20",
-        ""
-       ],
-       [
-        2028,
-        6,
-        "18-17",
-        ""
+        4,
+        "33-15",
+        "리그 우승"
        ]
       ],
-      "awards": 1,
-      "great": 18
+      "awards": 2,
+      "great": 15
      },
      "league": {
-      "players": 151,
+      "players": 156,
       "teams": 20,
       "top10": [
-       "P31:77.4",
-       "P45:75.2",
-       "P10:74",
-       "P42:71.9",
-       "P40:71.7",
-       "P16:71.5",
-       "P5:71.3",
-       "P66:71.1",
-       "P217:71",
-       "P216:71"
+       "P31:77.2",
+       "P54:77.2",
+       "P10:74.8",
+       "P45:74.6",
+       "P26:73",
+       "P155:72.2",
+       "P5:71.9",
+       "P50:71.7",
+       "P195:71.6",
+       "P15:71.5"
       ],
       "tier1": [
-       "BRO",
-       "DNS",
-       "GEN",
+       "DRX",
        "NS",
        "T1",
+       "GEN",
        "HLE",
-       "DRX",
        "DK",
+       "BFX",
+       "DNS",
        "KT",
-       "BFX"
+       "BRO"
       ],
       "awards": [],
-      "transfers": 78,
-      "history": "cbb6c3fd"
+      "transfers": 73,
+      "history": "8398f7f5"
      },
      "world": {
       "teams": 62,
-      "hash": "ddcdb93e"
+      "hash": "ceb0173f"
      },
      "news": {
-      "articles": 97
+      "articles": 88
      },
-     "inbox": 122
+     "inbox": 121
     }
    },
    {
-    "strict": "8d604076",
+    "strict": "e9dcaad6",
     "summary": {
-     "year": 2030,
+     "year": 2029,
      "week": 1,
      "retired": false,
      "me": {
       "team": "GEN",
-      "score": 79,
+      "score": 79.2,
       "stats": {
-       "accuracy": 69,
-       "laning": 61,
-       "teamfight": 96,
-       "macro": 92,
-       "vision": 93,
-       "shotcall": 92,
+       "accuracy": 70,
+       "laning": 63,
+       "teamfight": 94,
+       "macro": 90,
+       "vision": 91,
+       "shotcall": 91,
        "pool": 51,
        "mental": 100,
-       "reaction": 56,
-       "spacing": 95,
-       "adapt": 47,
-       "focus": 93
+       "reaction": 58,
+       "spacing": 94,
+       "adapt": 51,
+       "focus": 94
       },
-      "money": 868749916,
+      "money": 728645980,
       "pop": 99,
-      "rep": 74,
+      "rep": 69,
       "traits": [
        "battle_sense",
        "genius",
@@ -3029,95 +2899,350 @@
        ],
        [
         2023,
-        7,
-        "22-5",
+        5,
+        "25-2",
         ""
        ],
        [
         2024,
         2,
-        "23-12",
+        "22-14",
         ""
        ],
        [
         2025,
         3,
-        "29-18",
+        "19-17",
         ""
        ],
        [
         2026,
-        10,
-        "9-23",
-        ""
+        4,
+        "17-20",
+        "리그 우승"
        ],
        [
         2027,
-        6,
-        "18-20",
-        ""
+        4,
+        "33-15",
+        "리그 우승"
        ],
        [
         2028,
-        6,
-        "18-17",
-        ""
-       ],
-       [
-        2029,
-        9,
-        "14-19",
+        7,
+        "17-17",
         ""
        ]
       ],
       "awards": 2,
-      "great": 22
+      "great": 16
      },
      "league": {
-      "players": 155,
+      "players": 157,
       "teams": 20,
       "top10": [
-       "P31:78.4",
-       "P45:74.5",
-       "P10:73.2",
+       "P54:77.8",
+       "P31:77.6",
+       "P45:74.8",
+       "P10:74.7",
+       "P155:72.9",
+       "P50:72.6",
+       "P195:72.3",
        "P40:72",
-       "P186:71.6",
-       "P42:71.5",
-       "P200:71.4",
-       "P16:71.2",
-       "P5:70.8",
-       "P66:70.5"
+       "P5:71.7",
+       "P165:71.6"
       ],
       "tier1": [
-       "DNS",
-       "GEN",
        "DRX",
-       "BRO",
-       "BFX",
+       "GEN",
        "T1",
-       "DK",
+       "BFX",
+       "BRO",
+       "HLE",
+       "DNS",
        "KT",
        "NS",
-       "HLE"
+       "DK"
       ],
       "awards": [],
-      "transfers": 70,
-      "history": "6b73f2f8"
+      "transfers": 59,
+      "history": "490a268"
      },
      "world": {
       "teams": 62,
-      "hash": "f9e11451"
+      "hash": "42e16a4e"
      },
      "news": {
-      "articles": 113
+      "articles": 109
+     },
+     "inbox": 120
+    }
+   },
+   {
+    "strict": "bce25cac",
+    "summary": {
+     "year": 2030,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "GEN",
+      "score": 79.7,
+      "stats": {
+       "accuracy": 71,
+       "laning": 64,
+       "teamfight": 94,
+       "macro": 90,
+       "vision": 92,
+       "shotcall": 93,
+       "pool": 51,
+       "mental": 100,
+       "reaction": 59,
+       "spacing": 94,
+       "adapt": 51,
+       "focus": 94
+      },
+      "money": 857185992,
+      "pop": 100,
+      "rep": 66,
+      "traits": [
+       "battle_sense",
+       "genius",
+       "macro_mind"
+      ],
+      "salary": 119000000,
+      "benched": false,
+      "seasons": [
+       [
+        2022,
+        9,
+        "8-15",
+        ""
+       ],
+       [
+        2023,
+        5,
+        "25-2",
+        ""
+       ],
+       [
+        2024,
+        2,
+        "22-14",
+        ""
+       ],
+       [
+        2025,
+        3,
+        "19-17",
+        ""
+       ],
+       [
+        2026,
+        4,
+        "17-20",
+        "리그 우승"
+       ],
+       [
+        2027,
+        4,
+        "33-15",
+        "리그 우승"
+       ],
+       [
+        2028,
+        7,
+        "17-17",
+        ""
+       ],
+       [
+        2029,
+        6,
+        "21-15",
+        ""
+       ]
+      ],
+      "awards": 4,
+      "great": 20
+     },
+     "league": {
+      "players": 156,
+      "teams": 20,
+      "top10": [
+       "P31:78.2",
+       "P54:77.2",
+       "P10:74.5",
+       "P45:74.4",
+       "P155:73.5",
+       "P40:72.8",
+       "P165:72.7",
+       "P50:72.3",
+       "P195:71.7",
+       "P197:71.7"
+      ],
+      "tier1": [
+       "GEN",
+       "HLE",
+       "DRX",
+       "DNS",
+       "BFX",
+       "NS",
+       "DK",
+       "T1",
+       "BRO",
+       "KT"
+      ],
+      "awards": [],
+      "transfers": 67,
+      "history": "84b6bad5"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "4319691f"
+     },
+     "news": {
+      "articles": 125
      },
      "inbox": 121
     }
    },
    {
-    "strict": "ba1d08d0",
+    "strict": "df7e1a3",
     "summary": {
      "year": 2031,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "GEN",
+      "score": 80.2,
+      "stats": {
+       "accuracy": 72,
+       "laning": 65,
+       "teamfight": 94,
+       "macro": 91,
+       "vision": 92,
+       "shotcall": 94,
+       "pool": 51,
+       "mental": 100,
+       "reaction": 60,
+       "spacing": 94,
+       "adapt": 51,
+       "focus": 95
+      },
+      "money": 1032586016,
+      "pop": 100,
+      "rep": 84,
+      "traits": [
+       "battle_sense",
+       "genius",
+       "macro_mind",
+       "s_one_club"
+      ],
+      "salary": 155000000,
+      "benched": false,
+      "seasons": [
+       [
+        2022,
+        9,
+        "8-15",
+        ""
+       ],
+       [
+        2023,
+        5,
+        "25-2",
+        ""
+       ],
+       [
+        2024,
+        2,
+        "22-14",
+        ""
+       ],
+       [
+        2025,
+        3,
+        "19-17",
+        ""
+       ],
+       [
+        2026,
+        4,
+        "17-20",
+        "리그 우승"
+       ],
+       [
+        2027,
+        4,
+        "33-15",
+        "리그 우승"
+       ],
+       [
+        2028,
+        7,
+        "17-17",
+        ""
+       ],
+       [
+        2029,
+        6,
+        "21-15",
+        ""
+       ],
+       [
+        2030,
+        2,
+        "31-13",
+        "MSI 우승/리그 우승/월드 우승"
+       ]
+      ],
+      "awards": 6,
+      "great": 24
+     },
+     "league": {
+      "players": 158,
+      "teams": 20,
+      "top10": [
+       "P31:78.1",
+       "P54:76.9",
+       "P155:74.7",
+       "P45:74",
+       "P40:73.1",
+       "P209:72.8",
+       "P182:72.7",
+       "P166:72.5",
+       "P197:72.2",
+       "P226:72.2"
+      ],
+      "tier1": [
+       "DNS",
+       "DRX",
+       "BFX",
+       "GEN",
+       "NS",
+       "DK",
+       "BRO",
+       "HLE",
+       "KT",
+       "T1"
+      ],
+      "awards": [],
+      "transfers": 62,
+      "history": "399917dc"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "258221f6"
+     },
+     "news": {
+      "articles": 152
+     },
+     "inbox": 122
+    }
+   },
+   {
+    "strict": "15e69a1f",
+    "summary": {
+     "year": 2032,
      "week": 1,
      "retired": false,
      "me": {
@@ -3125,19 +3250,19 @@
       "score": 79.8,
       "stats": {
        "accuracy": 70,
-       "laning": 62,
-       "teamfight": 98,
-       "macro": 92,
+       "laning": 65,
+       "teamfight": 95,
+       "macro": 91,
        "vision": 93,
-       "shotcall": 92,
+       "shotcall": 94,
        "pool": 51,
        "mental": 100,
        "reaction": 57,
-       "spacing": 96,
-       "adapt": 49,
+       "spacing": 94,
+       "adapt": 51,
        "focus": 95
       },
-      "money": 1028029928,
+      "money": 1203216004,
       "pop": 100,
       "rep": 75,
       "traits": [
@@ -3157,235 +3282,101 @@
        ],
        [
         2023,
-        7,
-        "22-5",
+        5,
+        "25-2",
         ""
        ],
        [
         2024,
         2,
-        "23-12",
+        "22-14",
         ""
        ],
        [
         2025,
         3,
-        "29-18",
+        "19-17",
         ""
        ],
        [
         2026,
-        10,
-        "9-23",
-        ""
+        4,
+        "17-20",
+        "리그 우승"
        ],
        [
         2027,
-        6,
-        "18-20",
-        ""
+        4,
+        "33-15",
+        "리그 우승"
        ],
        [
         2028,
-        6,
-        "18-17",
-        ""
-       ],
-       [
-        2029,
-        9,
-        "14-19",
-        ""
-       ],
-       [
-        2030,
-        1,
-        "28-15",
-        ""
-       ]
-      ],
-      "awards": 2,
-      "great": 23
-     },
-     "league": {
-      "players": 154,
-      "teams": 20,
-      "top10": [
-       "P31:78.1",
-       "P45:74.4",
-       "P271:72.5",
-       "P10:72.4",
-       "P40:71.8",
-       "P16:71.4",
-       "P42:71.2",
-       "P11:70.3",
-       "P66:70.1",
-       "P147:70.1"
-      ],
-      "tier1": [
-       "DNS",
-       "GEN",
-       "HLE",
-       "BFX",
-       "NS",
-       "DRX",
-       "BRO",
-       "KT",
-       "DK",
-       "T1"
-      ],
-      "awards": [],
-      "transfers": 69,
-      "history": "a920c281"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "4bb3277"
-     },
-     "news": {
-      "articles": 134
-     },
-     "inbox": 121
-    }
-   },
-   {
-    "strict": "4ba9dcc6",
-    "summary": {
-     "year": 2032,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "GEN",
-      "score": 79.8,
-      "stats": {
-       "accuracy": 68,
-       "laning": 63,
-       "teamfight": 98,
-       "macro": 92,
-       "vision": 93,
-       "shotcall": 92,
-       "pool": 51,
-       "mental": 100,
-       "reaction": 56,
-       "spacing": 96,
-       "adapt": 51,
-       "focus": 96
-      },
-      "money": 1232939904,
-      "pop": 98,
-      "rep": 77,
-      "traits": [
-       "battle_sense",
-       "genius",
-       "macro_mind",
-       "s_one_club"
-      ],
-      "salary": 153000000,
-      "benched": false,
-      "seasons": [
-       [
-        2022,
-        9,
-        "8-15",
-        ""
-       ],
-       [
-        2023,
         7,
-        "22-5",
-        ""
-       ],
-       [
-        2024,
-        2,
-        "23-12",
-        ""
-       ],
-       [
-        2025,
-        3,
-        "29-18",
-        ""
-       ],
-       [
-        2026,
-        10,
-        "9-23",
-        ""
-       ],
-       [
-        2027,
-        6,
-        "18-20",
-        ""
-       ],
-       [
-        2028,
-        6,
-        "18-17",
+        "17-17",
         ""
        ],
        [
         2029,
-        9,
-        "14-19",
+        6,
+        "21-15",
         ""
        ],
        [
         2030,
-        1,
-        "28-15",
-        ""
+        2,
+        "31-13",
+        "MSI 우승/리그 우승/월드 우승"
        ],
        [
         2031,
-        2,
-        "32-12",
+        4,
+        "21-20",
         ""
        ]
       ],
-      "awards": 3,
-      "great": 26
+      "awards": 6,
+      "great": 30
      },
      "league": {
-      "players": 154,
+      "players": 158,
       "teams": 20,
       "top10": [
-       "P31:77.3",
-       "P45:73.8",
-       "P271:73.3",
-       "P16:71.8",
-       "P285:71.3",
-       "P40:71",
-       "P147:70.9",
-       "P42:70.8",
-       "P10:70.5",
-       "P66:69.6"
+       "P31:77.9",
+       "P54:76.6",
+       "P155:74.3",
+       "P209:73.6",
+       "P45:73.5",
+       "P197:73",
+       "P226:73",
+       "P182:72.7",
+       "P210:72.7",
+       "P183:72.2"
       ],
       "tier1": [
-       "GEN",
-       "HLE",
        "BFX",
-       "DRX",
+       "DNS",
        "T1",
-       "BRO",
-       "NS",
-       "KT",
+       "GEN",
        "DK",
-       "DNS"
+       "DRX",
+       "BRO",
+       "HLE",
+       "NS",
+       "KT"
       ],
       "awards": [],
-      "transfers": 63,
-      "history": "b8243970"
+      "transfers": 76,
+      "history": "b036304"
      },
      "world": {
       "teams": 62,
-      "hash": "f33c9f63"
+      "hash": "7f847b30"
      },
      "news": {
-      "articles": 151
+      "articles": 160
      },
-     "inbox": 121
+     "inbox": 122
     }
    }
   ],
@@ -3395,7 +3386,7 @@
   "name": "D 정글 2017 제안 수락",
   "snaps": [
    {
-    "strict": "5ac15a39",
+    "strict": "810af2cb",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -3440,7 +3431,7 @@
       "great": 1
      },
      "league": {
-      "players": 134,
+      "players": 140,
       "teams": 18,
       "top10": [
        "P45:73.1",
@@ -3456,12 +3447,12 @@
       ],
       "tier1": [
        "BBQ",
-       "GEN",
        "SKT",
+       "GEN",
        "JAG",
+       "HLE",
        "GRF",
        "AF",
-       "HLE",
        "KT",
        "MVP",
        "KZ"
@@ -3481,37 +3472,38 @@
     }
    },
    {
-    "strict": "c7194dbc",
+    "strict": "5b93b1fd",
     "summary": {
      "year": 2019,
      "week": 1,
      "retired": false,
      "me": {
       "team": "SB",
-      "score": 62,
+      "score": 61.4,
       "stats": {
        "accuracy": 46,
-       "laning": 49,
-       "teamfight": 77,
-       "macro": 81,
-       "vision": 78,
-       "shotcall": 70,
-       "pool": 41,
+       "laning": 47,
+       "teamfight": 74,
+       "macro": 76,
+       "vision": 76,
+       "shotcall": 73,
+       "pool": 42,
        "mental": 66,
-       "reaction": 47,
-       "spacing": 64,
-       "adapt": 38,
-       "focus": 69
+       "reaction": 46,
+       "spacing": 71,
+       "adapt": 37,
+       "focus": 68
       },
-      "money": 39099996,
-      "pop": 53,
-      "rep": 5,
+      "money": 38899996,
+      "pop": 39,
+      "rep": 2,
       "traits": [
        "battle_sense",
+       "glass_mental",
        "iron_body",
        "ladder_addict"
       ],
-      "salary": 65000000,
+      "salary": 58000000,
       "benched": false,
       "seasons": [
        [
@@ -3523,47 +3515,47 @@
        [
         2018,
         9,
-        "12-20",
+        "7-25",
         ""
        ]
       ],
       "awards": 0,
-      "great": 6
+      "great": 3
      },
      "league": {
-      "players": 137,
+      "players": 140,
       "teams": 18,
       "top10": [
-       "P40:72.4",
-       "P32:71",
-       "P64:70.7",
-       "P37:69.5",
-       "P44:68.8",
-       "P11:68.7",
-       "P17:68.5",
-       "P22:68.5",
+       "P45:72.8",
+       "P40:72",
+       "P64:71.1",
+       "P32:70.6",
+       "P44:69.4",
+       "P11:68.6",
+       "P22:68.6",
+       "P17:68.4",
        "P3:67.9",
-       "P19:67.8"
+       "P52:67.9"
       ],
       "tier1": [
-       "DWG",
-       "HLE",
-       "JAG",
        "GRF",
-       "AF",
-       "KZ",
-       "SB",
-       "KT",
+       "JAG",
        "SKT",
-       "GEN"
+       "AF",
+       "HLE",
+       "DWG",
+       "GEN",
+       "KT",
+       "SB",
+       "GY"
       ],
       "awards": [],
-      "transfers": 44,
-      "history": "623d7ba7"
+      "transfers": 47,
+      "history": "4053395c"
      },
      "world": {
       "teams": 62,
-      "hash": "a1de93cb"
+      "hash": "f8b40590"
      },
      "news": {
       "articles": 23
@@ -3572,37 +3564,39 @@
     }
    },
    {
-    "strict": "c91f5c0e",
+    "strict": "22a106db",
     "summary": {
      "year": 2020,
      "week": 1,
      "retired": false,
      "me": {
       "team": "HLE",
-      "score": 66.9,
+      "score": 66.3,
       "stats": {
        "accuracy": 47,
-       "laning": 53,
-       "teamfight": 86,
-       "macro": 86,
-       "vision": 87,
-       "shotcall": 77,
-       "pool": 41,
-       "mental": 75,
-       "reaction": 45,
-       "spacing": 70,
-       "adapt": 38,
-       "focus": 78
+       "laning": 48,
+       "teamfight": 84,
+       "macro": 81,
+       "vision": 83,
+       "shotcall": 78,
+       "pool": 42,
+       "mental": 79,
+       "reaction": 47,
+       "spacing": 76,
+       "adapt": 39,
+       "focus": 76
       },
-      "money": 96199996,
-      "pop": 77,
-      "rep": 11,
+      "money": 94900016,
+      "pop": 65,
+      "rep": 9,
       "traits": [
        "battle_sense",
+       "glass_mental",
        "iron_body",
-       "ladder_addict"
+       "ladder_addict",
+       "star_power"
       ],
-      "salary": 81000000,
+      "salary": 82000000,
       "benched": false,
       "seasons": [
        [
@@ -3614,53 +3608,53 @@
        [
         2018,
         9,
-        "12-20",
+        "7-25",
         ""
        ],
        [
         2019,
         9,
-        "12-20",
+        "8-24",
         ""
        ]
       ],
       "awards": 0,
-      "great": 9
+      "great": 5
      },
      "league": {
-      "players": 140,
+      "players": 148,
       "teams": 18,
       "top10": [
-       "P40:73",
+       "P45:72.2",
        "P32:71.5",
-       "P64:70.8",
-       "P44:70.7",
-       "P11:70.1",
+       "P44:71.1",
+       "P64:70.9",
+       "P11:69.9",
        "P17:69.3",
-       "P4:68.6",
-       "P56:68.5",
-       "P19:68.5",
-       "P52:68.5"
+       "P149:69.1",
+       "P39:68.8",
+       "P8:68.8",
+       "P52:68.8"
       ],
       "tier1": [
        "DYN",
-       "GEN",
-       "AF",
-       "DWG",
-       "SB",
-       "KT",
-       "HLE",
-       "DRX",
        "T1",
-       "SP"
+       "AF",
+       "SP",
+       "GEN",
+       "HLE",
+       "SB",
+       "GY",
+       "KT",
+       "DWG"
       ],
       "awards": [],
-      "transfers": 57,
-      "history": "c3c287ef"
+      "transfers": 53,
+      "history": "f2fa615d"
      },
      "world": {
       "teams": 62,
-      "hash": "b87fae81"
+      "hash": "11b472"
      },
      "news": {
       "articles": 34
@@ -3669,38 +3663,39 @@
     }
    },
    {
-    "strict": "587f0778",
+    "strict": "9eeb6162",
     "summary": {
      "year": 2021,
      "week": 1,
      "retired": false,
      "me": {
-      "team": "DK",
-      "score": 70.5,
+      "team": "BRO",
+      "score": 70.1,
       "stats": {
        "accuracy": 48,
-       "laning": 56,
-       "teamfight": 87,
-       "macro": 90,
-       "vision": 91,
+       "laning": 51,
+       "teamfight": 90,
+       "macro": 88,
+       "vision": 85,
        "shotcall": 82,
-       "pool": 41,
-       "mental": 84,
-       "reaction": 47,
-       "spacing": 77,
-       "adapt": 40,
-       "focus": 83
+       "pool": 42,
+       "mental": 89,
+       "reaction": 48,
+       "spacing": 79,
+       "adapt": 41,
+       "focus": 82
       },
-      "money": 207809980,
-      "pop": 97,
-      "rep": 20,
+      "money": 197470012,
+      "pop": 98,
+      "rep": 15,
       "traits": [
        "battle_sense",
-       "fan_service",
+       "glass_mental",
        "iron_body",
-       "ladder_addict"
+       "ladder_addict",
+       "star_power"
       ],
-      "salary": 123000000,
+      "salary": 121000000,
       "benched": false,
       "seasons": [
        [
@@ -3712,19 +3707,247 @@
        [
         2018,
         9,
-        "12-20",
+        "7-25",
         ""
        ],
        [
         2019,
         9,
-        "12-20",
+        "8-24",
         ""
        ],
        [
         2020,
-        8,
-        "9-18",
+        7,
+        "16-18",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 11
+     },
+     "league": {
+      "players": 159,
+      "teams": 20,
+      "top10": [
+       "P32:72.5",
+       "P44:72.5",
+       "P153:71",
+       "P8:70.2",
+       "P57:70.2",
+       "P149:70.2",
+       "P17:70",
+       "P52:70",
+       "P58:69.9",
+       "P39:69.9"
+      ],
+      "tier1": [
+       "BRO",
+       "KT",
+       "AF",
+       "GEN",
+       "NS",
+       "DK",
+       "LSB",
+       "T1",
+       "HLE",
+       "DRX"
+      ],
+      "awards": [],
+      "transfers": 66,
+      "history": "b1f4881b"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "343b6836"
+     },
+     "news": {
+      "articles": 46
+     },
+     "inbox": 122
+    }
+   },
+   {
+    "strict": "5d07b31b",
+    "summary": {
+     "year": 2022,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "GGA",
+      "score": 72.3,
+      "stats": {
+       "accuracy": 48,
+       "laning": 51,
+       "teamfight": 92,
+       "macro": 89,
+       "vision": 86,
+       "shotcall": 89,
+       "pool": 42,
+       "mental": 99,
+       "reaction": 48,
+       "spacing": 80,
+       "adapt": 41,
+       "focus": 88
+      },
+      "money": 322898008,
+      "pop": 96,
+      "rep": 15,
+      "traits": [
+       "battle_sense",
+       "glass_mental",
+       "iron_body",
+       "ladder_addict",
+       "star_power"
+      ],
+      "salary": 94000000,
+      "benched": false,
+      "seasons": [
+       [
+        2017,
+        7,
+        "9-20",
+        ""
+       ],
+       [
+        2018,
+        9,
+        "7-25",
+        ""
+       ],
+       [
+        2019,
+        9,
+        "8-24",
+        ""
+       ],
+       [
+        2020,
+        7,
+        "16-18",
+        ""
+       ],
+       [
+        2021,
+        4,
+        "13-14",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 11
+     },
+     "league": {
+      "players": 161,
+      "teams": 20,
+      "top10": [
+       "P211:74.5",
+       "P44:73.7",
+       "P32:73.4",
+       "P153:72.6",
+       "P52:71",
+       "P57:71",
+       "P24:70.7",
+       "P149:70.7",
+       "P58:70.4",
+       "P56:70.3"
+      ],
+      "tier1": [
+       "KDF",
+       "DRX",
+       "NS",
+       "DK",
+       "HLE",
+       "T1",
+       "GEN",
+       "LSB",
+       "BRO",
+       "KT"
+      ],
+      "awards": [],
+      "transfers": 60,
+      "history": "d80a9c9c"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "9d9acf51"
+     },
+     "news": {
+      "articles": 54
+     },
+     "inbox": 121
+    }
+   },
+   {
+    "strict": "47fb6fd5",
+    "summary": {
+     "year": 2023,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "DK",
+      "score": 73.6,
+      "stats": {
+       "accuracy": 48,
+       "laning": 53,
+       "teamfight": 93,
+       "macro": 90,
+       "vision": 88,
+       "shotcall": 90,
+       "pool": 42,
+       "mental": 100,
+       "reaction": 50,
+       "spacing": 82,
+       "adapt": 42,
+       "focus": 90
+      },
+      "money": 408397992,
+      "pop": 96,
+      "rep": 20,
+      "traits": [
+       "battle_sense",
+       "glass_mental",
+       "iron_body",
+       "ladder_addict",
+       "star_power"
+      ],
+      "salary": 116000000,
+      "benched": false,
+      "seasons": [
+       [
+        2017,
+        7,
+        "9-20",
+        ""
+       ],
+       [
+        2018,
+        9,
+        "7-25",
+        ""
+       ],
+       [
+        2019,
+        9,
+        "8-24",
+        ""
+       ],
+       [
+        2020,
+        7,
+        "16-18",
+        ""
+       ],
+       [
+        2021,
+        4,
+        "13-14",
+        ""
+       ],
+       [
+        2022,
+        9,
+        "9-17",
         ""
        ]
       ],
@@ -3732,77 +3955,467 @@
       "great": 12
      },
      "league": {
-      "players": 147,
+      "players": 159,
       "teams": 20,
       "top10": [
-       "P40:73.8",
-       "P44:72.3",
-       "P32:72.2",
-       "P24:70.2",
-       "P17:70.2",
-       "P57:69.7",
-       "P39:69.5",
-       "P4:69.5",
-       "P11:69.5",
-       "P56:69.2"
+       "P211:74",
+       "P153:73.4",
+       "P32:73.2",
+       "P57:71.7",
+       "P52:71.6",
+       "P200:71.4",
+       "P24:71.3",
+       "P58:71.3",
+       "P56:71.2",
+       "P4:71.1"
       ],
       "tier1": [
-       "GEN",
-       "T1",
-       "BRO",
-       "DRX",
-       "AF",
-       "HLE",
-       "NS",
-       "KT",
        "DK",
+       "KT",
+       "KDF",
+       "HLE",
+       "DRX",
+       "BRO",
+       "T1",
+       "NS",
+       "GEN",
        "LSB"
       ],
       "awards": [],
-      "transfers": 66,
-      "history": "6560e04c"
+      "transfers": 70,
+      "history": "ec90cffe"
      },
      "world": {
       "teams": 62,
-      "hash": "972fd9d3"
+      "hash": "8df4783c"
      },
      "news": {
-      "articles": 47
+      "articles": 67
      },
      "inbox": 121
     }
    },
    {
-    "strict": "248c5ff7",
+    "strict": "2c65c6b1",
     "summary": {
-     "year": 2022,
+     "year": 2024,
      "week": 1,
      "retired": false,
      "me": {
-      "team": "KT",
-      "score": 72.5,
+      "team": "FOX",
+      "score": 74.5,
       "stats": {
        "accuracy": 48,
-       "laning": 56,
-       "teamfight": 90,
-       "macro": 90,
-       "vision": 92,
-       "shotcall": 88,
-       "pool": 41,
-       "mental": 96,
-       "reaction": 47,
-       "spacing": 79,
-       "adapt": 40,
-       "focus": 85
+       "laning": 53,
+       "teamfight": 93,
+       "macro": 91,
+       "vision": 91,
+       "shotcall": 90,
+       "pool": 42,
+       "mental": 100,
+       "reaction": 50,
+       "spacing": 86,
+       "adapt": 42,
+       "focus": 91
       },
-      "money": 335310000,
-      "pop": 100,
-      "rep": 10,
+      "money": 534636436,
+      "pop": 98,
+      "rep": 37,
       "traits": [
        "battle_sense",
-       "fan_service",
+       "glass_mental",
        "iron_body",
-       "ladder_addict"
+       "ladder_addict",
+       "star_power"
+      ],
+      "salary": 128000000,
+      "benched": false,
+      "seasons": [
+       [
+        2017,
+        7,
+        "9-20",
+        ""
+       ],
+       [
+        2018,
+        9,
+        "7-25",
+        ""
+       ],
+       [
+        2019,
+        9,
+        "8-24",
+        ""
+       ],
+       [
+        2020,
+        7,
+        "16-18",
+        ""
+       ],
+       [
+        2021,
+        4,
+        "13-14",
+        ""
+       ],
+       [
+        2022,
+        9,
+        "9-17",
+        ""
+       ],
+       [
+        2023,
+        10,
+        "13-13",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 14
+     },
+     "league": {
+      "players": 162,
+      "teams": 20,
+      "top10": [
+       "P211:74.4",
+       "P153:74.1",
+       "P200:73",
+       "P24:72.8",
+       "P32:72.7",
+       "P57:72.5",
+       "P155:72.4",
+       "P58:72.3",
+       "P56:72.2",
+       "P163:72"
+      ],
+      "tier1": [
+       "FOX",
+       "KDF",
+       "DRX",
+       "NS",
+       "KT",
+       "DK",
+       "GEN",
+       "HLE",
+       "T1",
+       "BRO"
+      ],
+      "awards": [],
+      "transfers": 67,
+      "history": "75b99634"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "a8441f13"
+     },
+     "news": {
+      "articles": 76
+     },
+     "inbox": 120
+    }
+   },
+   {
+    "strict": "3933cf63",
+    "summary": {
+     "year": 2025,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "DRX",
+      "score": 75.4,
+      "stats": {
+       "accuracy": 49,
+       "laning": 56,
+       "teamfight": 94,
+       "macro": 92,
+       "vision": 92,
+       "shotcall": 91,
+       "pool": 42,
+       "mental": 100,
+       "reaction": 51,
+       "spacing": 87,
+       "adapt": 42,
+       "focus": 92
+      },
+      "money": 661136412,
+      "pop": 97,
+      "rep": 37,
+      "traits": [
+       "battle_sense",
+       "glass_mental",
+       "iron_body",
+       "ladder_addict",
+       "ladder_king",
+       "star_power"
+      ],
+      "salary": 138000000,
+      "benched": false,
+      "seasons": [
+       [
+        2017,
+        7,
+        "9-20",
+        ""
+       ],
+       [
+        2018,
+        9,
+        "7-25",
+        ""
+       ],
+       [
+        2019,
+        9,
+        "8-24",
+        ""
+       ],
+       [
+        2020,
+        7,
+        "16-18",
+        ""
+       ],
+       [
+        2021,
+        4,
+        "13-14",
+        ""
+       ],
+       [
+        2022,
+        9,
+        "9-17",
+        ""
+       ],
+       [
+        2023,
+        10,
+        "13-13",
+        ""
+       ],
+       [
+        2024,
+        5,
+        "11-16",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 14
+     },
+     "league": {
+      "players": 163,
+      "teams": 20,
+      "top10": [
+       "P153:74.7",
+       "P200:74.3",
+       "P211:74.2",
+       "P24:73.9",
+       "P155:73.3",
+       "P57:73.2",
+       "P163:72.7",
+       "P182:72.7",
+       "P181:72.7",
+       "P154:72.3"
+      ],
+      "tier1": [
+       "KT",
+       "HLE",
+       "NS",
+       "DK",
+       "T1",
+       "DNF",
+       "BFX",
+       "DRX",
+       "BRO",
+       "GEN"
+      ],
+      "awards": [],
+      "transfers": 60,
+      "history": "1a62fdcf"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "3fada84a"
+     },
+     "news": {
+      "articles": 84
+     },
+     "inbox": 122
+    }
+   },
+   {
+    "strict": "7fb5c79c",
+    "summary": {
+     "year": 2026,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "DK",
+      "score": 76.2,
+      "stats": {
+       "accuracy": 50,
+       "laning": 57,
+       "teamfight": 94,
+       "macro": 93,
+       "vision": 92,
+       "shotcall": 93,
+       "pool": 42,
+       "mental": 100,
+       "reaction": 52,
+       "spacing": 91,
+       "adapt": 42,
+       "focus": 92
+      },
+      "money": 806405644,
+      "pop": 99,
+      "rep": 30,
+      "traits": [
+       "battle_sense",
+       "glass_mental",
+       "iron_body",
+       "ladder_addict",
+       "star_power"
+      ],
+      "salary": 130000000,
+      "benched": false,
+      "seasons": [
+       [
+        2017,
+        7,
+        "9-20",
+        ""
+       ],
+       [
+        2018,
+        9,
+        "7-25",
+        ""
+       ],
+       [
+        2019,
+        9,
+        "8-24",
+        ""
+       ],
+       [
+        2020,
+        7,
+        "16-18",
+        ""
+       ],
+       [
+        2021,
+        4,
+        "13-14",
+        ""
+       ],
+       [
+        2022,
+        9,
+        "9-17",
+        ""
+       ],
+       [
+        2023,
+        10,
+        "13-13",
+        ""
+       ],
+       [
+        2024,
+        5,
+        "11-16",
+        ""
+       ],
+       [
+        2025,
+        8,
+        "14-18",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 16
+     },
+     "league": {
+      "players": 164,
+      "teams": 20,
+      "top10": [
+       "P153:75.4",
+       "P200:74.9",
+       "P155:74.2",
+       "P57:74.2",
+       "P182:73.7",
+       "P24:73.6",
+       "P181:73.6",
+       "P154:73.2",
+       "P163:73.1",
+       "P162:73"
+      ],
+      "tier1": [
+       "BRO",
+       "DK",
+       "HLE",
+       "T1",
+       "BFX",
+       "DRX",
+       "KT",
+       "NS",
+       "DNS",
+       "GEN"
+      ],
+      "awards": [],
+      "transfers": 73,
+      "history": "33b0f5fa"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "385977d3"
+     },
+     "news": {
+      "articles": 96
+     },
+     "inbox": 121
+    }
+   },
+   {
+    "strict": "80e6f9bc",
+    "summary": {
+     "year": 2027,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "GEN",
+      "score": 76.3,
+      "stats": {
+       "accuracy": 47,
+       "laning": 57,
+       "teamfight": 95,
+       "macro": 93,
+       "vision": 94,
+       "shotcall": 93,
+       "pool": 42,
+       "mental": 100,
+       "reaction": 50,
+       "spacing": 92,
+       "adapt": 43,
+       "focus": 93
+      },
+      "money": 1071175644,
+      "pop": 97,
+      "rep": 35,
+      "traits": [
+       "battle_sense",
+       "glass_mental",
+       "iron_body",
+       "ladder_addict",
+       "ladder_king",
+       "star_power"
       ],
       "salary": 118000000,
       "benched": false,
@@ -3816,711 +4429,100 @@
        [
         2018,
         9,
-        "12-20",
+        "7-25",
         ""
        ],
        [
         2019,
         9,
-        "12-20",
+        "8-24",
         ""
        ],
        [
         2020,
-        8,
-        "9-18",
-        ""
-       ],
-       [
-        2021,
-        9,
-        "6-16",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 15
-     },
-     "league": {
-      "players": 151,
-      "teams": 20,
-      "top10": [
-       "P40:74.4",
-       "P32:73",
-       "P44:72.9",
-       "P24:71.1",
-       "P57:71",
-       "P4:70.5",
-       "P56:70.5",
-       "P55:70.1",
-       "P17:69.9",
-       "P52:69.7"
-      ],
-      "tier1": [
-       "KDF",
-       "GEN",
-       "DRX",
-       "LSB",
-       "KT",
-       "NS",
-       "T1",
-       "HLE",
-       "DK",
-       "BRO"
-      ],
-      "awards": [],
-      "transfers": 64,
-      "history": "60d24105"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "f51095c3"
-     },
-     "news": {
-      "articles": 55
-     },
-     "inbox": 120
-    }
-   },
-   {
-    "strict": "d4db425d",
-    "summary": {
-     "year": 2023,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "GEN",
-      "score": 74.5,
-      "stats": {
-       "accuracy": 49,
-       "laning": 59,
-       "teamfight": 93,
-       "macro": 91,
-       "vision": 93,
-       "shotcall": 90,
-       "pool": 41,
-       "mental": 98,
-       "reaction": 48,
-       "spacing": 85,
-       "adapt": 40,
-       "focus": 90
-      },
-      "money": 424010012,
-      "pop": 100,
-      "rep": 24,
-      "traits": [
-       "battle_sense",
-       "fan_service",
-       "iron_body",
-       "ladder_addict"
-      ],
-      "salary": 134000000,
-      "benched": false,
-      "seasons": [
-       [
-        2017,
         7,
-        "9-20",
-        ""
-       ],
-       [
-        2018,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2019,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2020,
-        8,
-        "9-18",
+        "16-18",
         ""
        ],
        [
         2021,
-        9,
-        "6-16",
+        4,
+        "13-14",
         ""
        ],
        [
         2022,
-        5,
-        "14-14",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 19
-     },
-     "league": {
-      "players": 149,
-      "teams": 20,
-      "top10": [
-       "P40:73.7",
-       "P44:73.6",
-       "P32:72.3",
-       "P24:71.9",
-       "P57:71.8",
-       "P4:71.5",
-       "P56:71.2",
-       "P52:70.8",
-       "P17:70.2",
-       "P58:70.2"
-      ],
-      "tier1": [
-       "KDF",
-       "DRX",
-       "NS",
-       "GEN",
-       "DK",
-       "LSB",
-       "KT",
-       "HLE",
-       "T1",
-       "BRO"
-      ],
-      "awards": [],
-      "transfers": 60,
-      "history": "4115cb6e"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "cfdd13f3"
-     },
-     "news": {
-      "articles": 68
-     },
-     "inbox": 121
-    }
-   },
-   {
-    "strict": "4a64048b",
-    "summary": {
-     "year": 2024,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "DRX",
-      "score": 75.6,
-      "stats": {
-       "accuracy": 50,
-       "laning": 60,
-       "teamfight": 96,
-       "macro": 91,
-       "vision": 93,
-       "shotcall": 92,
-       "pool": 41,
-       "mental": 100,
-       "reaction": 49,
-       "spacing": 88,
-       "adapt": 40,
-       "focus": 91
-      },
-      "money": 556004616,
-      "pop": 100,
-      "rep": 26,
-      "traits": [
-       "battle_sense",
-       "fan_service",
-       "iron_body",
-       "ladder_addict"
-      ],
-      "salary": 111000000,
-      "benched": false,
-      "seasons": [
-       [
-        2017,
-        7,
-        "9-20",
-        ""
-       ],
-       [
-        2018,
         9,
-        "12-20",
-        ""
-       ],
-       [
-        2019,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2020,
-        8,
-        "9-18",
-        ""
-       ],
-       [
-        2021,
-        9,
-        "6-16",
-        ""
-       ],
-       [
-        2022,
-        5,
-        "14-14",
+        "9-17",
         ""
        ],
        [
         2023,
-        1,
-        "18-17",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 23
-     },
-     "league": {
-      "players": 148,
-      "teams": 20,
-      "top10": [
-       "P44:74.5",
-       "P40:73.2",
-       "P24:72.8",
-       "P57:72.2",
-       "P56:72",
-       "P32:71.5",
-       "P58:71.1",
-       "P4:70.9",
-       "P52:70.2",
-       "P204:69.8"
-      ],
-      "tier1": [
-       "KDF",
-       "DRX",
-       "GEN",
-       "BRO",
-       "NS",
-       "HLE",
-       "T1",
-       "FOX",
-       "KT",
-       "DK"
-      ],
-      "awards": [],
-      "transfers": 66,
-      "history": "85ba14e"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "2a9cd53a"
-     },
-     "news": {
-      "articles": 81
-     },
-     "inbox": 121
-    }
-   },
-   {
-    "strict": "93445527",
-    "summary": {
-     "year": 2025,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "T1A",
-      "score": 76.3,
-      "stats": {
-       "accuracy": 51,
-       "laning": 61,
-       "teamfight": 96,
-       "macro": 92,
-       "vision": 93,
-       "shotcall": 93,
-       "pool": 41,
-       "mental": 100,
-       "reaction": 50,
-       "spacing": 91,
-       "adapt": 41,
-       "focus": 91
-      },
-      "money": 674114596,
-      "pop": 100,
-      "rep": 25,
-      "traits": [
-       "battle_sense",
-       "fan_service",
-       "iron_body",
-       "ladder_addict"
-      ],
-      "salary": 134000000,
-      "benched": false,
-      "seasons": [
-       [
-        2017,
-        7,
-        "9-20",
-        ""
-       ],
-       [
-        2018,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2019,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2020,
-        8,
-        "9-18",
-        ""
-       ],
-       [
-        2021,
-        9,
-        "6-16",
-        ""
-       ],
-       [
-        2022,
-        5,
-        "14-14",
-        ""
-       ],
-       [
-        2023,
-        1,
-        "18-17",
+        10,
+        "13-13",
         ""
        ],
        [
         2024,
-        2,
-        "22-8",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 28
-     },
-     "league": {
-      "players": 148,
-      "teams": 20,
-      "top10": [
-       "P24:73.3",
-       "P57:73",
-       "P40:72.9",
-       "P56:71.5",
-       "P4:70.7",
-       "P32:70.6",
-       "P46:70.5",
-       "P58:70.4",
-       "P52:70",
-       "P141:69.9"
-      ],
-      "tier1": [
-       "GEN",
-       "DRX",
-       "KT",
-       "DK",
-       "T1",
-       "DNF",
-       "BRO",
-       "HLE",
-       "NS",
-       "BFX"
-      ],
-      "awards": [],
-      "transfers": 73,
-      "history": "a8a08fd6"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "54afe762"
-     },
-     "news": {
-      "articles": 89
-     },
-     "inbox": 121
-    }
-   },
-   {
-    "strict": "331f1174",
-    "summary": {
-     "year": 2026,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "KT",
-      "score": 77,
-      "stats": {
-       "accuracy": 51,
-       "laning": 65,
-       "teamfight": 96,
-       "macro": 92,
-       "vision": 93,
-       "shotcall": 93,
-       "pool": 42,
-       "mental": 100,
-       "reaction": 50,
-       "spacing": 92,
-       "adapt": 42,
-       "focus": 92
-      },
-      "money": 855994592,
-      "pop": 100,
-      "rep": 24,
-      "traits": [
-       "battle_sense",
-       "fan_service",
-       "iron_body",
-       "ladder_addict"
-      ],
-      "salary": 164000000,
-      "benched": false,
-      "seasons": [
-       [
-        2017,
-        7,
-        "9-20",
-        ""
-       ],
-       [
-        2018,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2019,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2020,
-        8,
-        "9-18",
-        ""
-       ],
-       [
-        2021,
-        9,
-        "6-16",
-        ""
-       ],
-       [
-        2022,
         5,
-        "14-14",
-        ""
-       ],
-       [
-        2023,
-        1,
-        "18-17",
-        ""
-       ],
-       [
-        2024,
-        2,
-        "22-8",
+        "11-16",
         ""
        ],
        [
         2025,
-        4,
-        "23-20",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 30
-     },
-     "league": {
-      "players": 151,
-      "teams": 20,
-      "top10": [
-       "P57:73.6",
-       "P24:73.2",
-       "P40:71.4",
-       "P4:70.7",
-       "P141:70.7",
-       "P46:70.5",
-       "P58:70.4",
-       "P127:70",
-       "P205:69.8",
-       "P52:69.1"
-      ],
-      "tier1": [
-       "KT",
-       "BRO",
-       "DRX",
-       "DK",
-       "BFX",
-       "T1",
-       "HLE",
-       "DNS",
-       "GEN",
-       "NS"
-      ],
-      "awards": [],
-      "transfers": 68,
-      "history": "fde140ad"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "13cbb033"
-     },
-     "news": {
-      "articles": 119
-     },
-     "inbox": 121
-    }
-   },
-   {
-    "strict": "f4ad6fa3",
-    "summary": {
-     "year": 2027,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "DK",
-      "score": 77.7,
-      "stats": {
-       "accuracy": 50,
-       "laning": 68,
-       "teamfight": 97,
-       "macro": 92,
-       "vision": 94,
-       "shotcall": 93,
-       "pool": 42,
-       "mental": 100,
-       "reaction": 49,
-       "spacing": 93,
-       "adapt": 44,
-       "focus": 95
-      },
-      "money": 1051154584,
-      "pop": 100,
-      "rep": 21,
-      "traits": [
-       "battle_sense",
-       "fan_service",
-       "iron_body",
-       "ladder_addict",
-       "ladder_king"
-      ],
-      "salary": 166000000,
-      "benched": false,
-      "seasons": [
-       [
-        2017,
-        7,
-        "9-20",
-        ""
-       ],
-       [
-        2018,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2019,
-        9,
-        "12-20",
-        ""
-       ],
-       [
-        2020,
         8,
-        "9-18",
-        ""
-       ],
-       [
-        2021,
-        9,
-        "6-16",
-        ""
-       ],
-       [
-        2022,
-        5,
-        "14-14",
-        ""
-       ],
-       [
-        2023,
-        1,
-        "18-17",
-        ""
-       ],
-       [
-        2024,
-        2,
-        "22-8",
-        ""
-       ],
-       [
-        2025,
-        4,
-        "23-20",
+        "14-18",
         ""
        ],
        [
         2026,
-        6,
-        "18-20",
+        9,
+        "12-20",
         ""
        ]
       ],
       "awards": 0,
-      "great": 34
+      "great": 21
      },
      "league": {
-      "players": 156,
+      "players": 166,
       "teams": 20,
       "top10": [
-       "P57:73",
-       "P24:72.7",
-       "P205:70.8",
-       "P127:70.8",
-       "P58:70.3",
-       "P141:70.2",
-       "P46:70.2",
-       "P40:69.4",
-       "P215:69.3",
-       "P151:68.9"
+       "P200:75.5",
+       "P153:75.1",
+       "P155:74.8",
+       "P182:74.8",
+       "P181:74.5",
+       "P240:74",
+       "P213:74",
+       "P163:73.8",
+       "P244:73.6",
+       "P180:73.4"
       ],
       "tier1": [
        "GEN",
+       "HLE",
+       "NS",
        "DNS",
+       "DRX",
+       "DK",
        "KT",
        "BRO",
-       "NS",
-       "DK",
        "BFX",
-       "HLE",
-       "T1",
-       "DRX"
+       "T1"
       ],
       "awards": [],
-      "transfers": 68,
-      "history": "342050d6"
+      "transfers": 65,
+      "history": "3baadb62"
      },
      "world": {
       "teams": 62,
-      "hash": "e2d18af0"
+      "hash": "894e6ed1"
      },
      "news": {
-      "articles": 140
+      "articles": 108
      },
-     "inbox": 122
+     "inbox": 121
     }
    }
   ],
@@ -4530,7 +4532,7 @@
   "name": "E 서포트 2012",
   "snaps": [
    {
-    "strict": "7610dcc5",
+    "strict": "17cbe38f",
     "summary": {
      "year": 2013,
      "week": 1,
@@ -4575,7 +4577,7 @@
       "great": 3
      },
      "league": {
-      "players": 105,
+      "players": 114,
       "teams": 14,
       "top10": [
        "P16:76.3",
@@ -4595,8 +4597,8 @@
        "JAG",
        "NJS",
        "KT",
-       "CJF",
        "KTA",
+       "CJF",
        "CJB"
       ],
       "awards": [],
@@ -4614,37 +4616,37 @@
     }
    },
    {
-    "strict": "61a65831",
+    "strict": "722c5ef4",
     "summary": {
      "year": 2014,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 52.9,
+      "score": 51.4,
       "stats": {
        "accuracy": 37,
-       "laning": 28,
-       "teamfight": 72,
-       "macro": 65,
-       "vision": 63,
-       "shotcall": 77,
+       "laning": 29,
+       "teamfight": 76,
+       "macro": 68,
+       "vision": 59,
+       "shotcall": 73,
        "pool": 26,
-       "mental": 64,
-       "reaction": 29,
-       "spacing": 58,
+       "mental": 52,
+       "reaction": 30,
+       "spacing": 59,
        "adapt": 28,
-       "focus": 66
+       "focus": 57
       },
-      "money": 9399976,
-      "pop": 30,
-      "rep": 27,
+      "money": 10669976,
+      "pop": 31,
+      "rep": 26,
       "traits": [
        "diligent",
        "iron_body",
        "machine"
       ],
-      "salary": 25000000,
+      "salary": 24000000,
       "benched": false,
       "seasons": [
        [
@@ -4655,87 +4657,87 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ]
       ],
       "awards": 0,
-      "great": 8
+      "great": 4
      },
      "league": {
-      "players": 122,
+      "players": 130,
       "teams": 16,
       "top10": [
-       "P16:77.5",
-       "P24:76.5",
-       "P50:75.7",
-       "P10:73.6",
-       "P18:72.6",
-       "P2:70.5",
-       "P40:70.5",
-       "P31:68.6",
-       "P48:68.2",
-       "P51:68.2"
+       "P16:77.4",
+       "P24:76.6",
+       "P50:75.9",
+       "P10:73.5",
+       "P4:73.1",
+       "P18:72.8",
+       "P2:70.7",
+       "P51:69.1",
+       "P31:68.2",
+       "P48:68.2"
       ],
       "tier1": [
-       "SSG",
        "SKT",
-       "JAG",
-       "CJB",
-       "KTA",
        "NJS",
-       "CJF",
+       "CJB",
+       "SSG",
+       "JAG",
+       "KTA",
        "KT",
-       "CL",
-       "HL"
+       "CJF",
+       "HL",
+       "DX"
       ],
       "awards": [],
-      "transfers": 44,
-      "history": "55e8b445"
+      "transfers": 50,
+      "history": "ed5c2da6"
      },
      "world": {
       "teams": 46,
-      "hash": "aa74893b"
+      "hash": "8a0a6704"
      },
      "news": {
-      "articles": 38
+      "articles": 34
      },
-     "inbox": 120
+     "inbox": 121
     }
    },
    {
-    "strict": "639f9fd3",
+    "strict": "453e41d5",
     "summary": {
      "year": 2015,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 58.7,
+      "score": 57.1,
       "stats": {
-       "accuracy": 39,
-       "laning": 30,
-       "teamfight": 80,
+       "accuracy": 38,
+       "laning": 31,
+       "teamfight": 83,
        "macro": 75,
-       "vision": 73,
-       "shotcall": 83,
+       "vision": 66,
+       "shotcall": 78,
        "pool": 26,
-       "mental": 76,
-       "reaction": 31,
-       "spacing": 65,
-       "adapt": 28,
-       "focus": 76
+       "mental": 69,
+       "reaction": 32,
+       "spacing": 67,
+       "adapt": 30,
+       "focus": 67
       },
-      "money": 28609964,
-      "pop": 50,
-      "rep": 30,
+      "money": 29369952,
+      "pop": 62,
+      "rep": 27,
       "traits": [
        "diligent",
        "iron_body",
        "machine"
       ],
-      "salary": 45000000,
+      "salary": 46000000,
       "benched": false,
       "seasons": [
        [
@@ -4746,93 +4748,93 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ],
        [
         2014,
-        6,
-        "17-15",
+        4,
+        "14-18",
         ""
        ]
       ],
       "awards": 0,
-      "great": 10
+      "great": 4
      },
      "league": {
-      "players": 124,
+      "players": 130,
       "teams": 16,
       "top10": [
-       "P16:78.4",
-       "P50:76.3",
-       "P24:75.9",
-       "P10:73.8",
-       "P18:73.4",
-       "P48:69.3",
-       "P40:68.8",
-       "P53:68.4",
-       "P31:68",
-       "P12:67.9"
+       "P16:78.1",
+       "P50:76.5",
+       "P24:76.1",
+       "P18:73.8",
+       "P10:73.7",
+       "P4:73.5",
+       "P3:69",
+       "P48:69",
+       "P116:68.8",
+       "P2:68.3"
       ],
       "tier1": [
        "SKT",
        "SBENU",
-       "JAG",
-       "HL",
-       "NJE",
-       "CJ",
-       "KOO",
        "SSG",
-       "CL",
-       "KT"
+       "NJE",
+       "JAG",
+       "KOO",
+       "KT",
+       "HL",
+       "CJ",
+       "CL"
       ],
       "awards": [],
-      "transfers": 49,
-      "history": "a2eaf3ee"
+      "transfers": 48,
+      "history": "7c32d600"
      },
      "world": {
       "teams": 46,
-      "hash": "8d4cec85"
+      "hash": "c0dd91d7"
      },
      "news": {
-      "articles": 56
+      "articles": 54
      },
-     "inbox": 123
+     "inbox": 120
     }
    },
    {
-    "strict": "eeeb3cae",
+    "strict": "d34492ca",
     "summary": {
      "year": 2016,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 63.6,
+      "score": 61.6,
       "stats": {
-       "accuracy": 41,
-       "laning": 32,
-       "teamfight": 84,
-       "macro": 79,
-       "vision": 78,
-       "shotcall": 87,
-       "pool": 26,
-       "mental": 98,
-       "reaction": 33,
-       "spacing": 71,
-       "adapt": 28,
-       "focus": 84
+       "accuracy": 39,
+       "laning": 33,
+       "teamfight": 86,
+       "macro": 80,
+       "vision": 74,
+       "shotcall": 83,
+       "pool": 27,
+       "mental": 79,
+       "reaction": 35,
+       "spacing": 73,
+       "adapt": 31,
+       "focus": 76
       },
-      "money": 70309984,
-      "pop": 58,
-      "rep": 37,
+      "money": 71869932,
+      "pop": 74,
+      "rep": 35,
       "traits": [
        "diligent",
        "iron_body",
        "machine"
       ],
-      "salary": 64000000,
+      "salary": 67000000,
       "benched": false,
       "seasons": [
        [
@@ -4843,101 +4845,99 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ],
        [
         2014,
-        6,
-        "17-15",
+        4,
+        "14-18",
         ""
        ],
        [
         2015,
-        10,
-        "8-25",
+        5,
+        "11-19",
         ""
        ]
       ],
       "awards": 0,
-      "great": 12
+      "great": 6
      },
      "league": {
-      "players": 140,
+      "players": 149,
       "teams": 18,
       "top10": [
-       "P16:79.8",
-       "P50:76.2",
-       "P10:74.4",
-       "P18:74.2",
-       "P162:73.5",
-       "P48:69.9",
-       "P12:69.3",
-       "P53:69.2",
-       "P3:68.4",
-       "P5:67.2"
+       "P16:79",
+       "P50:76.3",
+       "P18:74.7",
+       "P4:74.5",
+       "P10:74.3",
+       "P48:70",
+       "P116:69.9",
+       "P3:69.8",
+       "P112:69.5",
+       "P12:69.3"
       ],
       "tier1": [
-       "SKT",
-       "JAG",
-       "KT",
-       "ROX",
-       "NJE",
        "CL",
-       "CJ",
-       "HL",
+       "JAG",
+       "ROX",
+       "KT",
        "SSG",
-       "EVER"
+       "CJ",
+       "SKT",
+       "HL",
+       "EVER",
+       "NJE"
       ],
       "awards": [],
-      "transfers": 47,
-      "history": "382e5d4"
+      "transfers": 58,
+      "history": "fb6bb7eb"
      },
      "world": {
       "teams": 46,
-      "hash": "77832929"
+      "hash": "e147f983"
      },
      "news": {
-      "articles": 73
+      "articles": 75
      },
      "inbox": 121
     }
    },
    {
-    "strict": "948d8b3b",
+    "strict": "676966b1",
     "summary": {
      "year": 2017,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 67.3,
+      "score": 65.3,
       "stats": {
-       "accuracy": 43,
-       "laning": 33,
-       "teamfight": 91,
+       "accuracy": 40,
+       "laning": 35,
+       "teamfight": 90,
        "macro": 85,
-       "vision": 85,
-       "shotcall": 87,
-       "pool": 26,
-       "mental": 100,
-       "reaction": 35,
-       "spacing": 82,
-       "adapt": 28,
-       "focus": 91
+       "vision": 78,
+       "shotcall": 84,
+       "pool": 27,
+       "mental": 91,
+       "reaction": 37,
+       "spacing": 79,
+       "adapt": 33,
+       "focus": 83
       },
-      "money": 141309972,
-      "pop": 100,
-      "rep": 47,
+      "money": 208929956,
+      "pop": 97,
+      "rep": 46,
       "traits": [
        "diligent",
-       "fan_service",
        "iron_body",
-       "machine",
-       "star_power"
+       "machine"
       ],
-      "salary": 96000000,
+      "salary": 91000000,
       "benched": false,
       "seasons": [
        [
@@ -4948,66 +4948,66 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ],
        [
         2014,
-        6,
-        "17-15",
+        4,
+        "14-18",
         ""
        ],
        [
         2015,
-        10,
-        "8-25",
+        5,
+        "11-19",
         ""
        ],
        [
         2016,
-        9,
-        "11-18",
+        3,
+        "19-15",
         ""
        ]
       ],
       "awards": 0,
-      "great": 14
+      "great": 9
      },
      "league": {
-      "players": 139,
+      "players": 150,
       "teams": 18,
       "top10": [
-       "P16:80.3",
-       "P50:75.6",
-       "P18:74.7",
-       "P162:74.3",
-       "P10:74.1",
-       "P48:71.1",
-       "P53:70.1",
-       "P12:70.1",
-       "P3:69.4",
-       "P5:68.7"
+       "P16:79.5",
+       "P50:76",
+       "P18:75.5",
+       "P4:75",
+       "P10:73.5",
+       "P194:71.8",
+       "P116:71.3",
+       "P112:70.9",
+       "P48:70.8",
+       "P3:70.6"
       ],
       "tier1": [
        "SKT",
+       "KT",
+       "ROX",
+       "JAG",
+       "BBQ",
        "KDM",
        "HL",
-       "ROX",
-       "CL",
-       "BBQ",
-       "XY",
-       "KT",
-       "JAG",
-       "SSG"
+       "LZ",
+       "SSG",
+       "CL"
       ],
       "awards": [],
       "transfers": 63,
-      "history": "e8f49d0b"
+      "history": "d7d774fb"
      },
      "world": {
       "teams": 62,
-      "hash": "10f326db"
+      "hash": "e9b45ce1"
      },
      "news": {
       "articles": 90
@@ -5016,39 +5016,37 @@
     }
    },
    {
-    "strict": "177ee926",
+    "strict": "2aea8a21",
     "summary": {
      "year": 2018,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 68.8,
+      "score": 67.3,
       "stats": {
-       "accuracy": 45,
-       "laning": 34,
-       "teamfight": 91,
-       "macro": 88,
-       "vision": 91,
+       "accuracy": 41,
+       "laning": 36,
+       "teamfight": 90,
+       "macro": 87,
+       "vision": 79,
        "shotcall": 87,
-       "pool": 26,
+       "pool": 27,
        "mental": 100,
-       "reaction": 36,
-       "spacing": 85,
-       "adapt": 30,
-       "focus": 92
+       "reaction": 38,
+       "spacing": 81,
+       "adapt": 33,
+       "focus": 88
       },
-      "money": 237909980,
+      "money": 437389956,
       "pop": 100,
-      "rep": 57,
+      "rep": 55,
       "traits": [
        "diligent",
-       "fan_service",
        "iron_body",
-       "machine",
-       "star_power"
+       "machine"
       ],
-      "salary": 99000000,
+      "salary": 97000000,
       "benched": false,
       "seasons": [
        [
@@ -5059,113 +5057,111 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ],
        [
         2014,
-        6,
-        "17-15",
+        4,
+        "14-18",
         ""
        ],
        [
         2015,
-        10,
-        "8-25",
+        5,
+        "11-19",
         ""
        ],
        [
         2016,
-        9,
-        "11-18",
+        3,
+        "19-15",
         ""
        ],
        [
         2017,
-        6,
-        "20-14",
+        4,
+        "27-17",
         ""
        ]
       ],
       "awards": 0,
-      "great": 18
+      "great": 11
      },
      "league": {
-      "players": 141,
+      "players": 154,
       "teams": 18,
       "top10": [
-       "P50:75.7",
-       "P18:75.5",
-       "P162:75",
-       "P10:73.9",
-       "P48:71.9",
-       "P12:71",
-       "P53:70.9",
-       "P3:70.4",
-       "P5:69.5",
-       "P46:69.2"
+       "P16:79.7",
+       "P18:76",
+       "P50:75.8",
+       "P4:75.4",
+       "P194:73.2",
+       "P10:73.2",
+       "P116:72.8",
+       "P112:72.2",
+       "P140:72",
+       "P48:71.8"
       ],
       "tier1": [
-       "JAG",
-       "XY",
        "SKT",
-       "GRF",
-       "KT",
        "CL",
-       "HL",
-       "HLE",
        "GEN",
+       "JAG",
+       "KT",
+       "HL",
+       "GRF",
+       "KZ",
+       "HLE",
        "BBQ"
       ],
       "awards": [],
-      "transfers": 53,
-      "history": "7e81e12c"
+      "transfers": 57,
+      "history": "10f40d26"
      },
      "world": {
       "teams": 62,
-      "hash": "a35c130d"
+      "hash": "eaae1766"
      },
      "news": {
-      "articles": 109
+      "articles": 113
      },
      "inbox": 121
     }
    },
    {
-    "strict": "4ee31668",
+    "strict": "e534a09b",
     "summary": {
      "year": 2019,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 69.7,
+      "score": 69.1,
       "stats": {
-       "accuracy": 47,
-       "laning": 35,
-       "teamfight": 93,
-       "macro": 88,
-       "vision": 92,
-       "shotcall": 88,
-       "pool": 26,
+       "accuracy": 43,
+       "laning": 38,
+       "teamfight": 91,
+       "macro": 90,
+       "vision": 83,
+       "shotcall": 90,
+       "pool": 27,
        "mental": 100,
-       "reaction": 38,
-       "spacing": 86,
-       "adapt": 30,
-       "focus": 92
+       "reaction": 40,
+       "spacing": 81,
+       "adapt": 35,
+       "focus": 90
       },
-      "money": 460123972,
+      "money": 548889976,
       "pop": 100,
-      "rep": 54,
+      "rep": 55,
       "traits": [
        "diligent",
-       "fan_service",
        "iron_body",
-       "machine",
-       "star_power"
+       "machine"
       ],
-      "salary": 101000000,
+      "salary": 100000000,
       "benched": false,
       "seasons": [
        [
@@ -5176,120 +5172,118 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ],
        [
         2014,
-        6,
-        "17-15",
+        4,
+        "14-18",
         ""
        ],
        [
         2015,
-        10,
-        "8-25",
+        5,
+        "11-19",
         ""
        ],
        [
         2016,
-        9,
-        "11-18",
+        3,
+        "19-15",
         ""
        ],
        [
         2017,
-        6,
-        "20-14",
+        4,
+        "27-17",
         ""
        ],
        [
         2018,
-        4,
-        "19-21",
+        9,
+        "12-20",
         ""
        ]
       ],
       "awards": 0,
-      "great": 22
+      "great": 13
      },
      "league": {
-      "players": 137,
+      "players": 152,
       "teams": 18,
       "top10": [
-       "P18:75",
-       "P162:74.2",
-       "P10:73.8",
-       "P12:71.8",
-       "P48:71.4",
-       "P5:70.5",
-       "P3:70.2",
-       "P53:70.2",
-       "P187:69.2",
-       "P46:68.7"
+       "P16:80.2",
+       "P18:75.2",
+       "P194:74.7",
+       "P116:73.5",
+       "P112:73",
+       "P175:72.5",
+       "P140:72.5",
+       "P118:72.1",
+       "P117:71.9",
+       "P141:71.8"
       ],
       "tier1": [
-       "HL",
-       "SKT",
-       "JAG",
-       "XY",
        "DWG",
        "CL",
-       "YP",
-       "KT",
        "GEN",
-       "GRF"
+       "KT",
+       "HLE",
+       "GRF",
+       "SKT",
+       "KZ",
+       "HL",
+       "JAG"
       ],
       "awards": [],
-      "transfers": 61,
-      "history": "36fb46d3"
+      "transfers": 63,
+      "history": "aa64057c"
      },
      "world": {
       "teams": 62,
-      "hash": "e34bd8fa"
+      "hash": "2a54a499"
      },
      "news": {
-      "articles": 131
+      "articles": 127
      },
-     "inbox": 122
+     "inbox": 121
     }
    },
    {
-    "strict": "68596321",
+    "strict": "206beb1e",
     "summary": {
      "year": 2020,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 70.2,
+      "score": 70.8,
       "stats": {
-       "accuracy": 47,
-       "laning": 35,
-       "teamfight": 93,
-       "macro": 89,
-       "vision": 92,
-       "shotcall": 89,
-       "pool": 26,
+       "accuracy": 45,
+       "laning": 39,
+       "teamfight": 92,
+       "macro": 93,
+       "vision": 85,
+       "shotcall": 92,
+       "pool": 27,
        "mental": 100,
-       "reaction": 38,
-       "spacing": 87,
-       "adapt": 30,
-       "focus": 96
+       "reaction": 41,
+       "spacing": 86,
+       "adapt": 37,
+       "focus": 92
       },
-      "money": 552263988,
+      "money": 650889980,
       "pop": 100,
-      "rep": 67,
+      "rep": 64,
       "traits": [
        "diligent",
-       "fan_service",
        "iron_body",
        "machine",
-       "s_one_club",
-       "star_power"
+       "s_one_club"
       ],
-      "salary": 132000000,
+      "salary": 133000000,
       "benched": false,
       "seasons": [
        [
@@ -5300,260 +5294,122 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ],
        [
         2014,
-        6,
-        "17-15",
+        4,
+        "14-18",
         ""
        ],
        [
         2015,
-        10,
-        "8-25",
+        5,
+        "11-19",
         ""
        ],
        [
         2016,
-        9,
-        "11-18",
+        3,
+        "19-15",
         ""
        ],
        [
         2017,
-        6,
-        "20-14",
+        4,
+        "27-17",
         ""
        ],
        [
         2018,
-        4,
-        "19-21",
+        9,
+        "12-20",
         ""
        ],
        [
         2019,
-        3,
-        "26-14",
+        8,
+        "11-21",
         ""
        ]
       ],
       "awards": 0,
-      "great": 24
+      "great": 19
      },
      "league": {
-      "players": 137,
+      "players": 152,
       "teams": 18,
       "top10": [
-       "P18:75",
-       "P162:73.8",
-       "P12:72.7",
-       "P48:71.1",
-       "P10:71",
-       "P5:70.2",
-       "P188:69.7",
-       "P3:69.3",
-       "P88:69.1",
-       "P216:69"
+       "P16:80.7",
+       "P194:76.2",
+       "P112:73.8",
+       "P140:72.8",
+       "P117:72.7",
+       "P118:72.7",
+       "P151:72.7",
+       "P141:72.5",
+       "P142:72.5",
+       "P113:72.5"
       ],
       "tier1": [
-       "HL",
-       "XY",
        "CL",
-       "DYN",
-       "KT",
-       "YP",
-       "HLE",
        "SP",
+       "DYN",
+       "DRX",
+       "T1",
+       "GEN",
+       "HL",
+       "KT",
        "DWG",
-       "T1"
+       "HLE"
       ],
       "awards": [],
-      "transfers": 59,
-      "history": "4a80a5e8"
+      "transfers": 63,
+      "history": "ce6a4a83"
      },
      "world": {
       "teams": 62,
-      "hash": "37bead13"
+      "hash": "9365f2d2"
      },
      "news": {
-      "articles": 154
+      "articles": 147
      },
      "inbox": 121
     }
    },
    {
-    "strict": "db770eef",
+    "strict": "520fc5c2",
     "summary": {
      "year": 2021,
      "week": 1,
      "retired": false,
      "me": {
       "team": "KT",
-      "score": 71.2,
-      "stats": {
-       "accuracy": 48,
-       "laning": 36,
-       "teamfight": 93,
-       "macro": 92,
-       "vision": 92,
-       "shotcall": 93,
-       "pool": 26,
-       "mental": 100,
-       "reaction": 39,
-       "spacing": 88,
-       "adapt": 30,
-       "focus": 96
-      },
-      "money": 687564012,
-      "pop": 100,
-      "rep": 69,
-      "traits": [
-       "diligent",
-       "fan_service",
-       "iron_body",
-       "machine",
-       "s_one_club",
-       "star_power"
-      ],
-      "salary": 134000000,
-      "benched": false,
-      "seasons": [
-       [
-        2012,
-        8,
-        "5-20",
-        ""
-       ],
-       [
-        2013,
-        3,
-        "17-9",
-        ""
-       ],
-       [
-        2014,
-        6,
-        "17-15",
-        ""
-       ],
-       [
-        2015,
-        10,
-        "8-25",
-        ""
-       ],
-       [
-        2016,
-        9,
-        "11-18",
-        ""
-       ],
-       [
-        2017,
-        6,
-        "20-14",
-        ""
-       ],
-       [
-        2018,
-        4,
-        "19-21",
-        ""
-       ],
-       [
-        2019,
-        3,
-        "26-14",
-        ""
-       ],
-       [
-        2020,
-        8,
-        "14-18",
-        ""
-       ]
-      ],
-      "awards": 0,
-      "great": 28
-     },
-     "league": {
-      "players": 147,
-      "teams": 20,
-      "top10": [
-       "P18:74.2",
-       "P162:73.3",
-       "P12:72.9",
-       "P48:71.2",
-       "P5:70",
-       "P216:69.7",
-       "P3:69",
-       "P10:68.8",
-       "P80:68.6",
-       "P88:68.6"
-      ],
-      "tier1": [
-       "T1",
-       "KT",
-       "HLE",
-       "LSB",
-       "NS",
-       "GEN",
-       "AF",
-       "BRO",
-       "DK",
-       "DRX"
-      ],
-      "awards": [],
-      "transfers": 72,
-      "history": "5221c42d"
-     },
-     "world": {
-      "teams": 62,
-      "hash": "acab9378"
-     },
-     "news": {
-      "articles": 160
-     },
-     "inbox": 122
-    }
-   },
-   {
-    "strict": "d7fcf663",
-    "summary": {
-     "year": 2022,
-     "week": 1,
-     "retired": false,
-     "me": {
-      "team": "KT",
-      "score": 71.4,
+      "score": 71.9,
       "stats": {
        "accuracy": 46,
-       "laning": 38,
-       "teamfight": 94,
-       "macro": 92,
-       "vision": 92,
+       "laning": 41,
+       "teamfight": 93,
+       "macro": 93,
+       "vision": 90,
        "shotcall": 93,
-       "pool": 26,
+       "pool": 27,
        "mental": 100,
-       "reaction": 39,
-       "spacing": 89,
-       "adapt": 30,
-       "focus": 96
+       "reaction": 43,
+       "spacing": 87,
+       "adapt": 37,
+       "focus": 92
       },
-      "money": 917054008,
+      "money": 792369964,
       "pop": 100,
-      "rep": 74,
+      "rep": 65,
       "traits": [
        "diligent",
-       "fan_service",
        "iron_body",
        "machine",
-       "s_one_club",
-       "star_power"
+       "s_one_club"
       ],
       "salary": 135000000,
       "benched": false,
@@ -5566,101 +5422,235 @@
        ],
        [
         2013,
-        3,
-        "17-9",
+        6,
+        "12-16",
         ""
        ],
        [
         2014,
-        6,
-        "17-15",
-        ""
-       ],
-       [
-        2015,
-        10,
-        "8-25",
-        ""
-       ],
-       [
-        2016,
-        9,
-        "11-18",
-        ""
-       ],
-       [
-        2017,
-        6,
-        "20-14",
-        ""
-       ],
-       [
-        2018,
         4,
-        "19-21",
-        ""
-       ],
-       [
-        2019,
-        3,
-        "26-14",
-        ""
-       ],
-       [
-        2020,
-        8,
         "14-18",
         ""
        ],
        [
-        2021,
+        2015,
+        5,
+        "11-19",
+        ""
+       ],
+       [
+        2016,
+        3,
+        "19-15",
+        ""
+       ],
+       [
+        2017,
+        4,
+        "27-17",
+        ""
+       ],
+       [
+        2018,
+        9,
+        "12-20",
+        ""
+       ],
+       [
+        2019,
+        8,
+        "11-21",
+        ""
+       ],
+       [
+        2020,
         1,
-        "25-10",
+        "28-10",
         ""
        ]
       ],
       "awards": 0,
-      "great": 31
+      "great": 25
      },
      "league": {
-      "players": 152,
+      "players": 157,
       "teams": 20,
       "top10": [
-       "P12:73",
-       "P18:72.7",
-       "P162:70.6",
-       "P216:70.4",
-       "P232:69.5",
-       "P80:68.9",
-       "P147:68.8",
-       "P30:68.5",
-       "P188:68.3",
-       "P156:68.1"
+       "P194:77",
+       "P112:74.6",
+       "P151:73.5",
+       "P117:73.5",
+       "P140:73.3",
+       "P178:73.3",
+       "P142:73.2",
+       "P206:73.1",
+       "P113:72.9",
+       "P203:72.7"
       ],
       "tier1": [
-       "T1",
        "HLE",
-       "KDF",
-       "KT",
-       "DK",
-       "GEN",
-       "LSB",
        "NS",
+       "LSB",
+       "DK",
+       "T1",
+       "GEN",
+       "AF",
+       "KT",
        "DRX",
        "BRO"
       ],
       "awards": [],
-      "transfers": 67,
-      "history": "6c9c5e20"
+      "transfers": 62,
+      "history": "2267604f"
      },
      "world": {
       "teams": 62,
-      "hash": "a9028507"
+      "hash": "fb2b8a0b"
      },
      "news": {
       "articles": 160
      },
      "inbox": 121
+    }
+   },
+   {
+    "strict": "246e850a",
+    "summary": {
+     "year": 2022,
+     "week": 1,
+     "retired": false,
+     "me": {
+      "team": "KT",
+      "score": 72.2,
+      "stats": {
+       "accuracy": 45,
+       "laning": 43,
+       "teamfight": 93,
+       "macro": 93,
+       "vision": 90,
+       "shotcall": 93,
+       "pool": 27,
+       "mental": 100,
+       "reaction": 42,
+       "spacing": 88,
+       "adapt": 39,
+       "focus": 93
+      },
+      "money": 932269972,
+      "pop": 100,
+      "rep": 63,
+      "traits": [
+       "diligent",
+       "iron_body",
+       "machine",
+       "s_one_club"
+      ],
+      "salary": 136000000,
+      "benched": false,
+      "seasons": [
+       [
+        2012,
+        8,
+        "5-20",
+        ""
+       ],
+       [
+        2013,
+        6,
+        "12-16",
+        ""
+       ],
+       [
+        2014,
+        4,
+        "14-18",
+        ""
+       ],
+       [
+        2015,
+        5,
+        "11-19",
+        ""
+       ],
+       [
+        2016,
+        3,
+        "19-15",
+        ""
+       ],
+       [
+        2017,
+        4,
+        "27-17",
+        ""
+       ],
+       [
+        2018,
+        9,
+        "12-20",
+        ""
+       ],
+       [
+        2019,
+        8,
+        "11-21",
+        ""
+       ],
+       [
+        2020,
+        1,
+        "28-10",
+        ""
+       ],
+       [
+        2021,
+        6,
+        "14-13",
+        ""
+       ]
+      ],
+      "awards": 0,
+      "great": 25
+     },
+     "league": {
+      "players": 159,
+      "teams": 20,
+      "top10": [
+       "P194:78.2",
+       "P206:74.9",
+       "P112:74.4",
+       "P266:74.4",
+       "P151:74.3",
+       "P178:74.3",
+       "P205:74",
+       "P203:74",
+       "P140:73.8",
+       "P117:73.6"
+      ],
+      "tier1": [
+       "DK",
+       "BRO",
+       "GEN",
+       "T1",
+       "DRX",
+       "NS",
+       "KT",
+       "HLE",
+       "LSB",
+       "KDF"
+      ],
+      "awards": [],
+      "transfers": 72,
+      "history": "8d2c0612"
+     },
+     "world": {
+      "teams": 62,
+      "hash": "f6bd0717"
+     },
+     "news": {
+      "articles": 160
+     },
+     "inbox": 122
     }
    }
   ],

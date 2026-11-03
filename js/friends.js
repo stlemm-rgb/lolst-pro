@@ -127,7 +127,7 @@ function birthWeek() {
 function inPromotion() {
   const t = myTeam();
   const s = state.league.season;
-  if (!t || !s) return false;
+  if (!t || !s || franchiseOn(state.year)) return false; // 2021~ 프랜차이즈: 승강전 없음
   if (t.tier === 1) return !!s.finalOrder && s.finalOrder.slice(-2).indexOf(t.id) !== -1;
   const top = standings(["tier2", "tier2b"], tier2Ids()).slice(0, 2).map(function (r) { return r.id; });
   return top.indexOf(t.id) !== -1;

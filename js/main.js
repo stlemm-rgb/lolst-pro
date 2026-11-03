@@ -798,7 +798,7 @@ function nextWeek(restWeek) {
     state.player.age += 1;
     applyAging(); // 27세부터 노화 (js/retire.js)
     expireStartTrait(); // 유망주 전용 특성: 3년차부터 사라짐 (js/creation.js)
-    const leagueNews = applyRealTeamNames(state.year).concat(newSeasonLeague()).concat(convertToFranchise()).concat(contractsNewSeason()) // 253: 2021 프랜차이즈 전환 (js/franchise.js).concat(addBigRookies()).concat(placeLegends("season")); // 대형 신인 · 올해 데뷔하는 레전드 (js/league.js)
+    const leagueNews = applyRealTeamNames(state.year).concat(newSeasonLeague()).concat(convertToFranchise()).concat(contractsNewSeason()).concat(addBigRookies()).concat(placeLegends("season")); // 253: 2021 프랜차이즈 전환 (js/franchise.js) · 대형 신인 · 올해 데뷔하는 레전드 (js/league.js)
     initContracts(); // 새로 들어온 신인들 계약
     fillRosters(); // 은퇴·신인·이적이 다 끝난 뒤 후보 구성 다시 정리 (js/contracts.js 후보 구성 규칙)
     refillRivalAces(); // 은퇴한 🔥 리그의 에이스 자리 채우기 (js/straits.js)
