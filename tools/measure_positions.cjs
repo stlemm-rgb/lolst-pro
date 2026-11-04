@@ -47,7 +47,7 @@ const RUN = `(function (pos, seasons) {
 })`;
 const POS = ["top", "jungle", "mid", "adc", "support"], NAME = { top: "탑", jungle: "정글", mid: "미드", adc: "원딜", support: "서포트" };
 const seeds = [21, 22, 23];
-for (const pos of POS) {
+if (process.env.MODE !== "cause") for (const pos of POS) {
   const all = seeds.map(seed => JSON.parse(vm.runInContext(RUN, create(seed))(pos, SEASONS)));
   const sum = k => all.reduce((s, r) => s + r[k], 0);
   const n = seeds.length * SEASONS, sets = sum("sets");
@@ -62,4 +62,52 @@ for (const pos of POS) {
     const ps = Object.values(r.partners).sort((a, b) => b - a);
     console.log("  판 " + (i + 1) + " 파트너 " + ps.length + "명 (세트 " + ps.join("/") + "), 바뀐 횟수 " + r.changes);
   });
+}
+
+// ----- 원인 측정 (MODE=cause): 연차·점수에 따라 좋은 장면 : 실수 비율, 리그 선수 점수대별 비율 -----
+// 실행: MODE=cause node tools/measure_positions.cjs   (5포지션 × 1판 × 8시즌)
+if (process.env.MODE === "cause") {
+  const CAUSE = `(function (pos, seasons) {
+    linkifyNames = function () {}; renderMenu = function () {}; renderTopbar = function () {}; renderPage = function () {};
+    state = createNewState(); draft = newDraft(); draft.name = "측정"; draft.position = pos; draft.startYear = 2017; draft.teams = makeTeamDefs(2017);
+    const list = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1); draft.teamChoice = list[Math.floor(list.length / 2)][1];
+    startCareer(true); state.settings.autoSave = false;
+    const seen = new Set(), years = [], buckets = {};
+    let cur = null;
+    for (let w = 0; w < seasons * 52; w++) {
+      state.retirePlanned = false; state.plan = state.stamina < 30 ? "rest" : (state.week % 2 ? "scrim" : "replay");
+      state.inbox.filter(m => m.tab === "inbox" && m.choices && m.answered === null && m.kind !== "retire" && m.kind !== "offer").forEach(m => answerMessage(m.id, 0));
+      nextWeek();
+      if (!cur || cur.y !== state.year) { cur = { y: state.year, cy: careerYears(), score: 0, good: 0, bad: 0, sets: 0 }; years.push(cur); }
+      cur.score = Math.round(playerScore(USER_ID));
+      userMatches().forEach(m => {
+        if (!m.winner || !m.detail || seen.has(m)) return;
+        seen.add(m);
+        m.detail.sets.forEach(s => {
+          const ids = {}; (s.lanes || []).forEach(l => { ids[l.a] = 1; ids[l.b] = 1; });
+          if (ids[USER_ID]) cur.sets++;
+          (s.ev || []).forEach(e => {
+            const info = matchEventInfo(e), kind = info && info.kind;
+            if (kind !== "good" && kind !== "bad" || !e.p) return;
+            if (e.p === USER_ID) cur[kind]++;
+            const sc = e.p === USER_ID ? playerScore(USER_ID) : findPlayer(e.p) ? playerScore(e.p) : null;
+            if (sc === null) return;
+            const b = Math.floor(sc / 5) * 5, B = buckets[b] = buckets[b] || { good: 0, bad: 0 };
+            B[kind]++;
+          });
+        });
+      });
+    }
+    return JSON.stringify({ years, buckets });
+  })`;
+  const all = {};
+  for (const pos of POS) {
+    const r = JSON.parse(vm.runInContext(CAUSE, create(31))(pos, 8));
+    console.log("== " + NAME[pos] + " 연차별 (점수 · 좋은 : 실수 · 출전 세트)");
+    console.log("  " + r.years.map(y => y.cy + "년차 " + y.score + "점 " + y.good + ":" + y.bad + " (" + y.sets + ")").join(" / "));
+    Object.keys(r.buckets).forEach(b => { const A = all[b] = all[b] || { good: 0, bad: 0 }; A.good += r.buckets[b].good; A.bad += r.buckets[b].bad; });
+  }
+  console.log("== 리그 선수 전체 (내 경기에 나온 사건, 점수대별 좋은 : 실수)");
+  Object.keys(all).map(Number).sort((a, b) => a - b).forEach(b => console.log("  " + b + "~" + (b + 4) + "점: " + all[b].good + " : " + all[b].bad + " (실수 비율 " + Math.round(all[b].bad / (all[b].good + all[b].bad) * 100) + "%)"));
+  process.exit(0);
 }
