@@ -75,7 +75,7 @@ function weekSummaryHTML(r, kind) {
   const btn = replayQueue().length ? W.replayBtn : W.okBtn;
   return '<div class="ws-box' + (kind.indexOf("title") === 0 ? " champ" : "") + '" role="dialog" aria-label="이번 주 요약">' +
     '<div class="ws-screen">' + pic + head + '<div class="ws-cap">' + escapeHTML(cap) + '</div><div class="ws-rows ws-ovl">' + chips + "</div></div>" +
-    '<div class="ws-rest ws-rows">' + rows + '<div class="ws-two"><div>' + bars + "</div>" + kvHTML + "</div>" + special +
+    '<div class="ws-rest ws-rows">' + rows + positionWeekHTML(r) + '<div class="ws-two"><div>' + bars + "</div>" + kvHTML + "</div>" + special +
     '<div class="ws-foot"><button class="primary ws-btn" data-ws-close="1">' + btn + '</button><div class="muted small ws-hint">' + W.closeHint + "</div></div></div>" +
     '<div class="ws-flash"></div><span class="ws-skip">' + W.skipHint + "</span></div>";
 }
@@ -115,7 +115,8 @@ function wsPlay(box, r) {
   });
   t += M.bar * k;
   const kv = box.querySelector(".ws-kv");
-  later(t, function () { wsShow(kv); });
+  const role = box.querySelector(".ws-role"); // 260 이번 주 내 역할 (js/position_voice.js)
+  later(t, function () { wsShow(role); wsShow(kv); });
   t += M.kv * k;
   const sp = box.querySelectorAll(".ws-special");
   if (sp.length) {

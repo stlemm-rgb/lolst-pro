@@ -1457,6 +1457,12 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ws-special { display: flex; gap: 10px; align-items: center; margin-top: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid #fff; background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)); font-weight: 800; font-size: 15px; }
 .ws-special .ic { font-size: 22px; }
 .ws-special .muted { font-weight: 400; margin-top: 2px; }
+.ws-role { margin-top: 8px; padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(0, 224, 255, 0.35); background: rgba(0, 224, 255, 0.06); font-size: 13px; } /* 260 이번 주 내 역할 (js/position_voice.js) */
+.ws-role-h { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: space-between; font-weight: 800; }
+.ws-role-st { display: flex; gap: 10px; font-weight: 400; color: var(--muted); }
+.ws-role-st b { color: var(--text); }
+.ws-role-t { margin-top: 4px; line-height: 1.5; }
+.ws-role-ban { margin-top: 3px; color: var(--muted); font-size: 12px; }
 .ws-foot { margin-top: 12px; }
 .ws-btn { display: block; width: 100%; padding: 11px; font-size: 15px; }
 .ws-hint { text-align: center; margin-top: 6px; }
