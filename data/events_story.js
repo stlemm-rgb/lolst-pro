@@ -455,3 +455,64 @@ EVENTS.push(
     ],
   },
 );
+
+// ===== 258 ③ D 경력에 따라 역할이 바뀜 (always: 연락 수 상한 밖, 트리거: js/friends.js timeTriggerContext) =====
+Object.assign(TIME_EVENT_RULES, {
+  rookieYears: [3, 5],   // D1: 데뷔 몇 년차에
+  rookieAge: 19,         // D1: 우리 팀에 이 나이 이하 신인 (한 번)
+  rookieWeeks: [3, 30],  // D1: 확인하는 주 (사이)
+  pillarFrom: 6,         // D2: 이 연차부터
+  pillarStanding: 60,    // D2: 팀 내 입지가 이 이상 (한 팀에 한 번)
+  pillarWeeks: [5, 30],  // D2: 확인하는 주 (사이)
+  stallFrom: 7,          // D3: 이 연차부터
+  stallGrowth: 0.5,      // D3: 지난 2시즌 연속 점수 성장이 이것보다 작으면
+  stallWeek: 4,          // D3: 새 시즌 이 주에
+  stallGap: 3,           // D3: 한 번 받으면 몇 년 쉼
+  veteranFrom: 9,        // D4: 이 연차부터, 팀 3연패 때
+  veteranGap: 2,         // D4: 한 번 받으면 몇 년 쉼 (측정: 9년차부터 거의 해마다 3연패가 있음)
+});
+EVENTS.push(
+  // D1. 첫 후배 (3~5년차, 우리 팀에 19세 이하 신인)
+  {
+    id: "first_junior", tab: "inbox", trigger: "firstJunior", always: true,
+    title: "🐣 첫 후배",
+    text: "{age}세 신인 {player}이(가) 쭈뼛거리며 다가왔다. \"선배는 하루를 어떻게 보내세요? 저도 따라 해 보고 싶어요.\" 어느새 {name}에게도 '선배'라는 말이 붙었다.",
+    choices: [
+      { label: "내 하루 루틴을 알려 준다", effects: { relation: 4, shotcall: 1, flag: { mentee: true } }, result: "아침 솔랭 두 판, 점심 뒤 복기, 스크림 전 손 풀기. 받아 적는 후배를 보니 내가 왜 이렇게 하는지 다시 정리됐다." },
+      { label: "\"각자 자기 방식이 있어\" 내 연습에 집중한다", effects: { focus: 1 }, result: "후배는 고개를 끄덕이고 돌아갔다. 그날 연습은 유난히 잘 풀렸다." },
+    ],
+  },
+  // D2. 팀의 기둥 (6년차+, 팀 내 입지가 높을 때)
+  {
+    id: "team_pillar", tab: "inbox", trigger: "teamPillar", always: true,
+    title: "🏛️ 팀의 기둥",
+    text: "감독이 {name}을(를) 따로 불렀다. \"다음 주부터 코치진 운영 회의에 같이 들어와 줄래? 선수들 생각을 제일 잘 아는 게 너야.\"",
+    choices: [
+      { label: "회의에 들어간다", effects: { reputation: 3, shotcall: 1 }, result: "밴픽 회의, 연습 일정, 신인 기용까지. 선수 자리에서는 보이지 않던 고민이 많았다." },
+      { label: "\"저는 선수로만 집중하고 싶어요\"", effects: { condition: 5 }, result: "감독은 웃었다. \"그것도 답이다. 대신 경기장에서 보여 줘.\"" },
+    ],
+  },
+  // D3. 성장 정체 (7년차+, 2시즌 연속 점수가 거의 그대로)
+  {
+    id: "growth_stall", tab: "inbox", trigger: "growthStall", always: true,
+    title: "📉 멈춘 숫자",
+    text: "{year1}년 {score1}점, {year2}년 {score2}점, {year3}년 {score3}점. 시즌 기록을 넘기던 {name}이(가) 손을 멈췄다. 두 시즌째 숫자가 움직이지 않는다.",
+    choices: [
+      { label: "안 하던 챔피언까지 폭을 넓힌다", effects: { masteryMetaAll: 2 }, result: "손에 안 익은 챔피언으로 솔랭을 돌렸다. 지는 판이 늘었지만, 오랜만에 배우는 게 재밌었다." },
+      { label: "기본기부터 다시 한다", effects: { focus: 1 }, result: "CS 연습 모드를 켰다. 신인 때 하던 그 연습. 숫자가 조금씩 다시 올라가기 시작했다." },
+      { label: "받아들이고 경험으로 싸운다", effects: { mental: 2 }, result: "손이 예전만큼 빠르지 않다는 걸 인정했다. 대신 상대가 무엇을 할지 먼저 보인다." },
+    ],
+  },
+  // D4. 베테랑의 한마디 (9년차+, 팀 3연패)
+  {
+    id: "veteran_word", tab: "inbox", trigger: "veteranWord", always: true,
+    title: "🗣️ 베테랑의 한마디",
+    text: "3연패. 연습실이 조용하다. 누구도 먼저 입을 열지 않는다. 동료들의 눈이 팀에서 제일 오래 뛴 {name}에게 모였다.",
+    choices: [
+      { label: "팀 미팅을 연다", check: { stat: "shotcall", diff: 70 },
+        success: { effects: { teamRelation: 4 }, result: "\"우리 연패한 거 처음 아니잖아.\" 지난 연패를 어떻게 끊었는지 이야기하자 굳어 있던 얼굴들이 풀렸다." },
+        fail: { effects: { teamRelation: -1, condition: -3 }, result: "말이 길어질수록 분위기가 무거워졌다. 미팅은 아무 결론 없이 끝났다." } },
+      { label: "말 대신 묵묵히 연습한다", effects: { mental: 1 }, result: "가장 먼저 출근해 가장 늦게 퇴근했다. 아무 말도 하지 않았지만, 다음 날 연습실 불이 일찍 켜졌다." },
+    ],
+  },
+);

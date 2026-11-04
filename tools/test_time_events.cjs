@@ -122,5 +122,49 @@ const SETUP = `linkifyNames = function () {}; renderMenu = function () {}; rende
   ok(r.events === 5, "C 연락 데이터 5개");
 }
 
+// 4) ③ D 경력에 따라 역할이 바뀜 (258): 상황을 직접 만들어 조건 확인
+{
+  const ctx = create(13);
+  vm.runInContext(SETUP, ctx);
+  const r = JSON.parse(vm.runInContext(`(function () {
+    const out = {};
+    begin(2017, 1); resetWeekCtx(); play(3, {});
+    while (userMatches().filter(m => m.winner).length < 3 && state.week < 30) play(1, {}); // D4용 경기 3개
+    const M = timeMem(), t = myTeam(), P = state.league.players, d = state.career.debut;
+    // D1 첫 후배: 4년차 + 우리 팀 동료 한 명을 18세로
+    const kid = t.roster.find(id => id !== USER_ID);
+    const age0 = P[kid].age; P[kid].age = 18;
+    state.week = 10; d.year = state.year - 1; out.j2 = !!triggerContext("firstJunior"); // 2년차 = 아직
+    d.year = state.year - 3; out.j = triggerContext("firstJunior"); out.jTwice = !!triggerContext("firstJunior");
+    P[kid].age = age0;
+    // D2 팀의 기둥: 6년차 + 입지 (standingValue를 잠깐 바꿔서)
+    const sv = standingValue; d.year = state.year - 5;
+    standingValue = () => 50; out.p50 = !!triggerContext("teamPillar");
+    standingValue = () => 70; out.p = !!triggerContext("teamPillar"); out.pTwice = !!triggerContext("teamPillar");
+    standingValue = sv;
+    // D3 성장 정체: 7년차 + 지난 3시즌 기록 점수
+    d.year = state.year - 6; const y = state.year;
+    state.career.seasons = [{ year: y - 3, score: 80.1 }, { year: y - 2, score: 80.4 }, { year: y - 1, score: 80.6 }];
+    state.week = 5; out.sWeek = !!triggerContext("growthStall");
+    state.week = 4; out.s = triggerContext("growthStall"); out.sTwice = !!triggerContext("growthStall");
+    M.stallYear = 0; state.career.seasons[1].score = 79; out.sGrow = !!triggerContext("growthStall"); // 한 번은 1점 넘게 큼 → 아님
+    // D4 베테랑의 한마디: 9년차 + 3연패
+    d.year = state.year - 8; const done = userMatches().filter(m => m.winner);
+    out.hasGames = done.length >= 3;
+    const keep = done.slice(-3).map(m => m.winner), opp = m => (m.a === t.id ? m.b : m.a);
+    done.slice(-3).forEach(m => { m.winner = opp(m); });
+    state.weekCtx.losses = 0; out.vNoLoss = !!triggerContext("veteranWord"); // 이번 주 진 경기가 없으면 아님
+    state.weekCtx.losses = 1; out.v = !!triggerContext("veteranWord"); out.vTwice = !!triggerContext("veteranWord");
+    done.slice(-3).forEach((m, i) => { m.winner = keep[i]; });
+    out.events = ["first_junior", "team_pillar", "growth_stall", "veteran_word"].filter(id => findEvent(id)).length;
+    return JSON.stringify(out);
+  })()`, ctx));
+  ok(!r.j2 && r.j && r.j.age === 18 && !r.jTwice, "D1 첫 후배 · " + (r.j && r.j.player + " " + r.j.age + "세") + " (3~5년차, 한 번)");
+  ok(!r.p50 && r.p && !r.pTwice, "D2 팀의 기둥 (입지 60 이상, 한 팀에 한 번)");
+  ok(!r.sWeek && r.s && r.s.score3 === 81 && !r.sTwice && !r.sGrow, "D3 성장 정체 · " + (r.s && r.s.score1 + "→" + r.s.score2 + "→" + r.s.score3) + " (4주만, 3년 쉼, 크면 아님)");
+  ok(r.hasGames && !r.vNoLoss && r.v && !r.vTwice, "D4 베테랑의 한마디 (3연패 주, 2년 쉼)");
+  ok(r.events === 4, "D 연락 데이터 4개");
+}
+
 console.log(fail ? "❌ 실패 " + fail + "개" : "✅ 통과");
 process.exit(fail ? 1 : 0);

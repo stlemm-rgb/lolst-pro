@@ -275,6 +275,33 @@ function timeTriggerContext(trigger) {
       M.seen["v" + id] = 1; M.vsYear = y;
       return { pid: id, player: playerName(id), pteam: ot.name, untilYear: M.mates[id][1] };
     }
+    case "firstJunior": { // D1 첫 후배 (한 번)
+      const R = TIME_EVENT_RULES, n = careerYears(), t = myTeam(), P = state.league.players;
+      if (M.seen.d1 || !t || n < R.rookieYears[0] || n > R.rookieYears[1] || w < R.rookieWeeks[0] || w > R.rookieWeeks[1]) return null;
+      const id = sortDescBy(t.roster.filter(function (x) { return x !== USER_ID && P[x] && P[x].age <= R.rookieAge; }), playerScore)[0];
+      if (!id) return null;
+      M.seen.d1 = 1;
+      return { pid: id, player: playerName(id), age: P[id].age };
+    }
+    case "teamPillar": { // D2 팀의 기둥 (한 팀에 한 번)
+      const R = TIME_EVENT_RULES, t = myTeam();
+      if (!t || M.seen["p" + t.id] || careerYears() < R.pillarFrom || w < R.pillarWeeks[0] || w > R.pillarWeeks[1] || standingValue() < R.pillarStanding) return null;
+      M.seen["p" + t.id] = 1;
+      return {};
+    }
+    case "growthStall": { // D3 성장 정체: 지난 3시즌 기록의 점수가 2번 연속 거의 그대로
+      const R = TIME_EVENT_RULES, s = (state.career.seasons || []).slice(-3);
+      if (w !== R.stallWeek || careerYears() < R.stallFrom || s.length < 3 || y - (M.stallYear || 0) < R.stallGap) return null;
+      if (s[2].year !== y - 1 || s[1].year !== y - 2 || s[0].year !== y - 3) return null;
+      if (s[1].score - s[0].score >= R.stallGrowth || s[2].score - s[1].score >= R.stallGrowth) return null;
+      M.stallYear = y;
+      return { year1: s[0].year, score1: Math.round(s[0].score), year2: s[1].year, score2: Math.round(s[1].score), year3: s[2].year, score3: Math.round(s[2].score) };
+    }
+    case "veteranWord": { // D4 베테랑의 한마디: 팀 3연패 (2년에 한 번)
+      if (careerYears() < TIME_EVENT_RULES.veteranFrom || y - (M.vetYear || 0) < TIME_EVENT_RULES.veteranGap || !(state.weekCtx.losses > 0 && loseStreak() === 3)) return null;
+      M.vetYear = y;
+      return {};
+    }
     default: return null;
   }
 }

@@ -67,6 +67,8 @@
 //     eraFranchise(2021년 2주, 2020년 이전 데뷔, need.tier로 1군·2군 글) · careerAnniv(데뷔 5·10년차 3주: {years} {debutYear} {debutTeam} {debutAge} {debutScore} {nowScore})
 //     titleAnniv(첫 우승 3년 뒤 5주: {titleYear} {titleTeam} {titleName}, {player} = 그때 동료) · homeTeam(예전 팀과 경기하는 주, 그 팀에 옛 동료가 있을 때: {oldteam} {sinceYear} {player})
 // - trigger 추가 (257 ③ C): homeTeamSolo(친정팀인데 옛 동료 없음) · mateBack(한 해 넘게 떨어진 옛 동료가 다시 같은 팀: {player} {leftYear}) · juniorStar(같이 뛴 20세 이하 후배가 다른 팀에서 리그 상위 30명, 3·30주: {player} {pteam} {togetherYear} {age}) · exMateVs(친구 아닌 옛 동료와 떠난 뒤 첫 맞대결, 시즌 1번: {player} {pteam} {untilYear})
+// - trigger 추가 (258 ③ D, 숫자는 TIME_EVENT_RULES): firstJunior(3~5년차, 우리 팀 19세 이하 신인, 한 번: {player} {age}) · teamPillar(6년차+, 팀 내 입지 60↑, 한 팀에 한 번)
+//     growthStall(7년차+, 지난 2시즌 연속 점수 +0.5 미만, 4주, 3년 쉼: {year1~3} {score1~3}) · veteranWord(9년차+, 팀 3연패, 2년 쉼)
 const EVENT_RULES = {
   seasonMax: 1,         // 같은 연락은 한 시즌에 1번까지 (데이터 seasonMax로 바꿀 수 있음)
   inboxPerSeason: 10,   // 한 시즌 받은 연락 상한 (always 연락·후속 연락은 빼고 셈 → 전체는 1년 약 15~18개)

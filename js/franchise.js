@@ -73,11 +73,23 @@ function convertToFranchise() {
   academies.forEach(function (a) { while (a.roster.length < LEAGUE.rosterSize && pool.length) take(a, null); });
   pool.forEach(function (id) { const p = findPlayer(id); p.teamId = null; if (L.freeAgents.indexOf(id) === -1) L.freeAgents.push(id); });
   // ⑤ 내 팀이 해체되면: 1군 주전보다 강하면 그 구단 1군, 아니면 내 포지션 주전이 가장 약한 2군
-  if (userTeam) {
+  const pickDest = function () {
     const pos = state.player.position, me = playerScore(USER_ID);
     const weakest = function (list) { return list.slice().sort(function (a, b) { const sa = starterAt(a.id, pos), sb = starterAt(b.id, pos); return (sa ? playerScore(sa) : 0) - (sb ? playerScore(sb) : 0); })[0]; };
     const t1 = weakest(orgTeams), st = starterAt(t1.id, pos);
-    const dest = st && me > playerScore(st) ? t1 : weakest(academies);
+    return st && me > playerScore(st) ? t1 : weakest(academies);
+  };
+  // 258 버그: 이적하기로 한 팀(state.pendingMove)이 해체되면 같은 규칙으로 갈 팀을 바꿈 (계약 조건은 그대로)
+  const mv = state.pendingMove, mvGone = mv && gone.find(function (t) { return t.id === mv.teamId; });
+  if (mvGone && !userTeam) {
+    const to = pickDest();
+    mv.teamId = to.id;
+    postMessage("inbox", "🏛️ 프랜차이즈 출범 — 이적할 팀이 " + to.name + "(으)로", mvGone.name + "이(가) 해체되면서 이적하기로 한 계약이 " + to.name + (to.tier === 1 ? "(1군)" : "(2군)") + "으로 넘어갔다. 계약 조건은 그대로다." +
+      (to.tier === 2 ? " 2군에서 1군 주전보다 강해지면 콜업된다." : ""), {});
+  }
+  if (userTeam) {
+    const dest = pickDest();
+    if (mvGone) { state.contract = { teamId: dest.id, salary: mv.salary, endYear: mv.endYear, guarantee: mv.guarantee }; state.pendingMove = null; } // 해체된 팀끼리 옮기던 중이면 새 계약 조건으로 바로 새 구단에
     dest.roster.push(USER_ID);
     state.contract.teamId = dest.id;
     state.team = dest.name;
