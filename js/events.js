@@ -355,6 +355,7 @@ function runWeeklyEvents() {
   timeMemWeekly(); // 예전 팀·첫 우승 기억 (254, js/friends.js)
   duoWeekly(); // 바텀 듀오 기록·연락 (261, js/duo.js)
   posSceneWeekly(); // 포지션 연락용 내 장면 기록 (262, js/position_voice.js)
+  posArticleWeekly(); // 내 장면 분석 기사 (263, js/position_voice.js)
   let inboxFired = friendWeekly(); // 분기 친구 활동 · 친구 트리거 (js/friends.js)
   inboxFired = retirementWeekly() || inboxFired;
   inboxFired = standingWeekly() || inboxFired; // 팀 내 입지: 주장 제안·영입 후보·조기 재계약 (js/standing.js) // 메타 적응 은퇴 기사 · 은퇴 상담 · 코치→감독 (js/retirement.js)
@@ -548,6 +549,9 @@ function postSocial() {
     const c = Object.assign({}, ctx, { proteam: who.proteam }, cat === "patch" ? { champ: mySMeta() } : {});
     const raw = pick(freshOf(list, c));
     posted++;
+    // 263: 슈퍼플레이·실수·솔로킬·이긴 주(영혼의 듀오) 글은 이번 주 내 장면으로 글·글쓴이를 바꿈 (난수는 위에서 그대로 씀, js/position_voice.js)
+    const sw = posSocialSwap(cat, resultCat, c);
+    if (sw) { if (post(sw.who, sw.raw, c)) mentions++; return; }
     if (post(who, raw, c)) mentions++;
   });
   return mentions;

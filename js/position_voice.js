@@ -122,7 +122,8 @@ function posSceneWeekly() {
       played = true;
       (sd.ev || []).forEach(function (e) {
         const id = e.p === USER_ID ? e.e : e.v === USER_ID && e.e === "solo" ? "hit_solo" : null;
-        if (id) S.log.push({ w: now, e: id, pick: sd.pick, pm: sd.pm });
+        // 263: v 그 장면의 상대 선수(당한 선수 / 솔로킬 당함이면 이긴 선수), opp 같은 포지션 상대
+        if (id) S.log.push({ w: now, e: id, pick: sd.pick, pm: sd.pm, v: e.p === USER_ID ? e.v : e.p, opp: sd.lanes[me][side === "a" ? "b" : "a"] });
       });
     });
     if (played && m.pog === USER_ID) S.pog.push(now);
@@ -165,4 +166,68 @@ function posSceneContext(key) {
 function applyRelationPos(pos, notes) {
   const t = myTeam(), id = t && starters(t.id)[pos];
   if (id && id !== USER_ID && findPlayer(id)) changeRelation(id, POSITION_EVENT_RULES.relationPos, notes);
+}
+
+// ----- 6단계 (263): 같은 장면을 팬·동료·상대 선수·기사가 — 글: data/position_social.js -----
+// 이번 주 내 대표 장면: 포지션 연락용 기록(posSceneWeekly)에서 이번 주 것 — 좋은 장면(큰 것 먼저) / 실수(큰 것 먼저)
+function posWeekScenes() {
+  const S = state.flags && state.flags.posScene, now = absWeek(), rank = { l: 3, m: 2, s: 1 };
+  if (!S) return { good: null, bad: null };
+  const list = S.log.filter(function (x) { return x.w === now && x.e !== "hit_solo"; }).map(function (x) {
+    const info = x.e === "solo" ? { kind: "good", size: "m", name: "솔로킬" } : matchEventInfo({ e: x.e }) || {};
+    return { x: x, kind: info.kind, size: info.size || "s", name: info.name || "" };
+  }).filter(function (o) { return (o.kind === "good" || o.kind === "bad") && o.name; });
+  const best = function (k) { return list.filter(function (o) { return o.kind === k; }).sort(function (a, b) { return rank[b.size] - rank[a.size]; })[0] || null; };
+  return { good: best("good"), bad: best("bad") };
+}
+// 이번 주 같이 뛴 영혼의 듀오 (별명 있을 때)
+function posWeekDuo() {
+  const D = state.flags && state.flags.duo, rec = D && D.cur && D.p[D.cur];
+  if (!rec || !rec.nick || rec.left || rec.retired || rec.last !== state.year || DUO_RULES.stages[rec.st].id !== "soul") return null;
+  return rec;
+}
+function posFanWho(h) {
+  const fans = SOCIAL_FAN_NAMES.length ? SOCIAL_FAN_NAMES : ["팬"];
+  return { title: "@" + fans[h % fans.length] + (1000 + (Math.floor(h / fans.length) % 9000)), proId: null };
+}
+// postSocial에서 부름 (js/events.js). 돌려주는 값: { who, raw } 또는 null (원래 글 그대로)
+function posSocialSwap(cat, resultCat, c) {
+  const R = POSITION_SOCIAL_RULES, pos = state.player.position, t = myTeam(), h = voiceHash(absWeek() + "|" + cat);
+  if (!t) return null;
+  // 영혼의 듀오: 이긴 주 결과 글 몇 번에 한 번
+  if (cat === resultCat && /^win/.test(cat || "")) {
+    const duo = posWeekDuo();
+    if (duo && h % R.duoWinEvery === 0) return { who: posFanWho(h), raw: voicePick(DUO_SOCIAL.win, "duo|" + absWeek()).replace(/\{nick\}/g, duo.nick).replace(/\{partner\}/g, duo.name) };
+    return null;
+  }
+  if (R.cats.indexOf(cat) === -1 || !POSITION_SOCIAL[pos]) return null;
+  const sc = posWeekScenes(), good = cat !== "blunder", o = good ? sc.good : sc.bad;
+  if (!o) return null;
+  const L = POSITION_SOCIAL[pos][good ? "good" : "bad"], voices = [];
+  const mates = Object.values(starters(t.id)).filter(function (id) { return id && id !== USER_ID && findPlayer(id); });
+  const oppId = [o.x.v, o.x.opp].find(function (id) { return id && id !== USER_ID && findPlayer(id) && findPlayer(id).teamId && findPlayer(id).teamId !== t.id; });
+  voices.push("fan");
+  if (L.mate && mates.length) voices.push("mate");
+  if (L.opp && oppId) voices.push("opp");
+  const v = voices[h % voices.length];
+  let who;
+  if (v === "fan") who = posFanWho(h);
+  else {
+    const id = v === "mate" ? mates[Math.floor(h / 7) % mates.length] : oppId;
+    who = { title: "@" + playerName(id), proId: id };
+  }
+  c.proteam = who.proId ? teamName(findPlayer(who.proId).teamId) : "";
+  return { who: who, raw: voicePick(L[v], "soc|" + absWeek() + "|" + cat).replace(/\{scene\}/g, o.name) };
+}
+// 분석 기사 (js/events.js runWeeklyEvents, posSceneWeekly 다음): 좋은 장면이 크거나 포지션 핵심 장면이면, 최근 4주에 기사가 없을 때
+function posArticleWeekly() {
+  const S = state.flags && state.flags.posScene, R = POSITION_SOCIAL_RULES, pos = state.player.position, t = myTeam();
+  if (!S || !t || !POSITION_ARTICLES[pos]) return;
+  const o = posWeekScenes().good, now = absWeek();
+  if (!o || !(o.size === "l" || (R.core[pos] || []).indexOf(o.x.e) !== -1)) return;
+  if (S.article && now - S.article < R.articleGap) return;
+  S.article = now;
+  const a = voicePick(POSITION_ARTICLES[pos], "art|" + now), duo = posWeekDuo();
+  const fill = function (s) { return fillText(s.replace(/\{scene\}/g, o.name), {}); };
+  postMessage("news", fill(a.title), fill(a.text) + (duo ? " " + fill(DUO_SOCIAL.article.replace(/\{nick\}/g, duo.nick).replace(/\{partner\}/g, duo.name)) : ""), { eventId: "pos_article" });
 }
