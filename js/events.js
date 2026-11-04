@@ -116,6 +116,7 @@ function eventMoney(v) {
 // 돌려주는 것: { changes: {스탯 변화}, notes: [문장] }
 function applyEffects(eff, ctx) {
   const changes = {}, notes = [];
+  const stateOn = { ifTired: choiceStateOn("ifTired"), ifSlump: choiceStateOn("ifSlump") }; // 264: 고르는 순간의 상태 (체력을 먼저 올린 뒤에 보면 안 됨)
   const add = function (id, n) { if (n) changes[id] = (changes[id] || 0) + n; };
   Object.keys(eff || {}).forEach(function (key) {
     const v = eff[key];
@@ -229,8 +230,21 @@ function applyEffects(eff, ctx) {
       state.transferListed = true;
       notes.push("비시즌에 이적 제안이 늘어난다");
     } else if (key === "matchBoost") {
-      state.matchBoost = v;
-      notes.push("다음 경기 경기력 +" + Math.round(v * 100) + "%");
+      // 264 버그: 예전엔 덮어써서 +6% 뒤 +3%면 약해졌음 → 좋은 버프는 더 큰 쪽, 나쁜 버프는 더함
+      const cur = state.matchBoost || 0;
+      if (v > 0 && cur >= v) notes.push("다음 경기 경기력 +" + Math.round(cur * 100) + "% 그대로 (이미 더 큰 준비가 돼 있음)");
+      else {
+        state.matchBoost = v > 0 ? v : cur + v;
+        notes.push("다음 경기 경기력 " + (state.matchBoost >= 0 ? "+" : "−") + Math.round(Math.abs(state.matchBoost) * 100) + "%");
+      }
+    } else if (key === "ifTired" || key === "ifSlump") {
+      // 264 상황에 따라 달라지는 효과: 지쳐 있으면(체력 EVENT_RULES.tiredBelow 아래) / 연패 중이면(EVENT_RULES.slumpFrom연패 이상) 더
+      if (stateOn[key]) {
+        const r2 = applyEffects(v, ctx);
+        Object.keys(r2.changes).forEach(function (k) { add(k, r2.changes[k]); });
+        notes.push(key === "ifTired" ? "🔋 지쳐 있어서 더 회복됐다" : "💪 연패 중이라 더 힘이 됐다");
+        r2.notes.forEach(function (n) { notes.push(n); });
+      }
     }
   });
   return { changes: changes, notes: notes };
@@ -260,10 +274,35 @@ function rollTraitEffects(choice, notes) {
 }
 
 // 선택지 옆에 보여 줄 위험·극복 안내
+// 264: 상황 조건 (ifTired·ifSlump)
+function choiceStateOn(key) {
+  if (key === "ifTired") return state.stamina < EVENT_RULES.tiredBelow;
+  if (key === "ifSlump") return !!myTeam() && loseStreak() >= EVENT_RULES.slumpFrom;
+  return false;
+}
+// 264 선택 전 의도 힌트: 아이콘 + 대상 + 방향 (숫자는 결과 카드에서만). 글·아이콘 = data/events.js CHOICE_INTENT
+function choiceIntentParts(eff, ctx, prefix) {
+  const I = CHOICE_INTENT, out = [];
+  Object.keys(eff || {}).forEach(function (k) {
+    const v = eff[k];
+    let label = I.keys[k];
+    if (state.stats[k] !== undefined) label = I.stat.replace("{stat}", statName(k));
+    if (!label) return;
+    const who = k === "relation" ? ctx.player || I.someone : k === "affection" ? ctx.her || ctx.player || I.someone : k === "relationPos" ? findPosition(v).name : "";
+    const dir = typeof v === "number" ? (v > 0 ? "↑" : v < 0 ? "↓" : "") : k === "relationPos" ? "↑" : "";
+    out.push(prefix + label.replace("{who}", who) + dir);
+  });
+  ["ifTired", "ifSlump"].forEach(function (k) {
+    if (eff && eff[k]) out.push(prefix + (choiceStateOn(k) ? I[k + "On"] : I[k]) + "↑");
+  });
+  return out;
+}
 function choiceHint(choice, ctx) {
   const parts = [];
   if (choice.note) parts.push(fillText(choice.note, ctx)); // {player} 등 채우기
   const e = choice.effects || {};
+  choiceIntentParts(e, ctx || {}, "").forEach(function (x) { parts.push(x); });
+  if (choice.check && choice.success) choiceIntentParts(choice.success.effects, ctx || {}, CHOICE_INTENT.ifSuccess).forEach(function (x) { parts.push(x); });
   if (e.money && eventMoney(e.money)) parts.push("자금 " + (e.money > 0 ? "+" : "−") + moneyText(Math.abs(eventMoney(e.money))));
   if (e.activity && ACTIVITIES[e.activity] && !choice.note) parts.push(ACTIVITIES[e.activity].icon + " " + fillText(ACTIVITIES[e.activity].desc, ctx));
   if (e.cureOther) parts.push("💚 " + Math.round(e.cureOther * 100) + "% 확률로 동료의 나쁜 특성 극복");
@@ -593,7 +632,7 @@ function answerMessage(msgId, index) {
   // 예전에 온 연락이라 선택지 순서가 바뀌었으면 글자로 찾기
   const lab = function (c) { return c.label === msg.choices[index].label || fillText(c.label, msg.ctx || {}) === msg.choices[index].label; }; // 261: 빈칸을 채운 글자도 같다고 봄
   if (ev && msg.choices && msg.choices[index] && choice && !lab(choice)) {
-    choice = ev.choices.find(lab) || null;
+    choice = ev.choices.find(lab) || choice; // 264: 글자를 고친 선택지는 순서로 (예전 세이브의 답 안 한 연락)
   }
   if (!choice || choiceTooExpensive(msg, index)) return;
   const r = applyEffects(choice.effects, msg.ctx);

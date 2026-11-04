@@ -70,7 +70,24 @@
 // - trigger 추가 (258 ③ D, 숫자는 TIME_EVENT_RULES): firstJunior(3~5년차, 우리 팀 19세 이하 신인, 한 번: {player} {age}) · teamPillar(6년차+, 팀 내 입지 60↑, 한 팀에 한 번)
 //     growthStall(7년차+, 지난 2시즌 연속 점수 +0.5 미만, 4주, 3년 쉼: {year1~3} {score1~3}) · veteranWord(9년차+, 팀 3연패, 2년 쉼)
 // - trigger 추가 (262 ④ 포지션 연락): "pos:열쇠" — 규칙은 data/position_events.js POSITION_EVENT_RULES (최근 4주 내 장면 n번)
+// ----- 264 선택지 의도 힌트 (js/events.js choiceIntentParts): 고르기 전에 '무엇이 어느 쪽으로' 바뀌는지 아이콘으로 (숫자는 결과에서만) -----
+//   효과 ifTired: {...} → 지쳐 있을 때(체력 EVENT_RULES.tiredBelow 아래)만 더 / ifSlump: {...} → 연패 중(slumpFrom연패 이상)일 때만 더
+const CHOICE_INTENT = {
+  keys: {
+    condition: "😊 컨디션", stamina: "🔋 체력", reputation: "🏅 평판", popularity: "⭐ 인기",
+    relation: "🤝 {who} 관계", teamRelation: "🤝 팀 관계", affection: "💗 {who} 호감", relationPos: "🤝 {who} 관계",
+    matchBoost: "⚔️ 다음 경기", masteryMetaOne: "🎮 숙련도", masteryMetaAll: "🎮 메타 숙련도", masteryChamp: "🎮 숙련도",
+    salaryRaise: "💰 연봉", transferListed: "📨 이적 제안",
+  },
+  stat: "📈 {stat}",
+  someone: "그 선수",
+  ifSuccess: "성공 시 ",
+  ifTired: "🔋 지쳐 있으면 더 회복", ifTiredOn: "🔋 지금 지쳐 있어서 더 회복",
+  ifSlump: "💪 연패 중이면 더 도움", ifSlumpOn: "💪 지금 연패 중이라 더 도움",
+};
 const EVENT_RULES = {
+  tiredBelow: 40,       // 264 효과 ifTired: 체력이 이것보다 낮으면 '지쳐 있음'
+  slumpFrom: 2,         // 264 효과 ifSlump: 이만큼 연패면 '연패 중'
   seasonMax: 1,         // 같은 연락은 한 시즌에 1번까지 (데이터 seasonMax로 바꿀 수 있음)
   inboxPerSeason: 10,   // 한 시즌 받은 연락 상한 (always 연락·후속 연락은 빼고 셈 → 전체는 1년 약 15~18개)
   freshWeight: 3,       // 아직 한 번도 안 온 무작위 연락은 3배 잘 뽑힘
@@ -148,11 +165,11 @@ const EVENTS = [
     title: "결승 전날 밤",
     text: "내일은 결승이다. 숙소가 조용하다. 오늘 밤 어떻게 보낼까?",
     choices: [
-      { label: "평소대로 보낸다", effects: { condition: 4 }, result: "평소처럼 랭크 두 판, 샤워, 잠. 특별한 날일수록 평범하게." },
+      { label: "평소대로 보낸다", effects: { condition: 8, mental: 1 }, result: "평소처럼 랭크 두 판, 샤워, 잠. 특별한 날일수록 평범하게." },
       { label: "밤새 상대를 연구한다", check: { stat: "focus", diff: 55 },
         success: { effects: { masteryMetaAll: 3, matchBoost: 0.06, stamina: -8 }, result: "상대 정글러의 동선 습관을 찾아냈다. 내일은 보인다." },
         fail: { effects: { masteryMetaAll: 2, stamina: -15, condition: -5 }, result: "영상만 보다 날이 밝았다. 눈이 뻑뻑하다." } },
-      { label: "일찍 잔다", effects: { condition: 10, stamina: 10 }, result: "알람보다 먼저 눈이 떠졌다. 몸이 가볍다." },
+      { label: "일찍 잔다", effects: { condition: 4, stamina: 12, ifTired: { stamina: 8 } }, result: "알람보다 먼저 눈이 떠졌다. 몸이 가볍다." },
     ],
   },
   {
@@ -199,12 +216,12 @@ const EVENTS = [
     title: "콜 문제로 갈등",
     text: "스크림 도중 콜 문제로 {player} 선수와 언성이 높아졌다. 다른 팀원들은 눈치만 보고 있다.",
     choices: [
-      { label: "먼저 사과한다", effects: { reputation: 3, condition: -3, relation: 15 }, result: "{player}: \"아냐, 나도 예민했어.\" 둘이 편의점에서 컵라면을 먹었다." },
+      { label: "먼저 사과한다", effects: { reputation: 3, relation: 15 }, result: "{player}: \"아냐, 나도 예민했어.\" 둘이 편의점에서 컵라면을 먹었다." },
       { label: "내 의견을 끝까지 주장한다", check: { stat: "shotcall", diff: 60 },
         success: { effects: { shotcall: 2, relation: -5 }, result: "리플레이를 돌려 보니 내 콜이 맞았다. {player}도 마지못해 인정했다." },
         fail: { effects: { relation: -20, reputation: -3 }, result: "리플레이를 보니... 내가 틀렸다. 분위기가 싸늘하다.", risk: { trait: "stubborn", chance: 0.04 },
           followUp: { event: "conflict_after", weeks: [3, 6], chance: 0.7 } } },
-      { label: "감독에게 맡긴다", effects: { relation: -3 }, result: "감독이 둘을 불러 정리했다. 일은 끝났지만 어색함은 남았다." },
+      { label: "감독에게 맡긴다", effects: { relation: 5 }, result: "감독이 둘을 불러 정리했다. 서로 한 발씩 물러서니 생각보다 금방 풀렸다." },
     ],
   },
   {
@@ -222,10 +239,10 @@ const EVENTS = [
     title: "팀 회식",
     text: "오늘 저녁 팀 회식이 있다고 한다. 감독님이 고기를 산다고 한다.",
     choices: [
-      { label: "참석한다", effects: { condition: 8, teamRelation: 4 }, result: "고기 굽는 담당이 됐다. 다들 웃으며 이번 시즌 이야기를 했다." },
+      { label: "참석한다", effects: { condition: 8, teamRelation: 4, ifSlump: { condition: 5 } }, result: "고기 굽는 담당이 됐다. 다들 웃으며 이번 시즌 이야기를 했다." },
       { label: "2차, 3차까지 달린다", effects: { condition: 14, stamina: -12, teamRelation: 8 }, risk: { trait: "lazy", chance: 0.03 },
         result: "노래방에서 정글러의 숨은 재능을 발견했다. 다음 날 아침 스크림은... 묻지 말자." },
-      { label: "빠지고 연습한다", effects: { laning: 2, condition: -3, teamRelation: -3 }, result: "텅 빈 연습실. 손은 늘었지만 단톡방 사진을 보니 조금 쓸쓸하다." },
+      { label: "빠지고 연습한다", effects: { laning: 2, teamRelation: -2 }, result: "텅 빈 연습실. 손은 늘었지만 단톡방 사진을 보니 조금 쓸쓸하다." },
     ],
   },
   {
@@ -275,7 +292,7 @@ const EVENTS = [
       { label: "직접 해명한다", check: { stat: "reputation", diff: 10 },
         success: { effects: { reputation: 5, condition: 2 }, result: "연습실 영상을 올리자 분위기가 반전됐다. \"이걸 보고도 루머를 믿냐\"" },
         fail: { effects: { reputation: -2, condition: -5 }, result: "해명할수록 말꼬리를 잡힌다. 차라리 가만히 있을 걸.", followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } } },
-      { label: "무시한다", effects: { reputation: -3 }, result: "며칠 지나면 잊히겠지...", followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } },
+      { label: "무시한다", effects: { condition: 2 }, note: "몇 주 뒤 루머가 더 퍼질 수도 있어요", result: "신경 쓰지 않기로 했다. 며칠 지나면 잊히겠지...", followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } },
       { label: "법적 대응한다", effects: { money: -1000000, reputation: 5 }, note: "몇 주 뒤 결과가 와요 (사과문·합의금)", result: "변호사 사무실을 다녀왔다. 증거는 충분하다고 한다.",
         followUp: [{ event: "rumor_apology", weeks: [3, 6], chance: 0.6 }, { event: "rumor_settlement", weeks: [6, 10], chance: 0.5 }] },
     ],
@@ -328,7 +345,7 @@ const EVENTS = [
     choices: [
       { label: "알람을 맞추고 패턴을 고친다", check: { stat: "focus", diff: 50 },
         success: { effects: { condition: 6, focus: 1 }, result: "일주일 만에 아침형 인간이 됐다. 스크림 집중력이 확 올랐다." },
-        fail: { effects: { condition: -4 }, result: "알람 다섯 개를 다 끄고 잤다. 패턴 고치기는 생각보다 어렵다." } },
+        fail: { effects: { condition: -2, mental: 1 }, result: "알람 다섯 개를 다 끄고 잤다. 그래도 사흘은 지켰다. 패턴 고치기는 생각보다 어렵지만, 시작은 했다." } },
       { label: "그냥 이대로 지낸다", effects: { stamina: 5, teamRelation: -2 }, risk: { trait: "night_owl", chance: 0.04 }, result: "동료들이 아침마다 나를 깨우러 온다. 슬슬 눈치가 보인다." },
     ],
   },
@@ -609,7 +626,7 @@ const EVENTS = [
     text: "2부의 한 유망주가 {name}에게 조언을 구하고 싶다며 연락해 왔다. \"한 번만 시간 내 주실 수 있을까요?\"",
     choices: [
       { label: "시간을 내서 돕는다", effects: { reputation: 4, shotcall: 1, stamina: -4 }, result: "\"선배님 말씀 다 적어 갑니다!\" 노트를 세 장이나 채웠다." },
-      { label: "바빠서 거절한다", effects: { reputation: -1 } },
+      { label: "정중히 거절한다", effects: { condition: 2 }, result: "\"지금은 제 시즌에 집중해야 해서요. 시즌 끝나고 꼭 연락 주세요.\" 유망주는 오히려 고맙다고 했다." },
     ],
   },
   {

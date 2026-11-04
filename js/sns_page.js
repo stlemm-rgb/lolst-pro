@@ -249,6 +249,8 @@ function choiceHintParts(hint) {
     else if (/^관계 [−-]/.test(p) || /^자금 [−-]/.test(p) || p === "자금이 부족해요" || /^(⚠️|실패하면 ⚠️)/.test(p)) chip("down", p.replace(/^자금 /, ""));
     else if ((x = /^🎲 성공 확률 (\d+%) \((.+)\)$/.exec(p))) chip("dice", "🎲 " + x[1] + " (" + x[2] + ")");
     else if (/^실패하면 /.test(p)) chip("", p.replace(/^실패하면 /, "실패 시 "));
+    else if (/↑$/.test(p)) chip("up", p); // 264 의도 힌트
+    else if (/↓$/.test(p)) chip("down", p);
     else sub.push(p);
   });
   return { sub: sub, chips: chips };

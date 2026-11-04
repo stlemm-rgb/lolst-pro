@@ -57,8 +57,10 @@ function changeAffection(tid, n, notes) {
   const R = ensureRomance();
   if (!R.met[tid]) R.met[tid] = { name: targetName(tid), aff: 0 };
   const m = R.met[tid];
+  const before = m.aff; // 264: 표시는 실제 증감
   m.aff = Math.max(0, Math.min(100, m.aff + n));
-  if (notes) notes.push((n > 0 ? "💗 " : "💔 ") + m.name + " 호감 " + (n > 0 ? "+" : "") + n + " (" + romanceStageName(tid) + ")");
+  const d = m.aff - before;
+  if (notes) notes.push((n > 0 ? "💗 " : "💔 ") + m.name + " 호감 " + (d ? (d > 0 ? "+" : "") + d : "그대로") + " (" + romanceStageName(tid) + ")");
 }
 
 function romanceEffect(v, ctx, notes) {

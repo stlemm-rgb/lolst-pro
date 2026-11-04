@@ -1,5 +1,5 @@
 // 262 포지션 연락 검사: 브라우저 없이 Node로
-// 1) 5포지션 × 2판 × 3시즌 실제 진행 → 시즌마다 어떤 포지션 연락이 몇 개 오는지 (듀오 연락 포함 한도 2)
+// 1) 5포지션 × 2판 × 3시즌 실제 진행 → 시즌마다 어떤 포지션 연락이 몇 개 오는지 (듀오 연락 포함 한도 2 — 듀오 이야기는 막지 않음)
 // 2) 상황을 직접 만들어: 장면 수 조건 · 같은 장면 다시 안 셈 · 한 시즌 1번 · 한도 · POG 조건 · 다른 포지션 연락은 안 옴 · 원인 한마디 · relationPos
 // 실행: node tools/test_position_events.cjs   (약 3분)
 const fs = require("fs"), vm = require("vm"), path = require("path");
@@ -29,7 +29,8 @@ for (const pos of ["top", "jungle", "mid", "adc", "support"]) for (const seed of
   const got = JSON.parse(vm.runInContext(`(function () { begin("${pos}", 2017); const got = {}; play(52 * 3, got); return JSON.stringify(got); })()`, ctx));
   const ys = Object.keys(got);
   per[pos] = (per[pos] || []).concat([ys.map(y => y + ": " + got[y].join(", ")).join(" / ") || "없음"]);
-  ok(ys.every(y => got[y].length <= 2), pos + " 씨앗 " + seed + " 시즌마다 2개 이하");
+  // 한도(듀오 연락 포함 2개)가 찬 뒤에는 포지션 연락이 안 옴 (듀오 이야기 연락은 막지 않아서 드물게 3개)
+  ok(ys.every(y => got[y].every((id, i) => id.indexOf("pos_") !== 0 || i < 2)), pos + " 씨앗 " + seed + " 한도가 찬 뒤 포지션 연락 없음");
 }
 Object.keys(per).forEach(p => console.log("   " + p + " → " + per[p].join("  ||  ")));
 {

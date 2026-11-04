@@ -71,7 +71,8 @@ function changeRelation(id, n, notes) {
   let after = Math.max(-100, Math.min(100, before + n));
   after = friendGate(id, before, after); // 절친 칸 (js/friends.js)
   state.relations[id] = after;
-  if (notes) notes.push((n > 0 ? "🤝 " : "💢 ") + playerName(id) + "와(과)의 관계 " + (n > 0 ? "+" : "") + n + " (" + relationLabel(after).name + ")");
+  const d = after - before; // 264 버그: 예전엔 상한·절친 칸에 막혀도 요청한 n을 표시
+  if (notes) notes.push((n > 0 ? "🤝 " : "💢 ") + playerName(id) + "와(과)의 관계 " + (d ? (d > 0 ? "+" : "") + d : "그대로 (" + (n > 0 ? "더 오르지 않음" : "더 내려가지 않음") + ")") + " (" + relationLabel(after).name + ")");
   friendStageCheck(id, after, !!notes); // 친구·절친 단계 이야기 (js/friends.js)
 }
 const RELATION_LABELS = [

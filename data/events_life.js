@@ -18,9 +18,9 @@ EVENTS.push(
     title: "📞 어머니의 전화",
     text: "어머니: \"밥은 잘 먹고 다니니? 요즘 경기 보니까 얼굴이 많이 상했더라.\"",
     choices: [
-      { label: "영상 통화로 오래 이야기한다", effects: { condition: 8 }, result: "강아지까지 화면에 나와서 한참을 웃었다." },
+      { label: "영상 통화로 오래 이야기한다", effects: { condition: 8, ifTired: { condition: 6 } }, result: "강아지까지 화면에 나와서 한참을 웃었다." },
       { label: "\"다음 휴가 때 내려갈게요\"", effects: { condition: 4, flag: { homeVisit: true } }, result: "어머니 목소리가 한 톤 올라갔다.", followUp: { event: "home_visit", weeks: [8, 20], chance: 0.8 } },
-      { label: "바빠서 짧게 끊는다", effects: { condition: -2 }, result: "끊고 나서야 생각났다. 어머니 생신이 다음 주였다." },
+      { label: "짧게 안부만 전한다", effects: { condition: 2 }, result: "\"밥 잘 먹어요, 걱정 마세요.\" 짧은 통화였지만 목소리를 들으니 마음이 놓였다." },
     ],
   },
   {

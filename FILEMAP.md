@@ -15,7 +15,7 @@
 | `data/schedule.js` | 5 | 한 시즌(52주) 일정표 |  |
 | `data/league.js` | 7 | 리그 규칙 (3단계) |  |
 | `data/names.js` | 12 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
-| `data/events.js` | 53 | 이벤트 (SNS로 오는 연락과 소식) |  |
+| `data/events.js` | 55 | 이벤트 (SNS로 오는 연락과 소식) |  |
 | `data/events_story.js` | 42 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/duo.js` | 7 | ④ 3단계 (261): 영혼의 듀오 — 원딜·서포트만, 경험만(새 승률 효과 없음, 기존 팀 케미 그대로) — 코드 js/duo.js |  |
 | `data/position_events.js` | 9 | ④ 4단계 (262): 포지션 연락 — 내 실제 장면이 최근 몇 주에 쌓였을 때만 — 코드 js/position_voice.js posSceneContext |  |
@@ -56,7 +56,7 @@
 | `js/main.js` | 57 | 게임 상태 |  |
 | `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 20 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
-| `js/events.js` | 38 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
+| `js/events.js` | 41 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
 | `js/sns_page.js` | 39 | SNS 화면 |  |
 | `js/contracts.js` | 33 | 연봉 · 계약 · 2군행 · 이적 |  |
 | `js/club_market.js` | 29 | 구단 이적 시장·여름 이적 | club_market.js, summer_market.js |

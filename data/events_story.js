@@ -11,7 +11,7 @@ EVENTS.push(
     choices: [
       { label: "\"우승\" 두 글자를 크게 적는다", effects: { flag: { goalTitle: true }, matchBoost: 0.03 }, note: "시즌이 끝날 때 우승했는지 돌아봐요",
         result: "동료들이 휘파람을 불었다. 이제 말한 만큼 해내야 한다." },
-      { label: "\"작년보다 성장하기\"", effects: { flag: { goalGrowth: true } }, note: "시즌이 끝날 때 성장을 돌아봐요",
+      { label: "\"작년보다 성장하기\"", effects: { flag: { goalGrowth: true }, focus: 1 }, note: "시즌이 끝날 때 성장을 돌아봐요",
         result: "작지만 확실한 목표. 매일 1%씩." },
       { label: "\"즐겁게, 다치지 않고\"", effects: { flag: { goalFun: true }, condition: 6 }, result: "감독님이 웃으며 밑에 한 줄을 보탰다. \"그리고 이기면 더 즐겁다.\"" },
     ],
@@ -96,7 +96,7 @@ EVENTS.push(
     title: "지키지 못한 약속",
     text: "시즌 초 \"우승\"이라고 적었던 화이트보드가 아직 연습실에 걸려 있다. 커뮤니티에서는 그 사진이 돌고 있다.",
     choices: [
-      { label: "팬들에게 사과 글을 올린다", effects: { reputation: 4, condition: -3, unflag: ["goalTitle", "goalGrowth", "goalFun"] }, result: "\"내년엔 꼭.\" 짧은 글에 응원 댓글이 달렸다." },
+      { label: "팬들에게 사과 글을 올린다", effects: { reputation: 4, popularity: 1, unflag: ["goalTitle", "goalGrowth", "goalFun"] }, result: "\"내년엔 꼭.\" 짧은 글에 응원 댓글이 달렸다." },
       { label: "화이트보드를 그대로 둔다", effects: { mental: 2, unflag: ["goalTitle", "goalGrowth", "goalFun"] }, result: "지우지 않았다. 내년에 그 글자 옆에 체크 표시를 하기 위해." },
     ],
   },

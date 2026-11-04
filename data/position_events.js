@@ -6,7 +6,7 @@
 // 빈칸: {player} 동료 · {n} 장면 수 · {cause} 실패 원인 한마디 (data/position_voice.js POSITION_VOICE_CAUSE, 없으면 빈칸)
 const POSITION_EVENT_RULES = {
   weeks: 4,         // 최근 몇 주의 장면을 셈
-  seasonMax: 2,     // 포지션 연락 + 듀오 연락(소식 duo_pair 빼고) 합쳐 한 시즌 최대
+  seasonMax: 2,     // 포지션 연락 + 듀오 연락(소식 duo_pair 빼고) 합쳐 한 시즌 최대 — 듀오 이야기 연락은 막지 않음(포지션 연락만 양보, 드물게 3개)
   relationPos: 3,   // 효과 relationPos(포지션 동료 관계) 크기
   gapYears: 2,      // 같은 연락은 이만큼 해마다 한 번 (측정: 탑·정글은 해마다 같은 실패 연락이 옴)
   events: {
