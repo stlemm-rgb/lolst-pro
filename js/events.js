@@ -177,6 +177,8 @@ function applyEffects(eff, ctx) {
       romanceEffect(v, ctx, notes); // 연애 시작·결별·공개·비밀 (js/romance.js)
     } else if (key === "counsel") {
       counselEffect(v, ctx, notes); // 은퇴 상담: retire / stay / coach (js/retirement.js)
+    } else if (key === "duoNick") {
+      const t = applyDuoNick(v, ctx); if (t) notes.push(t); // 듀오 별명 (js/duo.js)
     } else if (key === "friendTip") {
       friendTip(ctx, notes); // 다른 팀 친구의 이적 정보 (js/friends.js)
     } else if (key === "activity") {
@@ -311,7 +313,7 @@ function fireEvent(ev, ctx) {
   } else {
     postMessage("inbox", title, text, {
       eventId: ev.id, ctx: ctx || {},
-      choices: ev.choices.map(function (c) { return { label: c.label, hint: choiceHint(c, ctx || {}) }; }),
+      choices: ev.choices.map(function (c) { return { label: fillText(c.label, ctx), hint: choiceHint(c, ctx || {}) }; }), // 261: 선택지 글자 빈칸({player} 등)도 채움
     });
   }
 }
@@ -349,6 +351,7 @@ function traitWeight(ev) {
 function runWeeklyEvents() {
   // 한 주에 선택지 연락은 1개까지 (always 연락은 따로): 시스템 트리거(js/friends.js) → 조건 연락 → 무작위
   timeMemWeekly(); // 예전 팀·첫 우승 기억 (254, js/friends.js)
+  duoWeekly(); // 바텀 듀오 기록·연락 (261, js/duo.js)
   let inboxFired = friendWeekly(); // 분기 친구 활동 · 친구 트리거 (js/friends.js)
   inboxFired = retirementWeekly() || inboxFired;
   inboxFired = standingWeekly() || inboxFired; // 팀 내 입지: 주장 제안·영입 후보·조기 재계약 (js/standing.js) // 메타 적응 은퇴 기사 · 은퇴 상담 · 코치→감독 (js/retirement.js)
@@ -581,8 +584,9 @@ function answerMessage(msgId, index) {
   const ev = findEvent(msg.eventId);
   let choice = ev && ev.choices[index];
   // 예전에 온 연락이라 선택지 순서가 바뀌었으면 글자로 찾기
-  if (ev && msg.choices && msg.choices[index] && choice && choice.label !== msg.choices[index].label) {
-    choice = ev.choices.find(function (c) { return c.label === msg.choices[index].label; }) || null;
+  const lab = function (c) { return c.label === msg.choices[index].label || fillText(c.label, msg.ctx || {}) === msg.choices[index].label; }; // 261: 빈칸을 채운 글자도 같다고 봄
+  if (ev && msg.choices && msg.choices[index] && choice && !lab(choice)) {
+    choice = ev.choices.find(lab) || null;
   }
   if (!choice || choiceTooExpensive(msg, index)) return;
   const r = applyEffects(choice.effects, msg.ctx);

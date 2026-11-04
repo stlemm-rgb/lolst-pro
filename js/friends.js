@@ -249,7 +249,7 @@ function timeTriggerContext(trigger) {
     case "mateBack": { // C1 다시 한 팀
       const b = M.back, t = myTeam();
       M.back = null;
-      if (!b || !t || !state.league.players[b.pid] || t.roster.indexOf(b.pid) === -1) return null;
+      if (!b || !t || !state.league.players[b.pid] || t.roster.indexOf(b.pid) === -1 || duoTakesOver(b.pid)) return null; // 단짝 이상 듀오면 duo_back이 대신
       return { pid: b.pid, player: playerName(b.pid), leftYear: b.leftYear };
     }
     case "juniorStar": { // C2 그 후배가 이렇게 컸다 (need.flag mentee로 글 2가지)
@@ -307,7 +307,7 @@ function timeTriggerContext(trigger) {
 }
 
 // 시스템 트리거: 다른 코드가 queueTrigger로 넣으면 그 주(또는 다음 주) 연락 처리 때 해당 trigger 연락 하나
-const QUEUE_TRIGGERS = ["rivalSigned", "fameUp", "skinMade", "benchedNow", "friendLeft", "friendVs", "friendTitle", "friendRetire", "ladderKing"]; // 친구 트리거: js/friends.js
+const QUEUE_TRIGGERS = ["rivalSigned", "fameUp", "skinMade", "benchedNow", "friendLeft", "friendVs", "friendTitle", "friendRetire", "ladderKing", "duoPair", "duoSoul", "duoSplit", "duoVs", "duoBack", "duoTitle", "duoRetire"]; // 듀오: js/duo.js // 친구 트리거: js/friends.js
 function queueTrigger(name, ctx) {
   if (!state.trigQueue) state.trigQueue = [];
   state.trigQueue.push({ name: name, ctx: ctx || {} });

@@ -683,6 +683,7 @@ function retirePlayer(p) {
   recordRetiree(p, team);
   logRetire(p, team); // 이적 목록에 은퇴 (js/retirement.js)
   friendOnRetire(p); // 친한 선수 은퇴 → 작별 연락·은퇴한 친구 (js/friends.js)
+  duoOnRetire(p); // 바텀 듀오 파트너 은퇴 (js/duo.js)
   delete state.league.players[p.id];
   const fa = state.league.freeAgents.indexOf(p.id);
   if (fa !== -1) state.league.freeAgents.splice(fa, 1);

@@ -17,6 +17,7 @@
 | `data/names.js` | 12 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
 | `data/events.js` | 53 | 이벤트 (SNS로 오는 연락과 소식) |  |
 | `data/events_story.js` | 42 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
+| `data/duo.js` | 7 | ④ 3단계 (261): 영혼의 듀오 — 원딜·서포트만, 경험만(새 승률 효과 없음, 기존 팀 케미 그대로) — 코드 js/duo.js |  |
 | `data/events_life.js` | 11 | 받은 연락 리뉴얼 ② 선수 생활·인생 · 동료·라이벌 관계 (2026-10-08) |  |
 | `data/friends.js` | 40 | 친구 시스템 데이터 (분기 활동 · 단계 이야기 · 친구 연락) |  |
 | `data/social_posts.js` | 83 | 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭) |  |
@@ -31,7 +32,7 @@
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/health.js` | 3 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |
 | `data/replay.js` | 2 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
-| `data/position_voice.js` | 14 | ④ 포지션 경험 1단계 (259): 경기 재생에서 내 장면 아래 '포지션다운 해설' 한 줄 — 코드는 js/position_voice.js |  |
+| `data/position_voice.js` | 15 | ④ 포지션 경험 1단계 (259): 경기 재생에서 내 장면 아래 '포지션다운 해설' 한 줄 — 코드는 js/position_voice.js |  |
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
 | `data/boxscore.js` | 1 | 경기 기록(박스 스코어) 만들기 규칙 |  |
 | `data/comps.js` | 7 | 챔피언 조합 성향 (밴픽 상성·시너지) |  |
@@ -87,13 +88,14 @@
 | `js/staff.js` | 17 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
 | `js/portrait.js` | 11 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
 | `js/replay.js` | 24 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
-| `js/position_voice.js` | 2 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
+| `js/position_voice.js` | 5 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
+| `js/duo.js` | 8 | ④ 3단계 (261): 영혼의 듀오 — 규칙·글: data/duo.js |  |
 | `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
 | `js/health.js` | 4 | 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js |  |
 | `js/franchise.js` | 8 | 프랜차이즈 (253, ② P5 · 사용자 결정 2026-11-03) — 실제 LCK처럼 2021년부터 |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
-| `js/dash_plus.js` | 23 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
+| `js/dash_plus.js` | 24 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
 | `js/room.js` | 23 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |
 | `js/dash_layout.js` | 20 | 대시보드 PC · 휴대폰 따로 (232, 시안 24 ② · Codex 토론) |  |
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
