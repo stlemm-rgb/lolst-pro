@@ -9,8 +9,8 @@ EVENTS.push(
     text: "오늘은 생일이다. 아침부터 팬들의 축하 메시지가 쏟아진다. 지하철역에 생일 축하 광고가 걸렸다는 소식도 들었다.",
     choices: [
       { label: "생일 방송으로 팬들과 보낸다", effects: { popularity: 4, stamina: -3 }, result: "팬들이 준비한 축하 영상에 눈물이 날 뻔했다." },
-      { label: "팀원들과 케이크를 자른다", effects: { teamRelation: 5, condition: 6 }, result: "얼굴에 생크림이 묻었다. 범인은 정글러다." },
-      { label: "가족과 저녁을 먹는다", effects: { condition: 10 }, result: "아버지가 처음으로 \"자랑스럽다\"고 말했다." },
+      { label: "팀원들과 케이크를 자른다", followUp: { event: "birthday_mate", weeks: [8, 16], chance: 0.6 }, effects: { teamRelation: 5, condition: 6 }, result: "얼굴에 생크림이 묻었다. 범인은 정글러다." },
+      { label: "가족과 저녁을 먹는다", followUp: { event: "birthday_family_after", weeks: [2, 5], chance: 0.7 }, effects: { condition: 10 }, result: "아버지가 처음으로 \"자랑스럽다\"고 말했다." },
     ],
   },
   {

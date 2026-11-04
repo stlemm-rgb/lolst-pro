@@ -21,11 +21,11 @@ EVENTS.push(
     title: "🎤 정규 시즌 미디어데이",
     text: "정규 시즌 개막을 앞두고 미디어데이가 열렸다. 사회자가 {name}에게 마이크를 넘겼다. \"올 시즌 각오 한마디!\"",
     choices: [
-      { label: "\"올해는 저희가 우승합니다.\"", check: { stat: "popularity", diff: 45 },
+      { label: "\"올해는 저희가 우승합니다.\"", followUp: [{ event: "media_vow_high", weeks: [10, 14] }, { event: "media_vow_low", weeks: [10, 14] }], check: { stat: "popularity", diff: 45 },
         success: { effects: { popularity: 5, matchBoost: 0.04 }, result: "객석에서 함성이 터졌다. 오늘의 헤드라인은 {team}." },
         fail: { effects: { popularity: 1, reputation: -2 }, result: "객석이 조용하다. 누군가 \"작년 순위는요?\"라고 외쳤다." } },
       { label: "\"한 경기 한 경기 최선을 다하겠습니다.\"", effects: { reputation: 3 }, result: "모범 답안. 기자들은 조금 아쉬워했다." },
-      { label: "다른 팀 선수를 지목해 도발한다", effects: { popularity: 4, reputation: -3 }, risk: { trait: "scandal", chance: 0.02 }, result: "지목당한 선수가 웃으며 손가락으로 나를 가리켰다. 시즌이 재밌어지겠다." },
+      { label: "다른 팀 선수를 지목해 도발한다", followUp: { event: "media_taunt_reply", weeks: [3, 6], chance: 0.8 }, effects: { popularity: 4, reputation: -3 }, risk: { trait: "scandal", chance: 0.02 }, result: "지목당한 선수가 웃으며 손가락으로 나를 가리켰다. 시즌이 재밌어지겠다." },
     ],
   },
   {
@@ -67,9 +67,9 @@ EVENTS.push(
     title: "📝 계약 마지막 해",
     text: "올 시즌으로 계약이 끝난다. 비시즌({window}주차)부터 재계약과 다른 팀 제안이 온다. 단장이 지나가며 어깨를 두드렸다. \"생각해 둔 거 있나?\"",
     choices: [
-      { label: "\"여기서 계속 뛰고 싶습니다.\"", effects: { reputation: 3, teamRelation: 3 }, result: "단장: \"좋은 소리 들으니 기분 좋네.\" 구단 분위기가 훈훈하다." },
+      { label: "\"여기서 계속 뛰고 싶습니다.\"", followUp: { event: "contract_stay_word", weeks: [14, 16] }, effects: { reputation: 3, teamRelation: 3 }, result: "단장: \"좋은 소리 들으니 기분 좋네.\" 구단 분위기가 훈훈하다." },
       { label: "\"시장 평가를 받아 보고 싶습니다.\"", effects: { transferListed: true }, note: "비시즌 이적 제안이 늘어남", result: "단장이 잠시 멈칫했다. \"...프로답네.\"" },
-      { label: "\"남은 경기로 보여 드리겠습니다.\"", effects: { matchBoost: 0.05, mental: 1 }, result: "말보다 숫자로. 남은 시즌이 곧 협상 테이블이다." },
+      { label: "\"남은 경기로 보여 드리겠습니다.\"", followUp: [{ event: "contract_prove_good", weeks: [15, 16] }, { event: "contract_prove_bad", weeks: [15, 16] }], effects: { matchBoost: 0.05, mental: 1 }, result: "말보다 숫자로. 남은 시즌이 곧 협상 테이블이다." },
     ],
   },
   {
@@ -117,9 +117,9 @@ EVENTS.push(
     title: "🏖️ 비시즌 계획",
     text: "시즌이 끝났다. 다음 시즌까지 남은 시간을 어떻게 쓸까?",
     choices: [
-      { label: "고향에 내려가 푹 쉰다", effects: { condition: 15, stamina: 20 }, result: "어머니가 해 준 밥을 먹고 열두 시간을 잤다." },
-      { label: "해외 부트캠프에 참가한다", effects: { money: -3000000, laning: 2, macro: 1, stamina: -8 }, result: "다른 지역의 랭크는 확실히 스타일이 달랐다. 새로운 시야가 생겼다." },
-      { label: "개인 방송으로 팬들과 보낸다", effects: { popularity: 5, stamina: -5 }, result: "비시즌에도 나를 기다려 주는 사람들이 있었다." },
+      { label: "고향에 내려가 푹 쉰다", followUp: { event: "home_rest_after", weeks: [4, 7], chance: 0.7 }, effects: { condition: 15, stamina: 20 }, result: "어머니가 해 준 밥을 먹고 열두 시간을 잤다." },
+      { label: "해외 부트캠프에 참가한다", followUp: { event: "bootcamp_memory", weeks: [4, 7], chance: 0.8 }, effects: { money: -3000000, laning: 2, macro: 1, stamina: -8 }, result: "다른 지역의 랭크는 확실히 스타일이 달랐다. 새로운 시야가 생겼다." },
+      { label: "개인 방송으로 팬들과 보낸다", followUp: { event: "offseason_stream_after", weeks: [4, 7], chance: 0.7 }, effects: { popularity: 5, stamina: -5 }, result: "비시즌에도 나를 기다려 주는 사람들이 있었다." },
     ],
   },
 
@@ -514,5 +514,121 @@ EVENTS.push(
         fail: { effects: { teamRelation: -1, condition: -3 }, result: "말이 길어질수록 분위기가 무거워졌다. 미팅은 아무 결론 없이 끝났다." } },
       { label: "말 대신 묵묵히 연습한다", effects: { mental: 1 }, result: "가장 먼저 출근해 가장 늦게 퇴근했다. 아무 말도 하지 않았지만, 다음 날 연습실 불이 일찍 켜졌다." },
     ],
+  },
+);
+
+// ===== ④-2 3단계 (267): 자주 오는 연락의 선택이 몇 주 뒤 다시 언급됨 =====
+// 후속 연락은 보낼 때 need를 다시 봄(안 맞으면 안 옴). who가 있으면 보낼 때 그 선수를 고름 (js/events.js firePendingEvents)
+// need.topRank: 우리 팀 리그 순위 n위 안 / need.lowRank: n위 아래 (js/friends.js storyNeedOk)
+EVENTS.push(
+  // 미디어데이 "우승합니다" → 시즌 중반 순위에 따라
+  {
+    id: "media_vow_high", tab: "news", trigger: "followUp", need: { topRank: 3 },
+    title: "📰 '우승합니다', 허세가 아니었다?",
+    text: "미디어데이에서 \"올해는 저희가 우승합니다\"라고 했던 {name}. 시즌 중반, {team}은(는) 리그 상위권에 올라 있다. 커뮤니티에 그날 영상이 다시 돌고 있다.",
+    effects: { popularity: 2, condition: 2 },
+  },
+  {
+    id: "media_vow_low", tab: "inbox", trigger: "followUp", need: { lowRank: 6 },
+    title: "📰 소환된 미디어데이 영상",
+    text: "\"올해는 저희가 우승합니다.\" 미디어데이 영상이 커뮤니티에 다시 올라왔다. 지금 {team}의 순위는 아래쪽이다. 댓글이 빠르게 달린다.",
+    choices: [
+      { label: "\"시즌은 아직 안 끝났습니다.\"", effects: { mental: 1 }, result: "짧은 한 줄을 남겼다. 남은 경기로 답하면 된다." },
+      { label: "웃으며 인정하는 글을 올린다", effects: { reputation: 2 }, result: "\"제가 말이 좀 앞섰네요. 그래도 목표는 그대로입니다.\" 의외로 응원 댓글이 많았다." },
+      { label: "커뮤니티를 끄고 연습한다", effects: { condition: 2 }, result: "휴대폰을 엎어 두었다. 오늘은 마우스만 잡기로 했다." },
+    ],
+  },
+  // 미디어데이 도발 → 같은 포지션 상대가 받아침
+  {
+    id: "media_taunt_reply", tab: "inbox", trigger: "followUp", who: "rival",
+    title: "🎙️ {player}의 답",
+    text: "미디어데이에서 내가 도발했던 일이 다시 화제다. {pteam}의 {player}가 인터뷰에서 웃으며 말했다. \"말은 들었습니다. 경기장에서 보죠.\"",
+    choices: [
+      { label: "\"기대하겠습니다.\"", effects: { popularity: 2 }, result: "짧은 한마디에 팬들이 맞대결 날짜를 세기 시작했다." },
+      { label: "한 번 더 받아친다", effects: { popularity: 3, relation: -5 }, result: "기사 제목이 하나 더 늘었다. {player}는 이번엔 웃지 않았다." },
+      { label: "대꾸하지 않는다", effects: { condition: 2 }, result: "말은 한 번이면 충분하다." },
+    ],
+  },
+  // 계약 마지막 해 → 비시즌 직전
+  {
+    id: "contract_stay_word", tab: "inbox", trigger: "followUp",
+    title: "📝 단장의 기억",
+    text: "비시즌을 앞두고 단장이 불렀다. \"시즌 초에 여기서 계속 뛰고 싶다고 했지. 그 말, 잊지 않았다.\"",
+    choices: [
+      { label: "\"그 마음 그대로입니다.\"", effects: { teamRelation: 3 }, result: "단장이 고개를 끄덕였다. \"제안서 곧 보내마.\"" },
+      { label: "\"조건은 들어 보고 싶어요.\"", result: "단장: \"당연하지. 그게 프로다.\" 분위기는 나쁘지 않았다." },
+    ],
+  },
+  {
+    id: "contract_prove_good", tab: "news", trigger: "followUp", need: { topRank: 4 },
+    title: "📝 말보다 숫자로",
+    text: "\"남은 경기로 보여 드리겠습니다.\" 계약 마지막 해에 한 말대로 {team}은(는) 상위권으로 시즌을 마쳤다. 단장이 기록지를 넘기며 고개를 끄덕였다.",
+    effects: { reputation: 3 },
+  },
+  {
+    id: "contract_prove_bad", tab: "news", trigger: "followUp", need: { lowRank: 5 },
+    title: "📝 다 보여 주지 못한 시즌",
+    text: "\"남은 경기로 보여 드리겠습니다.\" 팀 순위는 기대보다 아래였다. 그래도 단장은 \"끝까지 버틴 건 봤다\"고 했다.",
+    effects: { mental: 1 },
+  },
+  // 비시즌 계획 → 새 시즌 초
+  {
+    id: "bootcamp_memory", tab: "inbox", trigger: "followUp",
+    title: "✈️ 부트캠프에서 온 메시지",
+    text: "비시즌 부트캠프 때 같은 랭크 게임에서 자주 만났던 해외 선수에게서 메시지가 왔다. \"Good luck this season. 대회에서 만나자.\"",
+    choices: [
+      { label: "반갑게 답장한다", effects: { condition: 3 }, result: "번역기를 두 번 돌려 답장을 보냈다. 이모티콘 하나가 돌아왔다." },
+      { label: "그때 적은 노트를 다시 펼친다", effects: { mental: 1 }, result: "낯선 서버에서 적어 둔 메모. 다시 읽으니 놓친 게 보였다." },
+    ],
+  },
+  {
+    id: "home_rest_after", tab: "news", trigger: "followUp",
+    title: "🏠 고향에서 온 사진",
+    text: "비시즌에 고향에서 쉬다 왔더니, 동네 친구들이 개막전 단체 응원 사진을 보내왔다. 현수막 글씨가 삐뚤빼뚤하다.",
+    effects: { condition: 3 },
+  },
+  {
+    id: "offseason_stream_after", tab: "news", trigger: "followUp",
+    title: "📺 비시즌 방송 시청자들",
+    text: "비시즌 방송을 같이 보던 시청자들이 개막전 응원 채팅을 한꺼번에 올렸다. \"방송에서 말한 그 챔피언, 대회에서 보여 줘요!\"",
+    effects: { popularity: 2 },
+  },
+  // 경기 후 인터뷰 "팀원들 덕분이에요" → 동료의 답
+  {
+    id: "interview_thanks", tab: "inbox", trigger: "followUp", who: "teammate",
+    title: "🍖 {player}의 메시지",
+    text: "{player}: \"인터뷰 봤다. 팀원들 덕분이라며? 오늘 고기는 내가 산다.\"",
+    choices: [
+      { label: "고맙게 얻어먹는다", effects: { relation: 4, condition: 2 }, result: "고기를 굽는 내내 {player}가 그 인터뷰 흉내를 냈다." },
+      { label: "\"같이 복기나 하자\"", effects: { relation: 3, mental: 1 }, result: "밥 먹고 돌아와 둘이서 그 경기를 처음부터 다시 봤다." },
+    ],
+  },
+  // 새 챔피언 "내가 먼저 파 본다" → 동료가 물어봄
+  {
+    id: "new_champ_ask", tab: "inbox", trigger: "followUp", who: "teammate",
+    title: "🧪 '{champ}' 어떻게 하는 거야?",
+    text: "{player}: \"너 {champ} 먼저 팠다며. 그 콤보 나도 좀 알려 줘.\"",
+    choices: [
+      { label: "콤보를 알려 준다", effects: { relation: 5, stamina: -2 }, result: "한 시간 넘게 붙잡고 알려 줬다. {player}가 처음으로 콤보를 성공하자 둘 다 소리를 질렀다." },
+      { label: "같이 연습하자고 한다", effects: { relation: 3, masteryChamp: 5 }, result: "가르치다 보니 나도 몰랐던 틈이 보였다." },
+      { label: "\"이건 아직 비밀이야\"", effects: { condition: 2 }, result: "{player}가 웃으며 혀를 찼다. \"치사하다, 진짜.\"" },
+    ],
+  },
+  // 생일 → 다음 생일 언저리 / 가족
+  {
+    id: "birthday_mate", tab: "inbox", trigger: "followUp", who: "teammate",
+    title: "🎂 오늘은 {player}의 생일",
+    text: "오늘은 {player}의 생일이다. 내 생일에 다 같이 케이크를 잘랐던 게 생각난다. 그때 내 얼굴에 생크림을 묻힌 범인도 아직 기억난다.",
+    choices: [
+      { label: "생크림으로 갚아 준다", effects: { relation: 4, condition: 2 }, result: "연습실이 난장판이 됐다. 감독님도 웃으며 사진을 찍었다." },
+      { label: "작은 선물을 준비한다", effects: { money: -300000, relation: 6 }, result: "{player}가 선물을 한참 들여다보다가 \"이런 거 처음 받아 본다\"고 했다." },
+      { label: "축하 메시지만 보낸다", effects: { relation: 2 }, result: "\"생일 축하해. 오늘은 내가 서폿 해 줄게.\"" },
+    ],
+  },
+  {
+    id: "birthday_family_after", tab: "news", trigger: "followUp",
+    title: "📱 아버지의 문자",
+    text: "생일에 가족과 저녁을 먹은 뒤로, 아버지가 경기가 끝날 때마다 짧은 문자를 보낸다. 오늘은 \"잘했다\" 세 글자였다.",
+    effects: { condition: 3 },
   },
 );

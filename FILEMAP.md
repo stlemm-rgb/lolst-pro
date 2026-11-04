@@ -16,12 +16,12 @@
 | `data/league.js` | 7 | 리그 규칙 (3단계) |  |
 | `data/names.js` | 12 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
 | `data/events.js` | 55 | 이벤트 (SNS로 오는 연락과 소식) |  |
-| `data/events_story.js` | 42 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
+| `data/events_story.js` | 50 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/duo.js` | 7 | ④ 3단계 (261): 영혼의 듀오 — 원딜·서포트만, 경험만(새 승률 효과 없음, 기존 팀 케미 그대로) — 코드 js/duo.js |  |
 | `data/position_events.js` | 9 | ④ 4단계 (262): 포지션 연락 — 내 실제 장면이 최근 몇 주에 쌓였을 때만 — 코드 js/position_voice.js posSceneContext |  |
 | `data/position_social.js` | 9 | ④ 6단계 (263): 같은 장면을 팬·동료·상대 선수·기사가 다르게 말함 — 코드 js/position_voice.js posSocialPick·posArtic |  |
 | `data/events_life.js` | 11 | 받은 연락 리뉴얼 ② 선수 생활·인생 · 동료·라이벌 관계 (2026-10-08) |  |
-| `data/friends.js` | 40 | 친구 시스템 데이터 (분기 활동 · 단계 이야기 · 친구 연락) |  |
+| `data/friends.js` | 41 | 친구 시스템 데이터 (분기 활동 · 단계 이야기 · 친구 연락) |  |
 | `data/social_posts.js` | 83 | 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭) |  |
 | `data/social_posts_pro.js` | 81 | 프로 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭, 🎮 선수 표시가 붙는 글) |  |
 | `data/mishaps.js` | 13 | 웃긴 해프닝 (2026-11-02) — 게임 결과와 관계없는 우스꽝스러운 사건사고 |  |
@@ -43,7 +43,7 @@
 | `data/collection.js` | 9 | 수집·강화 (js/collection.js) — 2026-10-08 |  |
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
 | `data/standing.js` | 3 | 팀 내 입지 (126) — 엔진 js/standing.js |  |
-| `data/romance.js` | 51 | 연애: 규칙·대상 | romance_rules.js, romance.js |
+| `data/romance.js` | 50 | 연애: 규칙·대상 | romance_rules.js, romance.js |
 | `js/player.js` | 9 | 선수 관련 계산 |  |
 | `js/champions.js` | 18 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 38 | 캐릭터 생성 |  |

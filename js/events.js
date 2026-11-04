@@ -740,7 +740,12 @@ function firePendingEvents() {
     if (p.at > now) return true;
     const ev = findEvent(p.event);
     // 방송 관련 후속은 방송을 그만뒀으면 안 옴. 조건(need)이 이제 안 맞으면 조용히 안 보냄 (④-2 3단계)
-    if (ev && eventNeedOk(ev) && (p.event.indexOf("stream_") !== 0 || hasActivity("stream"))) fireEvent(ev, p.ctx);
+    if (!ev || !eventNeedOk(ev) || (p.event.indexOf("stream_") === 0 && !hasActivity("stream"))) return false;
+    // who가 있는데 처음 연락에 선수가 없으면 보낼 때 고름 (없으면 안 보냄). 친구 후속(fr_*)처럼 이미 있으면 그 사람 그대로
+    const pickWho = ev.who && !(p.ctx && p.ctx.pid);
+    const w = pickWho ? whoContext(ev.who) : null;
+    if (pickWho && !w) return false;
+    fireEvent(ev, Object.assign({}, p.ctx, w || {}));
     return false;
   });
 }

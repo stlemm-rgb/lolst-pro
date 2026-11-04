@@ -126,7 +126,7 @@ const EVENTS = [
     title: "경기 후 인터뷰 요청",
     text: "기자: \"{name} 선수, 오늘 경기 정말 인상적이었는데요. 한마디 해 주시겠어요?\"",
     choices: [
-      { label: "\"팀원들 덕분이에요.\"", effects: { reputation: 4, teamRelation: 3 },
+      { label: "\"팀원들 덕분이에요.\"", followUp: { event: "interview_thanks", weeks: [1, 2], chance: 0.4 }, effects: { reputation: 4, teamRelation: 3 },
         result: ["동료들이 인터뷰 영상을 돌려 보며 웃었다. \"야, 오늘 밥은 네가 사.\"", "겸손한 한마디에 팬들의 반응이 좋다. 팀 분위기도 한층 밝아졌다."] },
       { label: "\"상대가 생각보다 약하던데요?\" (도발)", check: { stat: "popularity", diff: 50 },
         success: { effects: { popularity: 6, reputation: -3 }, result: "\"건방지지만 실력으로 증명했다\" — 커뮤니티가 들끓는다. 팬이 확 늘었다." },
@@ -186,7 +186,7 @@ const EVENTS = [
     text: "새 챔피언 '{champ}'이(가) 나왔다. 출시 직후라 다음 패치 전까지는 꽤 세다는 평가다 (메타가 아니어도 픽 가치 +15·경기력 +6%). 다음 패치 때 메타에 들어갈 가능성도 높다. 팀에서 먼저 연구해 보자는 말이 나온다.",
     choices: [
       { label: "내가 먼저 파 본다", check: { stat: "adapt", diff: 50 },
-        success: { effects: { masteryChamp: 35, adapt: 1, stamina: -5 }, result: "사흘 만에 숨은 콤보를 찾아냈다. 다른 팀 코치들이 내 경기 영상을 돌려 본다는 소문." },
+        success: { followUp: { event: "new_champ_ask", weeks: [2, 4], chance: 0.7 }, effects: { masteryChamp: 35, adapt: 1, stamina: -5 }, result: "사흘 만에 숨은 콤보를 찾아냈다. 다른 팀 코치들이 내 경기 영상을 돌려 본다는 소문." },
         fail: { effects: { masteryChamp: 18, stamina: -8 }, result: "생각보다 손에 안 붙는다. 그래도 기본기는 익혔다." } },
       { label: "팀과 같이 연구한다", effects: { masteryChamp: 15, reputation: 2, teamRelation: 2 }, result: "화이트보드 앞에서 다섯 명이 머리를 맞댔다. 팀 전체의 이해도가 올라갔다." },
       { label: "지금 하던 챔피언에 집중한다", effects: { masteryMetaAll: 3 }, result: "유행은 돌고 돈다. 지금 메타를 더 단단히 다졌다." },

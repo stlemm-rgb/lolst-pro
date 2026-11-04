@@ -58,6 +58,8 @@ function storyNeedOk(need) {
   if (need.noFlag && state.flags && state.flags[need.noFlag]) return false;
   if (need.benched !== undefined && !!state.benched !== need.benched) return false;
   if (need.titleThisYear !== undefined && titleThisYear() !== need.titleThisYear) return false;
+  if (need.topRank !== undefined && !(myLeagueRank() >= 1 && myLeagueRank() <= need.topRank)) return false; // 우리 팀 리그 순위 n위 안 (④-2 3단계)
+  if (need.lowRank !== undefined && myLeagueRank() < need.lowRank) return false; // 우리 팀 리그 순위 n위 아래
   if (need.minSalary !== undefined && (!state.contract || state.contract.salary < need.minSalary * eraMoney())) return false;
   return true;
 }
