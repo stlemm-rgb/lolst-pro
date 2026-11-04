@@ -247,7 +247,7 @@ EVENTS.push(
     choices: [
       { label: "반갑게 답장한다", effects: { affection: 12 }, result: "경기 이야기로 시작한 대화가 저녁 메뉴까지 이어졌다." },
       { label: "정중히 선을 긋는다", effects: { affection: -10 }, result: "응원은 고맙지만 개인적인 연락은 어렵다고 전했다." },
-      { label: "읽고 넘긴다", effects: { affection: -3 }, result: "답장 칸을 비워 둔 채 휴대폰을 내려놓았다." },
+      { label: "읽고 넘긴다", effects: {}, result: "답장 칸을 비워 둔 채 휴대폰을 내려놓았다." },
     ],
   },
   {
@@ -257,7 +257,7 @@ EVENTS.push(
     choices: [
       { label: "다음에도 이야기하자고 한다", effects: { affection: 10, condition: 2 }, result: "다음에는 덜 어색하게 인사할 수 있을 것 같았다." },
       { label: "인사만 나누는 사이로 남는다", effects: { affection: -8 }, result: "좋은 인사였다고 답하고 개인적인 만남은 사양했다." },
-      { label: "답하지 않는다", effects: { affection: -3 }, result: "대화창에는 받은 인사만 남았다." },
+      { label: "답하지 않는다", effects: {}, result: "대화창에는 받은 인사만 남았다." },
     ],
   },
   {
@@ -286,7 +286,7 @@ EVENTS.push(
     text: "{her}에게서 한가한 시간을 묻는 연락이 왔다. \"{say}\" 조용한 카페의 위치가 뒤따라 도착했다.",
     choices: [
       { label: "함께 차를 마신다", effects: { affection: 12, condition: 6, stamina: -3, money: -20000 }, result: "주문한 차가 식는 줄도 모르고 이야기를 나눴다." },
-      { label: "다음에 만나자고 한다", effects: { affection: -2 }, result: "이번에는 쉬고 다음 빈 시간을 함께 찾아보기로 했다." },
+      { label: "다음에 만나자고 한다", effects: {}, result: "이번에는 쉬고 다음 빈 시간을 함께 찾아보기로 했다." },
     ],
   },
   {
@@ -295,7 +295,7 @@ EVENTS.push(
     text: "해가 질 무렵 {her}이(가) 메시지를 보냈다. \"{say}\" 잠깐 걸으며 하루 이야기를 나누자는 제안이었다.",
     choices: [
       { label: "산책을 나간다", effects: { affection: 10, condition: 5, stamina: -4 }, result: "돌아갈 갈림길에서 다음에 걸을 길까지 골랐다." },
-      { label: "다음 쉬는 날로 미룬다", effects: { affection: -2 }, result: "연습 때문에 늦어졌다고 설명하고 다음을 기약했다." },
+      { label: "다음 쉬는 날로 미룬다", effects: {}, result: "연습 때문에 늦어졌다고 설명하고 다음을 기약했다." },
     ],
   },
   {
@@ -304,7 +304,7 @@ EVENTS.push(
     text: "{her}이(가) 작은 서점에 같이 가자고 했다. \"{say}\" 경기 공략집 말고 다른 책을 골라 보기로 했다.",
     choices: [
       { label: "함께 책을 고른다", effects: { affection: 11, condition: 4, stamina: -2, money: -30000 }, result: "서로 고른 책에 짧은 추천 이유를 적었다." },
-      { label: "이번에는 쉬고 다음에 간다", effects: { affection: -1 }, result: "읽고 싶은 책 제목을 먼저 주고받았다." },
+      { label: "이번에는 쉬고 다음에 간다", effects: { stamina: 3 }, result: "읽고 싶은 책 제목을 먼저 주고받았다." },
     ],
   },
   {
@@ -314,7 +314,7 @@ EVENTS.push(
     choices: [
       { label: "🎲 좋아한다고 고백한다", check: { stat: "mental", diff: 50 },
         success: { effects: { romance: "start", affection: 10, condition: 5 }, result: "{her}도 같은 마음이라고 답했다. 오늘부터 서로의 연인이 됐다." },
-        fail: { effects: { affection: -10, condition: -3 }, result: "{her}은(는) 아직 같은 마음은 아니라고 말했다. 대답을 존중하기로 했다." } },
+        fail: { effects: { affection: -5, condition: -2 }, result: "{her}은(는) 아직 같은 마음은 아니라고 말했다. 대답을 존중하기로 했다." } },
       { label: "아직 친구로 지낸다", effects: { affection: 1 }, result: "잘 자라는 인사로 마무리하고 마음을 더 알아보기로 했다." },
     ],
   },
@@ -325,7 +325,7 @@ EVENTS.push(
     choices: [
       { label: "🎲 연인으로 만나자고 한다", check: { stat: "reputation", diff: 40 },
         success: { effects: { romance: "start", affection: 12 }, result: "다음 약속은 연인으로 만나기로 했다. 달력에 작은 별을 그렸다." },
-        fail: { effects: { affection: -8, condition: -2 }, result: "아직 친구로 만나고 싶다는 대답이 돌아왔다. 더 재촉하지 않았다." } },
+        fail: { effects: { affection: -5, condition: -2 }, result: "아직 친구로 만나고 싶다는 대답이 돌아왔다. 더 재촉하지 않았다." } },
       { label: "친구로 약속을 잡는다", effects: { affection: 1 }, result: "서두르지 않고 지금의 대화를 이어 가기로 했다." },
     ],
   },
@@ -354,8 +354,8 @@ EVENTS.push(
     choices: [
       { label: "🎲 와 달라고 한다", check: { stat: "mental", diff: 50 },
         success: { effects: { matchBoost: 0.02, affection: 5 }, result: "응원석을 보고 마음을 다잡았다. 준비한 경기에 집중할 수 있었다." },
-        fail: { effects: { matchBoost: -0.02, condition: -2 }, result: "잘하고 싶은 마음이 앞서 평소보다 긴장했다." } },
-      { label: "부담돼서 이번에는 거절한다", effects: { affection: -2 }, result: "이번에는 멀리서 응원해 달라고 부탁했다." },
+        fail: { effects: { condition: -1 }, result: "잘하고 싶은 마음이 앞서 평소보다 긴장했다." } },
+      { label: "부담돼서 이번에는 거절한다", effects: {}, result: "이번에는 멀리서 응원해 달라고 부탁했다." },
     ],
   },
   {
@@ -365,8 +365,8 @@ EVENTS.push(
     choices: [
       { label: "🎲 직접 와서 응원해 달라고 한다", check: { stat: "mental", diff: 55 },
         success: { effects: { matchBoost: 0.02, affection: 6 }, result: "짧은 응원 문구가 눈에 들어오자 복잡한 생각이 가라앉았다." },
-        fail: { effects: { matchBoost: -0.02, condition: -3 }, result: "응원에 멋지게 보답하려다 마음이 급해졌다." } },
-      { label: "이번에는 집에서 응원해 달라고 한다", effects: { affection: -1 }, result: "문구 사진은 저장해 두고 방문은 다음으로 미뤘다." },
+        fail: { effects: { condition: -1 }, result: "응원에 멋지게 보답하려다 마음이 급해졌다." } },
+      { label: "이번에는 집에서 응원해 달라고 한다", effects: {}, result: "문구 사진은 저장해 두고 방문은 다음으로 미뤘다." },
     ],
   },
   {
@@ -399,8 +399,8 @@ EVENTS.push(
     text: "{her}와(과) 나란히 걷는 사진이 퍼졌다. 열애설을 본 뒤 연락이 왔다. \"{say}\" 이제 어떤 입장을 낼지 정해야 했다.",
     choices: [
       { label: "연애 사실을 인정한다", effects: { romance: "public", popularity: 2, affection: 5 }, result: "서로 확인한 뒤 연애 중이라고 알렸다." },
-      { label: "연애를 부인한다", effects: { reputation: -4, affection: -12 }, result: "친분일 뿐이라고 말했다. {her}와(과) 나눈 약속이 무거워졌다." },
-      { label: "대응하지 않는다", effects: { condition: -2 }, result: "입장을 내지 않고 당분간 상황을 지켜봤다." },
+      { label: "연애를 부인한다", effects: { affection: -12 }, result: "친분일 뿐이라고 말했다. {her}와(과) 나눈 약속이 무거워졌다." },
+      { label: "대응하지 않는다", effects: {}, result: "입장을 내지 않고 당분간 상황을 지켜봤다." },
     ],
   },
   {
@@ -409,8 +409,8 @@ EVENTS.push(
     text: "{job} {her}와(과) 만났다는 목격담에 추측이 붙었다. \"{say}\" 둘의 사생활이 게시판의 화제가 됐다.",
     choices: [
       { label: "교제 중이라고 밝힌다", effects: { romance: "public", affection: 6, popularity: 3, reputation: -1 }, result: "관계를 인정하고 지나친 추측은 삼가 달라고 했다. 한동안 사생활 이야기가 이어졌다." },
-      { label: "사실이 아니라고 부인한다", effects: { reputation: -5, affection: -10 }, result: "말을 맞추지 않은 부인에 {her}은(는) 서운함을 전했다." },
-      { label: "별도 입장을 내지 않는다", effects: { condition: -3 }, result: "게시판 확인을 멈추고 서로의 안부부터 챙겼다." },
+      { label: "사실이 아니라고 부인한다", effects: { affection: -10 }, result: "말을 맞추지 않은 부인에 {her}은(는) 서운함을 전했다." },
+      { label: "별도 입장을 내지 않는다", effects: {}, result: "게시판 확인을 멈추고 서로의 안부부터 챙겼다." },
     ],
   },
   {
@@ -419,8 +419,8 @@ EVENTS.push(
     text: "{job} {her}와(과)의 만남을 두고 자극적인 제목이 퍼졌다. 직업만 보고 단정하는 댓글도 이어졌다. \"{say}\" 당사자끼리 답을 정하기로 했다.",
     choices: [
       { label: "연애를 인정하고 추측을 자제해 달라고 한다", effects: { romance: "public", affection: 8, popularity: 4, reputation: -3 }, result: "관계를 공개했다. 응원도 있었지만 논란은 바로 가라앉지 않았다." },
-      { label: "만나는 사이가 아니라고 한다", effects: { reputation: -6, affection: -15 }, result: "관계를 부인하자 {her}은(는) 자신만 남겨진 기분이라고 말했다." },
-      { label: "대응 없이 서로 연락을 이어 간다", effects: { condition: -4 }, result: "공개 답변은 미루고 {her}와(과) 앞으로의 대응을 의논했다." },
+      { label: "만나는 사이가 아니라고 한다", effects: { affection: -15 }, result: "관계를 부인하자 {her}은(는) 자신만 남겨진 기분이라고 말했다." },
+      { label: "대응 없이 서로 연락을 이어 간다", effects: {}, result: "공개 답변은 미루고 {her}와(과) 앞으로의 대응을 의논했다." },
     ],
   },
   {
@@ -448,7 +448,7 @@ EVENTS.push(
     choices: [
       { label: "🎲 시간을 내서 붙잡는다", check: { stat: "mental", diff: 50 },
         success: { effects: { affection: 15, condition: 3 }, result: "서운했던 일을 끝까지 듣고 지킬 수 있는 약속부터 다시 정했다." },
-        fail: { effects: { affection: -8, condition: -5 }, result: "변명부터 꺼내는 바람에 대화가 더 어긋났다." } },
+        fail: { effects: { affection: -4, condition: -2 }, result: "변명부터 꺼내는 바람에 대화가 더 어긋났다." } },
       { label: "마음을 존중하고 놓아준다", effects: { romance: "end", condition: -5 }, result: "함께한 시간에 고마움을 전하고 관계를 끝냈다." },
     ],
   },
@@ -459,7 +459,7 @@ EVENTS.push(
     choices: [
       { label: "🎲 구체적인 약속을 정하며 붙잡는다", check: { stat: "focus", diff: 55 },
         success: { effects: { affection: 14, stamina: -2 }, result: "실제로 낼 수 있는 시간을 함께 찾았다. 한 번 더 노력해 보기로 했다." },
-        fail: { effects: { affection: -10, condition: -4 }, result: "지키기 어려운 약속을 또 꺼냈다. 믿기 어렵다는 답이 돌아왔다." } },
+        fail: { effects: { affection: -4, condition: -2 }, result: "지키기 어려운 약속을 또 꺼냈다. 믿기 어렵다는 답이 돌아왔다." } },
       { label: "더 기다리게 하지 않고 헤어진다", effects: { romance: "end", condition: -6 }, result: "관계를 정리하고 서로의 일상으로 돌아가기로 했다." },
     ],
   },
@@ -469,7 +469,7 @@ EVENTS.push(
     text: "사적인 숙소 위치를 알아낸 사람이 출입구에서 기다리고 있었다. 응원이라며 비공개 일정을 묻는 행동에 불편함을 느꼈다.",
     choices: [
       { label: "구단에 알리고 대응을 맡긴다", effects: { condition: 3 }, result: "구단이 출입 관리를 확인하고 사적인 방문은 허용하지 않는다고 안내했다." },
-      { label: "직접 나서서 강하게 항의한다", note: "직접 대응 — 평판 하락 위험", effects: { reputation: -3, condition: -4 }, result: "방문은 멈췄지만 짧게 잘린 항의 영상이 퍼져 해명이 필요해졌다." },
+      { label: "직접 나서서 강하게 항의한다", note: "직접 대응 — 마음이 지칠 수 있어요", effects: { condition: -2 }, result: "방문은 멈췄다. 직접 나선 만큼 한동안 마음이 지쳤다." },
     ],
   },
   {
@@ -478,7 +478,7 @@ EVENTS.push(
     text: "비공개 이동 일정이 팬 대화방에 돌아다녔다. 기다렸다는 연락까지 이어져 구단에 상황을 전달할 필요가 있었다.",
     choices: [
       { label: "구단에 알리고 일정을 보호한다", effects: { condition: 2 }, result: "구단이 유출 경로를 확인하고 선수의 사생활을 지켜 달라고 공지했다." },
-      { label: "직접 공개 글로 항의한다", note: "공개 항의 — 표현에 따른 평판 위험", effects: { reputation: -2, condition: -3 }, result: "급하게 적은 표현이 오해를 불러 추가 설명을 해야 했다." },
+      { label: "직접 공개 글로 항의한다", note: "공개 항의 — 마음이 지칠 수 있어요", effects: { condition: -2 }, result: "항의 글이 퍼지자 동선 공유가 멈췄다. 다만 한동안 댓글을 피해 다녔다." },
     ],
   },
   {

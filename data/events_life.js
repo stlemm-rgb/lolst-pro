@@ -36,7 +36,7 @@ EVENTS.push(
     choices: [
       { label: "가장 좋은 자리를 마련한다", check: { stat: "mental", diff: 50 },
         success: { effects: { matchBoost: 0.07, condition: 6 }, result: "관중석의 부모님이 보였다. 이상하게 손이 가벼웠다." },
-        fail: { effects: { condition: -3 }, result: "의식하지 않으려 할수록 의식됐다. 긴장으로 손에 땀이 찼다." } },
+        fail: { effects: { condition: 1 }, result: "의식하지 않으려 할수록 의식됐다. 그래도 경기 뒤 부모님 얼굴을 보니 긴장이 다 풀렸다." } },
       { label: "\"다음에 오세요\"라고 한다", effects: { condition: -1 }, result: "부담을 덜었지만, 조금 미안하다." },
     ],
   },

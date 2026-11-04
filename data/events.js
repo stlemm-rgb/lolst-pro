@@ -153,7 +153,7 @@ const EVENTS = [
     choices: [
       { label: "이를 악물고 더 연습한다", check: { stat: "mental", diff: 55 },
         success: { effects: { stamina: -12, mental: 2, matchBoost: 0.05 }, result: "새벽 4시. 드디어 손이 기억을 되찾았다. 다음 경기가 기다려진다." },
-        fail: { effects: { stamina: -15, condition: -8 }, result: "연습할수록 꼬인다. 모니터 앞에서 한참을 멍하니 앉아 있었다.", risk: { trait: "glass_mental", chance: 0.04 } } },
+        fail: { effects: { stamina: -12, condition: -3, mental: 1 }, result: "연습할수록 꼬인다. 모니터 앞에서 한참을 멍하니 앉아 있었다. 그래도 끝까지 버틴 밤은 남는다.", risk: { trait: "glass_mental", chance: 0.04 } } },
       { label: "감독님과 상담한다", effects: { condition: 12 }, result: "감독: \"너 원래 잘하는 거 알아. 하던 대로만 해.\" 짧은 말이 오래 남았다.",
         followUp: { event: "slump_video", weeks: [2, 4], chance: 0.6 } },
       { label: "며칠 완전히 쉰다", effects: { stamina: 25, condition: 8, skipTraining: true }, note: "다음 주 훈련 없음",
@@ -253,7 +253,7 @@ const EVENTS = [
       { label: "휴식을 요청한다", effects: { stamina: 15, condition: 10 }, result: "감독: \"그래, 이틀 쉬어.\" 생각보다 쉽게 허락해 줬다." },
       { label: "괜찮다고 말한다", check: { stat: "mental", diff: 60 },
         success: { effects: { mental: 2, condition: 5 }, result: "말하고 나니 정말 괜찮아졌다. 마음먹기 나름이다." },
-        fail: { effects: { condition: -5 }, result: "괜찮다고 했지만... 사실 괜찮지 않다." } },
+        fail: { effects: { condition: -2, mental: 1 }, result: "괜찮다고 했지만 사실 괜찮지 않다. 코치는 눈치챘는지 \"언제든 다시 와\"라고만 했다." } },
     ],
   },
 
@@ -291,7 +291,7 @@ const EVENTS = [
     choices: [
       { label: "직접 해명한다", check: { stat: "reputation", diff: 10 },
         success: { effects: { reputation: 5, condition: 2 }, result: "연습실 영상을 올리자 분위기가 반전됐다. \"이걸 보고도 루머를 믿냐\"" },
-        fail: { effects: { reputation: -2, condition: -5 }, result: "해명할수록 말꼬리를 잡힌다. 차라리 가만히 있을 걸.", followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } } },
+        fail: { effects: { reputation: -1, condition: -2 }, result: "해명할수록 말꼬리를 잡힌다. 차라리 가만히 있을 걸.", followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } } },
       { label: "무시한다", effects: { condition: 2 }, note: "몇 주 뒤 루머가 더 퍼질 수도 있어요", result: "신경 쓰지 않기로 했다. 며칠 지나면 잊히겠지...", followUp: { event: "rumor_spread", weeks: [3, 6], chance: 0.5 } },
       { label: "법적 대응한다", effects: { money: -1000000, reputation: 5 }, note: "몇 주 뒤 결과가 와요 (사과문·합의금)", result: "변호사 사무실을 다녀왔다. 증거는 충분하다고 한다.",
         followUp: [{ event: "rumor_apology", weeks: [3, 6], chance: 0.6 }, { event: "rumor_settlement", weeks: [6, 10], chance: 0.5 }] },
@@ -334,7 +334,7 @@ const EVENTS = [
     choices: [
       { label: "이길 때까지 돌린다", check: { stat: "mental", diff: 55 },
         success: { effects: { reaction: 2, condition: 2 }, result: "새벽 3시, 5연승으로 마무리. 오늘의 나는 꺾이지 않았다." },
-        fail: { effects: { condition: -8, stamina: -5 }, result: "10연패. 키보드를 내려치려다 겨우 참았다.", risk: { trait: "tilt", chance: 0.04 } } },
+        fail: { effects: { condition: -3, stamina: -5, masteryMetaOne: 1 }, result: "10연패. 키보드를 내려치려다 겨우 참았다. 그래도 그 챔피언 손맛은 조금 늘었다.", risk: { trait: "tilt", chance: 0.04 } } },
       { label: "오늘은 접는다", effects: { condition: 4 }, result: "산책하고 돌아와 일찍 잤다. 내일의 나는 이길 것이다." },
     ],
   },
@@ -500,7 +500,7 @@ const EVENTS = [
     choices: [
       { label: "바로 사과 방송을 한다", check: { stat: "reputation", diff: 0 },
         success: { effects: { reputation: 1, condition: -3 }, result: "진심 어린 사과에 \"이 정도면 됐다\"는 반응. 오히려 호감이 늘었다." },
-        fail: { effects: { reputation: -4, condition: -6 }, result: "사과문 문장 하나가 또 논란이 됐다. 한동안 방송을 쉬기로 했다." } },
+        fail: { effects: { reputation: -1, condition: -3 }, result: "사과문 문장 하나가 또 논란이 됐다. 한동안 방송을 쉬기로 했다." } },
       { label: "별일 아니라며 넘긴다", effects: { reputation: -7 }, risk: { trait: "scandal", chance: 0.05 }, result: "\"별일 아니다\"라는 말이 더 큰 별일이 됐다." },
     ],
   },

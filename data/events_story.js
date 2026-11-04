@@ -45,7 +45,7 @@ EVENTS.push(
     choices: [
       { label: "\"트로피를 들고 돌아오겠습니다.\"", check: { stat: "mental", diff: 60 },
         success: { effects: { matchBoost: 0.07, popularity: 3 }, result: "말하고 나니 정말 그렇게 될 것 같다. 손끝이 뜨겁다." },
-        fail: { effects: { condition: -4, popularity: 2 }, result: "말은 했지만 밤새 잠이 오지 않았다. 부담이 어깨를 누른다." } },
+        fail: { effects: { condition: -1, popularity: 2 }, result: "말은 했지만 밤새 잠이 오지 않았다. 부담이 어깨를 누른다." } },
       { label: "\"우리 다섯 명이면 됩니다.\"", effects: { teamRelation: 6, condition: 4 }, result: "다섯 손이 가운데로 모였다. \"하나, 둘, 셋!\"" },
       { label: "말없이 고개만 끄덕인다", effects: { focus: 1 }, result: "말보다 경기로. 비행기에서 상대 분석 노트를 다시 펼쳤다." },
     ],
@@ -164,7 +164,7 @@ EVENTS.push(
       { label: "받아들이고 이를 간다", effects: { mental: 2, laning: 1, condition: -4 }, result: "대기실 모니터 앞에서 노트를 폈다. 다시 돌아갈 자리를 위해." },
       { label: "감독에게 이유를 묻는다", check: { stat: "reputation", diff: 10 },
         success: { effects: { condition: 3, focus: 1 }, result: "감독이 부족한 부분을 하나하나 짚어 줬다. 무엇을 고쳐야 하는지 분명해졌다." },
-        fail: { effects: { condition: -8, reputation: -2 }, result: "\"결정은 내가 한다.\" 문이 닫혔다." } },
+        fail: { effects: { condition: -3, mental: 1 }, result: "\"결정은 내가 한다.\" 문이 닫혔다. 그래도 무엇을 보여 줘야 하는지는 알 것 같다." } },
       { label: "{player}에게 축하를 건넨다", effects: { relation: 15, reputation: 3, condition: -2 }, result: "{player}: \"...고마워. 금방 다시 경쟁하자.\"" },
     ],
   },

@@ -49,5 +49,15 @@ STEP1.forEach(id => c.EVENTS.find(e => e.id === id).choices.forEach(ch => {
 ok(!bad.length, "1단계 연락에 손해만 있는 선택지 없음" + (bad.length ? " · " + bad.join(", ") : ""));
 const pf = c.EVENTS.find(e => e.id === "pre_final").choices;
 ok(pf[0].effects.mental && pf[2].effects.ifTired, "결승 전날: '평소대로' 멘탈 / '일찍 잔다' 지쳐 있으면 더 — 서로 다른 이유");
+// 265 2단계: 노력·용기의 실패는 작은 성과가 남거나 덜 아프게, 연애 미루기·무대응·친구 사과는 손해 없음
+const ev = id => c.EVENTS.find(e => e.id === id);
+const failOf = (id, i) => (ev(id).choices.filter(ch => ch.check)[i || 0].fail || {}).effects || {};
+const soft = ["slump", "coach_talk", "rank_grind", "benched_now", "family_visit"].filter(id => { const f = failOf(id); return Object.keys(f).some(k => f[k] > 0); });
+ok(soft.length === 5, "노력의 실패에 작은 성과가 남음 (" + soft.join(", ") + ")");
+ok(["rm_cheer_seat", "rm_cheer_banner"].every(id => failOf(id).matchBoost === undefined), "응원 부탁 실패에 경기 벌점 없음");
+const noLoss = [["rm_meet_dm", "읽고 넘긴다"], ["rm_date_cafe", "다음에 만나자고 한다"], ["rm_rumor_photo", "대응하지 않는다"], ["fr_clip_misunderstanding", "상처 준 말을 인정하고 만나자고 한다"]]
+  .filter(x => { const e = ev(x[0]).choices.find(ch => ch.label === x[1]).effects || {}; return Object.keys(e).every(k => typeof e[k] !== "number" || e[k] >= 0); });
+ok(noLoss.length === 4, "연애 미루기·무대응·친구 사과는 손해 없음");
+ok(ev("rm_rumor_photo").choices.find(ch => ch.label === "연애를 부인한다").effects.reputation === undefined, "열애설 부인에 평판 벌점 없음 (상대 서운함만)");
 console.log(fail ? "❌ 실패 " + fail + "개" : "✅ 통과");
 process.exit(fail ? 1 : 0);

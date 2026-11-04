@@ -374,8 +374,8 @@ EVENTS.push(
     title: "📱 짧게 잘린 농담",
     text: "방송에서 {player}와(과) 했던 농담이 앞뒤 없이 짧게 퍼졌다. '너도 나를 그렇게 생각했냐'는 메시지와 함께 함께 찍은 영상이 도착했다.",
     choices: [
-      { label: "상처 준 말을 인정하고 만나자고 한다",
-        effects: { relation: -5, flag: { fr_reconcile_pending: true } },
+      { label: "상처 준 말을 인정하고 만나자고 한다", note: "만나서 풀 기회가 생겨요",
+        effects: { flag: { fr_reconcile_pending: true } }, // 265 ④-2 2단계: 사과를 고른 쪽에 붙어 있던 관계 −5 뺌
         result: "해명부터 하려던 손을 멈추고 사과를 적었다. {player}은(는) 며칠 뒤 늘 가던 식당에서 보자고 했다.",
         followUp: { event: "fr_table_reconcile", weeks: [1, 3], chance: 1 } },
       { label: "농담도 못 받냐며 대화를 끊는다", effects: { relation: -15 }, result: "내가 웃겼다고 생각한 장면이 다시 눈에 들어왔다. 채팅창에는 더 이상 답이 올라오지 않았다." },
