@@ -302,7 +302,7 @@ function timeTriggerContext(trigger) {
       M.vetYear = y;
       return {};
     }
-    default: return null;
+    default: return trigger.indexOf("pos:") === 0 ? posSceneContext(trigger.slice(4)) : null; // 262 포지션 연락 (js/position_voice.js)
   }
 }
 

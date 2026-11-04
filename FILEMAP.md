@@ -18,6 +18,7 @@
 | `data/events.js` | 53 | 이벤트 (SNS로 오는 연락과 소식) |  |
 | `data/events_story.js` | 42 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/duo.js` | 7 | ④ 3단계 (261): 영혼의 듀오 — 원딜·서포트만, 경험만(새 승률 효과 없음, 기존 팀 케미 그대로) — 코드 js/duo.js |  |
+| `data/position_events.js` | 9 | ④ 4단계 (262): 포지션 연락 — 내 실제 장면이 최근 몇 주에 쌓였을 때만 — 코드 js/position_voice.js posSceneContext |  |
 | `data/events_life.js` | 11 | 받은 연락 리뉴얼 ② 선수 생활·인생 · 동료·라이벌 관계 (2026-10-08) |  |
 | `data/friends.js` | 40 | 친구 시스템 데이터 (분기 활동 · 단계 이야기 · 친구 연락) |  |
 | `data/social_posts.js` | 83 | 선수 SNS 글 ([SNS] → 💬 선수 SNS 탭) |  |
@@ -54,7 +55,7 @@
 | `js/main.js` | 57 | 게임 상태 |  |
 | `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 20 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
-| `js/events.js` | 37 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
+| `js/events.js` | 38 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
 | `js/sns_page.js` | 39 | SNS 화면 |  |
 | `js/contracts.js` | 33 | 연봉 · 계약 · 2군행 · 이적 |  |
 | `js/club_market.js` | 29 | 구단 이적 시장·여름 이적 | club_market.js, summer_market.js |
@@ -88,7 +89,7 @@
 | `js/staff.js` | 17 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
 | `js/portrait.js` | 11 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
 | `js/replay.js` | 24 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
-| `js/position_voice.js` | 5 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
+| `js/position_voice.js` | 9 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
 | `js/duo.js` | 8 | ④ 3단계 (261): 영혼의 듀오 — 규칙·글: data/duo.js |  |
 | `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |

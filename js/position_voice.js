@@ -96,3 +96,73 @@ function positionWeekHTML(r) {
     x.stats.map(function (s) { return "<span>" + escapeHTML(s[0]) + " <b>" + escapeHTML(String(s[1])) + "</b></span>"; }).join("") + "</span></div>" +
     '<div class="ws-role-t' + (b && !b.good ? " bad" : "") + '">' + line + "</div>" + (x.ban ? '<div class="ws-role-ban">' + escapeHTML(x.ban) + "</div>" : "") + "</div>";
 }
+
+// ----- 4단계 (262): 포지션 연락 — 규칙·글: data/position_events.js -----
+// 기억: state.flags.posScene = { log: [{ w 절대 주, e 장면 id(hit_solo = 솔로킬 당함), pick, pm 그때 숙련도, used }], pog: [절대 주], done: {경기 키: 1}, doneYear, last: {열쇠: 보낸 해} }
+function posSceneState() {
+  if (!state.flags) state.flags = {};
+  if (!state.flags.posScene) state.flags.posScene = { log: [], pog: [], done: {}, doneYear: 0 };
+  return state.flags.posScene;
+}
+// 매주 (js/events.js runWeeklyEvents, duoWeekly 다음): 지난 경기의 내 장면을 기록, 오래된 기록은 지움
+function posSceneWeekly() {
+  const t = myTeam(), S = posSceneState(), me = POSITION_IDS.indexOf(state.player.position), now = absWeek();
+  if (!t || me === -1) return;
+  if (S.doneYear !== state.year) { S.done = {}; S.doneYear = state.year; }
+  userMatches().forEach(function (m) {
+    if (!m.winner || !m.detail || !m.detail.sets) return;
+    const key = matchKey(m);
+    if (S.done[key]) return;
+    S.done[key] = 1;
+    const side = m.a === t.id ? "a" : m.b === t.id ? "b" : null;
+    if (!side) return;
+    let played = false;
+    m.detail.sets.forEach(function (sd) {
+      if (!sd.lanes || sd.lanes[me][side] !== USER_ID) return;
+      played = true;
+      (sd.ev || []).forEach(function (e) {
+        const id = e.p === USER_ID ? e.e : e.v === USER_ID && e.e === "solo" ? "hit_solo" : null;
+        if (id) S.log.push({ w: now, e: id, pick: sd.pick, pm: sd.pm });
+      });
+    });
+    if (played && m.pog === USER_ID) S.pog.push(now);
+  });
+  const from = now - POSITION_EVENT_RULES.weeks + 1;
+  S.log = S.log.filter(function (x) { return x.w >= from; });
+  S.pog = S.pog.filter(function (w) { return w >= from; });
+}
+// 포지션 연락 + 듀오 연락(inbox, 소식 duo_pair 빼고) 이번 시즌 보낸 수 — 듀오 연락은 trigger로 셈 (원래 있던 duo_offer 같은 연락은 빼려고)
+function posSeasonSent() {
+  const ys = eventLog().ys;
+  return EVENTS.filter(function (ev) { return ev.tab === "inbox" && (ev.trigger.indexOf("pos:") === 0 || /^duo[A-Z]/.test(ev.trigger)); })
+    .reduce(function (s, ev) { return s + (ys[ev.id] || 0); }, 0);
+}
+// trigger "pos:열쇠" (js/friends.js timeTriggerContext에서)
+function posSceneContext(key) {
+  const R = POSITION_EVENT_RULES, ev = R.events[key];
+  if (!ev || ev.pos !== state.player.position || !state.flags || !state.flags.posScene) return null;
+  const S = state.flags.posScene;
+  if (!S.last) S.last = {};
+  if (S.last[key] && state.year - S.last[key] < R.gapYears) return null; // 같은 연락은 2년에 한 번
+  if (posSeasonSent() >= R.seasonMax) return null;
+  if (ev.noPog && S.pog.length) return null;
+  const hits = S.log.filter(function (x) { return !x.used && ev.ids.indexOf(x.e) !== -1; });
+  if (hits.length < ev.n) return null;
+  const ctx = { n: hits.length, cause: "" };
+  if (ev.mate) {
+    const t = myTeam(), id = t && starters(t.id)[ev.mate];
+    if (!id || id === USER_ID || !findPlayer(id)) return null;
+    ctx.pid = id; ctx.player = playerName(id);
+  }
+  hits.forEach(function (x) { x.used = 1; });
+  S.last[key] = state.year;
+  const last = hits[hits.length - 1], C = POSITION_VOICE_CAUSE, VR = POSITION_VOICE_RULES, k = key + "|" + absWeek();
+  if (last.pm !== undefined && last.pm < VR.lowMastery && last.pick) ctx.cause = voicePick(C.mastery, k).replace(/\{champ\}/g, last.pick).replace(/\{mastery\}/g, last.pm);
+  else if (careerYears() <= VR.rookieYears) ctx.cause = voicePick(C.rookie, k);
+  return ctx;
+}
+// 효과 relationPos: "top" → 우리 팀 그 포지션 주전과 관계 + (js/events.js applyEffects)
+function applyRelationPos(pos, notes) {
+  const t = myTeam(), id = t && starters(t.id)[pos];
+  if (id && id !== USER_ID && findPlayer(id)) changeRelation(id, POSITION_EVENT_RULES.relationPos, notes);
+}
