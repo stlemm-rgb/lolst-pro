@@ -336,7 +336,7 @@ function playMatch(m) {
     h2hOnSet(set, m, userIn); // 내 맞수 전적 (js/rivals.js)
     if (detail) {
       const sd = setDetail(set, setCtx, m, userCtx ? userCtx.pick : null);
-      if (userCtx) { sd.pick = userCtx.pick; sd.joker = !!userCtx.joker; sd.banned = userCtx.banned; }
+      if (userCtx) { sd.pick = userCtx.pick; sd.joker = !!userCtx.joker; sd.banned = userCtx.banned; sd.pm = Math.round(state.mastery[userCtx.pick] || 0); } // pm: 그때 숙련도 (259 포지션 해설 원인)
       detail.sets.push(sd);
     }
   }

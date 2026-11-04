@@ -189,7 +189,8 @@ function rpAddEvent(m, e, i) {
   f.className = "rp-fe " + (e.s ? "b" : "a") + (info.size === "l" ? " big" : "") + (mine ? " mine" : "");
   f.setAttribute("data-rpi", i);
   f.innerHTML = '<span class="t">' + e.t + '분</span><span class="ev-tm s' + e.s + '">' + escapeHTML(teamShort(e.s ? m.b : m.a)) + "</span><span>" + (e.p ? portraitImg(e.p, { face: true, size: mine ? 24 : 18 }) : "") + '</span><span class="' + (e.k === "bad" ? "down" : e.k === "psych" ? "rp-psych" : "") + '">' +
-    (mine ? '<span class="rp-me">' + REPLAY_TEXTS.meTag + "</span> " : "") + (info.icon || "") + " " + matchEventText(e, rpName(m)) + "</span>";
+    (mine ? '<span class="rp-me">' + REPLAY_TEXTS.meTag + "</span> " : "") + (info.icon || "") + " " + matchEventText(e, rpName(m)) + "</span>" +
+    (mine ? positionVoiceHTML(m, RP.setIdx, e, i) : ""); // 259 포지션 해설 (js/position_voice.js)
   f.title = REPLAY_TEXTS.jumpTip;
   f.onclick = function () { replayJumpTo(e, i); }; // 기록 한 줄을 누르면 그 시간으로 + 장소 강조
   const feed = document.getElementById("rp-feed");

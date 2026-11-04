@@ -1112,6 +1112,9 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .rp-fe.big { background: rgba(var(--gold-rgb), 0.07); }
 .rp-fe.mine { background: linear-gradient(90deg, rgba(var(--gold-rgb), 0.2), rgba(var(--gold-rgb), 0.05)); box-shadow: inset 4px 0 0 var(--gold); font-weight: 700; font-size: 14px; border-radius: var(--r-xs); padding: 8px 6px; } /* 200: 내 장면 금색 */
 .rp-me { display: inline-block; font-size: 11px; font-weight: 800; color: var(--on-gold); background: var(--gold); border-radius: 999px; padding: 0 7px; margin-right: 2px; }
+.rp-voice { grid-column: 1 / -1; margin: 2px 0 0 80px; font-size: 12px; color: var(--text); opacity: 0.85; line-height: 1.45; } /* 259 포지션 해설 (js/position_voice.js) */
+.rp-voice .rp-cause { color: var(--muted); }
+@media (max-width: 600px) { .rp-voice { margin-left: 0; } }
 .rp-feed.only-me .rp-fe:not(.mine) { display: none; }
 .rp-feed.only-me:not(:has(.mine))::before { content: attr(data-empty); display: block; padding: 12px 4px; color: var(--muted); font-size: 13px; }
 .rp-feedhd { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
