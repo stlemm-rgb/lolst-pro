@@ -94,7 +94,7 @@ function positionWeekHTML(r) {
   const line = b ? escapeHTML((matchEventInfo(b.e) || {}).name || "") + " — " + escapeHTML(b.v.text) + (b.v.cause ? ' <span class="muted">' + escapeHTML(b.v.cause) + "</span>" : "") : escapeHTML(W.quiet[state.player.position] || "");
   return '<div class="ws-role"><div class="ws-role-h">' + W.title + '<span class="ws-role-st">' +
     x.stats.map(function (s) { return "<span>" + escapeHTML(s[0]) + " <b>" + escapeHTML(String(s[1])) + "</b></span>"; }).join("") + "</span></div>" +
-    '<div class="ws-role-t' + (b && !b.good ? " bad" : "") + '">' + line + "</div>" + (x.ban ? '<div class="ws-role-ban">' + escapeHTML(x.ban) + "</div>" : "") + "</div>";
+    '<div class="ws-role-t">' + line + (x.ban ? ' <span class="ws-role-ban">' + escapeHTML(x.ban) + "</span>" : "") + "</div></div>"; // 265: 밴은 따로 한 줄 대신 글 끝에
 }
 
 // ----- 4단계 (262): 포지션 연락 — 규칙·글: data/position_events.js -----
