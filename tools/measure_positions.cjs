@@ -47,7 +47,7 @@ const RUN = `(function (pos, seasons) {
 })`;
 const POS = ["top", "jungle", "mid", "adc", "support"], NAME = { top: "탑", jungle: "정글", mid: "미드", adc: "원딜", support: "서포트" };
 const seeds = [21, 22, 23];
-if (process.env.MODE !== "cause") for (const pos of POS) {
+if (!process.env.MODE) for (const pos of POS) {
   const all = seeds.map(seed => JSON.parse(vm.runInContext(RUN, create(seed))(pos, SEASONS)));
   const sum = k => all.reduce((s, r) => s + r[k], 0);
   const n = seeds.length * SEASONS, sets = sum("sets");
@@ -109,5 +109,47 @@ if (process.env.MODE === "cause") {
   }
   console.log("== 리그 선수 전체 (내 경기에 나온 사건, 점수대별 좋은 : 실수)");
   Object.keys(all).map(Number).sort((a, b) => a - b).forEach(b => console.log("  " + b + "~" + (b + 4) + "점: " + all[b].good + " : " + all[b].bad + " (실수 비율 " + Math.round(all[b].bad / (all[b].good + all[b].bad) * 100) + "%)"));
+  process.exit(0);
+}
+
+// ----- 원인 2 (MODE=cause2): 같은 점수대에서 내 선수 vs 리그 선수 — 챔피언 배율 cf · 전력-점수 · 스탯 고르기 -----
+// 실행: MODE=cause2 node tools/measure_positions.cjs   (PLAN=mix → 솔랭·스크림·리플레이·챔피언 연습 돌아가며, PLAN=champ → 챔피언 연습·집중 75%)
+if (process.env.MODE === "cause2") {
+  const C2 = `(function (pos, seasons) {
+    linkifyNames = function () {}; renderMenu = function () {}; renderTopbar = function () {}; renderPage = function () {};
+    state = createNewState(); draft = newDraft(); draft.name = "측정"; draft.position = pos; draft.startYear = 2017; draft.teams = makeTeamDefs(2017);
+    const list = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1); draft.teamChoice = list[Math.floor(list.length / 2)][1];
+    startCareer(true); state.settings.autoSave = false;
+    const rows = { me: {}, npc: {} };
+    const orig = rollSetEvents;
+    rollSetEvents = function (la, lb) {
+      la.concat(lb).forEach(p => {
+        if (!p.id) return;
+        const me = p.id === USER_ID, sc = playerScore(p.id);
+        if (sc < 65 || sc >= 75) return; // 같은 점수대만 (65~74)
+        const st = statsOfId(p.id), vals = Object.keys(st).filter(k => typeof st[k] === "number").map(k => st[k]);
+        const avg = vals.reduce((s, v) => s + v, 0) / vals.length, low = Math.min.apply(null, vals);
+        const R = rows[me ? "me" : "npc"], b = Math.floor(sc / 5) * 5, B = R[b] = R[b] || { n: 0, cf: 0, gap: 0, avg: 0, low: 0, score: 0 };
+        B.n++; B.cf += p.cf || 1; B.gap += p.power - sc; B.avg += avg; B.low += low; B.score += sc;
+        const ms = me ? state.mastery : findPlayer(p.id).mastery || {}, mv = Object.values(ms); B.mmax = (B.mmax || 0) + Math.max.apply(null, mv); B.mavg = (B.mavg || 0) + mv.reduce((s, v) => s + v, 0) / mv.length; B.meta = (B.meta || 0) + (me ? metaPenaltyInfo().avg : npcMetaAvg(findPlayer(p.id)));
+      });
+      return orig.apply(this, arguments);
+    };
+    for (let w = 0; w < seasons * 52; w++) {
+      state.retirePlanned = false; state.plan = state.stamina < 30 ? "rest" : PLANS[state.week % PLANS.length];
+      state.inbox.filter(m => m.tab === "inbox" && m.choices && m.answered === null && m.kind !== "retire" && m.kind !== "offer").forEach(m => answerMessage(m.id, 0));
+      nextWeek();
+    }
+    return JSON.stringify(rows);
+  })`;
+  const tot = { me: {}, npc: {} };
+  for (const pos of POS) {
+    const ctx = create(31); vm.runInContext("var PLANS = " + JSON.stringify(process.env.PLAN === "mix" ? ["solo_rank", "scrim", "replay", "champion"] : process.env.PLAN === "champ" ? ["champion", "champ_focus", "scrim", "champion"] : ["replay", "scrim"]), ctx);
+    const r = JSON.parse(vm.runInContext(C2, ctx)(pos, 8));
+    ["me", "npc"].forEach(k => Object.keys(r[k]).forEach(b => { const T = tot[k][b] = tot[k][b] || { n: 0, cf: 0, gap: 0, avg: 0, low: 0, score: 0, mmax: 0, mavg: 0, meta: 0 }; Object.keys(T).forEach(f => { T[f] += r[k][b][f]; }); }));
+  }
+  console.log("점수대 | 누구 | 세트 수 | 평균 점수 | 챔피언 배율 cf | 전력 − 점수 | 스탯 전체 평균 | 가장 낮은 스탯 | 숙련도 최고 | 숙련도 평균 | 메타 챔피언 숙련도");
+  ["65", "70"].forEach(b => ["me", "npc"].forEach(k => { const T = tot[k][b]; if (!T) return; const f = x => (T[x] / T.n).toFixed(2);
+    console.log(b + "~" + (+b + 4) + " | " + (k === "me" ? "내 선수" : "리그") + " | " + T.n + " | " + f("score") + " | " + f("cf") + " | " + f("gap") + " | " + f("avg") + " | " + f("low") + " | " + f("mmax") + " | " + f("mavg") + " | " + f("meta")); }));
   process.exit(0);
 }
