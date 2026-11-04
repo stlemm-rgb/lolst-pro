@@ -153,3 +153,42 @@ if (process.env.MODE === "cause2") {
     console.log(b + "~" + (+b + 4) + " | " + (k === "me" ? "내 선수" : "리그") + " | " + T.n + " | " + f("score") + " | " + f("cf") + " | " + f("gap") + " | " + f("avg") + " | " + f("low") + " | " + f("mmax") + " | " + f("mavg") + " | " + f("meta")); }));
   process.exit(0);
 }
+
+// ----- 리그 선수 vs 내 선수 (MODE=league): 1부 주전의 스탯·숙련도가 시즌마다 어떻게 되는지 -----
+// 실행: MODE=league node tools/measure_positions.cjs   (미드, 2017 1부 중간 팀, 내 선수 훈련 3가지 × 7시즌)
+if (process.env.MODE === "league") {
+  const LG = `(function (plans, seasons) {
+    linkifyNames = function () {}; renderMenu = function () {}; renderTopbar = function () {}; renderPage = function () {};
+    state = createNewState(); draft = newDraft(); draft.name = "측정"; draft.position = "mid"; draft.startYear = 2017; draft.teams = makeTeamDefs(2017);
+    const list = draft.teams.map((d, i) => [d, i]).filter(x => x[0].tier === 1); draft.teamChoice = list[Math.floor(list.length / 2)][1];
+    startCareer(true); state.settings.autoSave = false;
+    const snap = () => {
+      const ids = []; tier1Ids().forEach(tid => { const s = starters(tid); Object.keys(s).forEach(k => { if (s[k] && s[k] !== USER_ID) ids.push(s[k]); }); });
+      const one = id => { const st = statsOfId(id), v = Object.keys(st).filter(k => typeof st[k] === "number").map(k => st[k]);
+        const ms = id === USER_ID ? Object.keys(state.mastery).filter(n => myPositionChampions().indexOf(n) !== -1).map(n => state.mastery[n]) : Object.values(findPlayer(id).mastery || {});
+        const meta = id === USER_ID ? metaPenaltyInfo().avg : npcMetaAvg(findPlayer(id));
+        return [playerScore(id), Math.min.apply(null, v), Math.max.apply(null, v), Math.max.apply(null, ms), ms.reduce((s, x) => s + x, 0) / ms.length, meta, id === USER_ID ? state.player.age : findPlayer(id).age]; };
+      const rows = ids.map(one), avg = k => rows.reduce((s, r) => s + r[k], 0) / rows.length;
+      return { y: state.year, league: [0, 1, 2, 3, 4, 5, 6].map(avg), me: one(USER_ID) };
+    };
+    const out = [snap()];
+    for (let w = 0; w < seasons * 52; w++) {
+      state.retirePlanned = false; state.plan = state.stamina < 30 ? "rest" : plans[state.week % plans.length];
+      state.inbox.filter(m => m.tab === "inbox" && m.choices && m.answered === null && m.kind !== "retire" && m.kind !== "offer").forEach(m => answerMessage(m.id, 0));
+      nextWeek();
+      if (state.week === 47) out.push(snap());
+    }
+    return JSON.stringify(out);
+  })`;
+  const f = r => r.map((x, i) => i === 6 ? x.toFixed(0) + "세" : x.toFixed(0)).join(" / ");
+  const PL = { "스크림·리플레이만": ["replay", "scrim"], "챔피언 연습 25%": ["solo_rank", "scrim", "replay", "champion"], "챔피언 연습 75%": ["champion", "champ_focus", "scrim", "champion"] };
+  console.log("값 = 스탯 점수 / 가장 낮은 스탯 / 가장 높은 스탯 / 숙련도 최고 / 숙련도 평균 / 메타 챔피언 숙련도 / 나이");
+  let first = true;
+  for (const name of Object.keys(PL)) {
+    const r = JSON.parse(vm.runInContext(LG, create(51))(PL[name], 7));
+    if (first) { console.log("== 1부 주전 평균 (다른 선수)"); r.forEach(s => console.log("  " + s.y + ": " + f(s.league))); first = false; }
+    console.log("== 내 선수 · " + name);
+    r.forEach(s => console.log("  " + s.y + ": " + f(s.me)));
+  }
+  process.exit(0);
+}
