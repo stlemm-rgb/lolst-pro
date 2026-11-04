@@ -28,6 +28,10 @@ const r = JSON.parse(vm.runInContext(`(function () {
   // 글자를 고친 선택지: 예전 글자로 온 연락도 순서로 답할 수 있음
   fireEvent(findEvent("mentor"), {}); const m = state.inbox[0]; m.choices[1].label = "바빠서 거절한다"; const c0 = state.condition;
   answerMessage(m.id, 1); out.oldLabel = m.answered === 1;
+  // 3단계: 후속 연락은 보낼 때 조건(need)을 다시 봄 — 기억(flag)이 지워졌으면 안 옴, 남아 있으면 옴
+  const fu = n => { state.pendingEvents = [{ event: "home_visit", at: absWeek(), ctx: {} }]; const b = state.msgSeq; firePendingEvents(); return state.msgSeq - b; };
+  if (!state.flags) state.flags = {}; state.flags.homeVisit = true; out.fuOn = fu();
+  delete state.flags.homeVisit; out.fuOff = fu();
   return JSON.stringify(out);
 })()`, (() => { const c = create(5); return c; })()));
 ok(/🏅 평판↑/.test(r.hint) && /관계↑/.test(r.hint), "의도 힌트 · " + r.hint);
@@ -36,6 +40,7 @@ ok(r.tired === 50 && r.fresh === 72, "지쳐 있으면 더 회복 (30→" + r.ti
 ok(r.boostKeep === 0.06 && r.boostUp === 0.05, "경기 버프: 더 큰 쪽 유지 (" + r.boostKeep + ", " + r.boostUp + ")");
 ok(/\+2 /.test(r.relNote) || /관계 \+2/.test(r.relNote), "관계 표시 = 실제로 오른 만큼 · " + r.relNote);
 ok(r.oldLabel, "예전 글자로 온 연락도 답할 수 있음");
+ok(r.fuOn === 1 && r.fuOff === 0, "후속 연락: 조건이 맞으면 옴, 기억이 지워졌으면 안 옴 (" + r.fuOn + ", " + r.fuOff + ")");
 // 1단계 연락에 손해만 있는 선택지·이유 없는 벌점이 없어졌는지
 const c = { console }; vm.createContext(c);
 const html = fs.readFileSync(path.join(__dirname, "..", "Challenger_Road.html"), "utf8");

@@ -322,6 +322,18 @@ function eventReady(ev) {
   const cd = state.eventCooldown[ev.id];
   const wait = ev.cooldown || EVENT_RULES.cooldown;
   if (cd !== undefined && absWeek() - cd < wait) return false;
+  if (!eventNeedOk(ev)) return false;
+  // 한 시즌에 같은 연락은 seasonMax번까지, 받은 연락은 inboxPerSeason개까지 (always·후속 연락은 예외)
+  if (ev.tab === "inbox" && !ev.always && ev.trigger !== "followUp" && ev.trigger !== "signature") {
+    const L = eventLog();
+    if ((L.ys[ev.id] || 0) >= (ev.seasonMax || EVENT_RULES.seasonMax)) return false;
+    if (L.n >= EVENT_RULES.inboxPerSeason) return false;
+  }
+  return true;
+}
+
+// 연락의 need 조건만 (쉬는 기간·시즌 개수 제한은 안 봄) — 후속 연락도 보낼 때 이것만 다시 확인 (④-2 3단계)
+function eventNeedOk(ev) {
   const need = ev.need || {};
   if (need.minPopularity && state.popularity < need.minPopularity) return false;
   if (need.maxPopularity !== undefined && state.popularity > need.maxPopularity) return false;
@@ -332,12 +344,6 @@ function eventReady(ev) {
   if (need.trait && !hasTrait(need.trait)) return false;
   if (need.noTrait && hasTrait(need.noTrait)) return false;
   if (!storyNeedOk(need)) return false; // 리뉴얼 조건 (js/friends.js)
-  // 한 시즌에 같은 연락은 seasonMax번까지, 받은 연락은 inboxPerSeason개까지 (always·후속 연락은 예외)
-  if (ev.tab === "inbox" && !ev.always && ev.trigger !== "followUp" && ev.trigger !== "signature") {
-    const L = eventLog();
-    if ((L.ys[ev.id] || 0) >= (ev.seasonMax || EVENT_RULES.seasonMax)) return false;
-    if (L.n >= EVENT_RULES.inboxPerSeason) return false;
-  }
   return true;
 }
 
@@ -733,8 +739,8 @@ function firePendingEvents() {
   state.pendingEvents = state.pendingEvents.filter(function (p) {
     if (p.at > now) return true;
     const ev = findEvent(p.event);
-    // 방송 관련 후속은 방송을 그만뒀으면 안 옴
-    if (ev && (p.event.indexOf("stream_") !== 0 || hasActivity("stream"))) fireEvent(ev, p.ctx);
+    // 방송 관련 후속은 방송을 그만뒀으면 안 옴. 조건(need)이 이제 안 맞으면 조용히 안 보냄 (④-2 3단계)
+    if (ev && eventNeedOk(ev) && (p.event.indexOf("stream_") !== 0 || hasActivity("stream"))) fireEvent(ev, p.ctx);
     return false;
   });
 }
