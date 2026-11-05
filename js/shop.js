@@ -284,9 +284,8 @@ function investCardHTML() {
     return "<li>" + (inv ? inv.icon + " " + inv.name : "투자") + " " + moneyText(x.amount) + ' <span class="muted small">· ' + Math.max(0, x.at - now) + "주 뒤 결과</span></li>";
   }).join("");
   const profit = s.investProfit;
-  return '<div class="card"><h2>💹 투자 <span class="muted small">넣은 돈이 정해진 주 뒤에 무작위로 불어나거나 줄어요 · 완전 운</span></h2>' +
+  return '<div class="card"><h2>💹 투자 <span class="muted small">넣은 돈이 정해진 주 뒤에 무작위로 불어나거나 줄어요 · 완전 운</span>' + helpBtnHTML(HELP_TIPS.invest) + "</h2>" +
     '<table class="roster shop-table">' + rows + "</table>" +
-    '<p class="muted small">버튼 = 지금 자금의 몇 %를 넣을지 (마우스를 올리면 금액이 보여요). 평균은 본전 근처라서 오래 하면 운에 따라 갈려요.</p>' +
     '<p class="small">진행 중: ' + (holding ? "</p><ul class=\"invest-list\">" + holding + "</ul>" : '<span class="muted">없음</span></p>') +
     '<p class="small">지금까지 투자 손익: <b class="' + (profit >= 0 ? "up" : "down") + '">' + (profit >= 0 ? "+" : "−") + moneyText(Math.abs(profit)) + "</b></p></div>";
 }
@@ -448,7 +447,6 @@ function housingCardHTML() {
     return card(here ? "cur" : why ? "lock" : "", h.icon, h.name, fxText(h), price,
       here ? '<span class="chip good">지금 여기</span>' : '<button class="small-btn' + (why ? "" : " primary") + '" data-home="' + h.id + '"' + (why ? " disabled" : "") + ">" + (why ? "🔒 자금 부족" : h.rent ? "월세 계약" : "구매") + "</button>", h.desc);
   }).join("");
-  return '<div class="card"><h2>🏠 거주지 <span class="muted small">집이 없으면 팀 합숙 · 훈련은 잘 되지만 매주 컨디션이 ' + HOUSING.dormConditionLoss + "씩 깎여요</span></h2>" +
-    '<div class="homes">' + dormRow + rows + "</div>" +
-    '<p class="muted small">컨디션 100이면 경기력 +10%, 50이면 ±0, 0이면 −10%. 월세는 매주 나가고 모자라면 합숙으로 돌아가요. 아파트는 옮기거나 합숙으로 돌아가면 산 값의 ' + Math.round(HOUSING.resale * 100) + "%를 돌려받아요. 2부 선수들은 모두 합숙이라 조금 더 빨리 크지만 경기력은 조금 떨어져요.</p></div>";
+  return '<div class="card"><h2>🏠 거주지 <span class="muted small">집이 없으면 팀 합숙 · 훈련은 잘 되지만 매주 컨디션이 ' + HOUSING.dormConditionLoss + "씩 깎여요</span>" + helpBtnHTML(HELP_TIPS.housing.replace("{resale}", Math.round(HOUSING.resale * 100))) + "</h2>" +
+    '<div class="homes">' + dormRow + rows + "</div></div>"; // 278: 컨디션·월세·되팔기 규칙은 제목 ⓘ
 }

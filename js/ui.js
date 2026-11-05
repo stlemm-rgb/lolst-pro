@@ -174,7 +174,7 @@ function bindMotionSetting(page) {
 // ----- ⓘ 설명 창 (274): 고정 설명을 제목 옆 ⓘ로 — 누르면 화면 위에 작은 창 (CSS 툴팁은 휴대폰에서 잘리고 닫기가 없어서) -----
 // 다시 누르기·바깥 누르기·Esc·스크롤·화면 다시 그리기로 닫힘. 마우스가 있으면 올리기만 해도 보임. 화면용만 (게임 값·난수 안 건드림)
 // 버튼 안에는 넣지 말 것 (설명을 보려다 버튼이 눌림) → 제목 줄 옆에만
-let helpFor = null, helpPinned = false;
+let helpFor = null, helpPinned = false, helpAt = 0, helpY = 0;
 function helpBtnHTML(text) {
   return ' <button type="button" class="help-i" data-help="' + escapeHTML(text) + '" aria-label="' + HELP_TIPS.label + '">ⓘ</button>';
 }
@@ -182,7 +182,7 @@ function showHelp(btn, pinned) {
   let el = document.getElementById("help-pop");
   if (!el) { el = document.createElement("div"); el.id = "help-pop"; el.setAttribute("role", "tooltip"); document.body.appendChild(el); }
   if (helpFor && helpFor !== btn) helpFor.removeAttribute("aria-expanded");
-  helpFor = btn; helpPinned = pinned;
+  helpFor = btn; helpPinned = pinned; helpAt = Date.now(); helpY = window.scrollY;
   btn.setAttribute("aria-expanded", "true");
   el.textContent = btn.getAttribute("data-help");
   el.hidden = false;
@@ -218,5 +218,12 @@ document.addEventListener("mouseout", function (e) {
   if (b === helpFor && !(e.relatedTarget && b.contains(e.relatedTarget))) hideHelp();
 });
 document.addEventListener("keydown", function (e) { if (e.key === "Escape" && helpFor) hideHelp(); });
-window.addEventListener("scroll", function () { if (helpFor) hideHelp(); }, true);
+// 스크롤하면 닫힘 — 단, 누른 직후 브라우저가 버튼을 보이게 살짝 움직이는 것(278 버그: 바로 닫혔음)과 ⓘ가 없는 다른 칸(표·칩 줄)의 옆 스크롤은 빼고
+window.addEventListener("scroll", function (e) {
+  if (!helpFor || Date.now() - helpAt < 400) return;
+  const t = e.target;
+  if (t && t.nodeType === 1 && !t.contains(helpFor)) return;
+  if ((t === document || t === window) && Math.abs(window.scrollY - helpY) < 24) return;
+  hideHelp();
+}, true);
 window.addEventListener("resize", function () { if (helpFor) hideHelp(); });

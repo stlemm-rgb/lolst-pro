@@ -117,7 +117,7 @@ function trainStatsPanelHTML(exp) {
         (g ? '<span class="bar-gain" style="left:' + v + "%;width:" + Math.max(1.5, g) + '%"></span>' : "") + "</span>" +
       '<span class="tstat-val">' + v + '<span class="muted">/' + cap + "</span>" + (g ? ' <span class="up">+' + fmt1(g) + "</span>" : "") + "</span></div>";
   }).join("");
-  return '<div class="card tpanel"><h2>📊 내 스탯 <span class="muted small">초록 = 고른 훈련으로 이번 주 오를 양 · 카드에 마우스를 올리면 오를 스탯이 빛나요</span></h2>' +
+  return '<div class="card tpanel"><h2>📊 내 스탯' + helpBtnHTML(HELP_TIPS.trainStats) + "</h2>" +
     '<div class="tstats">' + rows + "</div></div>";
 }
 
@@ -131,13 +131,12 @@ function trainForecastHTML(t, exp) {
   const after = Math.max(0, Math.min(state.staminaMax, Math.round(state.stamina + exp.stamina)));
   const wk = userWeekMatches(state.week);
   const hasMatch = wk.matches.length + wk.preview.length > 0 && !userSidelined();
-  return '<div class="card tpanel"><h2>🔮 이번 주 예상 <span class="muted small">' + escapeHTML(t.name) + "</span></h2>" +
+  return '<div class="card tpanel"><h2>🔮 이번 주 예상 <span class="muted small">' + escapeHTML(t.name) + "</span>" + helpBtnHTML(HELP_TIPS.trainForecast) + "</h2>" +
     (exp.tired ? '<p class="down small">⚠️ 체력이 ' + TIRED_LIMIT + " 아래라 효과가 절반이에요. 휴식을 먼저 고려해 보세요.</p>" : "") +
     '<p class="tforecast">' + (parts.join(" · ") || '<span class="muted">스탯 변화 없음</span>') + "</p>" +
     '<p class="small">체력 ' + state.stamina + " → <b class=\"" + (after < TIRED_LIMIT ? "down" : "") + '">' + after + "</b>" +
       (hasMatch ? ' <span class="muted">(이번 주 경기가 있어서 더 줄어요)</span>' : "") +
-      (exp.ladder ? " · 솔로 랭크 " + exp.ladder + "판" : "") + "</p>" +
-    '<p class="muted small">평균값이에요. 실제로는 범위 안에서 무작위로 정해져요.</p></div>';
+      (exp.ladder ? " · 솔로 랭크 " + exp.ladder + "판" : "") + "</p></div>"; // 278: '평균값이에요' 설명은 제목 ⓘ
 }
 
 // 맨 위 한 줄: 지금 고른 훈련과 이번 주 예상 (자세한 건 아래 '이번 주 예상' 칸)
@@ -244,7 +243,7 @@ function trainCompareHTML() {
       "<td><b>" + t.name + "</b></td>" + cols.map(function (id) { return cell(e.stats[id]); }).join("") +
       cell(e.masteryTotal) + '<td class="' + (e.stamina < 0 ? "down" : "up") + '">' + signed1(e.stamina) + "</td><td>" + (e.ladder || "-") + "</td></tr>";
   }).join("");
-  return '<div class="card"><h2>📋 한눈에 비교 <span class="muted small">이번 주 예상 상승치(평균) · 진할수록 많이 올라요 · 줄을 누르면 선택</span></h2>' +
+  return '<div class="card"><h2>📋 한눈에 비교' + helpBtnHTML(HELP_TIPS.trainCompare) + "</h2>" +
     '<div class="tcompare-wrap"><table class="tcompare">' + head + rows + "</table></div></div>";
 }
 

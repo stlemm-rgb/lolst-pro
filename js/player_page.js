@@ -167,12 +167,11 @@ function statRadarHTML() {
       return "<tr><td" + (isBonusStat(r.s.id) ? ' class="bonus"' : "") + ">" + (isBonusStat(r.s.id) ? "★ " : "") + r.s.name + '</td><td class="r"><b>' + r.me + '</b></td><td class="r muted">' + r.av.toFixed(1) + "</td>" + deltaCell(r.d) + "</tr>";
     }).join("");
   const btn = function (id, text) { return '<button class="small-btn' + (radarCmp === id ? " primary" : "") + '" data-radar="' + id + '">' + text + "</button>"; };
-  return '<div class="card"><h2>스탯 12각형 <span class="muted small">나 vs ' + escapeHTML(label) + " (" + cmp.n + "명, 나 제외)</span></h2>" +
+  return '<div class="card"><h2>스탯 12각형 <span class="muted small">나 vs ' + escapeHTML(label) + " (" + cmp.n + "명, 나 제외)</span>" + helpBtnHTML(HELP_TIPS.radar) + "</h2>" +
     '<div class="radar-ctrl">' + btn("league", "리그 전체 평균") + " " + btn("pos", "같은 포지션(" + posName + ") 평균") + "</div>" +
     '<div class="radar-wrap"><div class="radar-fig">' + svg +
       '<div class="radar-legend"><span class="lg-me"></span> 나 <span class="lg-avg"></span> ' + escapeHTML(label) + "</div></div>" +
-      '<div class="radar-table"><table class="mini change-table"><tr><th>스탯</th><th class="r">나</th><th class="r">평균</th><th class="r">차이</th></tr>' + rows + "</table></div></div>" +
-    '<p class="muted small">꼭짓점이 바깥일수록 높아요 (가운데 0 → 바깥 100). 점·이름에 마우스를 올리면 평균과 차이가 보여요. 평균은 지금 내 소속 리그 선수(후보 포함) 기준이에요.</p></div>';
+      '<div class="radar-table"><table class="mini change-table"><tr><th>스탯</th><th class="r">나</th><th class="r">평균</th><th class="r">차이</th></tr>' + rows + "</table></div></div></div>"; // 278: 읽는 법은 제목 ⓘ
 }
 
 function playerAbilityHTML() {
@@ -192,13 +191,12 @@ function playerAbilityHTML() {
   }).join("");
   const score = playerScore(USER_ID);
   const changeCard =
-    '<div class="card"><h2>능력 변화 <span class="muted small">지금 값과 데뷔·이번 시즌 시작·4주 전 대비</span></h2>' +
+    '<div class="card"><h2>능력 변화 <span class="muted small">지금 값과 데뷔·이번 시즌 시작·4주 전 대비</span>' + helpBtnHTML(HELP_TIPS.statLog) + "</h2>" +
       '<table class="mini change-table"><tr><th>스탯</th><th class="r">지금</th><th class="r">데뷔 대비</th><th class="r">이번 시즌</th><th class="r">최근 4주</th></tr>' +
         '<tr class="total"><td><b>종합 능력</b></td><td class="r"><b>' + score.toFixed(1) + "</b></td>" + deltaCell(score - c.debut.score) +
           deltaCell(ss ? score - ss.score : null) + deltaCell(ago ? score - ago.score : null) + "</tr>" +
         rows + "</table>" +
-      '<p class="muted small">"-"는 아직 기록이 모자란 칸이에요 (최근 4주는 5주 이상 진행하면 보여요). 이벤트·노화로 바뀐 것도 들어가요.</p>' +
-    "</div>";
+    "</div>"; // 278: '-' 설명은 제목 ⓘ
   const scoreCard = '<div class="card"><h2>시즌별 종합 능력</h2>' + careerRecordParts().scoreBars + "</div>";
   return (
     '<div class="card"><h2>스탯 <span class="muted small"><span class="bonus">★</span> 포지션 가산점 · 최대 100</span></h2>' +
@@ -323,9 +321,8 @@ function playerChampsHTML() {
   const mastered = Object.keys(state.mastery).filter(function (n) { return state.mastery[n] >= MASTERY.max; }).length;
   return (
     championCardHTML() + // 이번 패치 메타 + 숙련도 상위 5 (js/dashboard.js)
-    '<div class="card"><h2>챔피언 숙련도 전체 <span class="muted small">' + escapeHTML(state.meta.label) + " · 숙련도 100 챔피언 " + mastered + "명</span></h2>" +
-      '<p class="muted small">1 = 한 번도 안 해 본 챔피언, 100 = 완벽하게 다룸. 금색 막대 = 이번 패치 메타 챔피언. ' +
-        "지금까지 출시된 챔피언 " + Object.keys(state.mastery).length + "명 · " + next + "</p>" +
+    '<div class="card"><h2>챔피언 숙련도 전체 <span class="muted small">' + escapeHTML(state.meta.label) + " · 숙련도 100 챔피언 " + mastered + "명</span>" + helpBtnHTML(HELP_TIPS.masteryAll) + "</h2>" +
+      '<p class="muted small">지금까지 출시된 챔피언 ' + Object.keys(state.mastery).length + "명 · " + next + "</p>" + // 278: 숫자·색 범례는 제목 ⓘ, 출시 인원·다음 출시는 그대로
       '<div class="buttons">' + tabs + "</div>" +
       '<div class="stat-columns mastery-list">' + rows + "</div>" +
     "</div>"
@@ -358,7 +355,7 @@ function playerGrowthHTML() {
       '<td class="r"><b>×' + real.toFixed(2) + "</b></td></tr>";
   }).join("");
   const trainCard =
-    '<div class="card"><h2>훈련 효과 <span class="muted small">스탯이 오를 때 곱해지는 값 · 실제 배율 = (1 + 보너스 합계) × 높은 스탯 감소(한계 특성 포함) × 노화 × 기본 ' + USER_TRAINING_SCALE + '</span></h2>' +
+    '<div class="card"><h2>훈련 효과' + helpBtnHTML(HELP_TIPS.trainEffect.replace("{scale}", USER_TRAINING_SCALE)) + "</h2>" +
       '<div class="table-wrap"><table class="roster growth-table"><tr><th>스탯</th><th class="r">시작 유형</th><th class="r">특성</th><th class="r">포지션★</th><th class="r">장비·고용</th><th class="r">합숙</th><th class="r">보너스 합계</th>' +
         '<th class="r">높은 스탯 감소</th><th class="r">노화</th><th class="r">실제 배율</th></tr>' + rows + "</table></div>" +
       '<p class="muted small">높은 스탯 감소: 스탯이 높을수록 덜 올라요. 노화: ' + agingStartAge() + "세부터 반응속도·입력 정확도만 덜 올라요. 체력이 20 아래면 이 값이 다시 절반이 돼요.</p>" +

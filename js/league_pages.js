@@ -316,9 +316,8 @@ function bracketHTML(def) {
   cols.push('<div class="bk-col bk-champ-col"><div class="bk-round">우승</div><div class="bk-boxes"><div class="bk-champ' + (winner ? "" : " tbd") + '">' +
     (winner ? "🏆 " + teamLabel(winner) : "🏆 ?") + "</div></div></div>");
   return (
-    '<div class="card"><h2>' + def.title + ' <span class="muted small">' + def.sub + "</span></h2>" +
+    '<div class="card"><h2>' + def.title + ' <span class="muted small">' + def.sub + "</span>" + helpBtnHTML(HELP_TIPS.bracket) + "</h2>" + // 278: 범례는 대회 제목마다 ⓘ (사용자)
       '<div class="bracket">' + cols.join("") + "</div>" +
-      '<p class="muted small">숫자 = 시드 · 굵은 글씨 = 이긴 팀 · 파란 테두리 = 우리 팀 · 우리 팀 경기와 결승은 눌러서 경기 결과를 볼 수 있어요.</p>' +
     "</div>"
   );
 }
