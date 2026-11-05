@@ -207,6 +207,7 @@ function stateFromSave(save) {
     fresh.player.traits.splice(fresh.player.traits.indexOf(stId), 1);
     fresh.player.startTraitUntil = null;
   }
+  cleanSaveNames(fresh); // 286: 남이 만든 세이브의 이름 속 코드 막기
   return fresh;
 }
 
@@ -376,6 +377,25 @@ function importSave(file, onDone) {
 // ===== 화면을 그리기 전에 매번: 빠진 칸 채우기·이번 주 준비 (R3, renderAll에서 옮김) =====
 // 순서 그대로 둘 것 (바꾸면 무작위 순서가 달라져 게임 결과가 바뀜 → python3 tools/golden.py check)
 // '예전 세이브'라고 적힌 것은 새 게임에서는 아무것도 안 하고 지나감
+// 286 보안: 가져온 세이브(남이 만든 파일일 수 있음)의 구단·선수 이름에서 HTML을 만들 수 있는 기호를 지움
+// 게임이 만드는 이름에는 이 기호가 없어서 정상 세이브는 그대로 ("Anyone's Legend"처럼 작은따옴표는 남김)
+// 이름은 화면 여러 곳에 그대로 들어가서, 한 곳씩 escapeHTML하는 대신 불러올 때 한 번에 (공개 사이트에는 CSP도, tools/bundle.py)
+function cleanName(s) { return typeof s === "string" ? s.replace(/[<>"&`]/g, "") : s; }
+function cleanSaveNames(st) {
+  const fix = function (o, keys) { if (o) keys.forEach(function (k) { if (typeof o[k] === "string") o[k] = cleanName(o[k]); }); };
+  fix(st.player, ["name"]);
+  const L = st.league, W = st.world;
+  if (L) {
+    (L.teams || []).concat(L.oldTeams || []).forEach(function (t) { fix(t, ["name", "short"]); });
+    Object.keys(L.players || {}).forEach(function (id) { fix(L.players[id], ["name"]); });
+  }
+  if (W) {
+    (W.teams || []).forEach(function (t) { fix(t, ["name", "short"]); });
+    Object.keys(W.players || {}).forEach(function (id) { fix(W.players[id], ["name"]); });
+  }
+  if (st.romance && st.romance.met) Object.keys(st.romance.met).forEach(function (k) { fix(st.romance.met[k], ["name"]); });
+  if (st.friends && st.friends.retired) st.friends.retired.forEach(function (x) { fix(x, ["name"]); });
+}
 function ensureStateReady() {
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
   ensureNpcTraits(); // 예전 세이브·새로 들어온 선수: 다른 선수 특성 (js/league.js)

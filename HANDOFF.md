@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-11-05 갱신 (283 옛 아이폰 Safari 오류 고침 · 공개 배포 중) / 이전: 2026-11-05 (269 ④-2 끝)
+# 다음 세션 이어가기 — 2026-11-05 갱신 (286 보안 검토 · 285 뒤로 가기 등 · 배포 대기) / 이전: 2026-11-05 (269 ④-2 끝)
 
 새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → CLAUDE.md → FILEMAP.md(파일 위치) → PROGRESS.md 최근 항목 → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태(`git status --short`, `git log --oneline -10`)를 확인한다.
 예전 기록: ver 1.0(1~133번)은 [docs/PROGRESS_1-133.md](docs/PROGRESS_1-133.md), 뉴스 개편 검증 요청문(끝난 일)은 [docs/AI_REVIEW_HANDOFF.md](docs/AI_REVIEW_HANDOFF.md), 뉴스 검증 결과는 [tools/NEWS_VALIDATION.md](tools/NEWS_VALIDATION.md).
@@ -117,6 +117,8 @@ git push
 - 받은 연락 휴대폰(218~221): msgDeckHTML 하나를 SNS 화면 왼쪽과 휴대폰 창(openPhone, 대시보드 [📱 휴대폰 열기])이 같이 씀, 버튼은 bindPhoneDeck. "SNS 열기" 대신 휴대폰 창을 여는 게 기본. 연락 2개 이상 = 대화 목록(deckOpenId null) + 계약 제안 비교표(223).
 - 경기 화면 팀 색(219): 우리 팀 하늘 · 상대 분홍 = css --side-a/--side-b, 우리 팀이 b면 sideSwapClass(m). 새 경기 화면 요소도 .a/.b·s0/s1에 이 변수를 쓸 것 (--accent/--bad 직접 쓰지 말기).
 - 빅게임: bigGameOf(x, y), 쌍 추가는 data/club.js BIG_GAMES 한 줄.
+- **보안(286)**: 화면에 넣는 글은 escapeHTML, 글 속 실행 코드(onclick="…")·eval·바깥 불러오기 금지 — 공개 사이트 CSP(tools/bundle.py)가 막고 `node tools/test_security.cjs`가 잡음. 세이브 이름은 불러올 때 cleanSaveNames.
+- **뒤로 가기·탭 밀기(285, js/nav.js)**: 새 겹창은 Esc로 닫히게 만들 것 (뒤로 가기가 Esc를 보냄) + shortcuts.js popupOpen 목록에 id.
 - **ⓘ 설명 창(274)**: 매주 볼 필요 없는 고정 설명은 늘 보이는 글 대신 `helpBtnHTML(글)` (js/ui.js, 글은 data/ui.js HELP_TIPS, 줄바꿈 
 ). 휴대폰에서도 화면 안에 뜨고 닫힘. 버튼 안에는 넣지 말 것(제목 줄 옆에만). 탭으로 묶인 화면은 h1이 지워지니 카드 안에(280). 예전 CSS 툴팁 .tip은 짧은 이름표용으로 그대로.
 - 디자인 부품: 새 화면도 pageHeadHTML·teamMarkHTML·rankBadgeHTML·emptyBoxHTML·portraitImg/faceTd 쓰기 (data/ui.js·js/ui.js·js/portrait.js). 색은 css/style.css 맨 위 변수만.
@@ -287,4 +289,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 1. **`git pull` 먼저** (다른 PC에서 올린 커밋 받기) → `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
    - 새 PC에서 측정·정답지 도구를 쓰려면: `python -m pip install playwright` → `python -m playwright install chromium` (Windows는 `python`, 출력 글자 때문에 `PYTHONIOENCODING=utf-8`). 브라우저 없이 빠른 체력·컨디션 측정은 `node tools/measure_health.cjs`.
 2. 새 사용자 요청 우선. 없으면 7장 순서대로: ① 네임드 선수 정리(대형 신인 측정부터) → ② 실제 LoL 역사 → ③ 시간 진행 이벤트 → ④ 포지션 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱. 해외 진출은 보류.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 284**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 287**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

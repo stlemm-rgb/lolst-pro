@@ -457,6 +457,7 @@ function selectMenu(id) {
       if (item.id === id && item.tabs) id = lastMenuTab[item.id] || item.tabs[0].id;
     });
   });
+  navRemember(state.currentMenu, id); // 285: 뒤로 가기용 이전 화면 + 마지막 화면 기억 (js/nav.js)
   state.currentMenu = id;
   state.notice = "";
   const lay = document.getElementById("layout");

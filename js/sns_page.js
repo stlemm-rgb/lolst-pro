@@ -390,7 +390,7 @@ function renderPhoneOverlay(opening) { // opening: 처음 열 때만 떠오르�
 let phoneTouch = null;
 let phoneSlide = ""; // 다음에 그릴 때 한 번만 미끄러지는 움직임 ("l" 왼쪽으로 밀었음 · "r" 오른쪽)
 function inSideScroll(el) {
-  for (; el && el.id !== "phone-overlay"; el = el.parentElement) {
+  for (; el && el !== document.body && el.id !== "phone-overlay"; el = el.parentElement) { // 285: 탭 밀기(js/nav.js)도 같이 씀
     const o = getComputedStyle(el).overflowX;
     if ((o === "auto" || o === "scroll") && el.scrollWidth > el.clientWidth + 1) return true;
   }

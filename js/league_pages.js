@@ -62,7 +62,7 @@ pages.team = function () {
   return (
     "<h1>소속팀</h1>" + standingCardHTML() + // 팀 내 입지 (js/standing.js)
     '<div class="grid">' +
-      '<div class="card"><h2>' + escapeHTML(team.name) + ' <span class="muted small">' + team.short + "</span></h2>" +
+      '<div class="card"><h2>' + escapeHTML(team.name) + ' <span class="muted small">' + escapeHTML(team.short) + "</span></h2>" +
         "<p>" + tierName(team.tier) + " 리그 · 현재 <b>" + rank + "위</b></p>" +
         "<p>팀 전력 <b>" + teamStrength(team.id).toFixed(1) + "</b> <span class=\"muted small\">(주전 5명 스탯 점수 평균)</span></p>" +
         "<p>이번 시즌 <b>" + rec.w + "승 " + rec.l + "패</b> <span class=\"muted small\">(세트 " + rec.sw + ":" + rec.sl + ")</span></p>" +

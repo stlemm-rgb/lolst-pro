@@ -190,6 +190,8 @@ function traitEffectKey(effect, key) {
 
 // "각 스탯이 하는 일" 표 (대시보드·훈련·캐릭터 생성 화면). 펼친 상태는 화면을 다시 그려도 유지
 let statGuideOpen = false;
+// 286: 열림 상태 기억 — 예전엔 글 속 ontoggle="…"였는데 공개 사이트 보안 규칙(CSP)이 글 속 실행 코드를 막아서 여기서 (toggle은 위로 안 올라가서 capture)
+document.addEventListener("toggle", function (e) { const d = e.target; if (d && d.classList && d.classList.contains("stat-guide")) statGuideOpen = d.open; }, true);
 function statGuideHTML(positionId) {
   const pos = positionId && findPosition(positionId);
   const row = function (s, bonus) {
@@ -197,7 +199,7 @@ function statGuideHTML(positionId) {
       '</td><td class="small">' + (s.roles || []).join(" · ") + "</td></tr>";
   };
   return (
-    '<details class="stat-guide"' + (statGuideOpen ? " open" : "") + ' ontoggle="statGuideOpen = this.open"><summary>❓ 각 스탯이 하는 일</summary>' +
+    '<details class="stat-guide"' + (statGuideOpen ? " open" : "") + '><summary>❓ 각 스탯이 하는 일</summary>' +
       '<p class="small">모든 실력 스탯은 <b>종합 능력(스탯 점수)</b>에 들어가요. 종합 능력은 경기력의 바탕이고, 주전 경쟁·연봉·이적 제안도 이 값으로 정해져요. ' +
         "★ 포지션 가산점 스탯은 종합 능력에서 " + POSITION_BONUS.matchMultiplier + "배로 계산되고 훈련 효과도 +" + Math.round(POSITION_BONUS.trainingBonus * 100) + "%예요." +
         (pos ? " (" + pos.name + " 가산점: " + pos.bonus.map(function (id) { return STATS.find(function (s) { return s.id === id; }).name; }).join("·") + ")" : "") + "</p>" +

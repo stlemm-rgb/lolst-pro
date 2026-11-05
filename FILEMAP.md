@@ -44,10 +44,10 @@
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
 | `data/standing.js` | 3 | 팀 내 입지 (126) — 엔진 js/standing.js |  |
 | `data/romance.js` | 50 | 연애: 규칙·대상 | romance_rules.js, romance.js |
-| `js/player.js` | 9 | 선수 관련 계산 |  |
+| `js/player.js` | 10 | 선수 관련 계산 |  |
 | `js/champions.js` | 18 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 38 | 캐릭터 생성 |  |
-| `js/save.js` | 23 | 저장 / 불러오기 |  |
+| `js/save.js` | 24 | 저장 / 불러오기 |  |
 | `js/league.js` | 33 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
@@ -102,6 +102,7 @@
 | `js/dash_layout.js` | 20 | 대시보드 PC · 휴대폰 따로 (232, 시안 24 ② · Codex 토론) |  |
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |
+| `js/nav.js` | 5 | 화면 이동 편의 (285, 사용자 선택 1·3·6·7) — 글: data/ui.js NAV_TEXT |  |
 | `js/start.js` | 0 | 게임 시작 |  |
 
 - 데이터(숫자·문구)는 `data/`, 규칙·화면 코드는 `js/` (CLAUDE.md 규칙)
