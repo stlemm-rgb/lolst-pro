@@ -428,3 +428,62 @@ function markEditionRead() {
   state.inbox.forEach(function (m) { if (m.tab === "news" && !m.read && newsWeekKey(m.year, m.week) === newsEdition) { m.read = true; changed = true; } });
   return changed;
 }
+
+// ━━━━━ 후반 '위기감' 기사 (281) ━━━━━ 글·숫자: data/news.js CRISIS_NEWS · CRISIS_RULES
+// 프로 5년차 이상 + 1부 3위 안일 때, 실제로 있었던 기록으로만: ① 2:1·3:2 진땀승 ② 이겼지만 분석 빗나감 ③ 다음 상대와 맞대결 승 ≤ 패 — 모두 신문
+// (단신 addNews는 받은 연락 보관 칸을 같이 써서 오래된 연락이 밀려나 연락 흐름이 바뀜 → 신문만 씀, 게임 결과 그대로)
+// ④ 해외 같은 팀 지역 2연패(새 시즌 3주, 신문). 시즌 합계·간격·종류별 상한. 표시·보관만 (경기·팬·돈 효과 없음, 무작위 안 씀)
+function crisisState() {
+  const N = ensureNewsState();
+  if (!N.crisis || N.crisis.y !== state.year) N.crisis = { y: state.year, n: 0, last: -99, c: {} };
+  return N.crisis;
+}
+function crisisRoom(kind) {
+  const C = crisisState(), R = CRISIS_RULES;
+  return C.n < R.seasonMax && absWeek() - C.last >= R.gapWeeks && (C.c[kind] || 0) < R.each[kind];
+}
+function crisisMark(kind) { const C = crisisState(); C.n++; C.last = absWeek(); C.c[kind] = (C.c[kind] || 0) + 1; }
+function crisisPick(list, salt) { return list[(state.year * 53 + state.week + salt) % list.length]; }
+function crisisHeadline(kind, art, v) {
+  publishHeadline({ key: "crisis_" + kind, headline: fillNews(art.headline, v), body: fillNews(art.body, v), mine: true, priority: 40 });
+  crisisMark(kind);
+}
+function crisisNewsWeek(playedWeek) {
+  const mine = state.player && !state.retired && state.league && myTeam();
+  if (!mine || mine.tier !== 1 || careerYears() < CRISIS_RULES.fromYear) return;
+  const v = { myTeam: mine.name, me: state.player.name };
+  // ④ 해외 왕좌: 새 시즌 초에 지난 두 해 우승 기록 (순위는 아직 의미 없어서 안 봄)
+  if (state.week === CRISIS_RULES.abroadWeek && crisisRoom("abroad")) {
+    const H = (state.world && state.world.history) || [];
+    const two = WORLD_REGIONS.map(function (r) {
+      const a = H.find(function (e) { return e.r === r.id && e.y === state.year - 2; }), b = H.find(function (e) { return e.r === r.id && e.y === state.year - 1; });
+      return a && b && a.teamId === b.teamId ? { region: r.name, team: b.team, y1: a.y, y2: b.y } : null;
+    }).filter(Boolean)[0];
+    if (two) { crisisHeadline("abroad", crisisPick(CRISIS_NEWS.abroad, 0), Object.assign({}, v, two)); return; }
+  }
+  const rank = myLeagueRank();
+  if (rank < 1 || rank > CRISIS_RULES.topRank) return;
+  v.rank = rank;
+  const involves = function (m) { return m.a === mine.id || m.b === mine.id; };
+  const played = seasonOf().matches.filter(function (m) { return m.week === playedWeek && m.winner === mine.id && involves(m); });
+  const oppOf = function (m) { return m.a === mine.id ? m.b : m.a; };
+  // ① 진땀승
+  const close = played.find(function (m) { const hi = Math.max(m.score[0], m.score[1]), lo = Math.min(m.score[0], m.score[1]); return hi >= 2 && lo === hi - 1; });
+  if (close && crisisRoom("close")) {
+    const my = close.a === mine.id ? 0 : 1;
+    crisisHeadline("close", crisisPick(CRISIS_NEWS.close, 1), Object.assign({}, v, { opp: teamName(oppOf(close)), score: close.score[my] + ":" + close.score[1 - my] }));
+    return;
+  }
+  // ② 분석이 빗나갔는데 이김
+  const miss = played.find(function (m) { return m.scout && m.scout.y === state.year && !m.scout.right; });
+  if (miss && crisisRoom("misread")) {
+    crisisHeadline("misread", crisisPick(CRISIS_NEWS.misread, 2), Object.assign({}, v, { opp: teamName(oppOf(miss)), plan: compLabel(miss.scout.shown), real: compLabel(miss.scout.target) }));
+    return;
+  }
+  // ③ 다음 상대와 맞대결이 안 좋음
+  const next = userWeekMatches(state.week).matches[0];
+  const h = next && h2hTeam(mine.id, oppOf(next));
+  if (h && h.w + h.l >= CRISIS_RULES.nemesisGames && h.w <= h.l && crisisRoom("nemesis")) {
+    crisisHeadline("nemesis", crisisPick(CRISIS_NEWS.nemesis, 3), Object.assign({}, v, { opp: teamName(oppOf(next)), w: h.w, l: h.l }));
+  }
+}

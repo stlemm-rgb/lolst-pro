@@ -314,3 +314,39 @@ const HISTORICAL_NEWS = [
     body: "2026 시즌에는 포지션별 역할 퀘스트가 도입되고 기존 정글·서포터 퀘스트도 조정된다. 맡은 역할의 플레이에 보상을 연결하는 변화다.",
     source: "https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/" }
 ];
+
+// ===== 후반 '위기감' 기사 (281, Codex 4번 아이디어 · 사용자 A안) — 코드: js/news.js crisisNewsWeek =====
+// 실제 난이도·승률은 그대로, 이겨도 '언제든 질 수 있다'고 느끼게. 근거는 실제로 있었던 기록만 (점수·분석 적중·맞대결 전적·해외 우승 기록)
+// '운으로 이겼다'처럼 직접 깎아내리지 않기. 글은 연도·주차 번호로 고름 (무작위 안 씀 → 경기 결과 그대로)
+const CRISIS_RULES = {
+  fromYear: 5,      // 프로 5년차부터
+  topRank: 3,       // 리그 3위 안(1부)일 때만
+  seasonMax: 6,     // 한 시즌 합계
+  gapWeeks: 4,      // 위기감 기사끼리 최소 간격
+  each: { close: 2, misread: 1, nemesis: 2, abroad: 1 }, // 종류별 시즌 상한
+  nemesisGames: 4,  // 까다로운 팀: 맞대결 이만큼 이상 + 승 ≤ 패
+  abroadWeek: 3,    // 해외 왕좌: 새 시즌 이 주차에 지난 두 해 우승 기록을 봄
+};
+const CRISIS_NEWS = {
+  // ① 마지막 세트까지 (2:1·3:2로 이긴 주) — 신문
+  close: [
+    { headline: "{myTeam}, {opp}에 {score} 진땀승", body: "{myTeam}이(가) {opp}을(를) {score}로 꺾었다. 승리는 챙겼지만 마지막 세트를 내줬다면 결과는 반대였다. 선두권 팀이라도 한 세트 차이는 언제든 뒤집힌다." },
+    { headline: "{score}, 끝까지 간 승부", body: "{opp}은(는) 마지막 세트까지 {myTeam}을(를) 몰아붙였다. 경기 뒤 {me}은(는) \"다음엔 더 빨리 끝내야 한다\"고 말했다. 이긴 팀도 웃기만 할 수 없는 경기였다." },
+    { headline: "{myTeam} 승리, 그러나 숙제", body: "{myTeam}이(가) {opp}전에서 {score}로 이겼다. 한 세트를 내준 내용은 다음 상대들이 그대로 돌려 볼 것이다." },
+  ],
+  // ② 예상 밖의 상대 (이겼지만 분석 리포트가 빗나감) — 신문 (단신은 받은 연락 보관 칸을 같이 써서 연락 흐름이 바뀜 → 신문으로)
+  misread: [
+    { headline: "{opp}의 예상 밖 {real}, {myTeam} 흔들", body: "분석관이 예상한 {plan} 대신 {opp}이(가) {real}을(를) 꺼냈다. {myTeam}은(는) 이겼지만, 준비하지 못한 수에 흔들린 장면이 여러 번 나왔다." },
+    { headline: "리포트에 없던 수, 다음엔?", body: "{opp}의 {real} 조합은 분석 리포트에 없던 수였다. 이번엔 막아 냈지만 상대들은 {myTeam}의 대응을 이미 돌려 보고 있다." },
+  ],
+  // ③ 유독 까다로운 팀 (다음 상대와 맞대결 전적이 비기거나 짐) — 신문
+  nemesis: [
+    { headline: "{rank}위 {myTeam}, 천적 {opp} 다시 만난다", body: "{myTeam}은(는) 리그 {rank}위지만, 이번 주 상대 {opp}에게는 통산 {w}승 {l}패다. 순위표와 맞대결은 다르다." },
+    { headline: "선두권에도 껄끄러운 상대", body: "선두권 {myTeam}에게도 껄끄러운 팀이 있다. {opp}전 통산 {w}승 {l}패, 이번 주 다시 만난다." },
+  ],
+  // ④ 해외 왕좌의 주인 (해외 같은 팀이 지역 2연패) — 신문
+  abroad: [
+    { headline: "{team}, {region} 2연패", body: "{region}의 {team}이(가) {y1}년에 이어 {y2}년에도 지역 정상에 올랐다. 국제무대에서 {myTeam}이(가) 넘어야 할 이름이 하나 더 늘었다." },
+    { headline: "{region}의 왕좌는 {team}", body: "{team}이(가) {region}을(를) 2년 연속 제패했다. 국내 선두 {myTeam}에게도 이 팀과의 만남은 쉬운 경기가 아닐 것이다." },
+  ],
+};

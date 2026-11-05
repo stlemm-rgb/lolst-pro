@@ -44,6 +44,8 @@ function stateFromSave(save) {
   if (s.newsState && Array.isArray(s.newsState.articles)) {
     fresh.newsState = { articles: s.newsState.articles.filter(function (a) { return a && typeof a.id === "string" && typeof a.headline === "string" && typeof a.body === "string"; }).slice(-NEWS_KEEP),
       notices: Array.isArray(s.newsState.notices) ? s.newsState.notices.filter(function (id) { return typeof id === "string"; }).slice(-400) : [] };
+    const c = s.newsState.crisis; // 281: 위기감 기사 이번 시즌 횟수·마지막 주
+    if (c && typeof c === "object" && typeof c.y === "number") fresh.newsState.crisis = { y: c.y, n: Number(c.n) || 0, last: Number(c.last) || -99, c: c.c && typeof c.c === "object" ? c.c : {} };
   }
 
   // 캐릭터 정보가 없으면 (예전 버전 세이브 등) 불러올 수 없음
