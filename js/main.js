@@ -295,6 +295,7 @@ pages.settings = function () {
       '<div class="setting-row">' +
         '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
       "</div>" +
+      soundSettingsHTML() + // 307 소리 (js/sound.js)
       replaySettingsHTML() + // 경기 자동 재생 (js/replay.js)
       weekSummarySettingHTML() + // 이번 주 요약 창 켜기·끄기 (196, js/dash_plus.js)
       shortcutSettingHTML() + // 단축키 켜기·끄기·목록 (198, js/shortcuts.js)
@@ -574,7 +575,7 @@ function renderPage() {
     };
   });
 
-  if (state.currentMenu === "settings") { bindSettings(page); bindReplaySettings(page); bindMotionSetting(page); bindWeekSummarySetting(page); bindShortcutSetting(page); }
+  if (state.currentMenu === "settings") { bindSettings(page); bindSoundSettings(page); bindReplaySettings(page); bindMotionSetting(page); bindWeekSummarySetting(page); bindShortcutSetting(page); }
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindRecords(page); // 개인 시상
@@ -999,7 +1000,9 @@ function renderAll() {
 // 측정 도구는 nextWeek만 부르므로 재생 창이 뜨지 않음
 function advanceWeek(rest) {
   wsBusy = true; // 211: 요약 창 먼저, 신문은 그 뒤 (js/dash_plus.js)
+  sfx("next"); // 307
   nextWeek(rest);
+  if ((state.inbox || []).some(function (m) { return m.year === state.year && m.week === state.week && m.choices && m.answered === null; })) sfxLater("notify", 450); // 307 새 연락
   // 훈련 대성공이면 연출을 먼저 보고 → 이번 주 요약 창 → 닫으면 경기 자동 재생 (js/great.js, js/dash_plus.js, js/replay.js)
   if (weekSummaryOn() && state.weekReport && state.weekReport.great) state.weekReport.great.seen = true; // 시안 27: 요약 창이 켜져 있으면 대성공은 요약 창 안(불꽃 빛·하얀 반짝임)에서
   showGreat(function () { showWeekSummary(afterWeekReplay); });

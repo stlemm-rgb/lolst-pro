@@ -75,6 +75,7 @@ function showGreat(done) {
   const r = state.weekReport;
   if (!r || !r.great || r.great.seen) { if (done) done(); return; }
   r.great.seen = true;
+  sfx("great"); // 307
   const ch = r.training.changes || {};
   const rows = Object.keys(ch).filter(function (k) { return ch[k] > 0 && (state.stats[k] !== undefined || k.indexOf("m:") === 0); }).slice(0, 5).map(function (k) {
     return { name: k.indexOf("m:") === 0 ? "⚔️ " + k.slice(2) : statName(k), to: ch[k], from: Math.max(1, Math.round(ch[k] / GREAT_RULES.mult)) };

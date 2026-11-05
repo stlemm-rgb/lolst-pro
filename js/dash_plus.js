@@ -113,7 +113,7 @@ function wsPlay(box, r) {
   let t = M.start * k;
   const chips = box.querySelector(".ws-chips");
   later(t, function () { wsShow(chips); });
-  box.querySelectorAll(".ws-chip").forEach(function (c) { later(t, function () { wsShow(c); }); t += M.chip * k; });
+  box.querySelectorAll(".ws-chip").forEach(function (c) { later(t, function () { wsShow(c); sfx(/▲|\+/.test(c.textContent) ? "statup" : "tick"); }); t += M.chip * k; }); // 307 소리
   const lines = (r.teamLines || []).slice(0, W.maxMatches), mine = (r.userLines || []).length > 0;
   lines.forEach(function (l, i) {
     const row = box.querySelector('[data-m="' + i + '"]');
@@ -132,7 +132,7 @@ function wsPlay(box, r) {
   const sp = box.querySelectorAll(".ws-special");
   if (sp.length) {
     t += M.specialGap * k;
-    later(t, function () { sp.forEach(wsShow); wsSparkle(box, k); });
+    later(t, function () { sp.forEach(wsShow); wsSparkle(box, k); sfx(r.title ? "trophy" : "great"); }); // 307 우승 = 팡파레
     t += M.special * k;
   }
   later(t, function () { wsShow(box.querySelector(".ws-foot")); wsDone(); });
@@ -187,10 +187,10 @@ function wsBig(row, l, mine, k) {
   if (el.animate) el.animate([{ transform: "translate(-50%,-50%) scale(1.4)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1)", opacity: 1 }], { duration: B.pop * k, easing: "cubic-bezier(.2,1.4,.4,1)", fill: "forwards" });
   const ds = el.querySelectorAll(".d");
   [l.my, l.their].forEach(function (n, j) {
-    for (let v = 1; v <= n; v++) run.timers.push(setTimeout(function () { ds[j].textContent = v; ds[j].classList.remove("tick"); void ds[j].offsetWidth; ds[j].classList.add("tick"); }, (B.pop + v * B.tick) * k));
+    for (let v = 1; v <= n; v++) run.timers.push(setTimeout(function () { ds[j].textContent = v; sfx("tick"); ds[j].classList.remove("tick"); void ds[j].offsetWidth; ds[j].classList.add("tick"); }, (B.pop + v * B.tick) * k));
   });
   const tRes = B.pop + Math.max(l.my, l.their) * B.tick + B.flipEnd;
-  run.timers.push(setTimeout(function () { el.classList.add(l.won ? "win" : "lose"); el.querySelector(".bw").textContent = l.won ? "승리" : "패배"; }, tRes * k));
+  run.timers.push(setTimeout(function () { el.classList.add(l.won ? "win" : "lose"); el.querySelector(".bw").textContent = l.won ? "승리" : "패배"; sfx(l.won ? "setwin" : "setlose"); }, tRes * k));
   run.timers.push(setTimeout(function () {
     wsRowFinal(row, l, mine);
     row.style.visibility = "hidden"; // 줄을 먼저 채워 자리를 재고, 큰 판을 그 자리·크기로 줄임

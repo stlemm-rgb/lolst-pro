@@ -31,12 +31,14 @@ function openReplay(keys) {
   if (!el) { el = document.createElement("div"); el.id = "replay-overlay"; document.body.appendChild(el); }
   RP = { queue: list, qi: 0, setIdx: 0, t: 0, playing: false, speed: replaySpeedSetting(), last: 0, shown: 0 };
   el.hidden = false;
+  sndDuck(true); // 307 경기 재생 중엔 음악 작게
   if (!el._esc) { el._esc = true; document.addEventListener("keydown", function (e) { if (e.key === "Escape" && RP) closeReplay(); }); }
   startReplayMatch();
 }
 function closeReplay() {
   if (RP) { RP.playing = false; clearTimeout(RP.drTimer); }
   RP = null;
+  sndDuck(false); // 307
   const el = document.getElementById("replay-overlay");
   if (el) { el.hidden = true; el.innerHTML = ""; }
 }
@@ -147,7 +149,7 @@ function drawReplay(reset) {
   if (added > 0) {
     const li = done.length - 1;
     rpCast(rpCasterLine(m, done[li], li)); RP.castT = RP.t;
-    if (RP.playing && added <= 2) rpCallout(m, done[li]);
+    if (RP.playing && added <= 2) { rpCallout(m, done[li]); rpSfxEvent(done[li]); } // 307 소리
   } else if (RP.playing && RP.t - (RP.castT || 0) >= REPLAY_SHOW.idleMin) { rpCast(rpIdleLine(RP.t)); RP.castT = RP.t; }
   drawReplayFlow(s, done, min); // 290 ⑤
   drawReplayObjects(s, min); // 293 ⑨
@@ -272,6 +274,7 @@ function replaySetEnd() {
   const m = rpMatch(), s = rpSet(), w = rpWins(RP.setIdx + 1), need = Math.ceil(m.bo / 2);
   const winId = s.w === 0 ? m.a : m.b;
   const over = w[0] >= need || w[1] >= need || RP.setIdx >= m.detail.sets.length - 1;
+  const mt = myTeam(); if (mt && (m.a === mt.id || m.b === mt.id)) sfx(winId === mt.id ? "setwin" : "setlose"); else sfx("setwin"); // 307
   replayEndBar('<div><b>' + (RP.setIdx + 1) + "세트 종료</b> · " + rpUni(uniformOfTeam(winId)) + " " + escapeHTML(teamName(winId)) + " 승리 · 세트 " + w[0] + " : " + w[1] + "</div>" +
     '<div class="rp-ctrl">' + (over ? '<button class="primary" data-rpnext="1">경기 결과 보기 ▶</button>' : '<button class="primary" data-rpnext="1">' + (RP.setIdx + 2) + '세트 시작 ▶</button><button data-rpskip="1">⏭ 결과 바로 보기</button>') + "</div>", "",
     function () { if (over) replayFinal(); else { RP.setIdx++; RP.t = 0; hideReplayEndBar(); drawReplay(true); replayPlay(true); } });
@@ -297,6 +300,7 @@ function replayFinal() {
     '<div class="rp-ctrl">' + (more ? '<button class="primary" data-rpnext="1">다음 경기 ▶</button>' : "") + '<button data-rpclose="1">닫기</button></div>', won ? "win" : "",
     function () { RP.qi++; startReplayMatch(); });
   if (won) replayConfetti(uniformOfTeam(m.winner));
+  if (won && m.label.indexOf("결승") !== -1) sfxLater("trophy", 300); // 307 결승 우승
 }
 function replayIntroHTML(m) {
   const big = bigGameOf(m.a, m.b);
@@ -564,9 +568,9 @@ function rpHomeAt(kind, side, i, t, set) {
   const D = REPLAY_DOTS, h = D.home[kind][i];
   if (i !== 1) return rpSide(h, side);
   // 정글: 두 캠프 사이를 곡선으로 오감 (캠프에서 잠깐 머물고 다음 캠프로)
-  const u = (t + side * 1.3 + set * 0.7) / D.jungle.period, k = Math.floor(u), f = rpSmooth((u - k) * 1.25);
-  const from = h[k % 2], to = h[(k + 1) % 2], p = rpLerp(from, to, f);
-  const dx = to[0] - from[0], dy = to[1] - from[1], len = Math.hypot(dx, dy) || 1, b = Math.sin(f * Math.PI) * D.jungle.bend * (k % 2 ? 1 : -1);
+  const u = (Math.max(0, t) + side * 1.3 + set * 0.7) / D.jungle.period, k = Math.floor(u), f = rpSmooth((u - k) * 1.25); // 307: 0보다 작은 시각(경기 시작 직후 죽음)도 안전하게
+  const from = h[((k % 2) + 2) % 2], to = h[((k + 1) % 2 + 2) % 2], p = rpLerp(from, to, f);
+  const dx = to[0] - from[0], dy = to[1] - from[1], len = Math.hypot(dx, dy) || 1, b = Math.sin(f * Math.PI) * D.jungle.bend * (((k % 2) + 2) % 2 ? 1 : -1);
   return rpSide([p[0] - dy / len * b, p[1] + dx / len * b], side);
 }
 function rpDotHome(side, i, t, set) {
@@ -729,6 +733,15 @@ function drawReplayKillFeed(m, s, t) {
     return '<div class="rp-kf ' + (f.side ? "b" : "a") + '">' + (info.icon || "⚔") + " " + body + "</div>";
   }).join("");
   if (box.innerHTML !== rows) box.innerHTML = rows;
+  // 307 킬 소리: 재생 중 새로 나온 킬 (한타 소리가 방금 났으면 건너뜀)
+  const prev = RP.kfT === undefined ? t : RP.kfT;
+  RP.kfT = t;
+  if (RP.playing && t > prev && t - prev < 1 && rpKillTimeline(s).feed.some(function (f) { return f.t > prev && f.t <= t; }) && !(SND && SND.last.fight && performance.now() - SND.last.fight < 400)) sfx("kill");
+}
+// 307 장면 소리: 한타 → 쾅쾅, 오브젝트 → 우웅
+function rpSfxEvent(e) {
+  const info = matchEventInfo(e) || {};
+  if (info.cat === "fight") sfx("fight"); else if (info.cat === "object") sfx("object");
 }
 // ----- 293 C ⑨ 오브젝트 안내 (data/replay.js REPLAY_OBJ) — 등장 알림 + 미니맵 자리 빛남 (잡은 사건 뒤엔 다시 등장까지 어둡게) -----
 function rpObjState(s, o, t, min) {

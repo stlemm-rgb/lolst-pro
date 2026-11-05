@@ -33,20 +33,21 @@
 | `data/room.js` | 14 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/health.js` | 3 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |
-| `data/replay.js` | 11 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
+| `data/replay.js` | 12 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
 | `data/position_voice.js` | 15 | ④ 포지션 경험 1단계 (259): 경기 재생에서 내 장면 아래 '포지션다운 해설' 한 줄 — 코드는 js/position_voice.js |  |
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
 | `data/boxscore.js` | 1 | 경기 기록(박스 스코어) 만들기 규칙 |  |
 | `data/comps.js` | 7 | 챔피언 조합 성향 (밴픽 상성·시너지) |  |
 | `data/era.js` | 24 | 시대: 대격변 패치·시대·해외 리그·시대별 경기 환경 | shakeup.js, era.js, era_match.js |
 | `data/op_patch.js` | 11 | 301 패치 사고 '사기 챔피언' SS·SSS (로직: js/op_patch.js) — 사용자 결정 2026-11-06 |  |
+| `data/sound.js` | 3 | 307 사운드 (로직: js/sound.js) — 사용자 결정 2026-11-06 |  |
 | `data/fame.js` | 9 | 인기도 · 평판 (js/fame.js) — 2026-10-07 |  |
 | `data/collection.js` | 9 | 수집·강화 (js/collection.js) — 2026-10-08 |  |
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
 | `data/standing.js` | 3 | 팀 내 입지 (126) — 엔진 js/standing.js |  |
 | `data/romance.js` | 50 | 연애: 규칙·대상 | romance_rules.js, romance.js |
 | `js/player.js` | 10 | 선수 관련 계산 |  |
-| `js/champions.js` | 18 | 챔피언 · 숙련도 · 메타(패치) |  |
+| `js/champions.js` | 19 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 38 | 캐릭터 생성 |  |
 | `js/save.js` | 25 | 저장 / 불러오기 |  |
 | `js/league.js` | 33 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
@@ -78,7 +79,7 @@
 | `js/match_detail.js` | 24 | [경기 결과] 화면: 경기 요약 · 세트별 분석 · 선수 기록 |  |
 | `js/history_pages.js` | 15 | 역사관·리그 생태계·트로피 진열장 | history_pages.js, trophies.js |
 | `js/shakeup.js` | 7 | 대격변 패치 (값: data/era.js) |  |
-| `js/op_patch.js` | 8 | 301 패치 사고 '사기 챔피언' SS·SSS (규칙·글: data/op_patch.js OP_PATCH_RULES·OP_PATCH_TEXT) |  |
+| `js/op_patch.js` | 9 | 301 패치 사고 '사기 챔피언' SS·SSS (규칙·글: data/op_patch.js OP_PATCH_RULES·OP_PATCH_TEXT) |  |
 | `js/era.js` | 28 | 시대·해외 리그·시대별 경기 환경 | era.js, era_match.js |
 | `js/fame.js` | 14 | 인기도 · 평판 (값: data/fame.js) |  |
 | `js/collection.js` | 21 | 시그니처 픽·업적·컬렉션 | signature.js, collection.js |
@@ -91,7 +92,7 @@
 | `js/rivals.js` | 17 | 맞대결 전적·구단별 빅게임 | h2h.js, biggame.js |
 | `js/staff.js` | 17 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
 | `js/portrait.js` | 11 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
-| `js/replay.js` | 50 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
+| `js/replay.js` | 52 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
 | `js/position_voice.js` | 13 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
 | `js/duo.js` | 8 | ④ 3단계 (261): 영혼의 듀오 — 규칙·글: data/duo.js |  |
 | `js/ui.js` | 14 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
@@ -105,6 +106,7 @@
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |
 | `js/nav.js` | 5 | 화면 이동 편의 (285, 사용자 선택 1·3·6·7) — 글: data/ui.js NAV_TEXT |  |
+| `js/sound.js` | 11 | 307 사운드 엔진 (값·소리·곡: data/sound.js) |  |
 | `js/start.js` | 0 | 게임 시작 |  |
 
 - 데이터(숫자·문구)는 `data/`, 규칙·화면 코드는 `js/` (CLAUDE.md 규칙)
