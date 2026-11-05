@@ -2273,3 +2273,13 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .rp-dr-ban { font-size: 13px; color: var(--bad); }
 @keyframes rpDrIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (max-width: 560px) { .rp-dr { gap: 6px; } .rp-dr-col { padding: 6px; } .rp-dr-row { grid-template-columns: 24px 22px minmax(0, 1fr); column-gap: 4px; font-size: 12px; } .rp-dr-row .rp-dr-ch { font-size: 11px; } }
+
+/* 297 신문 기사 긴 목록 → 종류별 표 (js/news.js articleBodyHTML) — 신문 팝업(.np-article)·SNS 신문(.npt-art) 같이 */
+.np-article p + p, .npt-art p + p, .np-grp + p, .np-grp + .np-grp { margin-top: 8px; }
+.np-grp { margin: 8px 0; }
+.np-grp-h { font-weight: 700; margin-bottom: 4px; }
+.np-tbl { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.4; }
+.np-tbl th { text-align: left; font-weight: 600; font-size: 12px; opacity: 0.7; padding: 2px 6px 2px 0; border-bottom: 1px solid rgba(0, 0, 0, 0.25); }
+.np-tbl td { padding: 3px 6px 3px 0; border-bottom: 1px solid rgba(0, 0, 0, 0.12); vertical-align: top; }
+.np-tbl tr.mine td { font-weight: 700; color: #b45309; }
+@media (max-width: 560px) { .np-tbl { font-size: 13px; } }

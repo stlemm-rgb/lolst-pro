@@ -133,13 +133,72 @@ function repeatNews(who, vars, st, art) {
   }
 }
 
+// ----- 297 기사 본문: 새해·해외 결산·월즈 특집의 긴 목록을 종류별 표로 (글: data/news.js NEWS_GROUP_TEXT) — 보여 줄 때만, 무작위 없음 -----
+function articleBodyHTML(a) {
+  const body = String(a.body || "");
+  const html = a.key === "newyear" ? newYearBodyHTML(body) : a.key === "worldStory" ? worldStoryBodyHTML(body) : a.key === "worlds_preview" ? worldsPreviewBodyHTML(body) : null;
+  return html || "<p>" + escapeHTML(body) + "</p>";
+}
+function newsMyTeamName() { const t = state.player && myTeam(); return t ? t.name : ""; }
+// 표 하나: rows = [{ cells: [...글자], mine: 우리 팀 줄 }] → 우리 팀 줄 맨 위 + ★ (같은 묶음 안에서 원래 순서 유지)
+function newsTableHTML(title, cols, rows) {
+  if (!rows.length) return "";
+  const G = NEWS_GROUP_TEXT;
+  const sorted = rows.filter(function (r) { return r.mine; }).concat(rows.filter(function (r) { return !r.mine; }));
+  return '<div class="np-grp"><div class="np-grp-h">' + escapeHTML(title.replace("{n}", rows.length)) + '</div><table class="np-tbl"><tr>' +
+    cols.map(function (c) { return "<th>" + escapeHTML(c) + "</th>"; }).join("") + "</tr>" +
+    sorted.map(function (r) {
+      return "<tr" + (r.mine ? ' class="mine"' : "") + ">" + r.cells.map(function (c, i) { return "<td>" + (i === 0 && r.mine ? G.mineMark : "") + escapeHTML(c) + "</td>"; }).join("") + "</tr>";
+    }).join("") + "</table></div>";
+}
+function newYearBodyHTML(body) {
+  const G = NEWS_GROUP_TEXT, mine = newsMyTeamName();
+  const renames = [], moves = [], rookies = [], rest = [];
+  let history = null;
+  body.split("\n").forEach(function (ln) {
+    if (history !== null) { history.push(ln); return; }
+    if (ln.indexOf("📜") === 0) { history = [ln]; return; } // 시대 소개는 끝까지 그대로
+    let m = /^🏷️ 구단 이름 변경: (.+) → (.+)$/.exec(ln);
+    if (m) { renames.push({ cells: [m[1], m[2]], mine: m[1] === mine || m[2] === mine }); return; }
+    // 이적 (🧩 경쟁 후보·💥 주전 이적) — 예전엔 아는 아이콘이 아니라서 앞에 ⬆️(승강)가 잘못 붙었음 → 떼고 이적으로
+    m = /^(?:⬆️ )?(🧩|💥) (.+?), (?:FA |(.+?)의 )(.+?)\((.+?), [\d.]+\) 영입(?: — [^·]*)?(?: · 이적료 (.+))?$/.exec(ln);
+    if (m) { moves.push({ cells: [m[1] + " " + m[2], m[4] + " (" + m[5] + ")", m[3] || G.fa, m[6] || "-"], mine: m[2] === mine || m[3] === mine }); return; }
+    m = /^🌟 (대형|레전드) 신인 (.+?)\((.+?), .+?\) (.+?) 입단/.exec(ln);
+    if (m) { rookies.push({ cells: [m[2] + " · " + (G.rookieKind[m[1]] || m[1]), m[3], m[4]], mine: m[4] === mine }); return; }
+    if (ln.trim()) rest.push(ln.replace(/^⬆️ (?=[🧩💥])/u, ""));
+  });
+  if (!renames.length && !moves.length && !rookies.length) return null; // 묶을 게 없으면 원래대로
+  return newsTableHTML(G.rename, G.renameCols, renames) + newsTableHTML(G.move, G.moveCols, moves) + newsTableHTML(G.rookie, G.rookieCols, rookies) +
+    (rest.length ? "<p>" + escapeHTML(rest.join("\n")) + "</p>" : "") + (history ? "<p>" + escapeHTML(history.join("\n")) + "</p>" : "");
+}
+function worldStoryBodyHTML(body) {
+  const G = NEWS_GROUP_TEXT, lines = body.split("\n"), rows = [], rest = [];
+  lines.forEach(function (ln) {
+    const m = /^🏆 (.+?): (.+?) 우승(?: · MVP (.+?)\((.+?), .+?\)(.*))?$/.exec(ln);
+    if (m) rows.push({ cells: [m[1], m[2], m[3] ? m[3] + " (" + m[4] + ")" + (m[5] || "") : "-"], mine: false });
+    else if (ln.trim()) rest.push(ln);
+  });
+  if (!rows.length) return null;
+  return (rest.length ? "<p>" + escapeHTML(rest.join("\n")) + "</p>" : "") + newsTableHTML("", G.world, rows);
+}
+function worldsPreviewBodyHTML(body) {
+  const G = NEWS_GROUP_TEXT, mine = newsMyTeamName();
+  let done = false;
+  const parts = body.split("\n\n").map(function (para) {
+    const ls = para.split("\n");
+    const rows = ls.slice(1).map(function (ln) { const m = /^(.+?): (.+) \((.+)\)$/.exec(ln); return m ? { cells: [m[1], m[2], m[3]], mine: m[3] === mine } : null; });
+    if (ls.length > 2 && rows.every(Boolean)) { done = true; return "<p>" + escapeHTML(ls[0]) + "</p>" + newsTableHTML("", G.mvp, rows); } // 지역 MVP 목록
+    return "<p>" + escapeHTML(para) + "</p>";
+  });
+  return done ? parts.join("") : null;
+}
 // ----- 화면 -----
 function newsOverlayHTML(items) {
   const r = state.weekReport;
   const arts = items.slice().sort(function (a, b) { return newsPriority(b) - newsPriority(a); }).map(function (a, i) {
     return '<article class="np-article' + (i === 0 ? " lead" : "") + (a.mine ? " mine" : "") + '">' +
       (a.mine && i === 0 ? '<span class="np-pf">' + portraitImg(USER_ID, { scale: 2 }) + "</span>" : "") + // 내 기사 1면: 내 얼굴 (js/portrait.js)
-      "<h2>" + escapeHTML(a.headline) + "</h2><div class=\"muted small\">" + escapeHTML(newsDate(a)) + "</div><p>" + escapeHTML(a.body) + "</p></article>";
+      "<h2>" + escapeHTML(a.headline) + "</h2><div class=\"muted small\">" + escapeHTML(newsDate(a)) + "</div>" + articleBodyHTML(a) + "</article>"; // 297: 긴 목록은 표로
   }).join("");
   return '<div class="np-paper">' +
     '<div class="np-mast"><span class="np-title">📰 e스포츠 데일리</span><span class="np-date">' + "주간 주요 소식" + "</span></div>" +
@@ -364,7 +423,7 @@ function newsPaperHTML(list) {
   let lead = "";
   if (arts.length) {
     lead = arts.map(function (a, i) {
-      return '<article class="npt-art' + (i === 0 ? " lead" : "") + (a.mine ? " mine" : "") + '"><h3>' + escapeHTML(a.headline) + "</h3><p>" + escapeHTML(a.body) + "</p></article>";
+      return '<article class="npt-art' + (i === 0 ? " lead" : "") + (a.mine ? " mine" : "") + '"><h3>' + escapeHTML(a.headline) + "</h3>" + articleBodyHTML(a) + "</article>"; // 297
     }).join("");
   } else if (mine.length) {
     const m = mine.shift();

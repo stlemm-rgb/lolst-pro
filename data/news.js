@@ -315,6 +315,16 @@ const HISTORICAL_NEWS = [
     source: "https://www.leagueoflegends.com/en-us/news/game-updates/patch-26-1-notes/" }
 ];
 
+// ===== 줄이 길게 나열되는 기사를 종류별 표로 묶어 보여 주기 (297, 사용자: 접기 없이 묶기만 · 신인은 선수·포지션·팀 · 우리 팀 줄은 맨 위 ★) — js/news.js articleBodyHTML =====
+// 저장된 기사 글은 그대로, 보여 줄 때만 묶음 (예전 세이브 기사도 똑같이). 표 제목의 {n} = 건수
+const NEWS_GROUP_TEXT = {
+  rename: "🏷️ 구단 이름 변경 {n}곳", renameCols: ["예전 이름", "새 이름"],
+  move: "🔁 이적 {n}건", moveCols: ["팀", "선수", "어디서", "이적료"], fa: "FA",
+  rookie: "🌟 신인 입단 {n}명", rookieCols: ["선수", "포지션", "팀"], rookieKind: { 대형: "대형", 레전드: "레전드" },
+  world: ["지역", "우승", "MVP"], mvp: ["지역", "MVP", "팀"],
+  mineMark: "★ ",
+};
+
 // ===== 후반 '위기감' 기사 (281, Codex 4번 아이디어 · 사용자 A안) — 코드: js/news.js crisisNewsWeek =====
 // 실제 난이도·승률은 그대로, 이겨도 '언제든 질 수 있다'고 느끼게. 근거는 실제로 있었던 기록만 (점수·분석 적중·맞대결 전적·해외 우승 기록)
 // '운으로 이겼다'처럼 직접 깎아내리지 않기. 글은 연도·주차 번호로 고름 (무작위 안 씀 → 경기 결과 그대로)
