@@ -484,7 +484,7 @@ function questPanelHTML() {
 }
 
 // ===== 디자인 D2 (176): 맨 위 '내 선수 카드' (예전 요약 4칸 + 프로필 카드를 하나로) =====
-function heroCardHTML(compact) { // compact (225): 대시보드 오른쪽 좁은 칸 — 체력·컨디션은 이번 주 칸에
+function heroCardHTML(compact, mobile) { // compact (225): 대시보드 오른쪽 좁은 칸 — 체력·컨디션은 이번 주 칸에 · mobile (306): 휴대폰 [더 보기] — 위쪽에 이미 있는 종합 능력·이번 주 변화·솔랭·연봉은 뺌
   const p = state.player;
   const team = myTeam();
   const rankList = team.tier === 1 ? tier1FinalOrder() : standings(["tier2", "tier2b"], tier2Ids()).map(function (x) { return x.id; });
@@ -506,23 +506,23 @@ function heroCardHTML(compact) { // compact (225): 대시보드 오른쪽 좁은
         '<div class="hero-name">' + escapeHTML(p.name) + ' <span class="muted small">' + findPosition(p.position).name + " · " + p.age + "세" + (archetypeDupTrait(p) ? "" : " · " + findArchetype(p.archetype).name) + "</span>" + titleBadgeHTML() + "</div>" + // 칭호 (196, js/dash_plus.js)
         '<div class="hero-team small"><span class="uni-sw"><i style="background:' + uni[0] + '"></i><i style="background:' + uni[1] + '"></i></span>' + teamLinkHTML(team.id) + " " +
           tierName(team.tier) + " · " + (state.benched ? '<span class="down">2군 (후보)</span>' : '<span class="up">1군 (주전)</span>') + " · 팀 순위 <b>" + leagueRank + "위</b>" +
-          '<span class="muted"> · ' + (c ? "연봉 " + moneyText(c.salary) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : "계약 없음") + "</span></div>" +
+          (mobile ? "" : '<span class="muted"> · ' + (c ? "연봉 " + moneyText(c.salary) + (c.guarantee ? " · 출전 보장 " + c.guarantee + "경기" : "") : "계약 없음") + "</span>") + "</div>" +
         '<div class="chips">' + traits + "</div>" +
         goalLineHTML() + // 🎯 지금 목표 (js/guide.js)
       "</div>" +
-      '<div class="hero-ovr"><div class="sum-label tip" tabindex="0" data-tip="스탯 12개 평균 (포지션 가산점 스탯은 1.5배). 경기력의 바탕이 돼요.">종합 능력</div>' +
+      (mobile ? "" : '<div class="hero-ovr"><div class="sum-label tip" tabindex="0" data-tip="스탯 12개 평균 (포지션 가산점 스탯은 1.5배). 경기력의 바탕이 돼요.">종합 능력</div>' +
         '<div class="hero-big">' + playerScore(USER_ID).toFixed(1) + "</div>" +
         '<div class="small">리그 ' + findPosition(p.position).name + " " + pr.total + "명 중 <b>" + pr.rank + "위</b></div>" +
         weekGrowthHTML() +
-      "</div>" +
+      "</div>") +
       '<div class="hero-status">' +
         (compact ? "" : conditionBarHTML()) + // 203: 체력은 위쪽 막대에만, 225: 대시보드에선 이번 주 칸에
         miniBarHTML("인기도", state.popularity) +
         '<div class="mini-bar"><span class="mini-label tip" tabindex="0" data-tip="-100 ~ +100. 좋은 이미지인지 나쁜 이미지인지. 구단 제안·이적에 영향">평판</span>' +
           '<span class="bar rep-bar"><span class="rep-mid"></span><span class="bar-fill ' + (v < 0 ? "neg" : "pos") + '" style="margin-left:' + (v < 0 ? 50 + v / 2 : 50) + "%;width:" + Math.abs(v) / 2 + '%"></span></span>' +
           '<span class="mini-value ' + (v < 0 ? "down" : v > 0 ? "up" : "") + '">' + (v > 0 ? "+" : "") + v + "</span></div>" +
-        '<div class="hero-ladder tip" tabindex="0" data-tip="' + escapeHTML(ladderTip) + '">' + tierEmblemSVG(sr.points, 26) +
-          '<span><b style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + "</b> " + sr.points.toLocaleString() + '점 <span class="muted">· 솔랭 ' + myLadderRank + "위</span></span>" + weekLadderHTML() + "</div>" +
+        (mobile ? "" : '<div class="hero-ladder tip" tabindex="0" data-tip="' + escapeHTML(ladderTip) + '">' + tierEmblemSVG(sr.points, 26) +
+          '<span><b style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + "</b> " + sr.points.toLocaleString() + '점 <span class="muted">· 솔랭 ' + myLadderRank + "위</span></span>" + weekLadderHTML() + "</div>") +
         (hasTrait(LADDER.kingTrait) ? '<div class="small king">👑 지난 랭크 시즌 1위 · 경기력 +3%</div>' : "") +
         fameLineHTML() + // 스타 등급·팬 수·평판 등급 (js/fame.js)
         standingLineHTML() + // 팀 내 입지 (js/standing.js)

@@ -148,6 +148,8 @@
 304. [경기 재생 밴픽 소개: 눌러야 시작 · 사용자 요청(스크린샷)] 예전엔 2.6초 뒤 저절로 세트 시작이라 다 읽기 전에 넘어감(사진의 CJ 서포터 빈칸도 줄이 차례로 나타나는 도중). → data/replay.js REPLAY_DRAFT.autoMs 0(저절로 안 함, 0보다 크면 예전처럼) + hint '아무 곳이나 누르면 세트가 시작돼요', js/replay.js rpDraftFirst: 밴픽 창(#rp-banner) 아무 곳이나 누르면 시작(버튼도), go가 RP.onNext를 비워 버튼·창 클릭이 겹쳐도 한 번만. 자동 재생이어도 세트마다 밴픽에서 멈춤. 확인(WebKit 아이폰 13): 4초 기다려도 그대로, 빈 곳·선수 카드·버튼 누르면 1배속으로 한 번 시작, 오류 0. 검사·정답지 그대로.
 
 305. [밴 이유 꼬리표 · 사용자: 왜 밴됐는지 알 수 있게 → 제안 가·나·다 중 '가'] 예전엔 밴된 이름만 저장, 밴픽 창은 전부 '견제 밴'으로 묶어 보여 줌(실제론 아닌 것도 섞임). js/champions.js rollBans가 banned.why를 같이 만듦(난수 안 씀): s 시그니처(먼저 밴) · o 사기 챔피언(SS·SSS) · f 견제(rollBanList banned.focus, 숙련도 80↑ 메타 1위) · rN 상대 경계 순위(banValue 순위). js/matchsim.js userMatchContext → banWhy, 세트 기록 sd.banWhy. 글 data/replay.js REPLAY_BAN_WHY(+ 마우스 올리면 설명 tip), 표시 js/replay.js banWhyTagHTML·banWhyListHTML → 밴픽 소개 창('🚫 {me} 밴: 제라스 🚨 사기 챔피언 · 아지르 📋 경계 1위')·경기 기록 세트별 '(밴: …)'. css .ban-why(f 빨강, s·o 금색). 예전 기록은 이름만. 확인: 한 시즌 밴 52개 모두 이유 있음(숙련도 낮을 땐 경계 순위만), 일부러 조건 맞춤(메타 숙련도 95·시그니처·SSS) → 견제 6·시그니처 4·사기 8·경계 8, WebKit 아이폰 화면 2곳, 오류 0. 정답지 그대로(게임 결과 같음), 예전 세이브·검사 통과. 나(눌러서 숫자)·다(밴 리포트)는 안 함 — 원하면 나중에.
+
+306. [⑤ 휴대폰 '내 선수' 펼침 중복 · 사용자: 2번 진행] 휴대폰 대시보드 [더 보기] 안 내 선수 카드(heroCardHTML compact)가 위쪽과 4가지 겹침: 종합 능력·리그 순위(상태 칸), 이번 주 변화(내 스탯 ▲), 솔랭 티어·점수·순위(그림 아래 솔랭 줄), 연봉(돈 칸). → js/dashboard.js heroCardHTML(compact, mobile): mobile이면 hero-ovr·hero-ladder·연봉 뺌, js/dash_layout.js 휴대폰만 heroCardHTML(true, true). 남는 것: 얼굴·이름·팀·팀 순위·특성·🎯 목표·인기도·평판·팬·입지·집. PC 카드는 그대로(확인). 확인: WebKit 아이폰 13 화면, test_names·css·security, 정답지 그대로.
 ## 다음 할 일
 
 1. ver 1.2 내 선수 해외 진출 — 시작 전에 측정 → 표 → 선택지로 묻기 (HANDOFF.md 7장)

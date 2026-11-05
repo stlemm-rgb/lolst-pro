@@ -132,7 +132,7 @@ function dashMobileHTML() {
     dashAdviceMobileHTML() +
     dashQuestLinesHTML() +
     dashDetails("more", "card dm-more", '더 보기 <span class="muted small">지난주 결과 · 내 선수 · 챔피언 · 목표 · 조합 전략 · 최근 경기</span>',
-      weekReportHTML() + heroCardHTML(true) + championCardHTML() + dashGoalsHTML() + '<div class="card">' + compPlanHTML() + "</div>" + recentMatchesHTML()) +
+      weekReportHTML() + heroCardHTML(true, true) + championCardHTML() + dashGoalsHTML() + '<div class="card">' + compPlanHTML() + "</div>" + recentMatchesHTML()) +
   "</div>";
 }
 
