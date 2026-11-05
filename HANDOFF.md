@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-11-05 갱신 (291 휴대폰 재생 버튼 안 눌림 고침 · 290 경기 재생 연출 B · 다음 C(③움직이는 미니맵 ④킬 표시 ⑦밴픽 ⑨오브젝트) + 🛟 아이콘) / 이전: 2026-11-05 (269 ④-2 끝)
+# 다음 세션 이어가기 — 2026-11-05 갱신 (292 요약 창 [닫기] · 291 휴대폰 재생 버튼 안 눌림 고침 · 290 경기 재생 연출 B · 다음 C(③움직이는 미니맵 ④킬 표시 ⑦밴픽 ⑨오브젝트) + 🛟 아이콘) / 이전: 2026-11-05 (269 ④-2 끝)
 
 새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → CLAUDE.md → FILEMAP.md(파일 위치) → PROGRESS.md 최근 항목 → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태(`git status --short`, `git log --oneline -10`)를 확인한다.
 예전 기록: ver 1.0(1~133번)은 [docs/PROGRESS_1-133.md](docs/PROGRESS_1-133.md), 뉴스 개편 검증 요청문(끝난 일)은 [docs/AI_REVIEW_HANDOFF.md](docs/AI_REVIEW_HANDOFF.md), 뉴스 검증 결과는 [tools/NEWS_VALIDATION.md](tools/NEWS_VALIDATION.md).
@@ -291,4 +291,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 1. **`git pull` 먼저** (다른 PC에서 올린 커밋 받기) → `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
    - 새 PC에서 측정·정답지 도구를 쓰려면: `python -m pip install playwright` → `python -m playwright install chromium` (Windows는 `python`, 출력 글자 때문에 `PYTHONIOENCODING=utf-8`). 브라우저 없이 빠른 체력·컨디션 측정은 `node tools/measure_health.cjs`.
 2. 새 사용자 요청 우선. 없으면 7장 순서대로: ① 네임드 선수 정리(대형 신인 측정부터) → ② 실제 LoL 역사 → ③ 시간 진행 이벤트 → ④ 포지션 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱. 해외 진출은 보류.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 292**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 293**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

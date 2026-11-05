@@ -1480,6 +1480,7 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ws-role-ban { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .ws-foot { margin-top: 12px; }
 .ws-btn { display: block; width: 100%; padding: 11px; font-size: 15px; }
+.ws-btns { display: flex; gap: 8px; } .ws-btns .ws-btn { flex: 2; } .ws-btns .ws-noreplay { flex: 1; } /* 292: [경기 재생 보기] 옆 [닫기] */
 .ws-hint { text-align: center; margin-top: 6px; }
 .ws-skip { position: absolute; right: 14px; bottom: 10px; font-size: 11px; color: var(--muted); pointer-events: none; }
 .ws-flash { position: absolute; inset: 0; border-radius: 18px; background: #fff; opacity: 0; pointer-events: none; }

@@ -75,6 +75,7 @@ const WEEK_SUMMARY = {
   closeHint: "클릭·Space·A(ㅁ)·Enter = 바로 끝까지, 한 번 더 = 닫기 · Esc = 닫기",
   skipHint: "클릭하면 바로 끝",
   replayBtn: "경기 재생 보기 ▶",
+  noReplayBtn: "닫기",             // 292 (사용자): 경기 재생을 보지 않고 닫기 (재생할 경기가 있을 때만 옆에)
   okBtn: "확인",
   settingText: "진행 직후 '이번 주 요약' 창",
   speeds: [["normal", "보통"], ["fast", "빠르게"], ["off", "끄기"]], // 설정 (끄기 = settings.weekSummary false)

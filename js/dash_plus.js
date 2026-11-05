@@ -12,7 +12,7 @@ function weekSummaryOn() { return !state.settings || state.settings.weekSummary 
 let wsBusy = false; // 211: 진행 직후 요약 창이 뜰 차례면 신문 팝업은 요약 창을 닫은 뒤에 (겹쳐 뜨지 않게)
 function showWeekSummary(done) {
   const r = state.weekReport;
-  const finish = function () { wsBusy = false; maybeShowNews(); if (done) done(); };
+  const finish = function (noReplay) { wsBusy = false; maybeShowNews(); if (done && !noReplay) done(); }; // 292: [닫기]면 경기 재생 건너뜀
   if (!weekSummaryOn() || !r || !r.growthBase || r.summarySeen || state.retired) { finish(); return; }
   r.summarySeen = true;
   let el = document.getElementById("ws-overlay");
@@ -21,19 +21,23 @@ function showWeekSummary(done) {
   el.innerHTML = weekSummaryHTML(r, kind);
   el.hidden = false;
   const box = el.querySelector(".ws-box");
-  const close = function () {
+  const close = function (noReplay) {
     wsStop();
     el.hidden = true;
     document.removeEventListener("keydown", onKey);
-    finish();
+    finish(noReplay);
   };
-  // 클릭·Space·A(ㅁ)·Enter: 다다닥 중이면 바로 끝까지, 다 나왔으면 닫기 / Esc: 바로 닫기 (단축키 199, data/ui.js SUMMARY_OK_CODES)
+  // 클릭·Space·A(ㅁ)·Enter: 다다닥 중이면 바로 끝까지, 다 나왔으면 닫기(재생할 경기가 있으면 재생) / Esc·[닫기]: 재생 없이 닫기 (단축키 199, data/ui.js SUMMARY_OK_CODES)
   const press = function () { if (wsRun && !wsRun.done) wsSkip(); else close(); };
   const onKey = function (e) {
-    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key === "Escape") { e.preventDefault(); close(true); return; } // 292: Esc = [닫기]와 같게 (재생 안 봄)
     if (SUMMARY_OK_CODES.indexOf(e.code) !== -1 || e.key === "Enter" || e.code === "Space") { e.preventDefault(); press(); }
   };
-  el.onclick = function (e) { if (e.target.closest && e.target.closest("[data-ws-close]")) close(); else press(); };
+  el.onclick = function (e) {
+    if (e.target.closest && e.target.closest("[data-ws-noreplay]")) close(true); // 292: 재생 안 보고 닫기
+    else if (e.target.closest && e.target.closest("[data-ws-close]")) close();
+    else press();
+  };
   document.addEventListener("keydown", onKey);
   wsPlay(box, r);
 }
@@ -76,7 +80,9 @@ function weekSummaryHTML(r, kind) {
   return '<div class="ws-box' + (kind.indexOf("title") === 0 ? " champ" : "") + '" role="dialog" aria-label="이번 주 요약">' +
     '<div class="ws-screen">' + pic + head + '<div class="ws-cap">' + escapeHTML(cap) + '</div><div class="ws-rows ws-ovl">' + chips + "</div></div>" +
     '<div class="ws-rest ws-rows">' + rows + positionWeekHTML(r) + '<div class="ws-two"><div>' + bars + "</div>" + kvHTML + "</div>" + special +
-    '<div class="ws-foot"><button class="primary ws-btn" data-ws-close="1">' + btn + '</button><div class="muted small ws-hint">' + W.closeHint + "</div></div></div>" +
+    '<div class="ws-foot"><div class="ws-btns"><button class="primary ws-btn" data-ws-close="1">' + btn + "</button>" +
+      (replayQueue().length ? '<button class="ws-btn ws-noreplay" data-ws-noreplay="1">' + W.noReplayBtn + "</button>" : "") + // 292
+      '</div><div class="muted small ws-hint">' + W.closeHint + "</div></div></div>" +
     '<div class="ws-flash"></div><span class="ws-skip">' + W.skipHint + "</span></div>";
 }
 function wsFill(text, v) { return String(text || "").replace(/\{(\w+)\}/g, function (all, k) { return v[k] !== undefined ? v[k] : all; }); }
