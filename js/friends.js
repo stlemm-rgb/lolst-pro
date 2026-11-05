@@ -248,9 +248,8 @@ function timeTriggerContext(trigger) {
       if (w !== 5 || !M.title || y !== M.title.year + 3) return null;
       const P = state.league.players;
       const mate = M.title.mates.filter(function (id) { return P[id]; }).sort(function (a, b) { return relationOf(b) - relationOf(a); })[0];
-      const ctx = { titleYear: M.title.year, titleTeam: M.title.team, titleName: M.title.name };
-      if (mate) { ctx.pid = mate; ctx.player = playerName(mate); }
-      return ctx;
+      if (!mate) return null; // 277: 그때 동료가 다 은퇴했으면 안 보냄 ('단톡방' 선택의 관계 효과가 먹을 사람이 없어서)
+      return { titleYear: M.title.year, titleTeam: M.title.team, titleName: M.title.name, pid: mate, player: playerName(mate) };
     }
     case "homeTeam": case "homeTeamSolo": { // 옛 동료가 있으면 home_team, 없으면 home_team_solo (둘이 1년 쉬는 기간을 같이 씀)
       const other = state.eventCooldown[trigger === "homeTeam" ? "home_team_solo" : "home_team"];
@@ -626,11 +625,7 @@ function friendWhoContext(who) {
   if (who === "bestFriend") ids = F.best.filter(function (id) { return P[id] && relationOf(id) >= R.bestFrom; });
   if (who === "friendMate") ids = mine.roster.filter(function (id) { return id !== USER_ID && P[id] && relationOf(id) >= R.friendFrom; });
   if (who === "friendOther") ids = Object.keys(state.relations || {}).filter(function (id) { return P[id] && P[id].teamId && P[id].teamId !== mine.id && relationOf(id) >= R.friendFrom; });
-  if (who === "retiredFriend") {
-    if (!F.retired.length) return null;
-    const x = pick(F.retired);
-    return { pid: x.pid, player: x.name, pteam: x.role, pos: findPosition(x.pos).name, role: x.role };
-  }
+  if (who === "retiredFriend") return null; // 277: 은퇴한 친구 연락(코치·해설자 재회)은 안 보냄 (위 friendOnRetire와 같은 이유)
   return ids.length ? friendCtx(pick(ids)) : null;
 }
 
@@ -645,9 +640,7 @@ function friendOnRetire(p) {
   F.retired = F.retired.slice(0, 12);
   const i = F.best.indexOf(p.id);
   if (i !== -1) F.best.splice(i, 1);
-  if (p.counselled) return; // 은퇴 상담을 한 친구는 작별 연락 대신 상담으로 끝
-  const t = p.teamId && findTeam(p.teamId);
-  queueTrigger("friendRetire", { pid: p.id, player: p.name, pteam: t ? t.name : "FA", pos: findPosition(p.pos).name, role: role });
+  // 277: 작별 연락(friendRetire)은 보내지 않음 — 연락이 올 때는 이미 은퇴 처리돼 관계 효과가 안 먹어서 (사용자: 은퇴한 친구는 연락에 더 안 나오게). 기록(F.retired)은 친구 화면에 그대로
 }
 
 // ----- 효과 friendTip: 다른 팀 친구의 이적 정보 (js/events.js applyEffects) -----

@@ -683,6 +683,16 @@ function unreadCount(tab) {
 
 // ===== 다른 선수가 나오는 연락: who → { pid, player, pteam, trait, traitName } =====
 const TEAMMATE_BAD_TRAITS = ["lazy", "stage_fright", "inconsistent", "slow_starter"];
+// 277: 리그나 해외 리그에 아직 있는 선수인지 (은퇴하면 둘 다에서 지워짐)
+function playerAround(id) {
+  return !!(state.league.players[id] || (state.world && state.world.players && state.world.players[id]));
+}
+function followUpUnflag(ev) {
+  [ev.effects].concat((ev.choices || []).map(function (c) { return c.effects; })).forEach(function (e) {
+    const v = e && e.unflag;
+    if (v && state.flags) (Array.isArray(v) ? v : [v]).forEach(function (k) { delete state.flags[k]; });
+  });
+}
 function whoContext(who) {
   const mine = myTeam();
   if (!mine) return null;
@@ -741,6 +751,8 @@ function firePendingEvents() {
     const ev = findEvent(p.event);
     // 방송 관련 후속은 방송을 그만뒀으면 안 옴. 조건(need)이 이제 안 맞으면 조용히 안 보냄 (④-2 3단계)
     if (!ev || !eventNeedOk(ev, p.ctx) || (p.event.indexOf("stream_") === 0 && !hasActivity("stream"))) return false;
+    // 277: 첫 연락의 선수가 그사이 은퇴했으면 안 보냄 (관계 효과가 안 먹어서) — 그 후속이 풀어 줄 이야기 기억(unflag)은 풀어서 같은 연락이 다시 올 수 있게
+    if (p.ctx && p.ctx.pid && !playerAround(p.ctx.pid)) { followUpUnflag(ev); return false; }
     // who가 있는데 처음 연락에 선수가 없으면 보낼 때 고름 (없으면 안 보냄). 친구 후속(fr_*)처럼 이미 있으면 그 사람 그대로
     const pickWho = ev.who && !(p.ctx && p.ctx.pid);
     const w = pickWho ? whoContext(ev.who) : null;
