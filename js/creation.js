@@ -458,7 +458,7 @@ function renderCreation() {
   const nameInput = document.getElementById("c-name");
   if (nameInput) {
     nameInput.oninput = function () {
-      draft.name = this.value;
+      draft.name = cleanName(this.value); // 287: < > " & ` 는 이름에 못 씀 (내보낸 세이브를 다른 사람이 가져올 때 안전하게, js/save.js)
       if (draft.error) draft.error = ""; // 이름을 입력하면 안내 문구 지우기
       // 등록증 이름만 바로 바꾸기 (다시 그리면 입력 칸 커서가 사라져서)
       box.querySelectorAll(".cr-name").forEach(function (el) { el.innerHTML = draft.name.trim() ? escapeHTML(draft.name.trim()) : ""; });

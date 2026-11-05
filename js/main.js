@@ -335,7 +335,7 @@ const settingsActions = {
     document.getElementById("import-file").click();
   },
   rename: function () {
-    const name = document.getElementById("player-name").value.trim();
+    const name = cleanName(document.getElementById("player-name").value).trim(); // 287: 이름에 < > " & ` 못 씀 (js/save.js)
     if (!name) return showNotice("이름을 한 글자 이상 입력해 주세요.");
     state.player.name = name.slice(0, 20);
     if (state.settings.autoSave) saveGame();

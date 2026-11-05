@@ -39,6 +39,7 @@ function stateFromSave(save) {
   if (!save || save.game !== SAVE_GAME_ID || typeof save.state !== "object" || save.state === null) {
     throw new Error("이 게임의 세이브 파일이 아닙니다.");
   }
+  cleanSaveText(save.state); // 287: 세이브 안 모든 글에서 < > ` 지움 (태그를 못 만들게, 정상 세이브엔 없는 기호)
   const s = save.state;
   const fresh = createNewState();
   if (s.newsState && Array.isArray(s.newsState.articles)) {
@@ -362,6 +363,7 @@ function exportSave() {
 
 // .json 파일을 읽어서 게임 상태로. 다 읽으면 onDone(새 상태 또는 null, 오류 문구)
 function importSave(file, onDone) {
+  if (file && file.size > SAVE_IMPORT_MAX) { onDone(null, "파일이 너무 커요. 이 게임의 세이브 파일이 맞는지 확인해 주세요."); return; } // 287: 아주 큰 파일로 브라우저가 멈추지 않게
   const reader = new FileReader();
   reader.onload = function () {
     try {
@@ -377,6 +379,18 @@ function importSave(file, onDone) {
 // ===== 화면을 그리기 전에 매번: 빠진 칸 채우기·이번 주 준비 (R3, renderAll에서 옮김) =====
 // 순서 그대로 둘 것 (바꾸면 무작위 순서가 달라져 게임 결과가 바뀜 → python3 tools/golden.py check)
 // '예전 세이브'라고 적힌 것은 새 게임에서는 아무것도 안 하고 지나감
+// 287 보안: 세이브 안의 모든 글(값·이름표)에서 < > ` 를 지움 — 남이 만든 세이브 글이 화면에 그대로 들어가도 태그를 만들 수 없게
+// 정상 세이브 글 9천여 칸에는 이 기호가 하나도 없음(2017·2012 판 측정). 큰따옴표는 대사·기록 번호에 써서 남김 → 화면 속성에 넣을 땐 escapeHTML
+const SAVE_IMPORT_MAX = 10 * 1024 * 1024; // 287: 가져오기 파일 최대 10MB (보통 세이브는 10시즌에 약 0.7MB)
+function cleanSaveText(o) {
+  if (Array.isArray(o)) { for (let i = 0; i < o.length; i++) { if (typeof o[i] === "string") o[i] = o[i].replace(/[<>`]/g, ""); else if (o[i] && typeof o[i] === "object") cleanSaveText(o[i]); } return; }
+  Object.keys(o).forEach(function (k) {
+    if (/[<>`]/.test(k)) { delete o[k]; return; }
+    const v = o[k];
+    if (typeof v === "string") o[k] = v.replace(/[<>`]/g, "");
+    else if (v && typeof v === "object") cleanSaveText(v);
+  });
+}
 // 286 보안: 가져온 세이브(남이 만든 파일일 수 있음)의 구단·선수 이름에서 HTML을 만들 수 있는 기호를 지움
 // 게임이 만드는 이름에는 이 기호가 없어서 정상 세이브는 그대로 ("Anyone's Legend"처럼 작은따옴표는 남김)
 // 이름은 화면 여러 곳에 그대로 들어가서, 한 곳씩 escapeHTML하는 대신 불러올 때 한 번에 (공개 사이트에는 CSP도, tools/bundle.py)
