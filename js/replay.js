@@ -151,12 +151,13 @@ function drawReplay(reset) {
   } else if (RP.playing && RP.t - (RP.castT || 0) >= REPLAY_SHOW.idleMin) { rpCast(rpIdleLine(RP.t)); RP.castT = RP.t; }
   drawReplayFlow(s, done, min); // 290 ⑤
   drawReplayObjects(s, min); // 293 ⑨
+  drawReplayKillFeed(m, s, Math.min(RP.t, min)); // 294 ④
   const pct = Math.min(100, RP.t / min * 100);
   document.getElementById("rp-fill").style.width = pct + "%";
   document.getElementById("rp-head").style.left = pct + "%";
   const w = rpWins(RP.setIdx + (RP.t >= min ? 1 : 0));
   document.getElementById("rp-score").textContent = w[0] + " : " + w[1];
-  const k = Math.min(1, RP.t / min), kills = [Math.round(s.box.kills[0] * k), Math.round(s.box.kills[1] * k)];
+  const kills = rpKillsAt(s, Math.min(RP.t, min)); // 294 ④ 장면과 맞는 킬 수 (예전: 최종 킬 × 시간 비율)
   const mm = Math.floor(RP.t), ss = Math.floor((RP.t - mm) * 60), tm = Math.floor(min), ts = Math.round((min - tm) * 60);
   // 291: 세트 탭은 내용이 바뀔 때만 다시 그림 (매 순간 새로 그리면 휴대폰에서 손가락을 떼기 전에 버튼이 바뀌어 탭을 놓침), 시계만 매번
   const bar = document.getElementById("rp-setbar");
@@ -509,6 +510,60 @@ function rpHlNext() {
   H.end = h.t + L.tail;
   drawReplay();
   if (!RP.playing) replayPlay(true); else requestAnimationFrame(replayTick);
+}
+// ----- 294 C ④ 장면과 맞는 킬 수 + 킬 알림 (data/replay.js REPLAY_KILLS) — 화면용 근사: 사건과 최종 킬 수가 따로 만들어져서 (Codex 주의) -----
+// 장면에서 나온 킬을 먼저 놓고(최종 킬 수보다 많으면 작은 장면부터 뺌), 모자라면 2분 ~ 끝 1분 전 사이에 고르게 채움 → 세트 끝에는 늘 최종 킬 수
+const RP_KT = new WeakMap(); // 세트 → 킬 시간표 (화면용 임시, 경기 기록 객체에 붙이면 세이브에 들어가서 따로)
+function rpKillTimeline(s) {
+  if (RP_KT.has(s)) return RP_KT.get(s);
+  const K = REPLAY_KILLS, min = s.box.min, out = { times: [[], []], feed: [] };
+  const anchors = [[], []];
+  rpEvents(s).forEach(function (e, i) {
+    const info = matchEventInfo(e) || {};
+    const side = e.k === "bad" ? 1 - e.s : e.s;
+    let n = 0, killer = null, victim = null;
+    if (e.e === "solo") { n = 1; killer = e.p; victim = e.v; }
+    else if (info.cat === "fight") n = K.fight[info.size] || 1;
+    else if (e.k === "good" && e.v && K.killCats.indexOf(info.cat) !== -1) { n = 1; killer = e.p; victim = e.v; }
+    else if (e.k === "bad" && info.cat === "mistake" && e.p) { n = 1; victim = e.p; }
+    if (n) anchors[side].push({ t: e.t, n: n, i: i, e: e, killer: killer, victim: victim });
+  });
+  [0, 1].forEach(function (side) {
+    const total = s.box.kills[side];
+    // 큰 장면부터 최종 킬 수까지만
+    const list = anchors[side].slice().sort(function (a, b) { return b.n - a.n || a.t - b.t; });
+    let used = 0;
+    list.forEach(function (a) { const take = Math.min(a.n, total - used); a.take = take; used += take; });
+    list.forEach(function (a) {
+      for (let j = 0; j < a.take; j++) out.times[side].push(a.t);
+      if (a.take) out.feed.push({ t: a.t, side: side, n: a.take, killer: a.killer, victim: a.victim, e: a.e });
+    });
+    const rest = total - used, lo = 2, hi = Math.max(lo + 1, min - 1);
+    for (let j = 0; j < rest; j++) out.times[side].push(lo + (hi - lo) * (j + 0.5 + (rpJit(side * 97 + j * 13) - 0.5) * 0.6) / rest);
+    out.times[side].sort(function (a, b) { return a - b; });
+  });
+  out.feed.sort(function (a, b) { return a.t - b.t; });
+  RP_KT.set(s, out);
+  return out;
+}
+function rpKillsAt(s, t) {
+  const T = rpKillTimeline(s);
+  return [0, 1].map(function (side) { let n = 0; T.times[side].forEach(function (x) { if (x <= t) n++; }); return n; });
+}
+function drawReplayKillFeed(m, s, t) {
+  const map = document.getElementById("rp-map");
+  if (!map) return;
+  let box = map.querySelector(".rp-kfeed");
+  if (!box) { box = document.createElement("div"); box.className = "rp-kfeed"; map.appendChild(box); }
+  const K = REPLAY_KILLS, nm = function (id, side) { return '<b class="ev-n s' + side + (id === USER_ID ? " me" : "") + '">' + escapeHTML(playerName(id)) + "</b>"; };
+  const rows = rpKillTimeline(s).feed.filter(function (f) { return f.t <= t && f.t > t - K.feedShow; }).slice(-K.feedMax).map(function (f) {
+    const info = matchEventInfo(f.e) || {};
+    const body = f.killer && f.victim ? nm(f.killer, f.side) + " ⚔ " + nm(f.victim, 1 - f.side)
+      : f.victim ? "⚔ " + nm(f.victim, 1 - f.side) + " " + REPLAY_KILL_TEXT.fell
+      : '<b class="ev-n s' + f.side + '">' + escapeHTML(teamShort(f.side ? m.b : m.a)) + "</b> " + REPLAY_KILL_TEXT.fight.replace("{n}", f.n);
+    return '<div class="rp-kf ' + (f.side ? "b" : "a") + '">' + (info.icon || "⚔") + " " + body + "</div>";
+  }).join("");
+  if (box.innerHTML !== rows) box.innerHTML = rows;
 }
 // ----- 293 C ⑨ 오브젝트 안내 (data/replay.js REPLAY_OBJ) — 등장 알림 + 미니맵 자리 빛남 (잡은 사건 뒤엔 다시 등장까지 어둡게) -----
 function rpObjState(s, o, t, min) {

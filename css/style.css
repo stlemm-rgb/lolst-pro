@@ -2244,3 +2244,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 @keyframes rpObjIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 .rp-obj-spot { transition: opacity 0.3s; opacity: 0.45; }
 .rp-obj-spot.up { opacity: 1; stroke: var(--gold); stroke-width: 1; }
+
+/* 294 경기 재생 연출 C ④ 킬 알림 (js/replay.js drawReplayKillFeed) */
+.rp-kfeed { position: absolute; left: 18%; bottom: 6px; z-index: 4; display: flex; flex-direction: column; gap: 3px; max-width: 64%; pointer-events: none; }
+.rp-kf { padding: 3px 8px; border-radius: 8px; background: rgba(8, 8, 16, 0.82); border-left: 3px solid var(--side-a); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: rpObjIn 0.3s ease-out; }
+.rp-kf.b { border-left-color: var(--side-b); }

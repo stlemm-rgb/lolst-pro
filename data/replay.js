@@ -44,6 +44,14 @@ const REPLAY_OBJ = [
   { id: "baron", icon: "🐉", name: "바론", spawn: 20, respawn: 6, match: /baron/ },
 ];
 const REPLAY_OBJ_TEXT = { up: "{icon} {name} 등장", again: "{icon} {name} 다시 등장", show: 1.5 }; // show: 알림이 떠 있는 시간(경기 분)
+// ----- C (294) ④ 장면과 맞는 킬 수: 어떤 장면을 몇 킬로 볼지 (최종 킬 수는 경기 기록 그대로, 모자라면 장면 사이에 고르게 채움) -----
+const REPLAY_KILLS = {
+  killCats: ["early", "lane", "play", "fight"], // 상대를 잡은 좋은 장면 = 1킬 (한타는 크기만큼)
+  fight: { s: 1, m: 2, l: 3 },                   // 한타 장면 킬 수 (크기 작음·중간·큼)
+  feedShow: 2,                                   // 킬 알림이 떠 있는 시간 (경기 분)
+  feedMax: 2,                                    // 킬 알림 최대 줄
+};
+const REPLAY_KILL_TEXT = { fight: "한타 {n}킬", fell: "처치당함" };
 const REPLAY_B_TEXT = {
   slowTag: "🎬 승부처",
   hlBtn: "⭐ 하이라이트",
