@@ -267,7 +267,7 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 ## 8. 밸런스 메모
 
 - **238 뒤 측정 (2026-11-02, node tools/measure_health.cjs, 미드 씨앗 3 × 2시즌)**: 1부 2017 — 기본(30↓ 휴식)·관리(50↓) 부상·번아웃 0, 성장 15.1·14.8 / 안 쉼(솔랭만) 부상 7.7회·번아웃 82%의 주·성장 9.2(전 10.3). 2부 2012(합숙 −2) — 기본 컨디션 평균 63(전 39)·번아웃 13%의 주 / 관리 번아웃 0 / 안 쉼 부상 7.3회·번아웃 53%. 합숙 −3이면 기본 43%·관리 21%, −1이면 컨디션 87(원룸 상한 80보다 높아 집 살 이유 없음). 세트 승률은 이 크기에서 ±15%p라 판단에 안 씀.
-- JUNG PC: Playwright WebKit(아이폰 사파리 엔진) 설치됨 (2026-11-05) → `pw.webkit.launch()` + `pw.devices["iPhone 13"]`로 아이폰 흉내 시험. 휴대폰 화면은 겹창 안 버튼이 화면 밖으로 나가지 않는지 꼭 볼 것(291).
+- JUNG PC·이 PC(dhlth): Playwright WebKit(아이폰 사파리 엔진) 설치됨 (2026-11-05) → `pw.webkit.launch()` + `pw.devices["iPhone 13"]`로 아이폰 흉내 시험. 휴대폰 화면은 겹창 안 버튼이 화면 밖으로 나가지 않는지 꼭 볼 것(291).
 - JUNG PC: PIL이 없어 `shots.py diff`가 안 됨 → cmp로 바뀐 사진 찾기. 휴대폰 검사는 터치 흉내(CDP Emulation.setTouchEmulationEnabled + pointer coarse)로 해야 맞음 (PROGRESS 272).
 - JUNG PC(2026-11-04): Git Bash에서 `python`(Python310)에 Playwright가 이미 있음 → `PYTHONIOENCODING=utf-8 python tools/golden.py check` 바로 됨.
 - 이 PC(Windows)에서 파이썬 도구를 돌릴 때: Git Bash에서는 `python`도 스토어 바로가기가 먼저 잡힘 → `/c/Users/dhlth/AppData/Local/Python/bin/python` (Playwright는 2026-11-04 이 파이썬에 다시 설치) + 출력 글자 때문에 `PYTHONIOENCODING=utf-8`. Playwright는 2026-11-02 설치함.
@@ -291,4 +291,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 1. **`git pull` 먼저** (다른 PC에서 올린 커밋 받기) → `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
    - 새 PC에서 측정·정답지 도구를 쓰려면: `python -m pip install playwright` → `python -m playwright install chromium` (Windows는 `python`, 출력 글자 때문에 `PYTHONIOENCODING=utf-8`). 브라우저 없이 빠른 체력·컨디션 측정은 `node tools/measure_health.cjs`.
 2. 새 사용자 요청 우선. 없으면 7장 순서대로: ① 네임드 선수 정리(대형 신인 측정부터) → ② 실제 LoL 역사 → ③ 시간 진행 이벤트 → ④ 포지션 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱. 해외 진출은 보류.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 299**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 300**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
