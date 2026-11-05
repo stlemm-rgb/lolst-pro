@@ -2287,3 +2287,4 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 /* 298 받은 소식 속 줄 목록 표 (js/news.js msgTextHTML) */
 .npt-body { font-size: 17px; line-height: 1.7; white-space: pre-line; }
 .msg-text .np-tbl, .npt-brief .np-tbl, .npt-body .np-tbl { white-space: normal; margin: 4px 0; }
+.rep-list { display: inline-block; vertical-align: top; } /* 298: 지난주 결과의 퀘스트·투자 묶음 */

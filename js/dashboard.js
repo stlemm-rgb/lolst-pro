@@ -175,12 +175,14 @@ function weekReportHTML() {
   const t = r.training;
   html += '<div class="rep-row"><span class="rep-tag train">훈련</span><b>' + escapeHTML(t.name) + "</b> · " + escapeHTML(t.message) +
     ' <span class="log-changes' + (r.great ? " gs-chips" : "") + '">' + changesText(reportChanges(t.changes, r)) + "</span></div>" + greatReportRowHTML(r); // 훈련 대성공 (js/great.js)
-  (r.questLines || []).forEach(function (q) {
-    html += '<div class="rep-row"><span class="rep-tag rank">퀘스트</span>' + escapeHTML(q) + "</div>";
-  });
-  (r.investLines || []).forEach(function (l) {
-    html += '<div class="rep-row"><span class="rep-tag ' + (l.up ? "win" : "lose") + '">투자</span>' + escapeHTML(l.text) + "</div>";
-  });
+  // 298: 퀘스트·투자는 건마다 꼬리표를 달지 않고 한 줄에 모음 (2건 이상이면 건수 + 줄바꿈으로)
+  const qs = r.questLines || [], inv = r.investLines || [];
+  if (qs.length) html += '<div class="rep-row"><span class="rep-tag rank">퀘스트' + (qs.length > 1 ? " " + qs.length : "") + '</span><span class="rep-list">' + qs.map(escapeHTML).join("<br>") + "</span></div>";
+  if (inv.length) {
+    const up = inv.filter(function (l) { return l.up; }).length;
+    html += '<div class="rep-row"><span class="rep-tag ' + (up * 2 >= inv.length ? "win" : "lose") + '">투자' + (inv.length > 1 ? " " + inv.length : "") + '</span><span class="rep-list">' +
+      inv.map(function (l) { return '<span class="' + (l.up ? "up" : "down") + '">' + (l.up ? "▲" : "▼") + "</span> " + escapeHTML(l.text); }).join("<br>") + "</span></div>";
+  }
   // 스폰서 계약 수입(r.activityIncome)은 지난주 결과에 보이지 않음 (131, 돈은 그대로 들어옴)
   // 솔로 랭크 결과는 선수 카드 솔랭 줄 (weekLadderHTML)
 

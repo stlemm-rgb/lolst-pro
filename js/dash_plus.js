@@ -71,10 +71,15 @@ function weekSummaryHTML(r, kind) {
   const sp = [];
   if (r.title) sp.push(["🏆", escapeHTML(wsTitleName(r.title)) + " 우승!", ""]);
   if (r.great) sp.push(["🔥", W.greatText, ""]);
-  (r.achv || []).forEach(function (id) {
-    const a = ACHIEVEMENTS.find(function (x) { return x.id === id; });
-    if (a) sp.push([a.icon, "업적 달성 · 「" + escapeHTML(a.name) + "」", escapeHTML(a.desc) + (titleAuto() && titleAuto().id === a.id ? " · 새 칭호가 이름 아래 붙었어요" : "")]);
-  });
+  // 298: 업적이 여러 개면 한 덩어리로 ("업적 달성 2개 · 「A」 · 「B」"), 하나면 예전처럼 설명까지
+  const achv = (r.achv || []).map(function (id) { return ACHIEVEMENTS.find(function (x) { return x.id === id; }); }).filter(Boolean);
+  if (achv.length === 1) {
+    const a = achv[0];
+    sp.push([a.icon, "업적 달성 · 「" + escapeHTML(a.name) + "」", escapeHTML(a.desc) + (titleAuto() && titleAuto().id === a.id ? " · 새 칭호가 이름 아래 붙었어요" : "")]);
+  } else if (achv.length > 1) {
+    const newTitle = achv.some(function (a) { return titleAuto() && titleAuto().id === a.id; });
+    sp.push([achv[0].icon, "업적 달성 " + achv.length + "개 · " + achv.map(function (a) { return "「" + escapeHTML(a.name) + "」"; }).join(" · "), newTitle ? "새 칭호가 이름 아래 붙었어요" : ""]);
+  }
   const special = sp.map(function (x) { return '<div class="ws-special"><span class="ic">' + x[0] + "</span><div>" + x[1] + (x[2] ? '<div class="muted small">' + x[2] + "</div>" : "") + "</div></div>"; }).join("");
   const btn = replayQueue().length ? W.replayBtn : W.okBtn;
   return '<div class="ws-box' + (kind.indexOf("title") === 0 ? " champ" : "") + '" role="dialog" aria-label="이번 주 요약">' +
