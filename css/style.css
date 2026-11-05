@@ -2256,6 +2256,7 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .rp-dot.b { border-color: var(--side-b); }
 .rp-dot.me { border-color: var(--gold); box-shadow: 0 0 6px rgba(var(--gold-rgb), 0.8); z-index: 2; }
 .rp-dot.dead { opacity: 0.25; }
+.rp-dot.lost { opacity: 0.45; filter: grayscale(0.6); } /* 300 경기 끝: 진 팀 */
 .rp-dot img { width: 14px; height: 14px; image-rendering: pixelated; }
 @media (max-width: 760px) { .rp-dot { width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; border-width: 1.5px; } .rp-dot img { width: 11px; height: 11px; } }
 

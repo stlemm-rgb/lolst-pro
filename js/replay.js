@@ -541,19 +541,103 @@ function replayDraftHTML(m, s) {
     '<div class="rp-dr" style="--step:' + D.stepS + 's">' + col(0) + col(1) + "</div>" +
     '<button class="primary" data-rpnext="1">' + D.go + "</button>";
 }
-// ----- 295 C ③ 움직이는 미니맵: 선수 10명 도트 얼굴 (data/replay.js REPLAY_DOTS) — 평소 자리(시간대) + 장면 앞뒤엔 그 장소로 + 죽으면 흐려짐 -----
+// ----- 295 C ③ 움직이는 미니맵: 선수 10명 도트 얼굴 (data/replay.js REPLAY_DOTS) -----
+// 300: 걸어서 움직이게 — 위치는 경기 시각 t만으로 계산 (되감기·하이라이트·세트 클릭에도 같은 자리, 게임 난수 안 씀)
+//  평소 길(시간대 자리 사이를 천천히 걸어감 + 라인 밀고 당기기 + 정글 캠프 사이 곡선) → 장면에 낀 선수만 거리에 맞춰 일찍 출발해 모였다 흩어짐
+//  → 경기 끝 배치(이긴 팀 상대 본진 앞, 진 팀 자기 본진) → 죽음(그 자리에서 흐려짐 → 본진에서 다시 걸어 나옴)
+function rpSmooth(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
+function rpLerp(p, q, w) { return [p[0] + (q[0] - p[0]) * w, p[1] + (q[1] - p[1]) * w]; }
+function rpSide(p, side) { return side ? [p[1], p[0]] : p; } // 오른쪽 팀 = x·y 바꿈 (맵 대각선 대칭)
+function rpDist(p, q) { return Math.hypot(p[0] - q[0], p[1] - q[1]); }
+function rpHomeAt(kind, side, i, t, set) {
+  const D = REPLAY_DOTS, h = D.home[kind][i];
+  if (i !== 1) return rpSide(h, side);
+  // 정글: 두 캠프 사이를 곡선으로 오감 (캠프에서 잠깐 머물고 다음 캠프로)
+  const u = (t + side * 1.3 + set * 0.7) / D.jungle.period, k = Math.floor(u), f = rpSmooth((u - k) * 1.25);
+  const from = h[k % 2], to = h[(k + 1) % 2], p = rpLerp(from, to, f);
+  const dx = to[0] - from[0], dy = to[1] - from[1], len = Math.hypot(dx, dy) || 1, b = Math.sin(f * Math.PI) * D.jungle.bend * (k % 2 ? 1 : -1);
+  return rpSide([p[0] - dy / len * b, p[1] + dx / len * b], side);
+}
 function rpDotHome(side, i, t, set) {
-  const D = REPLAY_DOTS, P = REPLAY_SHOW.phase, k = side ? "b" : "a";
-  let p = D.lane[k][i];
-  if (i === 1) { const c = p[Math.floor((t + side * 2) / 3) % 2]; p = c; } // 정글: 캠프 두 곳을 3분마다 오감
-  if (t >= P[0]) {
-    const g = (t >= P[1] ? D.group.late : D.group.mid)[k];
-    const off = [(rpJit(set * 31 + side * 7 + i) - 0.5) * D.spread * 2, (rpJit(set * 17 + side * 5 + i * 3) - 0.5) * D.spread * 2];
-    const pull = i === 0 && t < P[1] ? 0.35 : 0.85; // 탑은 중반까지 사이드에 조금 남음
-    p = [p[0] + (g[0] + off[0] - p[0]) * pull, p[1] + (g[1] + off[1] - p[1]) * pull];
+  const D = REPLAY_DOTS, P = REPLAY_SHOW.phase, S = D.shift;
+  const lag = (rpJit(set * 13 + side * 7 + i * 3) - 0.5) * 2 * S.jitter; // 포지션마다 출발 시각이 조금씩 다름
+  const w1 = rpSmooth((t - (P[0] + lag - S.half)) / (2 * S.half)), w2 = rpSmooth((t - (P[1] + lag - S.half)) / (2 * S.half));
+  let p = rpHomeAt("lane", side, i, t, set);
+  if (w1 > 0) p = rpLerp(p, rpHomeAt("mid", side, i, t, set), w1);
+  if (w2 > 0) p = rpLerp(p, rpHomeAt("late", side, i, t, set), w2);
+  if (!motionOff()) {
+    const dir = D.laneDir[i];
+    if (dir && w1 < 1) { // 라인전: 라인 방향으로 밀고 당기기 (서폿은 원딜과 같이)
+      const d = rpSide(dir, side), wv = Math.sin((t + (i === 4 ? 3 : i) * 0.37 + side * 0.8 + set) / D.wave.period * Math.PI * 2) * D.wave.amp * (1 - w1);
+      p = [p[0] + d[0] * wv, p[1] + d[1] * wv];
+    }
+    const wd = D.wander, sw = D.sway;
+    p = [p[0] + Math.sin(t * 0.41 + i * 1.9 + side * 2.3 + set) * wd + Math.sin(t * 1.7 + i * 2 + side) * sw,
+         p[1] + Math.cos(t * 0.37 + i * 2.7 + side * 1.1 + set) * wd + Math.cos(t * 1.3 + i * 3 + side) * sw];
   }
-  if (!motionOff()) { const w = D.sway; p = [p[0] + Math.sin(t * 1.7 + i * 2 + side) * w, p[1] + Math.cos(t * 1.3 + i * 3 + side) * w]; }
   return p;
+}
+// 세트마다 한 번: 장면별로 누가 어디로 언제 가는지 (화면용 임시 — 경기 기록 객체에 붙이면 세이브에 들어가서 WeakMap)
+const RP_GO = new WeakMap();
+function rpGoPlan(s, setIdx) {
+  if (RP_GO.has(s)) return RP_GO.get(s);
+  const D = REPLAY_DOTS, G = D.go, plan = [[], [], [], [], [], [], [], [], [], []]; // 0~4 왼쪽 팀, 5~9 오른쪽 팀
+  const idOf = function (side, i) { const l = s.lanes[i]; return l ? (side ? l.b : l.a) : null; };
+  rpEvents(s).forEach(function (e, j) {
+    const info = matchEventInfo(e) || {}, q = rpPos(e, j);
+    const near = function (side, n) { // 장면 자리에서 가까운 n명
+      return [0, 1, 2, 3, 4].map(function (i) { return { i: i, d: rpDist(rpDotHome(side, i, e.t, setIdx), q) }; })
+        .sort(function (a, b) { return a.d - b.d; }).slice(0, n).map(function (x) { return x.i; });
+    };
+    [0, 1].forEach(function (side) {
+      let who = [];
+      if (info.cat === "fight") who = info.size === "l" ? [0, 1, 2, 3, 4] : near(side, D.fight[info.size] || D.fight.s);
+      else if (info.cat === "object") who = info.size === "l" ? near(side, D.fight.m).concat([1]) : [1, 4];
+      [0, 1, 2, 3, 4].forEach(function (i) { const id = idOf(side, i); if (id && (e.p === id || e.v === id) && who.indexOf(i) === -1) who.push(i); });
+      who.forEach(function (i) {
+        if (plan[side * 5 + i].some(function (g) { return g.j === j; })) return; // 정글이 near와 [1]에 둘 다 들어간 경우
+        const o = [(rpJit(j * 11 + side * 5 + i) - 0.5) * 2 * D.spot, (rpJit(j * 7 + side * 3 + i * 2) - 0.5) * 2 * D.spot];
+        const at = [q[0] + o[0], q[1] + o[1]];
+        const go = Math.max(G.min, Math.min(G.max, rpDist(rpDotHome(side, i, e.t, setIdx), at) / D.speed)); // 멀면 일찍 출발
+        plan[side * 5 + i].push({ j: j, q: at, a: e.t - G.before - go, b: e.t - G.before, c: e.t + G.after, d: e.t + G.after + go });
+      });
+    });
+  });
+  RP_GO.set(s, plan);
+  return plan;
+}
+function rpDotPath(s, side, i, t, setIdx) {
+  const D = REPLAY_DOTS, home = rpDotHome(side, i, t, setIdx);
+  // 장면들: 겹치면 무게대로 섞음 (순서와 상관없이 같은 자리, 끊김 없음)
+  let sw = 0, sx = 0, sy = 0;
+  rpGoPlan(s, setIdx)[side * 5 + i].forEach(function (g) {
+    if (t <= g.a || t >= g.d) return;
+    const w = t < g.b ? rpSmooth((t - g.a) / (g.b - g.a)) : t <= g.c ? 1 : 1 - rpSmooth((t - g.c) / (g.d - g.c));
+    sw += w; sx += g.q[0] * w; sy += g.q[1] * w;
+  });
+  let p = home;
+  if (sw > 0) { const k = Math.max(1, sw), h = 1 - Math.min(1, sw); p = [home[0] * h + sx / k, home[1] * h + sy / k]; }
+  // 경기 끝: 마지막 lead분 동안 끝 배치로
+  const E = D.end, min = s.box.min, we = rpSmooth((t - (min - E.lead)) / E.lead);
+  if (we > 0) {
+    const winA = s.w === 0, won = side === 0 ? winA : !winA; // 이 팀이 이겼나
+    p = rpLerp(p, rpSide((won ? E.win : E.lose)[i], side), we);
+  }
+  return p;
+}
+// 죽음: 가장 최근에 당한 킬 → 쓰러진 자리에서 흐려짐 → 본진에서 다시 걸어 나옴
+// 쓰러진 자리 = 바로 전 순간의 자리 (다시 걸어 나오던 중에 또 죽어도 튀지 않게, 앞의 죽음부터 차례로 따라감)
+function rpDotAt(s, side, i, id, t, setIdx, feed) {
+  const D = REPLAY_DOTS;
+  let last = null;
+  if (id) feed.forEach(function (f) { if (f.victim === id && f.t <= t && (!last || f.t > last.t)) last = f; });
+  let p = rpDotPath(s, side, i, t, setIdx);
+  if (!last) return { p: p, dead: false };
+  const back = last.t + D.dead;
+  if (t < back) return { p: rpDotAt(s, side, i, id, last.t - 1e-6, setIdx, feed).p, dead: true };
+  const base = D.base[side ? "b" : "a"], walk = Math.max(D.go.min, Math.min(D.go.max, rpDist(base, p) / D.speed));
+  if (t < back + walk) p = rpLerp(base, p, rpSmooth((t - back) / walk));
+  return { p: p, dead: false };
 }
 function drawReplayDots(m, s, t) {
   const map = document.getElementById("rp-map");
@@ -571,25 +655,13 @@ function drawReplayDots(m, s, t) {
       });
     });
   }
-  const D = REPLAY_DOTS, evs = rpEvents(s), feed = rpKillTimeline(s).feed;
-  const idOf = function (side, i) { const l = s.lanes[i]; return side ? l.b : l.a; };
+  const D = REPLAY_DOTS, feed = rpKillTimeline(s).feed, setIdx = RP.setIdx, min = s.box.min;
   box.querySelectorAll(".rp-dot").forEach(function (d) {
-    const k = d.getAttribute("data-dot").split(":"), side = Number(k[0]), i = Number(k[1]), id = idOf(side, i);
-    let p = rpDotHome(side, i, t, RP.setIdx), best = 0;
-    evs.forEach(function (e, j) {
-      const w = 1 - Math.abs(t - e.t) / D.near;
-      if (w <= best) return;
-      const info = matchEventInfo(e) || {};
-      const inv = info.cat === "fight" || (id && (e.p === id || e.v === id)) || (info.cat === "object" && (i === 1 || i === 4));
-      if (!inv) return;
-      const q = rpPos(e, j), o = [(rpJit(j * 11 + side * 5 + i) - 0.5) * 8, (rpJit(j * 7 + side * 3 + i * 2) - 0.5) * 8];
-      best = w;
-      p = [p[0] + (q[0] + o[0] - p[0]) * w, p[1] + (q[1] + o[1] - p[1]) * w];
-    });
-    // 죽음: 킬 알림의 당한 선수 → 잠깐 흐려지고 본진으로
-    const dead = id && feed.some(function (f) { return f.victim === id && t >= f.t && t < f.t + D.dead; });
-    if (dead) p = D.base[side ? "b" : "a"];
-    d.classList.toggle("dead", !!dead);
+    const k = d.getAttribute("data-dot").split(":"), side = Number(k[0]), i = Number(k[1]), l = s.lanes[i], id = l ? (side ? l.b : l.a) : null;
+    const at = rpDotAt(s, side, i, id, t, setIdx, feed), p = at.p, dead = at.dead;
+    const lost = t >= min && (s.w === 0 ? side === 1 : side === 0);
+    d.classList.toggle("dead", dead);
+    d.classList.toggle("lost", lost && !dead);
     d.style.left = p[0].toFixed(1) + "%"; d.style.top = p[1].toFixed(1) + "%";
   });
 }
