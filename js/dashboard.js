@@ -329,14 +329,12 @@ function championCardHTML() {
   }).join("");
   const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
   return (
-    '<div class="card"><h2><span class="tip tip-down" tabindex="0" data-tip="' + escapeHTML(masteryTipText()) + '">⚔️ 챔피언 <span class="tip-mark">ⓘ</span></span> <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" +
+    '<div class="card"><h2>⚔️ 챔피언' + helpBtnHTML(championHelpText()) + ' <span class="muted small">' + escapeHTML(state.meta.label) + "</span></h2>" + // 274: 숫자 뜻·S/A급·목록 위치도 ⓘ로
       metaAvgLineHTML() + // 203: 메타 숙련도 평균 (예전 '이번 주' 💡 줄)
-      '<p class="muted small">' + findPosition(myPos).name + " 메타 챔피언 · 숫자 = 내 숙련도</p>" +
+      '<p class="muted small">' + findPosition(myPos).name + " 메타 챔피언</p>" +
       '<div class="chips">' + myMeta + "</div>" +
-      '<p class="muted small">S급: 픽 우선 +' + MATCH.metaPickBonus.S + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.S * 100) + "% · A급: 픽 우선 +" + MATCH.metaPickBonus.A + ", 경기력 +" + Math.round(MATCH.metaPowerBonus.A * 100) + "%</p>" +
       '<details class="other-meta"><summary class="muted small">다른 포지션 메타 보기</summary><div class="muted small">' + others + "</div></details>" +
       '<h2 class="sub">내 숙련도 상위 5</h2>' + top5.map(function (n) { return masteryRowHTML(n); }).join("") +
-      '<p class="muted small">전체 목록은 [선수 정보] → ⚔️ 챔피언에서 볼 수 있어요.</p>' +
     "</div>"
   );
 }
@@ -379,7 +377,7 @@ function recentMatchesHTML() {
     return '<span class="wl-chip ' + (w ? "w" : "l") + '" title="' + m.week + "주 vs " + escapeHTML(teamName(m.a === mine.id ? m.b : m.a)) + " " + m.score[0] + ":" + m.score[1] + '">' + (w ? "승" : "패") + "</span>";
   }).join("");
   const last = done[0];
-  return '<div class="card"><h2>🗂️ 최근 경기 <span class="muted small">전체 기록은 [경기 결과]</span></h2>' +
+  return '<div class="card"><h2>🗂️ 최근 경기' + helpBtnHTML(HELP_TIPS.recent) + "</h2>" +
     '<div class="wl-chips">' + chips + "</div>" +
     '<div class="muted small">최근 ' + done.length + "경기 " + wins + "승 " + (done.length - wins) + "패 · " + last.week + "주 vs " + escapeHTML(teamName(last.a === mine.id ? last.b : last.a)) + " " + last.score[0] + ":" + last.score[1] + "</div>" +
     '<details class="recent-more"><summary class="muted small">경기 목록 펼치기</summary><table class="matches">' + done.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table></details></div>";
@@ -416,7 +414,7 @@ function leagueLadderHTML() {
     prev = i;
   });
   return (
-    '<div class="card"><h2>🏆 리그 솔로 랭크 <span class="muted small">' + board.length + "명 · 패치마다 초기화</span></h2>" +
+    '<div class="card"><h2>🏆 리그 솔로 랭크 <span class="muted small">' + board.length + "명</span></h2>" + // 274: 초기화 설명은 선수 카드 솔랭 툴팁에
       '<table class="mini ladder-board"><tr><th class="r">#</th><th>선수</th><th>팀</th><th class="r">점수</th></tr>' + rows + "</table>" +
       '<div class="buttons"><button class="small-btn" data-ladderall>' + (ladderShowAll ? "접기" : "전체 보기") + "</button></div>" +
     "</div>"

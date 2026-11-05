@@ -84,7 +84,7 @@ function rookieCardsHTML() {
     return flipCardHTML({ key: "rk" + R.year + "-" + i, flipped: !first, grade: sc >= R.avg + ROOKIE_CARD.sAbove ? "S" : "A", backIcon: "🌟", backLbl: "대형 신인", role: findPosition(p.pos).name, isNew: true,
       pf: portraitImg(id, { scale: 3 }), name: p.name, eff: "종합 능력 <b>" + sc.toFixed(1) + "</b> · " + p.age + "세<br>" + (t ? escapeHTML(t.name) + (t.tier === 1 ? " · 1부 직행" : "") : "FA") });
   }).join("");
-  return '<div class="card rookie-card"><h2>🌟 ' + R.year + '년 대형 신인 <span class="muted small">이번 주만 보여요 · 다시 보려면 [선수 검색]에서 🌟</span>' +
+  return '<div class="card rookie-card"><h2>🌟 ' + R.year + '년 대형 신인 <span class="muted small">이번 주만 보여요</span>' + helpBtnHTML(HELP_TIPS.rookie) +
       '<button class="small-btn rookie-close" data-rookieclose="1">닫기</button></h2>' +
     '<div class="fc-deck' + (first ? " fc-deal" : "") + '">' + cards + "</div></div>";
 }
@@ -170,3 +170,53 @@ function bindMotionSetting(page) {
   const sel = page.querySelector("#motion-set");
   if (sel) sel.onchange = function () { state.settings.motion = sel.value; applyMotion(); showNotice("움직임: " + (sel.value === "off" ? "끄기" : "켜기")); };
 }
+
+// ----- ⓘ 설명 창 (274): 고정 설명을 제목 옆 ⓘ로 — 누르면 화면 위에 작은 창 (CSS 툴팁은 휴대폰에서 잘리고 닫기가 없어서) -----
+// 다시 누르기·바깥 누르기·Esc·스크롤·화면 다시 그리기로 닫힘. 마우스가 있으면 올리기만 해도 보임. 화면용만 (게임 값·난수 안 건드림)
+// 버튼 안에는 넣지 말 것 (설명을 보려다 버튼이 눌림) → 제목 줄 옆에만
+let helpFor = null, helpPinned = false;
+function helpBtnHTML(text) {
+  return ' <button type="button" class="help-i" data-help="' + escapeHTML(text) + '" aria-label="' + HELP_TIPS.label + '">ⓘ</button>';
+}
+function showHelp(btn, pinned) {
+  let el = document.getElementById("help-pop");
+  if (!el) { el = document.createElement("div"); el.id = "help-pop"; el.setAttribute("role", "tooltip"); document.body.appendChild(el); }
+  if (helpFor && helpFor !== btn) helpFor.removeAttribute("aria-expanded");
+  helpFor = btn; helpPinned = pinned;
+  btn.setAttribute("aria-expanded", "true");
+  el.textContent = btn.getAttribute("data-help");
+  el.hidden = false;
+  // 자리: 버튼 아래 (모자라면 위), 화면 좌우 8px 안
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight, r = btn.getBoundingClientRect();
+  el.style.maxWidth = Math.min(320, vw - 16) + "px";
+  el.style.left = "0px"; el.style.top = "0px";
+  const w = el.offsetWidth, h = el.offsetHeight;
+  const left = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, vw - w - 8));
+  let top = r.bottom + 6;
+  if (top + h > vh - 8 && r.top - 6 - h >= 8) top = r.top - 6 - h;
+  el.style.left = Math.round(left) + "px"; el.style.top = Math.round(top) + "px";
+}
+function hideHelp() {
+  const el = document.getElementById("help-pop");
+  if (el) el.hidden = true;
+  if (helpFor) helpFor.removeAttribute("aria-expanded");
+  helpFor = null; helpPinned = false;
+}
+document.addEventListener("click", function (e) {
+  const b = e.target.closest && e.target.closest("[data-help]");
+  if (b) { e.preventDefault(); e.stopPropagation(); if (helpFor === b && helpPinned) hideHelp(); else showHelp(b, true); return; }
+  if (helpFor && !(e.target.closest && e.target.closest("#help-pop"))) hideHelp();
+}, true);
+document.addEventListener("mouseover", function (e) {
+  if (helpPinned || !window.matchMedia("(hover: hover)").matches) return;
+  const b = e.target.closest && e.target.closest("[data-help]");
+  if (b && b !== helpFor) showHelp(b, false);
+});
+document.addEventListener("mouseout", function (e) {
+  if (helpPinned || !helpFor) return;
+  const b = e.target.closest && e.target.closest("[data-help]");
+  if (b === helpFor && !(e.relatedTarget && b.contains(e.relatedTarget))) hideHelp();
+});
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && helpFor) hideHelp(); });
+window.addEventListener("scroll", function () { if (helpFor) hideHelp(); }, true);
+window.addEventListener("resize", function () { if (helpFor) hideHelp(); });

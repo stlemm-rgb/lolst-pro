@@ -1,4 +1,4 @@
-# 다음 세션 이어가기 — 2026-11-05 갱신 (273 ⑤ 폴리싱: 자동 측정 문제 4개 끝 + PC 바로가기) / 이전: 2026-11-05 (269 ④-2 끝)
+# 다음 세션 이어가기 — 2026-11-05 갱신 (274 ⑤ 폴리싱: 대시보드 설명 → ⓘ 설명 창) / 이전: 2026-11-05 (269 ④-2 끝)
 
 새 세션(Claude Code·Codex·Claude 클라우드 세션 무엇이든)은 **이 파일 → CLAUDE.md → FILEMAP.md(파일 위치) → PROGRESS.md 최근 항목 → 필요하면 GAME_PLAN.md** 순서로 읽고, 먼저 실제 git 상태(`git status --short`, `git log --oneline -10`)를 확인한다.
 예전 기록: ver 1.0(1~133번)은 [docs/PROGRESS_1-133.md](docs/PROGRESS_1-133.md), 뉴스 개편 검증 요청문(끝난 일)은 [docs/AI_REVIEW_HANDOFF.md](docs/AI_REVIEW_HANDOFF.md), 뉴스 검증 결과는 [tools/NEWS_VALIDATION.md](tools/NEWS_VALIDATION.md).
@@ -9,7 +9,7 @@
 |---|---|
 | 저장소 폴더 | **`C:\project\Game`** (명령 안내도 이 경로. 예전 `C:\Project\Game\Game`은 틀림) |
 | 출시 | ver 1.2.1 (태그 v1.2.1) 공개 중. 화면 왼쪽 위 `ver 1.2.1` (Challenger_Road.html 로고) |
-| 지금 작업 | 273까지 (2026-11-05: 273 ✅ 4번 읽는 글자 최소 11px·구단 카드 이름 잘림 → **자동 측정으로 찾은 4개 끝**. 272 ✅ 3번 터치 화면 누르는 칸 34px (측정은 터치 흉내로 — 마우스 측정은 25px로 잘못 나옴, PROGRESS 272). 271 PC 대시보드 바로가기 = 휴대폰·훈련·챔피언·📋퀘스트·🎬지난 경기·집 (휴식 주·지난 신문 뺌, 사용자 B안). 270 **⑤ 폴리싱 시작** — shots 79장 + 22화면 × 폭 4가지 자동 검사(가로 넘침 0). 문제 4개 중 사용자가 1·2 먼저: ✅ 태블릿(768px) 왼쪽 메뉴 이름 잘림(메뉴 최소 폭 168px) ✅ 휴대폰 소속팀 선수단 표 특성 칩·나이 겹침. **다음 = PC·휴대폰 그림을 직접 보며 다른 문제 찾기 (자동 측정이 못 잡는 것: 겹치는 정보·빈칸·정렬) → 표 → 사용자에게 묻기**. 269: ④-2 끝. Codex는 읽기 전용(docs/CODEX_TASKS.md). 이 PC는 PIL이 없어 `shots.py diff`가 안 됨 → 파일 비교(cmp)로 바뀐 화면 찾기 |
+| 지금 작업 | 274까지 (2026-11-05: 274 ✅ 대시보드 고정 설명을 ⓘ 설명 창으로 (js/ui.js helpBtnHTML, 글 data/ui.js HELP_TIPS, Codex 상담). 다른 화면에도 쓸지는 사용자에게. 273 ✅ 4번 읽는 글자 최소 11px·구단 카드 이름 잘림 → **자동 측정으로 찾은 4개 끝**. 272 ✅ 3번 터치 화면 누르는 칸 34px (측정은 터치 흉내로 — 마우스 측정은 25px로 잘못 나옴, PROGRESS 272). 271 PC 대시보드 바로가기 = 휴대폰·훈련·챔피언·📋퀘스트·🎬지난 경기·집 (휴식 주·지난 신문 뺌, 사용자 B안). 270 **⑤ 폴리싱 시작** — shots 79장 + 22화면 × 폭 4가지 자동 검사(가로 넘침 0). 문제 4개 중 사용자가 1·2 먼저: ✅ 태블릿(768px) 왼쪽 메뉴 이름 잘림(메뉴 최소 폭 168px) ✅ 휴대폰 소속팀 선수단 표 특성 칩·나이 겹침. **다음 = PC·휴대폰 그림을 직접 보며 다른 문제 찾기 (자동 측정이 못 잡는 것: 겹치는 정보·빈칸·정렬) → 표 → 사용자에게 묻기**. 269: ④-2 끝. Codex는 읽기 전용(docs/CODEX_TASKS.md). 이 PC는 PIL이 없어 `shots.py diff`가 안 됨 → 파일 비교(cmp)로 바뀐 화면 찾기 |
 | 방금 (2026-11-02) | 238 체력·컨디션 불이익(부상·번아웃·합숙 매주 컨디션 −2) → 239 컨디션 바닥 반등(30 아래면 매주 +4, 연패 문제) → 240 PC 대시보드 빈칸 정리(바로가기 6칸·미니 스탯·빈틈 없이 쌓기·중복 정리, 시안 26 A) |
 | 그다음 (사용자 결정 2026-11-03) | ① 네임드 선수 정리 → ② 실제 LoL 역사에 맞춘 진행 → ③ 시간 진행에 따른 이벤트 추가 → ④ 5개 포지션별 플레이 경험 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱 (7장). **내 선수 해외 진출은 사용자가 꺼낼 때까지 보류** |
 | 알려진 위험 | js/links.js의 lookbehind 정규식이 iOS 16.3 이하 Safari에서 오류 (사용자가 이번엔 안 고치기로) |
@@ -115,6 +115,8 @@ git push
 - 받은 연락 휴대폰(218~221): msgDeckHTML 하나를 SNS 화면 왼쪽과 휴대폰 창(openPhone, 대시보드 [📱 휴대폰 열기])이 같이 씀, 버튼은 bindPhoneDeck. "SNS 열기" 대신 휴대폰 창을 여는 게 기본. 연락 2개 이상 = 대화 목록(deckOpenId null) + 계약 제안 비교표(223).
 - 경기 화면 팀 색(219): 우리 팀 하늘 · 상대 분홍 = css --side-a/--side-b, 우리 팀이 b면 sideSwapClass(m). 새 경기 화면 요소도 .a/.b·s0/s1에 이 변수를 쓸 것 (--accent/--bad 직접 쓰지 말기).
 - 빅게임: bigGameOf(x, y), 쌍 추가는 data/club.js BIG_GAMES 한 줄.
+- **ⓘ 설명 창(274)**: 매주 볼 필요 없는 고정 설명은 늘 보이는 글 대신 `helpBtnHTML(글)` (js/ui.js, 글은 data/ui.js HELP_TIPS, 줄바꿈 
+). 휴대폰에서도 화면 안에 뜨고 닫힘. 버튼 안에는 넣지 말 것(제목 줄 옆에만). 예전 CSS 툴팁 .tip은 짧은 이름표용으로 그대로.
 - 디자인 부품: 새 화면도 pageHeadHTML·teamMarkHTML·rankBadgeHTML·emptyBoxHTML·portraitImg/faceTd 쓰기 (data/ui.js·js/ui.js·js/portrait.js). 색은 css/style.css 맨 위 변수만.
 - 훈련 대성공: data/great.js GREAT_RULES (228: 기본 2%·최대 10%, 유망주 7%·15%), 저장 칸 state.great.
 - 시작 화면·캐릭터 생성(212·213, js/creation.js): 캐릭터가 없으면 renderCreation → 시작 화면(startScreenDone=false) → [선수 등록하기] → 7단계(CREATION_STEPS, data/ui.js). 시작 화면 검사는 **구단 목록 맞추기 뒤**에 있어야 함 (측정 도구 sim_lib.new_career가 draft.startYear만 바꾸고 renderCreation을 불러서, 앞에 두면 정답지가 달라짐). 단계 화면 버튼은 그 단계에만 있으니 묶을 때 없으면 건너뜀. 도트 글자 로고 = js/portrait.js pixelLogoHTML. 버전 글자는 Challenger_Road.html 로고 한 곳.
@@ -259,6 +261,7 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 ## 8. 밸런스 메모
 
 - **238 뒤 측정 (2026-11-02, node tools/measure_health.cjs, 미드 씨앗 3 × 2시즌)**: 1부 2017 — 기본(30↓ 휴식)·관리(50↓) 부상·번아웃 0, 성장 15.1·14.8 / 안 쉼(솔랭만) 부상 7.7회·번아웃 82%의 주·성장 9.2(전 10.3). 2부 2012(합숙 −2) — 기본 컨디션 평균 63(전 39)·번아웃 13%의 주 / 관리 번아웃 0 / 안 쉼 부상 7.3회·번아웃 53%. 합숙 −3이면 기본 43%·관리 21%, −1이면 컨디션 87(원룸 상한 80보다 높아 집 살 이유 없음). 세트 승률은 이 크기에서 ±15%p라 판단에 안 씀.
+- JUNG PC: PIL이 없어 `shots.py diff`가 안 됨 → cmp로 바뀐 사진 찾기. 휴대폰 검사는 터치 흉내(CDP Emulation.setTouchEmulationEnabled + pointer coarse)로 해야 맞음 (PROGRESS 272).
 - JUNG PC(2026-11-04): Git Bash에서 `python`(Python310)에 Playwright가 이미 있음 → `PYTHONIOENCODING=utf-8 python tools/golden.py check` 바로 됨.
 - 이 PC(Windows)에서 파이썬 도구를 돌릴 때: Git Bash에서는 `python`도 스토어 바로가기가 먼저 잡힘 → `/c/Users/dhlth/AppData/Local/Python/bin/python` (Playwright는 2026-11-04 이 파이썬에 다시 설치) + 출력 글자 때문에 `PYTHONIOENCODING=utf-8`. Playwright는 2026-11-02 설치함.
 
@@ -281,4 +284,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 1. **`git pull` 먼저** (다른 PC에서 올린 커밋 받기) → `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
    - 새 PC에서 측정·정답지 도구를 쓰려면: `python -m pip install playwright` → `python -m playwright install chromium` (Windows는 `python`, 출력 글자 때문에 `PYTHONIOENCODING=utf-8`). 브라우저 없이 빠른 체력·컨디션 측정은 `node tools/measure_health.cjs`.
 2. 새 사용자 요청 우선. 없으면 7장 순서대로: ① 네임드 선수 정리(대형 신인 측정부터) → ② 실제 LoL 역사 → ③ 시간 진행 이벤트 → ④ 포지션 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱. 해외 진출은 보류.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 274**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 275**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

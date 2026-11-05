@@ -363,6 +363,12 @@ function masteryText(text) {
 function masteryTipText() {
   return masteryText(MASTERY_TIP);
 }
+// 274: 대시보드 챔피언 카드 ⓘ — 숙련도 설명 + 칩 숫자 뜻 + S/A급 효과 + 전체 목록 위치 (data/ui.js HELP_TIPS)
+function championHelpText() {
+  const tier = HELP_TIPS.champTier.replace("{pS}", MATCH.metaPickBonus.S).replace("{mS}", Math.round(MATCH.metaPowerBonus.S * 100))
+    .replace("{pA}", MATCH.metaPickBonus.A).replace("{mA}", Math.round(MATCH.metaPowerBonus.A * 100));
+  return HELP_TIPS.champNum + "\n" + masteryTipText() + "\n" + tier + "\n" + HELP_TIPS.champList;
+}
 
 // 게임 방법: 숙련도 자세히 (배율 표·성장 속도 표는 실제 계산으로)
 function masteryGuideHTML() {

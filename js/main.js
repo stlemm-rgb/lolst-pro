@@ -526,6 +526,7 @@ function staminaBadgeHTML() {
 // ===== 우측 본문 =====
 function renderPage() {
   applyMotion(); // 움직임 끄기 설정 (디자인 D6, js/ui.js)
+  hideHelp(); // ⓘ 설명 창 닫기 (274, 화면을 다시 그리면 ⓘ 버튼이 새로 생김)
   updateTutorial(); // 코치 안내 단계 확인 (215, js/guide.js)
   renderTopbar(); // 상단바 (고른 훈련·체력이 바뀌었을 수 있어서)
   const page = document.getElementById("page");

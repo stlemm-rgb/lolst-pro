@@ -7,11 +7,11 @@ from pathlib import Path
 T = Path(__file__).resolve().parent
 bad = 0
 for f in sorted(T.glob("test_*.cjs")):
-    r = subprocess.run(["node", str(f)], capture_output=True, text=True)
+    r = subprocess.run(["node", str(f)], capture_output=True, text=True, encoding="utf-8", errors="replace")
     print(("✅ " if r.returncode == 0 else "❌ ") + f.name)
     if r.returncode:
         bad += 1; print(r.stdout[-600:], r.stderr[-600:])
-r = subprocess.run([sys.executable, str(T / "test_oldsaves.py")], capture_output=True, text=True)
+r = subprocess.run([sys.executable, str(T / "test_oldsaves.py")], capture_output=True, text=True, encoding="utf-8", errors="replace")
 print(("✅ " if r.returncode == 0 else "❌ ") + "test_oldsaves.py (예전 세이브 4가지)")
 if r.returncode:
     bad += 1; print(r.stdout[-800:], r.stderr[-600:])

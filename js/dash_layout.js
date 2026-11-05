@@ -169,8 +169,8 @@ function dashPcBarHTML() {
 }
 // 유형 스탯 칸 (240): 스탯 12개는 이번 주 칸 미니 스탯에 있어서 PC 아래쪽은 유형 스탯만
 function typeStatsCardHTML() {
-  return '<div class="card"><h2>' + QUICK_ACTIONS.typeTitle + ' <button class="small-btn" data-go="career" data-ptabgo="ability">' + QUICK_ACTIONS.typeMore + "</button></h2>" +
-    '<p class="muted small">' + QUICK_ACTIONS.typeSub + '</p><div class="stat-columns type-stats">' + typeScoresHTML() + "</div></div>";
+  return '<div class="card"><h2>' + QUICK_ACTIONS.typeTitle + helpBtnHTML(QUICK_ACTIONS.typeSub) + ' <button class="small-btn" data-go="career" data-ptabgo="ability">' + QUICK_ACTIONS.typeMore + "</button></h2>" +
+    '<div class="stat-columns type-stats">' + typeScoresHTML() + "</div></div>"; // 274: 설명은 ⓘ
 }
 function dashPcHTML() {
   const w = dashWeek();

@@ -770,6 +770,11 @@ ul.howto li { margin: 4px 0; font-size: 14px; }
 /* 아래로 펼쳐지는 말풍선 (카드 제목 등 위쪽이 좁을 때) */
 .tip.tip-down:hover::after, .tip.tip-down:focus::after { left: 0; transform: none; bottom: auto; top: calc(100% + 8px); max-width: 320px; font-size: 13px; font-weight: normal; }
 .tip-mark { font-size: 12px; color: var(--muted); }
+/* 274: ⓘ 설명 버튼 + 설명 창 (js/ui.js helpBtnHTML·showHelp) — 버튼 모양 없이 글자만, 터치 화면은 누르는 칸만 34px */
+button.help-i { background: none; border: 0; box-shadow: none; padding: 0 4px; margin: 0; font-size: 13px; font-weight: normal; line-height: 1; color: var(--muted); cursor: help; vertical-align: 1px; }
+button.help-i:hover:not(:disabled), button.help-i[aria-expanded] { background: none; box-shadow: none; color: var(--accent); }
+#help-pop { position: fixed; z-index: 1400; width: max-content; max-width: 320px; padding: 8px 12px; border-radius: var(--r-s); background: var(--panel-2); border: 1px solid rgba(var(--accent-rgb), 0.5); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55); color: var(--text); font-size: 13px; font-weight: normal; line-height: 1.55; white-space: pre-line; text-align: left; }
+#help-pop[hidden] { display: none; }
 .mastery-table th, .mastery-table td { text-align: center; }
 .mastery-table td:first-child { text-align: left; white-space: nowrap; }
 table.calc.mastery-table td:last-child { text-align: center; }
@@ -1327,6 +1332,7 @@ table.standings th, table.standings td { white-space: nowrap; }
   #page details:not(.card):not(.log-card) > summary { padding-top: 9px; padding-bottom: 9px; }
   #page details.card > summary { padding-top: 7px; padding-bottom: 7px; }
   #page input[type=checkbox] { width: 22px; height: 22px; vertical-align: middle; }
+  #page button.help-i { min-height: 34px; min-width: 34px; margin: -10px -6px; } /* 274: ⓘ는 누르는 칸만 크게, 줄 높이는 그대로 */
 }
 /* 경기 재생 창: 태블릿은 미니맵을 화면 높이에 맞추고, 휴대폰은 점수를 위 줄로 */
 @media (max-width: 820px) {

@@ -16,7 +16,7 @@
 | `data/league.js` | 7 | 리그 규칙 (3단계) |  |
 | `data/names.js` | 12 | 이름: 구단·선수·실존 이름 선수 | team_names.js, player_names.js, named_players.js |
 | `data/events.js` | 55 | 이벤트 (SNS로 오는 연락과 소식) |  |
-| `data/events_story.js` | 50 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
+| `data/events_story.js` | 58 | 받은 연락 리뉴얼 ① 시즌 흐름 · 새 시스템 연결 · 이어지는 이야기 (2026-10-08) |  |
 | `data/duo.js` | 7 | ④ 3단계 (261): 영혼의 듀오 — 원딜·서포트만, 경험만(새 승률 효과 없음, 기존 팀 케미 그대로) — 코드 js/duo.js |  |
 | `data/position_events.js` | 9 | ④ 4단계 (262): 포지션 연락 — 내 실제 장면이 최근 몇 주에 쌓였을 때만 — 코드 js/position_voice.js posSceneContext |  |
 | `data/position_social.js` | 9 | ④ 6단계 (263): 같은 장면을 팬·동료·상대 선수·기사가 다르게 말함 — 코드 js/position_voice.js posSocialPick·posArtic |  |
@@ -29,7 +29,7 @@
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
 | `data/news.js` | 42 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
-| `data/ui.js` | 15 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
+| `data/ui.js` | 16 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/room.js` | 14 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/health.js` | 3 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |
@@ -63,24 +63,24 @@
 | `js/market_pages.js` | 26 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
 | `js/links.js` | 4 | 선수·구단 이름 링크: 어느 화면이든 이름을 누르면 [선수 검색] / [구단 탐색]의 그 선수·구단으로 |  |
 | `js/news.js` | 22 | 뉴스: 소식·신문 팝업·월즈 특집·역사 뉴스 | news.js, news_popup.js, worlds_news.js, historical_news.js |
-| `js/dashboard.js` | 36 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
+| `js/dashboard.js` | 35 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
 | `js/records.js` | 10 | 기록: 세트 평점, POG, 시즌 기록, 시상, 커리어 시즌 기록 |  |
 | `js/quests.js` | 18 | 퀘스트: 코치·감독 과제 |  |
 | `js/shop.js` | 24 | 상점·거주지 | shop.js, housing.js |
-| `js/guide.js` | 23 | 초보자 도움: 코치 안내 · 그때그때 팁 · 지금 목표 · 이번 주 추천 · 게임 방법 (글은 data/guide.js) |  |
+| `js/guide.js` | 24 | 초보자 도움: 코치 안내 · 그때그때 팁 · 지금 목표 · 이번 주 추천 · 게임 방법 (글은 data/guide.js) |  |
 | `js/records_pages.js` | 12 | 기록 화면: 선수 정보 기록(위쪽), 개인 시상, 대회 일정(아래쪽) |  |
 | `js/player_page.js` | 32 | [선수 정보] 내 선수의 모든 것 (2026-10-07, 예전 '나의 커리어'를 바꿈) |  |
 | `js/retire.js` | 16 | 노화 · 은퇴 · 엔딩 · 명예의 전당 · 커리어 주요 순간 |  |
 | `js/straits.js` | 14 | S급 특성: 얻는 조건 확인과 지급 (나와 다른 선수 모두) |  |
 | `js/boxscore.js` | 5 | 경기 기록(박스 스코어): 픽, 킬/데스/어시스트, CS, 피해량, 시야, 라인·운영·한타 점수 |  |
-| `js/comps.js` | 9 | 조합 성향: 메타 조합 · 조합 전략 · 밴픽 · 상성 · 시너지 |  |
+| `js/comps.js` | 8 | 조합 성향: 메타 조합 · 조합 전략 · 밴픽 · 상성 · 시너지 |  |
 | `js/match_detail.js` | 23 | [경기 결과] 화면: 경기 요약 · 세트별 분석 · 선수 기록 |  |
 | `js/history_pages.js` | 15 | 역사관·리그 생태계·트로피 진열장 | history_pages.js, trophies.js |
 | `js/shakeup.js` | 7 | 대격변 패치 (값: data/era.js) |  |
 | `js/era.js` | 29 | 시대·해외 리그·시대별 경기 환경 | era.js, era_match.js |
 | `js/fame.js` | 14 | 인기도 · 평판 (값: data/fame.js) |  |
 | `js/collection.js` | 21 | 시그니처 픽·업적·컬렉션 | signature.js, collection.js |
-| `js/friends.js` | 40 | 선수 관계 이야기·친구 | stories.js, friends.js |
+| `js/friends.js` | 41 | 선수 관계 이야기·친구 | stories.js, friends.js |
 | `js/retirement.js` | 8 | 은퇴·세대교체 (122) — 값: data/league.js LEAGUE.veterans · RETIRE_RULES, 글: data/retire_stories.j |  |
 | `js/standing.js` | 17 | 팀 내 입지 (126) — 값·글: data/standing.js |  |
 | `js/romance.js` | 12 | 연애 요소 (128) — 규칙 data/romance.js, 대상·대사·연락 data/romance.js |  |
@@ -92,7 +92,7 @@
 | `js/replay.js` | 24 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
 | `js/position_voice.js` | 13 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
 | `js/duo.js` | 8 | ④ 3단계 (261): 영혼의 듀오 — 규칙·글: data/duo.js |  |
-| `js/ui.js` | 10 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
+| `js/ui.js` | 13 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
 | `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
 | `js/health.js` | 4 | 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js |  |
 | `js/franchise.js` | 8 | 프랜차이즈 (253, ② P5 · 사용자 결정 2026-11-03) — 실제 LCK처럼 2021년부터 |  |
