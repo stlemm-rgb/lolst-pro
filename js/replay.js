@@ -152,6 +152,7 @@ function drawReplay(reset) {
   drawReplayFlow(s, done, min); // 290 ⑤
   drawReplayObjects(s, min); // 293 ⑨
   drawReplayKillFeed(m, s, Math.min(RP.t, min)); // 294 ④
+  drawReplayDots(m, s, Math.min(RP.t, min)); // 295 ③
   const pct = Math.min(100, RP.t / min * 100);
   document.getElementById("rp-fill").style.width = pct + "%";
   document.getElementById("rp-head").style.left = pct + "%";
@@ -510,6 +511,58 @@ function rpHlNext() {
   H.end = h.t + L.tail;
   drawReplay();
   if (!RP.playing) replayPlay(true); else requestAnimationFrame(replayTick);
+}
+// ----- 295 C ③ 움직이는 미니맵: 선수 10명 도트 얼굴 (data/replay.js REPLAY_DOTS) — 평소 자리(시간대) + 장면 앞뒤엔 그 장소로 + 죽으면 흐려짐 -----
+function rpDotHome(side, i, t, set) {
+  const D = REPLAY_DOTS, P = REPLAY_SHOW.phase, k = side ? "b" : "a";
+  let p = D.lane[k][i];
+  if (i === 1) { const c = p[Math.floor((t + side * 2) / 3) % 2]; p = c; } // 정글: 캠프 두 곳을 3분마다 오감
+  if (t >= P[0]) {
+    const g = (t >= P[1] ? D.group.late : D.group.mid)[k];
+    const off = [(rpJit(set * 31 + side * 7 + i) - 0.5) * D.spread * 2, (rpJit(set * 17 + side * 5 + i * 3) - 0.5) * D.spread * 2];
+    const pull = i === 0 && t < P[1] ? 0.35 : 0.85; // 탑은 중반까지 사이드에 조금 남음
+    p = [p[0] + (g[0] + off[0] - p[0]) * pull, p[1] + (g[1] + off[1] - p[1]) * pull];
+  }
+  if (!motionOff()) { const w = D.sway; p = [p[0] + Math.sin(t * 1.7 + i * 2 + side) * w, p[1] + Math.cos(t * 1.3 + i * 3 + side) * w]; }
+  return p;
+}
+function drawReplayDots(m, s, t) {
+  const map = document.getElementById("rp-map");
+  if (!map || !s.lanes) return;
+  let box = map.querySelector(".rp-dots");
+  if (!box) {
+    box = document.createElement("div"); box.className = "rp-dots"; map.appendChild(box);
+    [0, 1].forEach(function (side) {
+      s.lanes.forEach(function (l, i) {
+        const id = side ? l.b : l.a, d = document.createElement("div");
+        d.className = "rp-dot " + (side ? "b" : "a") + (id === USER_ID ? " me" : "");
+        d.setAttribute("data-dot", side + ":" + i);
+        d.innerHTML = id ? portraitImg(id, { face: true, size: 14 }) : "";
+        box.appendChild(d);
+      });
+    });
+  }
+  const D = REPLAY_DOTS, evs = rpEvents(s), feed = rpKillTimeline(s).feed;
+  const idOf = function (side, i) { const l = s.lanes[i]; return side ? l.b : l.a; };
+  box.querySelectorAll(".rp-dot").forEach(function (d) {
+    const k = d.getAttribute("data-dot").split(":"), side = Number(k[0]), i = Number(k[1]), id = idOf(side, i);
+    let p = rpDotHome(side, i, t, RP.setIdx), best = 0;
+    evs.forEach(function (e, j) {
+      const w = 1 - Math.abs(t - e.t) / D.near;
+      if (w <= best) return;
+      const info = matchEventInfo(e) || {};
+      const inv = info.cat === "fight" || (id && (e.p === id || e.v === id)) || (info.cat === "object" && (i === 1 || i === 4));
+      if (!inv) return;
+      const q = rpPos(e, j), o = [(rpJit(j * 11 + side * 5 + i) - 0.5) * 8, (rpJit(j * 7 + side * 3 + i * 2) - 0.5) * 8];
+      best = w;
+      p = [p[0] + (q[0] + o[0] - p[0]) * w, p[1] + (q[1] + o[1] - p[1]) * w];
+    });
+    // 죽음: 킬 알림의 당한 선수 → 잠깐 흐려지고 본진으로
+    const dead = id && feed.some(function (f) { return f.victim === id && t >= f.t && t < f.t + D.dead; });
+    if (dead) p = D.base[side ? "b" : "a"];
+    d.classList.toggle("dead", !!dead);
+    d.style.left = p[0].toFixed(1) + "%"; d.style.top = p[1].toFixed(1) + "%";
+  });
 }
 // ----- 294 C ④ 장면과 맞는 킬 수 + 킬 알림 (data/replay.js REPLAY_KILLS) — 화면용 근사: 사건과 최종 킬 수가 따로 만들어져서 (Codex 주의) -----
 // 장면에서 나온 킬을 먼저 놓고(최종 킬 수보다 많으면 작은 장면부터 뺌), 모자라면 2분 ~ 끝 1분 전 사이에 고르게 채움 → 세트 끝에는 늘 최종 킬 수

@@ -1082,7 +1082,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .rp-stage { display: grid; grid-template-columns: 380px 1fr; gap: 16px; padding: 16px 18px; }
 .rp-map { position: relative; width: 100%; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; border: 1px solid var(--border); background: #0d1a14; }
 .rp-map svg { width: 100%; height: 100%; display: block; }
-.rp-ping { position: absolute; transform: translate(-50%, -50%); pointer-events: none; font-size: 18px; text-shadow: 0 1px 3px #000; }
+.rp-ping { position: absolute; z-index: 2; transform: translate(-50%, -50%); pointer-events: none; font-size: 18px; text-shadow: 0 1px 3px #000; }
 .rp-ping.a { color: var(--side-a); } .rp-ping.b { color: var(--side-b); }
 .rp-ping .ring { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; border: 2px solid currentColor; animation: rpRing 1.1s ease-out forwards; }
 .rp-ping .ic { position: relative; display: block; animation: rpPop 0.35s ease-out; }
@@ -2249,3 +2249,12 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .rp-kfeed { position: absolute; left: 18%; bottom: 6px; z-index: 4; display: flex; flex-direction: column; gap: 3px; max-width: 64%; pointer-events: none; }
 .rp-kf { padding: 3px 8px; border-radius: 8px; background: rgba(8, 8, 16, 0.82); border-left: 3px solid var(--side-a); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; animation: rpObjIn 0.3s ease-out; }
 .rp-kf.b { border-left-color: var(--side-b); }
+
+/* 295 경기 재생 연출 C ③ 움직이는 미니맵 (js/replay.js drawReplayDots) — 사건 아이콘(.rp-ping)보다 아래 */
+.rp-dots { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.rp-dot { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; border: 2px solid var(--side-a); background: #0b0b14; overflow: hidden; display: flex; align-items: center; justify-content: center; transition: opacity 0.25s; }
+.rp-dot.b { border-color: var(--side-b); }
+.rp-dot.me { border-color: var(--gold); box-shadow: 0 0 6px rgba(var(--gold-rgb), 0.8); z-index: 2; }
+.rp-dot.dead { opacity: 0.25; }
+.rp-dot img { width: 14px; height: 14px; image-rendering: pixelated; }
+@media (max-width: 760px) { .rp-dot { width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; border-width: 1.5px; } .rp-dot img { width: 11px; height: 11px; } }
