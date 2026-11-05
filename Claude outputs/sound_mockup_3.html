@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>챌린저 로드 — 배경 음악 시안 3 (설레는 출발 편곡)</title>
+<style>
+  :root { --bg: #0b0b14; --panel: #151527; --border: #2a2a44; --text: #e8e8f4; --muted: #8b8ba8; --o: #8b8ba8; --a: #ffb84a; --b: #3ad0ff; --c: #ff5c9a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px; background: var(--bg); color: var(--text); font-family: system-ui, "Malgun Gothic", sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.lead { color: var(--muted); margin: 0 0 16px; font-size: 14px; line-height: 1.6; }
+  .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; padding: 10px 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .col { background: var(--panel); border: 2px solid var(--border); border-radius: 14px; padding: 16px; }
+  .col.O { border-style: dashed; } .col.A { border-color: var(--a); } .col.B { border-color: var(--b); } .col.C { border-color: var(--c); }
+  .col h2 { margin: 0; font-size: 17px; }
+  .col.A h2 { color: var(--a); } .col.B h2 { color: var(--b); } .col.C h2 { color: var(--c); }
+  .desc { color: var(--muted); font-size: 13px; margin: 6px 0 12px; line-height: 1.6; min-height: 84px; }
+  button { font: inherit; color: var(--text); background: #22223a; border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; cursor: pointer; min-height: 40px; width: 100%; font-weight: 700; font-size: 15px; }
+  button.on { background: linear-gradient(90deg, #7c4dff, #1aa3d9); border-color: transparent; }
+  .eq { display: flex; gap: 3px; height: 26px; align-items: flex-end; margin-top: 12px; }
+  .eq i { flex: 1; background: var(--border); border-radius: 2px; height: 3px; transition: height 0.08s; }
+  .eq i.hit { background: var(--text); }
+  .note { margin-top: 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<h1>🎵 배경 음악 시안 3 — '설레는 출발' 롤 느낌 편곡</h1>
+<p class="lead">'설레는 출발' 멜로디는 그대로 두고 분위기만 바꿨어요. 실제 게임 음악을 따라 하지 않고, 웅장한 판타지 · e스포츠 무대 · 전장 행진의 <b>분위기</b>만 빌렸어요.<br>바탕은 레트로 게임기 소리이고, 배경 음악에만 울림(공간감)과 두꺼운 소리를 더했어요.</p>
+<div class="bar">
+  <label>음악 크기 <input type="range" id="vol" min="0" max="100" value="45"></label> <span id="volv">45</span>
+  <label><input type="checkbox" id="rev" checked> 울림(공간감)</label>
+</div>
+<div class="grid" id="grid"></div>
+<div class="note">
+  "원정의 화음 + 소환의 킥"처럼 섞어 달라고 하셔도 돼요. 빠르기·밝기도 고칠 수 있어요.<br>
+  게임에서는 대시보드 기본 곡 1개로 시작하고, 경기 재생 중 곡은 따로 정해요.
+</div>
+<script>
+// ===== 엔진 =====
+let AC = null, MUSIC = null, DRY = null, WET = null, PAD = null;
+function ac() {
+  if (!AC) {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    MUSIC = AC.createGain(); MUSIC.connect(AC.destination);
+    DRY = AC.createGain(); DRY.connect(MUSIC);
+    // 울림: 짧게 사라지는 잡음으로 만든 공간 (파일 없음)
+    const conv = AC.createConvolver(), len = AC.sampleRate * 2.2, ir = AC.createBuffer(2, len, AC.sampleRate);
+    for (let c = 0; c < 2; c++) { const ch = ir.getChannelData(c); let s = 777 + c; for (let i = 0; i < len; i++) { s = (s * 16807) % 2147483647; ch[i] = (s / 1073741823.5 - 1) * Math.pow(1 - i / len, 3); } }
+    conv.buffer = ir; WET = AC.createGain(); WET.gain.value = 0.28; conv.connect(WET); WET.connect(MUSIC);
+    PAD = AC.createGain(); PAD.connect(DRY); PAD.connect(conv); // 배경 깔리는 소리 (소환: 펌핑)
+    DRY.conv = conv; setVol();
+  }
+  if (AC.state === "suspended") AC.resume();
+  return AC;
+}
+function setVol() { if (MUSIC) { MUSIC.gain.value = (document.getElementById("vol").value / 100) * 0.55; WET.gain.value = document.getElementById("rev").checked ? 0.28 : 0; } }
+const PULSE = {};
+function pulseWave(duty) {
+  if (PULSE[duty]) return PULSE[duty];
+  const n = 64, re = new Float32Array(n), im = new Float32Array(n);
+  for (let k = 1; k < n; k++) re[k] = (2 / (k * Math.PI)) * Math.sin(k * Math.PI * duty);
+  return (PULSE[duty] = ac().createPeriodicWave(re, im));
+}
+function out(node, o) { node.connect(o.bus || DRY); if (o.wet) node.connect(DRY.conv); }
+// tone: t 시작 · f · dur · duty|type · vol · att(소리 커지는 시간) · rel · lp(저역) · lpEnv(필터가 열렸다 닫힘) · det(살짝 어긋난 소리 겹치기)
+function tone(o) {
+  const c = ac(), t0 = o.t, d = o.dur, voices = o.det ? [-o.det, 0, o.det] : [0];
+  const g = c.createGain(), att = o.att || 0.005, v = o.vol / voices.length * (o.det ? 1.6 : 1);
+  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(v, t0 + att);
+  g.gain.setValueAtTime(v, t0 + Math.max(att, d * 0.6)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d + (o.rel || 0));
+  let head = g;
+  if (o.lp) { const f = c.createBiquadFilter(); f.type = "lowpass"; f.Q.value = 2; f.frequency.setValueAtTime(o.lpEnv ? o.lp * 4 : o.lp, t0); if (o.lpEnv) f.frequency.exponentialRampToValueAtTime(o.lp, t0 + 0.18); g.connect(f); head = f; }
+  out(head, o);
+  voices.forEach(function (cents) {
+    const osc = c.createOscillator();
+    if (o.duty) osc.setPeriodicWave(pulseWave(o.duty)); else osc.type = o.type || "square";
+    osc.frequency.setValueAtTime(o.f, t0); osc.detune.value = cents;
+    if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t0 + d);
+    osc.connect(g); osc.start(t0); osc.stop(t0 + d + (o.rel || 0) + 0.05);
+  });
+}
+let NOISE = null;
+function noise(o) {
+  const c = ac(), t0 = o.t, d = o.dur;
+  if (!NOISE) { const len = c.sampleRate * 2; NOISE = c.createBuffer(1, len, c.sampleRate); const ch = NOISE.getChannelData(0); let s = 12345; for (let i = 0; i < len; i++) { s = (s * 16807) % 2147483647; ch[i] = s / 1073741823.5 - 1; } }
+  const src = c.createBufferSource(); src.buffer = NOISE;
+  const f = c.createBiquadFilter(); f.type = o.hp ? "highpass" : o.bp ? "bandpass" : "lowpass"; f.frequency.setValueAtTime(o.hp || o.bp || o.lp || 2000, t0);
+  if (o.sweep) f.frequency.exponentialRampToValueAtTime(o.sweep, t0 + d);
+  const g = c.createGain(), att = o.att || 0.002;
+  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(o.vol, t0 + att); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+  src.connect(f); f.connect(g); out(g, o); src.start(t0); src.stop(t0 + d + 0.02);
+}
+function N(name) {
+  const m = /^([A-G])(#?)(\d)$/.exec(name), idx = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] + (m[2] ? 1 : 0);
+  return 440 * Math.pow(2, (idx - 9) / 12 + (Number(m[3]) - 4));
+}
+function up(name, oct) { const m = /^([A-G]#?)(\d)$/.exec(name); return m[1] + (Number(m[2]) + oct); }
+const kick = function (t, v) { tone({ t: t, f: 150, to: 42, dur: 0.16, type: "sine", vol: v || 0.6 }); };
+const snare = function (t, v) { noise({ t: t, dur: 0.12, bp: 1800, vol: v || 0.3 }); tone({ t: t, f: 220, to: 160, dur: 0.06, type: "triangle", vol: 0.15 }); };
+const hat = function (t, v) { noise({ t: t, dur: 0.03, hp: 8000, vol: v || 0.07 }); };
+const crash = function (t) { noise({ t: t, dur: 1.4, hp: 5000, vol: 0.13, wet: true }); };
+const tom = function (t, f) { tone({ t: t, f: f, to: f * 0.6, dur: 0.22, type: "sine", vol: 0.45, wet: true }); };
+const timp = function (t, f) { tone({ t: t, f: f, to: f * 0.92, dur: 0.6, type: "sine", vol: 0.5, wet: true }); noise({ t: t, dur: 0.08, lp: 600, vol: 0.15 }); };
+
+// ===== 멜로디 =====
+// 원래 '설레는 출발' (다장조)
+const MEL_C = ["E5 - G5 C6 - B5 G5 -", "D5 - G5 B5 - A5 G5 -", "C5 - E5 A5 - G5 E5 -", "F5 - A5 C6 - D6 C6 -",
+               "E6 - D6 C6 - G5 E5 -", "D6 - C6 B5 - G5 D5 -", "C6 - B5 A5 - E5 C5 -", "A5 - C6 F5 . G5 B5 D6"];
+// 같은 멜로디를 라단조 영웅 진행 (Am F C G)으로 옮김 — 원정·소환·행진이 같이 씀
+const MEL_M = ["C5 - E5 A5 - G5 E5 -", "C5 - F5 A5 - G5 F5 -", "E5 - G5 C6 - B5 G5 -", "D5 - G5 B5 - A5 G5 -",
+               "C6 - B5 A5 - E5 C5 -", "A5 - G5 F5 - C5 A4 -", "G5 - A5 C6 - B5 G5 -", "B5 - D6 G5 . A5 B5 E6"];
+const CH_C = [["C", "E", "G"], ["G", "B", "D"], ["A", "C", "E"], ["F", "A", "C"]];
+const CH_M = [["A", "C", "E"], ["F", "A", "C"], ["C", "E", "G"], ["G", "B", "D"]];
+const ROOT_C = ["C", "G", "A", "F"], ROOT_M = ["A", "F", "C", "G"];
+
+const SONGS = {
+  O: { name: "원래: 설레는 출발", desc: "시안 2 그대로 (비교용). 밝은 다장조, 레트로 게임기 소리만.", bpm: 128, mel: MEL_C, ch: CH_C, root: ROOT_C,
+    step: function (t, bar, i, sd, S) {
+      if (i % 2 === 0) tone({ t: t, f: N(S.root[bar % 4] + (i % 4 ? "3" : "2")), dur: sd * 1.8, type: "triangle", vol: 0.32 });
+      tone({ t: t, f: N(S.ch[bar % 4][i % 3] + "5"), dur: sd * 0.45, duty: 0.125, vol: 0.05 });
+      const d = ["k.h.s.h.", "k.h.s.hk", "k.h.s.h.", "k.hks.so"][bar % 4][i];
+      if (d === "k") kick(t, 0.5); if (d === "s") snare(t, 0.22); if (d === "h") hat(t); if (d === "o") hat(t, 0.1);
+      return { duty: 0.25, vol: 0.16 };
+    } },
+  A: { name: "원정 (웅장한 판타지)", desc: "라단조 영웅 진행. 합창처럼 깔리는 소리 + 금관 같은 찌르는 소리 + 큰 북·심벌 + 울림. 모험을 떠나는 느낌.", bpm: 104, mel: MEL_M, ch: CH_M, root: ROOT_M,
+    step: function (t, bar, i, sd, S) {
+      const ch = S.ch[bar % 4], root = S.root[bar % 4];
+      if (i === 0) { ch.forEach(function (n, k) { tone({ t: t, f: N(n + (k ? "4" : "4")), dur: sd * 7.5, type: "sawtooth", det: 9, att: 0.35, rel: 0.4, lp: 1400, vol: 0.09, bus: PAD }); }); tone({ t: t, f: N(root + "2"), dur: sd * 7.6, type: "triangle", vol: 0.35 }); }
+      if (i === 0 || i === 3 || i === 6) ch.forEach(function (n) { tone({ t: t, f: N(n + "4"), dur: sd * 1.2, type: "sawtooth", lp: 900, lpEnv: true, vol: 0.07, wet: true }); }); // 금관
+      if (i === 0) kick(t, 0.65);
+      if (i === 4) snare(t, 0.3);
+      if (bar % 4 === 3 && i >= 4) tom(t, [180, 150, 120, 95][i - 4]);
+      if (i === 0 && bar % 4 === 0) crash(t);
+      return { duty: 0.5, vol: 0.13, octave: true, wet: true };
+    } },
+  B: { name: "소환 (e스포츠 무대)", desc: "쿵쿵 4박 킥 + 킥에 맞춰 숨 쉬는 배경(펌핑) + 16분음 반짝이 + 두꺼운 리드. 마지막 마디에 고조됐다가 처음으로 터짐.", bpm: 128, mel: MEL_M, ch: CH_M, root: ROOT_M,
+    step: function (t, bar, i, sd, S) {
+      const ch = S.ch[bar % 4], root = S.root[bar % 4];
+      if (i === 0) ch.forEach(function (n) { tone({ t: t, f: N(n + "4"), dur: sd * 7.8, type: "sawtooth", det: 14, att: 0.05, lp: 2400, vol: 0.08, bus: PAD }); });
+      if (i % 2 === 0) { kick(t, 0.7); PAD.gain.cancelScheduledValues(t); PAD.gain.setValueAtTime(0.25, t); PAD.gain.linearRampToValueAtTime(1, t + sd * 1.7); } // 펌핑
+      if (i % 2 === 1) tone({ t: t, f: N(root + "2"), dur: sd * 0.8, type: "sawtooth", lp: 500, lpEnv: true, vol: 0.28 }); // 엇박 베이스
+      if (i === 2 || i === 6) { noise({ t: t, dur: 0.14, bp: 1500, vol: 0.28 }); noise({ t: t + 0.012, dur: 0.12, bp: 2200, vol: 0.18 }); } // 박수
+      hat(t + sd / 2, 0.06);
+      tone({ t: t, f: N(ch[i % 3] + "6"), dur: sd * 0.4, duty: 0.125, vol: 0.05 }); tone({ t: t + sd / 2, f: N(ch[(i + 1) % 3] + "5"), dur: sd * 0.4, duty: 0.125, vol: 0.05 });
+      if (bar === 7) { if (i === 0) noise({ t: t, dur: sd * 8, hp: 400, sweep: 9000, att: sd * 7.5, vol: 0.16 }); }
+      if (bar === 0 && i === 0) crash(t);
+      return { duty: 0.25, vol: 0.12, det: 12 };
+    } },
+  C: { name: "행진 (전장으로)", desc: "작은북 연타 + 팀파니 + 호른 같은 화음. 힘찬 걸음 박자. 팀이 무대로 걸어 나오는 느낌.", bpm: 112, mel: MEL_M, ch: CH_M, root: ROOT_M,
+    step: function (t, bar, i, sd, S) {
+      const ch = S.ch[bar % 4], root = S.root[bar % 4];
+      if (i === 0 || i === 4) { tone({ t: t, f: N(ch[0] + "4"), dur: sd * 3.6, type: "triangle", vol: 0.12, wet: true }); tone({ t: t, f: N(ch[2] + "4"), dur: sd * 3.6, duty: 0.5, lp: 1200, vol: 0.06, wet: true }); } // 호른
+      if (i === 0) timp(t, N(root + "2")); if (i === 4) timp(t, N(root + "2") * 1.5);
+      const sn = ["x.x.xxx.", "x.x.xxx.", "x.x.xxx.", "xxxxxxxx"][bar % 4][i];
+      if (sn === "x") { snare(t, 0.16); if (bar % 4 === 3) snare(t + sd / 2, 0.12); }
+      if (i % 2 === 0) tone({ t: t, f: N(root + "2"), dur: sd * 1.6, type: "triangle", vol: 0.3 });
+      if (i === 0 && bar % 4 === 0) crash(t);
+      return { duty: 0.25, vol: 0.15, wet: true };
+    } },
+};
+let PLAY = null;
+function scheduleStep(S, step, t) {
+  const sd = 60 / S.bpm / 2, bar = Math.floor(step / 8) % 8, i = step % 8;
+  const L = S.step(t, bar, i, sd, S);
+  const mel = S.mel[bar].split(" ");
+  if (mel[i] !== "-" && mel[i] !== ".") {
+    let n = 1; while (mel[i + n] === "-") n++;
+    tone({ t: t, f: N(mel[i]), dur: sd * n * 0.92, duty: L.duty, vol: L.vol, det: L.det, wet: L.wet });
+    if (L.octave) tone({ t: t, f: N(up(mel[i], -1)), dur: sd * n * 0.92, type: "triangle", vol: L.vol * 0.8, wet: true });
+  }
+  return i;
+}
+function play(key) {
+  stop();
+  const c = ac(), S = SONGS[key], sd = 60 / S.bpm / 2;
+  PAD.gain.cancelScheduledValues(0); PAD.gain.value = 1;
+  PLAY = { key: key, step: 0, next: c.currentTime + 0.08 };
+  PLAY.timer = setInterval(function () {
+    while (PLAY && PLAY.next < c.currentTime + 0.15) {
+      const i = scheduleStep(S, PLAY.step, PLAY.next), when = (PLAY.next - c.currentTime) * 1000, k = PLAY.key;
+      setTimeout(function () { eqHit(k, i); }, Math.max(0, when));
+      PLAY.step++; PLAY.next += sd;
+    }
+  }, 25);
+  draw();
+}
+function stop() { if (PLAY) clearInterval(PLAY.timer); PLAY = null; draw(); }
+function eqHit(k, i) { document.querySelectorAll(".col." + k + " .eq i").forEach(function (b, j) { b.classList.toggle("hit", j === i); b.style.height = (j === i ? 26 : 6) + "px"; }); }
+const grid = document.getElementById("grid");
+Object.keys(SONGS).forEach(function (k) {
+  const S = SONGS[k], col = document.createElement("div");
+  col.className = "col " + k;
+  col.innerHTML = "<h2>" + S.name + "</h2><div class=\"desc\">" + S.desc + "</div><button data-k=\"" + k + "\">▶ 재생</button><div class=\"eq\">" + "<i></i>".repeat(8) + "</div>";
+  grid.appendChild(col);
+});
+function draw() { document.querySelectorAll("button[data-k]").forEach(function (b) { const on = PLAY && PLAY.key === b.dataset.k; b.classList.toggle("on", on); b.textContent = on ? "⏸ 멈춤" : "▶ 재생"; }); }
+grid.addEventListener("click", function (e) { const b = e.target.closest("button[data-k]"); if (!b) return; if (PLAY && PLAY.key === b.dataset.k) stop(); else play(b.dataset.k); });
+document.getElementById("vol").addEventListener("input", function () { document.getElementById("volv").textContent = this.value; setVol(); });
+document.getElementById("rev").addEventListener("change", setVol);
+</script>
+</body>
+</html>
