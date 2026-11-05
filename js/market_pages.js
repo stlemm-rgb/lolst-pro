@@ -71,7 +71,7 @@ pages.search = function () {
     return '<option value="' + o[0] + '"' + (searchFilter.sort === o[0] ? " selected" : "") + ">" + o[1] + "</option>";
   }).join("");
 
-  const rows = ids.map(function (id) {
+  const rowOf = function (id) {
     const p = playerInfo(id);
     const team = p.teamId ? findTeam(p.teamId) : null;
     const wt = !team && id !== USER_ID && state.world && state.world.players[id] ? findWorldTeam(worldTeamIdOf(id)) : null; // 해외 리그 선수
@@ -89,6 +89,11 @@ pages.search = function () {
         '<td class="r">' + (p.teamId && p.contractEnd ? (p.id === USER_ID ? contractEndText(state.contract) : p.contractEnd + "년") : "-") + "</td>" +
       "</tr>"
     );
+  };
+  // 298: 포지션을 고르지 않았으면 포지션별 소제목 줄로 묶음 (탑→서포트, 안은 고른 정렬 그대로)
+  const rows = searchFilter.pos ? ids.map(rowOf).join("") : POSITIONS.map(function (pos) {
+    const g = ids.filter(function (id) { return playerInfo(id).pos === pos.id; });
+    return g.length ? '<tr class="srch-pos"><th colspan="10">' + pos.name + ' <span class="muted small">' + g.length + "명</span></th></tr>" + g.map(rowOf).join("") : "";
   }).join("");
 
   return (

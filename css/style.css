@@ -2299,3 +2299,4 @@ table.tlog tr.tlog-team.me td { color: var(--gold); }
 .res-grp:first-of-type { margin-top: 4px; }
 table.matches tr.ms-grp th { text-align: left; padding-top: 12px; font-size: 14px; color: var(--accent); border-bottom: 1px solid var(--border); }
 .ib-grp { font-size: 13px; font-weight: 700; color: var(--accent); margin: 14px 2px 4px; } /* 298 지난 연락 주차별 소제목 */
+table.roster tr.srch-pos th { text-align: left; padding-top: 12px; font-size: 14px; color: var(--accent); border-bottom: 1px solid var(--border); } /* 298 선수 검색 포지션별 소제목 */
