@@ -136,7 +136,7 @@ function repeatNews(who, vars, st, art) {
 // ----- 297 기사 본문: 새해·해외 결산·월즈 특집의 긴 목록을 종류별 표로 (글: data/news.js NEWS_GROUP_TEXT) — 보여 줄 때만, 무작위 없음 -----
 function articleBodyHTML(a) {
   const body = String(a.body || "");
-  const html = a.key === "newyear" ? newYearBodyHTML(body) : a.key === "worldStory" ? worldStoryBodyHTML(body) : a.key === "worlds_preview" ? worldsPreviewBodyHTML(body) : null;
+  const html = a.key === "newyear" ? newYearBodyHTML(body) : a.key === "worldStory" ? worldStoryBodyHTML(body) : a.key === "worlds_preview" ? worldsPreviewBodyHTML(body) : a.key === "eraIntro" ? eraIntroBodyHTML(body) : null;
   return html || "<p>" + escapeHTML(body) + "</p>";
 }
 // 298 받은 소식 글: 올스타전처럼 '포지션: A / B' 줄이 3개 넘게 이어지면 표로 (나머지 글은 그대로)
@@ -168,8 +168,8 @@ function newsTableHTML(title, cols, rows, keepOrder) {
   if (!rows.length) return "";
   const G = NEWS_GROUP_TEXT;
   const sorted = keepOrder ? rows : rows.filter(function (r) { return r.mine; }).concat(rows.filter(function (r) { return !r.mine; })); // keepOrder: 포지션 순서처럼 순서가 뜻이 있으면 그대로
-  return '<div class="np-grp"><div class="np-grp-h">' + escapeHTML(title.replace("{n}", rows.length)) + '</div><table class="np-tbl"><tr>' +
-    cols.map(function (c) { return "<th>" + escapeHTML(c) + "</th>"; }).join("") + "</tr>" +
+  return '<div class="np-grp">' + (title ? '<div class="np-grp-h">' + escapeHTML(title.replace("{n}", rows.length)) + "</div>" : "") + '<table class="np-tbl">' +
+    (cols.length ? "<tr>" + cols.map(function (c) { return "<th>" + escapeHTML(c) + "</th>"; }).join("") + "</tr>" : "") + // 298: 머리 없는 목록 표도
     sorted.map(function (r) {
       return "<tr" + (r.mine ? ' class="mine"' : "") + ">" + r.cells.map(function (c, i) { return "<td>" + (i === 0 && r.mine ? G.mineMark : "") + escapeHTML(c) + "</td>"; }).join("") + "</tr>";
     }).join("") + "</table></div>";
@@ -193,6 +193,21 @@ function newYearBodyHTML(body) {
   if (!renames.length && !moves.length && !rookies.length) return null; // 묶을 게 없으면 원래대로
   return newsTableHTML(G.rename, G.renameCols, renames) + newsTableHTML(G.move, G.moveCols, moves) + newsTableHTML(G.rookie, G.rookieCols, rookies) +
     (rest.length ? "<p>" + escapeHTML(rest.join("\n")) + "</p>" : "") + (history ? "<p>" + escapeHTML(history.join("\n")) + "</p>" : "");
+}
+// 298 2012년 리그 소개(eraIntro): '🏟️ 리그 규모: …' 같은 줄은 항목·지금 표, '🔜 내년(…)에는:' 아래 '  · …' 줄은 그 제목의 목록 표
+function eraIntroBodyHTML(body) {
+  const G = NEWS_GROUP_TEXT, now = [], next = [], rest = [];
+  let nextTitle = "";
+  body.split("\n").forEach(function (ln) {
+    let m = /^  · (.+)$/.exec(ln);
+    if (m && nextTitle) { next.push({ cells: [m[1]], mine: false }); return; }
+    if (/^🔜 /.test(ln)) { nextTitle = ln.replace(/[:：]\s*$/, ""); return; }
+    m = /^(\S+ [^:]{1,12}): (.+)$/.exec(ln);
+    if (m && !nextTitle) { now.push({ cells: [m[1], m[2]], mine: false }); return; }
+    if (ln.trim()) rest.push(ln);
+  });
+  if (!now.length && !next.length) return null;
+  return newsTableHTML("", G.era, now, true) + (rest.length ? "<p>" + escapeHTML(rest.join("\n")) + "</p>" : "") + newsTableHTML(nextTitle, [], next, true);
 }
 function worldStoryBodyHTML(body) {
   const G = NEWS_GROUP_TEXT, lines = body.split("\n"), rows = [], rest = [];

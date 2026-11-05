@@ -323,6 +323,7 @@ const NEWS_GROUP_TEXT = {
   rookie: "🌟 신인 입단 {n}명", rookieCols: ["선수", "포지션", "팀"], rookieKind: { 대형: "대형", 레전드: "레전드" },
   world: ["지역", "우승", "MVP"], mvp: ["지역", "MVP", "팀"],
   allstar: ["포지션", "팀 블루", "팀 레드"], // 298 올스타전 소식 (js/news.js msgTextHTML)
+  era: ["항목", "지금"],                      // 298 2012 리그 소개 기사 (eraIntro)
   mineMark: "★ ",
 };
 
