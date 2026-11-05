@@ -78,7 +78,7 @@
   --pf-bg2: #1c1b30; /* 포트레잇 배경(바깥) (R4) */
   --on-gold: #1a1405; /* 금색 위 글자 (R4) */
   /* 경기 화면 팀 색 (219, 27부분): 우리 팀 = 하늘, 상대 = 분홍. 우리 팀이 오른쪽(b)이면 .side-swap이 바꿈 */
-  --side-a: var(--accent); --side-b: #ff5c8a; --side-a-rgb: var(--accent-rgb); --side-b-rgb: 255, 92, 138;
+  --side-a: var(--accent); --side-b: #ff5c8a; --side-a-rgb: var(--accent-rgb); --side-b-rgb: 255, 92, 138; --side-a-chart: #00a3bf; --side-b-chart: #d6426f; /* 290: 차트 면 색 (네온보다 한 단계 어둡게, dataviz 검사 통과: 밝기·색약 ΔE 11.9·대비) */
   --gold-light: #fff3c4; /* 옅은 금색 (R4) */
   --brawl: #fb923c; /* 난전·빅게임 주황 (R4) */
   --carry: #f472b6; /* 캐리 분홍 (R4) */
@@ -1095,10 +1095,6 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 @keyframes rpRing { from { transform: scale(1); opacity: 1; } to { transform: scale(6); opacity: 0; } }
 @keyframes rpPop { 0% { transform: scale(0.3); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
 .rp-mom { margin-top: 12px; }
-.rp-mom-bar { position: relative; height: 12px; border-radius: 99px; background: rgba(var(--side-b-rgb), 0.55); overflow: hidden; }
-.rp-mom-bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--side-a); transition: width 0.4s; }
-.rp-mom-bar b { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 2px; background: #fff; opacity: 0.6; }
-.rp-mom-lbl { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
 .rp-tl { position: relative; height: 26px; margin-top: 12px; border-radius: 8px; background: var(--panel-2); cursor: pointer; }
 .rp-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 8px; background: rgba(var(--accent-rgb), 0.12); }
 .rp-head { position: absolute; top: -3px; bottom: -3px; width: 2px; background: #fff; }
@@ -1944,7 +1940,7 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 
 /* ===== 27. 경기 기록 팀 구분 (219): 우리 팀 = 하늘, 상대 = 분홍 (우리 팀 경기가 아니면 왼쪽 팀 a = 하늘)
    미니맵 본진·포탑·핑·흐름 막대·기록 줄·이름·팀 칩이 모두 같은 색. 우리 팀이 b면 .side-swap (js/match_events.js sideSwapClass) ===== */
-.side-swap { --side-a: #ff5c8a; --side-b: var(--accent); --side-a-rgb: 255, 92, 138; --side-b-rgb: var(--accent-rgb); }
+.side-swap { --side-a: #ff5c8a; --side-b: var(--accent); --side-a-rgb: 255, 92, 138; --side-b-rgb: var(--accent-rgb);  --side-a-chart: #d6426f; --side-b-chart: #00a3bf; }
 .rp-base.sa { fill: rgba(var(--side-a-rgb), 0.28); stroke: var(--side-a); } .rp-base.sb { fill: rgba(var(--side-b-rgb), 0.28); stroke: var(--side-b); }
 .rp-tw.sa { fill: var(--side-a); opacity: 0.8; } .rp-tw.sb { fill: var(--side-b); opacity: 0.8; }
 .ev-n.s0, .ev-n.s0 b { color: var(--side-a); }
@@ -2224,3 +2220,17 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .rp-pog { display: flex; align-items: center; gap: 12px; margin: 8px 0; padding: 10px 12px; border-radius: var(--r-s); background: rgba(var(--gold-rgb), 0.08); border: 1px solid rgba(var(--gold-rgb), 0.5); text-align: left; }
 .rp-pog .rp-pog-h { color: var(--gold); margin-bottom: 2px; }
 @media (max-width: 760px) { .rp-call b { font-size: 17px; } .rp-cast { font-size: 13px; } }
+
+/* 290 경기 재생 연출 B (js/replay.js): ⑤ 흐름 그래프 · ⑥ 승부처 표시 · ⑧ 하이라이트 표시 */
+.rp-flow { position: relative; height: 64px; margin-top: 10px; border-radius: var(--r-s); background: var(--panel-2); border: 1px solid var(--border); cursor: pointer; overflow: hidden; }
+.rp-flow svg { display: block; width: 100%; height: 100%; }
+.rp-fl-mid { stroke: rgba(255, 255, 255, 0.18); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 3 3; }
+.rp-fl-a { fill: var(--side-a-chart); opacity: 0.55; }
+.rp-fl-b { fill: var(--side-b-chart); opacity: 0.55; }
+.rp-fl-line { fill: none; stroke: #e8e8f2; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.rp-fl-x { stroke: rgba(255, 255, 255, 0.7); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.rp-fl-lbl { position: absolute; left: 6px; font-size: 11px; color: var(--muted); pointer-events: none; }
+.rp-fl-lbl.up { top: 3px; } .rp-fl-lbl.down { bottom: 3px; }
+.rp-fl-tip { position: absolute; top: 50%; transform: translateY(-50%); padding: 2px 8px; border-radius: 8px; background: rgba(8, 8, 16, 0.9); border: 1px solid var(--border); font-size: 12px; color: var(--text); white-space: nowrap; pointer-events: none; }
+.rp-slowtag { color: var(--gold); font-weight: 700; }
+.rp-hltag { color: var(--gold); font-weight: 700; }

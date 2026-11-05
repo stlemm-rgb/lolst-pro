@@ -32,6 +32,20 @@ const REPLAY_SHOW = {
   callMs: 1700,            // ① 승부처 큰 글씨가 떠 있는 시간 (ms)
   idleMin: 2.5,            // ② 장면 없이 이만큼(경기 분) 지나면 시간대 중계 한 줄
   phase: [14, 26],         // 시간대: 라인전 < 14분 ≤ 중반 < 26분 ≤ 후반
+  // ----- B (290) -----
+  slow: { before: 0.7, after: 0.5, mult: 0.35 }, // ⑥ 승부처 느린 화면: 큰 장면 0.7분 전 ~ 0.5분 뒤까지 35% 속도
+  hl: { lead: 1.2, tail: 0.9 },                  // ⑧ 하이라이트: 장면마다 1.2분 전부터 0.9분 뒤까지
+  flowMin: 30,                                   // ⑤ 흐름 그래프 높이 최소 기준 (사건 점수 합, 이보다 작게 오간 세트도 이 높이로)
+};
+const REPLAY_B_TEXT = {
+  slowTag: "🎬 승부처",
+  hlBtn: "⭐ 하이라이트",
+  hlTag: "⭐ 하이라이트 {k}/{n}",
+  hlNone: "이 경기엔 하이라이트 장면이 없어요.",
+  hlEnd: "⭐ 하이라이트 끝",
+  flowUp: "▲ {team} 우세", flowDown: "▼ {team} 우세",
+  flowTip: "{t}분 · {team} 우세", flowEven: "{t}분 · 팽팽",
+  flowTitle: "경기 흐름 (위 = {a} 우세 · 아래 = {b} 우세, 누르면 그 시간으로)",
 };
 const REPLAY_CASTER = {
   // 사건 분류(cat)·좋은/나쁜 장면(good/bad)별 중계 한 줄

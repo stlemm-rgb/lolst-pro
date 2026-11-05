@@ -77,9 +77,12 @@ function replayShellHTML(m) {
     '<div class="rp-stage"><div>' +
       '<div class="rp-map" id="rp-map"></div>' +
       '<div class="rp-cast" id="rp-cast"><span class="rp-mic">🎙️</span><span id="rp-cast-t"></span></div>' + // 289 ② 캐스터 자막
-      '<div class="rp-mom"><div class="rp-mom-bar"><i id="rp-mom"></i><b></b></div><div class="rp-mom-lbl"><span>' + escapeHTML(teamShort(m.a)) + '</span><span>경기 흐름</span><span>' + escapeHTML(teamShort(m.b)) + "</span></div></div>" +
+      '<div class="rp-mom rp-flow" id="rp-flow" title="' + escapeHTML(REPLAY_B_TEXT.flowTitle.replace("{a}", teamShort(m.a)).replace("{b}", teamShort(m.b))) + '">' + // 290 ⑤ 흐름 그래프 (예전 막대 자리)
+        '<svg viewBox="0 0 100 40" preserveAspectRatio="none" id="rp-flow-svg"></svg>' +
+        '<span class="rp-fl-lbl up">' + escapeHTML(REPLAY_B_TEXT.flowUp.replace("{team}", teamShort(m.a))) + '</span><span class="rp-fl-lbl down">' + escapeHTML(REPLAY_B_TEXT.flowDown.replace("{team}", teamShort(m.b))) + "</span>" +
+        '<span class="rp-fl-tip" id="rp-fl-tip" hidden></span></div>' +
       '<div class="rp-tl" id="rp-tl"><div class="rp-fill" id="rp-fill"></div><div class="rp-head" id="rp-head"></div></div>' +
-      '<div class="rp-ctrl"><button class="primary" data-rpplay="1" id="rp-play">▶ 재생</button>' + speeds + '<button data-rpskip="1">⏭ 결과 보기</button></div>' +
+      '<div class="rp-ctrl"><button class="primary" data-rpplay="1" id="rp-play">▶ 재생</button>' + speeds + '<button data-rpskip="1">⏭ 결과 보기</button><button data-rphl="1">' + REPLAY_B_TEXT.hlBtn + "</button></div>" + // 290 ⑧
       '<div class="rp-endbar" id="rp-endbar" hidden></div>' + // 200: 세트·경기 끝 안내 (화면을 가리지 않음)
     '</div><div class="rp-side"><div class="rp-lanes" id="rp-lanes"></div>' +
       '<div class="rp-feedwrap"><div class="rp-feedhd"><span class="muted small">경기 기록 · 새 장면이 위로</span>' + (rpUserPlays(m) ? '<label class="small"><input type="checkbox" id="rp-onlyme"' + (RP.onlyMe ? " checked" : "") + "> " + REPLAY_TEXTS.onlyMe + ' <b id="rp-mecount">0</b></label>' : "") + "</div>" +
@@ -146,9 +149,7 @@ function drawReplay(reset) {
     rpCast(rpCasterLine(m, done[li], li)); RP.castT = RP.t;
     if (RP.playing && added <= 2) rpCallout(m, done[li]);
   } else if (RP.playing && RP.t - (RP.castT || 0) >= REPLAY_SHOW.idleMin) { rpCast(rpIdleLine(RP.t)); RP.castT = RP.t; }
-  let mom = 0;
-  done.forEach(function (e) { mom += e.s === 0 ? e.x : -e.x; });
-  document.getElementById("rp-mom").style.width = (50 + Math.max(-1, Math.min(1, mom / REPLAY_RULES.momentumScale)) * 50) + "%";
+  drawReplayFlow(s, done, min); // 290 ⑤
   const pct = Math.min(100, RP.t / min * 100);
   document.getElementById("rp-fill").style.width = pct + "%";
   document.getElementById("rp-head").style.left = pct + "%";
@@ -159,8 +160,9 @@ function drawReplay(reset) {
   document.getElementById("rp-setbar").innerHTML = m.detail.sets.map(function (x, i) {
     const fin = i < RP.setIdx || (i === RP.setIdx && RP.t >= x.box.min);
     return '<span class="rp-st' + (i === RP.setIdx ? " on" : "") + '" data-rpset="' + i + '">' + (i + 1) + "세트" + (fin ? " · " + escapeHTML(teamShort(x.w === 0 ? m.a : m.b)) + " 승" : "") + "</span>";
-  }).join("") + '<span class="rp-clock">⏱ ' + mm + ":" + String(ss).padStart(2, "0") + " / " + tm + ":" + String(ts).padStart(2, "0") + ' · ⚔ <b>' + kills[0] + " : " + kills[1] + "</b></span>";
-  document.querySelectorAll("[data-rpset]").forEach(function (el) { el.onclick = function () { replayPlay(false); RP.setIdx = Number(el.getAttribute("data-rpset")); RP.t = 0; hideReplayBanner(); hideReplayEndBar(); drawReplay(true); }; });
+  }).join("") + '<span class="rp-clock">' + (RP.hl ? '<span class="rp-hltag">' + REPLAY_B_TEXT.hlTag.replace("{k}", RP.hl.k + 1).replace("{n}", RP.hl.list.length) + "</span> " : "") + (RP.slow ? '<span class="rp-slowtag">' + REPLAY_B_TEXT.slowTag + "</span> " : "") + // 290 ⑥⑧
+    "⏱ " + mm + ":" + String(ss).padStart(2, "0") + " / " + tm + ":" + String(ts).padStart(2, "0") + ' · ⚔ <b>' + kills[0] + " : " + kills[1] + "</b></span>";
+  document.querySelectorAll("[data-rpset]").forEach(function (el) { el.onclick = function () { RP.hl = null; replayPlay(false); RP.setIdx = Number(el.getAttribute("data-rpset")); RP.t = 0; hideReplayBanner(); hideReplayEndBar(); drawReplay(true); }; });
   drawReplayLanes(m, s);
 }
 function drawReplayLanes(m, s) {
@@ -208,6 +210,7 @@ function rpAddEvent(m, e, i) {
 // 기록에서 고른 장면으로: 재생을 멈추고 그 시간으로 돌아가 미니맵에 강조 고리 + 기록 줄 강조
 function replayJumpTo(e, i) {
   if (!RP) return;
+  RP.hl = null; // 290: 하이라이트 중이면 끝
   replayPlay(false);
   hideReplayBanner();
   RP.t = e.t;
@@ -245,9 +248,11 @@ function replayTick(now) {
   if (!RP || !RP.playing) return;
   const dt = (now - RP.last) / 1000;
   RP.last = now;
-  RP.t += dt * RP.speed / REPLAY_RULES.secPerMinute;
+  RP.slow = rpSlowNow(); // 290 ⑥ 큰 장면 앞뒤는 느리게
+  RP.t += dt * RP.speed * (RP.slow ? REPLAY_SHOW.slow.mult : 1) / REPLAY_RULES.secPerMinute;
   const min = rpSet().box.min;
-  if (RP.t >= min) { RP.t = min; drawReplay(); replayPlay(false); replaySetEnd(); return; } // 200: 화면을 가리는 창 대신 아래 안내 (천천히 다시 보기)
+  if (RP.hl && RP.t >= RP.hl.end) { rpHlNext(); return; } // 290 ⑧ 다음 하이라이트로
+  if (RP.t >= min) { RP.t = min; drawReplay(); if (RP.hl) { rpHlNext(); return; } replayPlay(false); replaySetEnd(); return; } // 290: 하이라이트 중엔 세트 끝에서 멈추지 않고 다음 장면으로 // 200: 화면을 가리는 창 대신 아래 안내 (천천히 다시 보기)
   drawReplay();
   requestAnimationFrame(replayTick);
 }
@@ -262,6 +267,7 @@ function replaySetEnd() {
 }
 function replaySkip() {
   if (!RP) return;
+  RP.hl = null;
   replayPlay(false);
   RP.setIdx = rpMatch().detail.sets.length - 1;
   RP.t = rpSet().box.min;
@@ -332,6 +338,7 @@ function bindReplay() {
   const el = document.getElementById("replay-overlay");
   el.querySelectorAll("[data-rpclose]").forEach(function (b) { b.onclick = closeReplay; });
   el.querySelector("[data-rpplay]").onclick = function () {
+    RP.hl = null; // 290: 직접 재생하면 하이라이트 끝
     if (RP.t >= rpSet().box.min) { RP.t = 0; drawReplay(true); replayPlay(true); return; } // 끝까지 봤으면 이 세트를 처음부터 다시 (200)
     replayPlay(!RP.playing);
   };
@@ -345,7 +352,16 @@ function bindReplay() {
     };
   });
   el.querySelectorAll(".rp-ctrl [data-rpskip]").forEach(function (b) { b.onclick = replaySkip; });
+  const hlb = el.querySelector("[data-rphl]");
+  if (hlb) hlb.onclick = rpHlStart; // 290 ⑧
+  const flow = document.getElementById("rp-flow"); // 290 ⑤ 흐름 그래프: 올리면 그 시간 우세, 누르면 그 시간으로
+  if (flow) {
+    flow.onmousemove = function (e) { rpFlowTip(e, false); };
+    flow.onmouseleave = function () { const t = document.getElementById("rp-fl-tip"); if (t) t.hidden = true; const x = document.getElementById("rp-fl-x"); if (x) x.setAttribute("opacity", "0"); };
+    flow.onclick = function (e) { rpFlowTip(e, true); };
+  }
   document.getElementById("rp-tl").onclick = function (e) {
+    RP.hl = null;
     const r = this.getBoundingClientRect(), min = rpSet().box.min;
     RP.t = Math.max(0, Math.min(min, (e.clientX - r.left) / r.width * min));
     drawReplay();
@@ -377,7 +393,7 @@ function rpCasterLine(m, e, i) {
 function rpCallout(m, e) {
   const info = matchEventInfo(e) || {};
   const fin = e.e.indexOf("fin:") === 0;
-  if (!(info.size === "l" || fin || (e.p === USER_ID && e.k === "good" && info.size === "m"))) return;
+  if (!rpIsBig(e)) return; // 290: ⑥ 느린 화면·⑧ 하이라이트와 같은 기준
   const map = document.getElementById("rp-map");
   if (!map) return;
   map.querySelectorAll(".rp-call").forEach(function (x) { x.remove(); });
@@ -407,6 +423,84 @@ function rpPogCardHTML(m) {
     '<div class="rp-pog-h">' + REPLAY_POG.title + " · <b>" + escapeHTML(playerName(id)) + '</b> <span class="muted small">' + escapeHTML(teamShort(side ? m.b : m.a)) + "</span></div>" +
     '<div class="small">' + REPLAY_POG.kda + " <b>" + k + " / " + d + " / " + a + "</b></div>" +
     (scene ? '<div class="small">' + REPLAY_POG.scene + ": " + scene + "</div>" : "") + "</div></div>";
+}
+// ----- 290 중계 연출 B: ⑤ 흐름 그래프 · ⑥ 승부처 느린 화면 · ⑧ 하이라이트 (값·글: data/replay.js REPLAY_SHOW·REPLAY_B_TEXT) -----
+// 큰 장면 = 크기 '대' 사건 · 마무리 장면 · 내 선수의 '중' 이상 좋은 장면 (① 큰 글씨·⑥·⑧이 같이 씀)
+function rpIsBig(e) {
+  const info = matchEventInfo(e) || {};
+  return info.size === "l" || e.e.indexOf("fin:") === 0 || (e.p === USER_ID && e.k === "good" && info.size === "m");
+}
+// ⑤ 흐름 = 지금까지 사건 점수 합 (위 = 왼쪽 팀 우세). 골드가 아니라 경기 판정 점수 흐름 (Codex 주의)
+function rpFlowPoints(s, upto) {
+  const pts = [[0, 0]]; let mom = 0;
+  rpEvents(s).forEach(function (e) { if (e.t > upto) return; pts.push([e.t, mom]); mom += e.s === 0 ? e.x : -e.x; pts.push([e.t, mom]); });
+  pts.push([upto, mom]);
+  return pts;
+}
+// 높이 = 이 세트에서 가장 크게 벌어진 만큼 (세트 전체 기준이라 재생 중에 크기가 안 바뀜, 최소 flowMin)
+function rpFlowScale(s) {
+  let mx = REPLAY_SHOW.flowMin;
+  rpFlowPoints(s, s.box.min).forEach(function (p) { mx = Math.max(mx, Math.abs(p[1])); });
+  return mx * 1.1;
+}
+function rpFlowY(v, sc) { return 20 - Math.max(-1, Math.min(1, v / sc)) * 18; }
+function drawReplayFlow(s, done, min) {
+  const svg = document.getElementById("rp-flow-svg");
+  if (!svg) return;
+  const pts = rpFlowPoints(s, Math.min(RP.t, min)), sc = rpFlowScale(s);
+  const xy = pts.map(function (p) { return (p[0] / min * 100).toFixed(2) + " " + rpFlowY(p[1], sc).toFixed(2); });
+  const area = "M0 20 L" + xy.join(" L") + " L" + (Math.min(RP.t, min) / min * 100).toFixed(2) + " 20 Z";
+  svg.innerHTML = '<defs><clipPath id="rp-fl-up"><rect x="0" y="0" width="100" height="20"/></clipPath><clipPath id="rp-fl-dn"><rect x="0" y="20" width="100" height="20"/></clipPath></defs>' +
+    '<line class="rp-fl-mid" x1="0" y1="20" x2="100" y2="20"/>' +
+    '<path class="rp-fl-a" d="' + area + '" clip-path="url(#rp-fl-up)"/><path class="rp-fl-b" d="' + area + '" clip-path="url(#rp-fl-dn)"/>' +
+    '<polyline class="rp-fl-line" points="' + xy.join(" ") + '"/>' +
+    '<line class="rp-fl-x" id="rp-fl-x" x1="0" y1="0" x2="0" y2="40" opacity="0"/>';
+}
+function rpFlowTip(e, jump) {
+  if (!RP) return;
+  const box = document.getElementById("rp-flow"), tip = document.getElementById("rp-fl-tip"), x = document.getElementById("rp-fl-x");
+  const r = box.getBoundingClientRect(), m = rpMatch(), s = rpSet(), min = s.box.min;
+  const f = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), t = f * min;
+  if (jump) { RP.hl = null; replayPlay(false); RP.t = Math.round(t * 10) / 10; drawReplay(); return; }
+  const pts = rpFlowPoints(s, min); let v = 0;
+  pts.forEach(function (p) { if (p[0] <= t) v = p[1]; });
+  const lead = Math.abs(v) < 4 ? null : v > 0 ? m.a : m.b;
+  tip.textContent = (lead ? REPLAY_B_TEXT.flowTip.replace("{team}", teamShort(lead)) : REPLAY_B_TEXT.flowEven).replace("{t}", Math.floor(t));
+  tip.hidden = false;
+  tip.style.left = Math.max(0, Math.min(r.width - tip.offsetWidth, f * r.width - tip.offsetWidth / 2)) + "px";
+  if (x) { x.setAttribute("x1", f * 100); x.setAttribute("x2", f * 100); x.setAttribute("opacity", "1"); }
+}
+// ⑥ 지금이 큰 장면 앞뒤인가
+function rpSlowNow() {
+  const S = REPLAY_SHOW.slow;
+  return rpEvents(rpSet()).some(function (e) { return rpIsBig(e) && RP.t >= e.t - S.before && RP.t <= e.t + S.after; });
+}
+// ⑧ 하이라이트: 모든 세트의 큰 장면 + 내 장면을 차례로
+function rpHlStart() {
+  if (!RP) return;
+  const list = [];
+  rpMatch().detail.sets.forEach(function (s, si) {
+    rpEvents(s).forEach(function (e) { if (rpIsBig(e) || e.p === USER_ID || e.v === USER_ID) list.push({ si: si, t: e.t }); });
+  });
+  hideReplayEndBar(); hideReplayBanner();
+  if (!list.length) { rpCast(REPLAY_B_TEXT.hlNone); return; }
+  RP.hl = { list: list, k: -1, end: 0 };
+  rpHlNext();
+}
+function rpHlNext() {
+  const H = RP.hl, L = REPLAY_SHOW.hl;
+  H.k++;
+  if (H.k >= H.list.length) {
+    RP.hl = null; replayPlay(false); drawReplay();
+    replayEndBar("<div><b>" + REPLAY_B_TEXT.hlEnd + "</b></div>", "", null);
+    return;
+  }
+  const h = H.list[H.k], start = Math.max(0, h.t - L.lead);
+  if (h.si !== RP.setIdx || RP.t > start + 0.01 && RP.t > h.t) { RP.setIdx = h.si; RP.t = start; drawReplay(true); }
+  else if (RP.t < start) RP.t = start;
+  H.end = h.t + L.tail;
+  drawReplay();
+  if (!RP.playing) replayPlay(true); else requestAnimationFrame(replayTick);
 }
 // [설정] 화면 줄
 function replaySettingsHTML() {
