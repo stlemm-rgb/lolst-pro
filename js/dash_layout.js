@@ -72,7 +72,7 @@ function dashTilesHTML() {
 
 // 지금 필요한 경고·추천 (있을 때만 카드로)
 function dashAdviceMobileHTML() {
-  const rows = adviceRowsHTML(true, true) + ladderResetNoticeHTML();
+  const rows = adviceRowsHTML(true, true); // 솔랭 초기화 예고도 이 안에 (276)
   return rows ? '<div class="card dm-advice">' + rows + "</div>" : "";
 }
 
@@ -143,14 +143,13 @@ function dashWeekCardPcHTML(w) {
   const low = state.stamina < TIRED_LIMIT, warn = state.stamina < TEAM_MATCH.lowStaminaLimit;
   return '<div class="card upcoming wc"><div class="wc-hd"><b>▶ ' + state.year + "년 " + week + '주차 · 이번 주</b><span class="muted small">' +
       (w.matches.length ? "경기 " + w.matches.length + "개 · 우리 팀 전력 " + teamStrength(mine.id).toFixed(1) : escapeHTML(scheduleOfWeek(week).name)) + "</span></div>" +
-    '<div class="dp-wk">' + roomBlockHTML(w.matches.length) + // 이번 주 행동 그림 (js/room.js)
+    '<div class="dp-wk">' + roomBlockHTML(w.matches.length, false) + // 이번 주 행동 그림 (js/room.js), 아래 글 줄은 옆 칸과 겹쳐서 뺌 (276)
       '<div class="dp-side"><div class="wc-box"><span class="muted small">이번 주 훈련</span><b>' + (isInjured() ? "🩹 재활 중" : t ? escapeHTML(t.name) : '<span class="down">아직 안 골랐어요</span>') + "</b></div>" + // 240: 바꾸기는 바로가기 🏋️·위쪽 막대 배지
         '<div class="wc-box">' + miniBarHTML("체력", state.stamina, state.staminaMax, low ? "neg" : warn ? "warn" : "") + conditionBarHTML() + "</div></div></div>" +
     dashPcBarHTML() +
     dashMatchRowsHTML(w) +
     dashMiniStatsHTML() + dashQuestLinesHTML() + // 휴대폰과 같은 미니 스탯 · 퀘스트 한 줄씩
     adviceRowsHTML(true, true) + // 💡 이번 주 추천 (js/guide.js)
-    ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고 — 휴식 주·다음 주로 진행은 위쪽 막대에 (240)
   "</div>";
 }
 // PC 바로가기 6칸 (240·271): 📱 휴대폰 · 🏋️ 훈련 · ⚔️ 챔피언 연습 · 📋 퀘스트 · 🎬 지난 경기 · 🏠 집·고용 (data/ui.js QUICK_ACTIONS.pcIcons)

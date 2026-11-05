@@ -766,7 +766,6 @@ ul.howto li { margin: 4px 0; font-size: 14px; }
 .salary-details summary { cursor: pointer; color: var(--accent); font-size: 13px; margin: 2px 0 4px; }
 .salary-details .salary-breakdown { font-size: 13px; color: var(--muted); white-space: pre-line; }
 .warn-text { color: var(--gold); font-weight: bold; }
-.rep-row.ladder-reset { background: rgba(var(--gold-rgb), 0.08); }
 /* 아래로 펼쳐지는 말풍선 (카드 제목 등 위쪽이 좁을 때) */
 .tip.tip-down:hover::after, .tip.tip-down:focus::after { left: 0; transform: none; bottom: auto; top: calc(100% + 8px); max-width: 320px; font-size: 13px; font-weight: normal; }
 .tip-mark { font-size: 12px; color: var(--muted); }
@@ -1027,7 +1026,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .mcard .h2h-row { border-bottom: 0; padding: 3px 0; }
 /* 조합 전략 한 줄 선택칸 */
 .comp-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--panel-2); border-radius: var(--r-s); padding: 4px; margin: 6px 0; }
-.comp-seg button { border: 0; background: transparent; box-shadow: none; border-radius: 8px; padding: 9px 6px; min-width: 0; white-space: normal; }
+.comp-seg button { border: 0; background: transparent; box-shadow: none; border-radius: 8px; padding: 9px 6px; min-width: 0; white-space: normal; word-break: keep-all; } /* 276: 좁으면 단어 사이에서만 줄바꿈 ('따라가/기' 막기) */
 .comp-seg button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.06); transform: none; box-shadow: none; }
 .comp-seg button.on { background: var(--grad-btn); color: #fff; font-weight: bold; }
 .comp-seg button.rec { box-shadow: inset 0 0 0 1px var(--gold); }

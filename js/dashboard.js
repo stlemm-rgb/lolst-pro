@@ -426,16 +426,6 @@ function isPrePatchWeek(week) {
   return MASTERY.patchWeeks.some(function (pw) { return (pw === 1 ? CREATION.weeksPerSeason : pw - 1) === week; });
 }
 
-// 이번 주 솔로 랭크 초기화 예고 줄 (대시보드 '이번 주'·솔로 랭크 칸)
-function ladderResetNoticeHTML() {
-  if (!isPrePatchWeek(state.week)) return "";
-  const r = myLadderRank();
-  const top = leagueLadder()[0];
-  const gap = top && top.id !== USER_ID ? top.points - (state.soloRank ? state.soloRank.points : 0) : 0;
-  return '<div class="rep-row ladder-reset"><span class="rep-tag rank">랭크</span>⚠️ 이번 주가 끝나면 패치로 <b>솔로 랭크 초기화</b> (' + LADDER.resetPoints.toLocaleString() + "점) · 지금 리그 <b>" + r + "위</b>" +
-    (r === 1 ? " · 이대로면 👑 솔랭 1위 칭호!" : gap > 0 ? " · 1위와 " + gap.toLocaleString() + "점 차이" : "") + "</div>";
-}
-
 // 랭크 시즌 1위 칭호: 지금 1위에게 주고, 예전 1위에게서는 뺌
 function crownLadderKing() {
   const id = LADDER.kingTrait;
@@ -531,7 +521,6 @@ function heroCardHTML(compact) { // compact (225): 대시보드 오른쪽 좁은
         '<div class="hero-ladder tip" tabindex="0" data-tip="' + escapeHTML(ladderTip) + '">' + tierEmblemSVG(sr.points, 26) +
           '<span><b style="color:' + ladderTierInfo(sr.points).color + '">' + ladderTier(sr.points) + "</b> " + sr.points.toLocaleString() + '점 <span class="muted">· 솔랭 ' + myLadderRank + "위</span></span>" + weekLadderHTML() + "</div>" +
         (hasTrait(LADDER.kingTrait) ? '<div class="small king">👑 지난 랭크 시즌 1위 · 경기력 +3%</div>' : "") +
-        (isPrePatchWeek(state.week) ? '<div class="small warn-text">⚠️ 이번 주 끝에 솔로 랭크 초기화</div>' : "") +
         fameLineHTML() + // 스타 등급·팬 수·평판 등급 (js/fame.js)
         standingLineHTML() + // 팀 내 입지 (js/standing.js)
         homeLineHTML() +

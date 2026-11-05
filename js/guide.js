@@ -258,10 +258,12 @@ function weekAdvice(noQuest) {
   } else if (hasMatch && state.stamina < TEAM_MATCH.lowStaminaLimit) {
     list.push({ text: "이번 주 경기가 있는데 체력 " + state.stamina + ". " + TEAM_MATCH.lowStaminaLimit + " 미만이면 경기력 −" + Math.round(TEAM_MATCH.lowStaminaCut * 100) + "%. 쉬면 경기 전에 회복돼요.", label: "휴식 주로 진행", act: { rest: true } });
   }
-  // 2-1) 패치 전 주: 솔로 랭크 초기화 예고 (이번 주만 의미 있으니 앞쪽에)
+  // 2-1) 패치 전 주: 솔로 랭크 초기화 예고 (이번 주만 의미 있으니 앞쪽에) — 276: 대시보드의 따로 있던 경고 줄·선수 카드 경고를 여기 하나로 합침
   if (isPrePatchWeek(state.week)) {
-    const r = myLadderRank();
-    list.push({ text: "이번 주가 끝나면 솔로 랭크가 초기화돼요. 지금 리그 " + r + "위" + (r <= 3 ? " — 1위면 👑 칭호(경기력 +3%)!" : "."),
+    const r = myLadderRank(), top = leagueLadder()[0];
+    const gap = top && top.id !== USER_ID ? top.points - (state.soloRank ? state.soloRank.points : 0) : 0;
+    list.push({ text: "⚠️ 이번 주가 끝나면 패치로 솔로 랭크가 초기화돼요 (" + LADDER.resetPoints.toLocaleString() + "점). 지금 리그 " + r + "위" +
+      (r === 1 ? " — 이대로면 👑 솔랭 1위 칭호(경기력 +3%)!" : (gap > 0 ? " · 1위와 " + gap.toLocaleString() + "점 차이" : "") + (r <= 3 ? " — 1위면 👑 칭호(경기력 +3%)!" : ".")),
       label: state.plan === "solo_rank" ? "솔로 랭크 선택됨" : "솔로 랭크로 선택", act: { plan: "solo_rank" } });
   }
   // 2-2) 월드 우승 스킨 챔피언 고르기 (js/collection.js)
