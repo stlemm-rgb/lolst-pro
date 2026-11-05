@@ -404,7 +404,8 @@ button.big { padding: 12px 28px; font-size: 17px; }
 
 /* 챔피언 */
 .chip.meta { border-color: var(--gold); color: var(--gold); cursor: default; }
-.meta-tag { font-size: 10px; color: var(--gold); border: 1px solid var(--gold); border-radius: var(--r-xs); padding: 0 3px; }
+/* 273: 읽는 글자는 최소 11px (숫자 배지·단축키 표시·● 점은 그대로 작게) */
+.meta-tag { font-size: 11px; color: var(--gold); border: 1px solid var(--gold); border-radius: var(--r-xs); padding: 0 3px; }
 .mastery-list { margin-top: 12px; }
 select {
   font: inherit;
@@ -420,7 +421,7 @@ select {
 .badge-easy { font-size: 11px; color: var(--good); border: 1px solid var(--good); border-radius: var(--r-xs); padding: 1px 5px; vertical-align: middle; }
 
 /* 챔피언 유형 */
-.type-tag { font-size: 10px; border-radius: var(--r-xs); padding: 0 3px; border: 1px solid var(--border); color: var(--muted); }
+.type-tag { font-size: 11px; border-radius: var(--r-xs); padding: 0 3px; border: 1px solid var(--border); color: var(--muted); }
 .type-tag.carry, .bar-fill.type-carry { border-color: var(--carry); color: var(--carry); }
 .type-tag.utility, .bar-fill.type-utility { border-color: var(--good); color: var(--good); }
 .type-tag.aggro, .bar-fill.type-aggro { border-color: var(--bad); color: var(--bad); }
@@ -911,7 +912,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .stat-radar { width: 100%; height: auto; display: block; }
 .stat-radar .rd-grid { fill: none; stroke: var(--border); stroke-width: 1; }
 .stat-radar .rd-axis { stroke: var(--border); stroke-width: 1; }
-.stat-radar .rd-tick { fill: var(--muted); font-size: 9px; }
+.stat-radar .rd-tick { fill: var(--muted); font-size: 10px; }
 .stat-radar .rd-label { fill: var(--text); font-size: 11px; }
 .stat-radar .rd-label.bonus { fill: var(--gold); }
 .stat-radar .rd-val { fill: var(--muted); font-weight: bold; }
@@ -1025,7 +1026,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .comp-seg button:hover:not(:disabled) { background: rgba(255, 255, 255, 0.06); transform: none; box-shadow: none; }
 .comp-seg button.on { background: var(--grad-btn); color: #fff; font-weight: bold; }
 .comp-seg button.rec { box-shadow: inset 0 0 0 1px var(--gold); }
-.comp-seg .rec-tag { display: block; font-size: 10px; color: var(--gold); }
+.comp-seg .rec-tag { display: block; font-size: 11px; color: var(--gold); }
 .comp-seg button.on .rec-tag { color: var(--gold-light); }
 /* 최근 경기 승패 칸 */
 .wl-chips { display: flex; gap: 6px; margin-bottom: 8px; }
@@ -1252,10 +1253,11 @@ table.standings tr.cut td { border-bottom: 1px dashed rgba(var(--gold-rgb), 0.5)
 .clubs-grid .club-name { min-width: 0; }
 .clubs-grid .club > :not(.club-stripe):not(.club-head) { margin-left: 14px; margin-right: 14px; }
 .club-faces { display: flex; gap: 4px; margin-top: 10px; margin-bottom: 8px; }
-.club-faces .cf { width: 54px; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; min-width: 0; }
+.club-faces .cf { flex: 1 1 0; max-width: 72px; text-align: center; font-size: 11px; display: flex; flex-direction: column; align-items: center; min-width: 0; }
 .club-faces .cf img { border-radius: 8px; background: var(--track); margin-bottom: 2px; }
 .club-faces .cf b { font-weight: normal; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.club-faces .cf small { color: var(--muted); font-size: 10px; }
+.club-faces .cf small { color: var(--muted); font-size: 11px; }
+@media (max-width: 380px) { .club-faces { gap: 2px; } .club-faces .cf b { letter-spacing: -0.4px; } } /* 273: 작은 휴대폰에서 긴 이름(ShowMakar)이 잘려서 */
 .club-kv { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
 .club-kv .pwbar { flex: 1; } .club-kv .pwbar-in { width: 100%; }
 .club-kv b { color: var(--text); font-weight: normal; white-space: nowrap; }
@@ -1296,7 +1298,7 @@ table.standings tr.cut td { border-bottom: 1px dashed rgba(var(--gold-rgb), 0.5)
 .aw-sub { margin: 12px 0 6px; font-size: 13px; font-weight: bold; }
 .allpro { display: flex; gap: 8px; flex-wrap: wrap; }
 .ap { width: 72px; text-align: center; font-size: 12px; display: flex; flex-direction: column; align-items: center; padding: 6px 2px; border-radius: var(--r-s); }
-.ap small { color: var(--muted); font-size: 10.5px; }
+.ap small { color: var(--muted); font-size: 11px; }
 /* 이적 시장: 내 계약 */
 .ct-top { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
 .ct-money { font-size: 24px; font-weight: bold; margin-top: 2px; }
@@ -1513,7 +1515,7 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ptr-end { fill: var(--accent); }
 .ptr-card.gold .ptr-end { fill: var(--gold); }
 .ptr-hit { fill: transparent; }
-.ptr-axis { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); }
+.ptr-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
 .ptr-empty { padding: 14px 0; }
 @media (max-width: 760px) { .ptrend { grid-template-columns: 1fr; } }
 /* ④ 칭호 */
@@ -1548,8 +1550,8 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ph-cmp th { text-align: left; font-weight: 400; color: var(--muted); padding: 2px 4px; border-bottom: 1px solid #26263d; }
 .ph-cmp td { padding: 6px 4px; border-bottom: 1px solid #1e1e30; vertical-align: top; }
 .ph-cmp tr[data-deckopen] { cursor: pointer; } .ph-cmp tr[data-deckopen]:hover td { background: rgba(var(--accent-rgb), 0.06); }
-.ph-cmp small { color: var(--muted); font-size: 10px; }
-.ph-tag { font-size: 10px; color: var(--accent); border: 1px solid rgba(var(--accent-rgb), 0.5); border-radius: 999px; padding: 0 5px; }
+.ph-cmp small { color: var(--muted); font-size: 11px; }
+.ph-tag { font-size: 11px; color: var(--accent); border: 1px solid rgba(var(--accent-rgb), 0.5); border-radius: 999px; padding: 0 5px; }
 .ph-note.warn { color: #ffb4c6; background: rgba(var(--bad-rgb), 0.08); border-color: rgba(var(--bad-rgb), 0.35); }
 /* 221: 휴대폰 창 (대시보드 [📱 휴대폰 열기]) */
 #phone-overlay { position: fixed; inset: 0; z-index: 1040; background: rgba(4, 4, 10, 0.72); display: flex; align-items: center; justify-content: center; padding: 16px; }
@@ -1594,7 +1596,7 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ph-bub { background: #1d1d2e; border-radius: 6px 18px 18px 18px; padding: 9px 12px; font-size: 14px; line-height: 1.6; white-space: pre-line; min-width: 0; }
 .ph-bt { display: block; font-size: 12px; color: var(--accent); margin-bottom: 2px; white-space: normal; }
 .ph-out { align-self: flex-end; display: flex; gap: 6px; align-items: flex-end; max-width: 85%; }
-.ph-read { font-size: 10px; color: var(--muted); flex: none; }
+.ph-read { font-size: 11px; color: var(--muted); flex: none; }
 .ph-me { background: var(--grad-btn); color: #fff; border-radius: 18px 18px 6px 18px; padding: 8px 12px; font-size: 14px; line-height: 1.5; }
 .ph-sys { align-self: center; max-width: 94%; text-align: center; font-size: 13px; line-height: 1.6; color: #d6d6e8; background: rgba(var(--accent-rgb), 0.07); border: 1px solid rgba(var(--accent-rgb), 0.25); border-radius: 14px; padding: 9px 12px; white-space: pre-line; }
 .ph-bub .log-changes, .ph-bub .msg-notes, .ph-sys .log-changes { margin-top: 6px; padding: 0; font-size: 12px; }
