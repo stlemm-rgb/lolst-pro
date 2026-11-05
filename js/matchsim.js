@@ -813,6 +813,28 @@ function nextUserMatch() {
 }
 
 // 내 팀이 한 경기들 (최근 것부터)
+// 298 경기 목록을 대회별로 묶기: 같은 대회(comp)가 이어지는 동안 한 덩어리 → [{ comp, title, items, w, l }]
+//   list 순서는 그대로 (최근 먼저면 덩어리도 최근 먼저). w/l = 우리 팀 승패 (끝난 경기만)
+function matchGroups(list) {
+  const mine = myTeam(), G = NEWS_GROUP_TEXT, out = [];
+  const strip = function (label) { return String(label || "").replace(/\s+(\d+라운드|\d+강|결승|[A-Z]조)$/, ""); };
+  list.forEach(function (m) {
+    let g = out[out.length - 1];
+    if (!g || g.comp !== m.comp) { g = { comp: m.comp, names: [], items: [], w: 0, l: 0 }; out.push(g); }
+    g.items.push(m);
+    if (g.names.indexOf(strip(m.label)) === -1) g.names.push(strip(m.label));
+    if (m.winner && mine && (m.a === mine.id || m.b === mine.id)) { if (m.winner === mine.id) g.w++; else g.l++; }
+  });
+  out.forEach(function (g) {
+    // 이름이 여럿이면 앞에서부터 같은 낱말까지 ("KeSPA 컵 플레이오프" + "KeSPA 컵" → "KeSPA 컵")
+    let words = g.names[0].split(" ");
+    g.names.slice(1).forEach(function (n) { const ws = n.split(" "); let k = 0; while (k < words.length && words[k] === ws[k]) k++; words = words.slice(0, k); });
+    g.title = (G.compTitle && G.compTitle[g.comp]) || words.join(" ") || g.names[0];
+  });
+  return out;
+}
+function matchGroupRecord(g) { return g.w + g.l ? NEWS_GROUP_TEXT.compRecord.replace("{w}", g.w).replace("{l}", g.l) : ""; }
+
 function userMatches() {
   const mine = myTeam();
   if (!mine) return [];

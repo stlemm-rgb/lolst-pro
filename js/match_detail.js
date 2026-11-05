@@ -199,7 +199,7 @@ pages.results = function () {
   if (!m || !m.detail) { m = list[0]; resultsKey = matchKey(m); }
   const mine = myTeam();
 
-  const items = list.map(function (x) {
+  const itemOf = function (x, gTitle) {
     const key = matchKey(x);
     const mineIn = mine && (x.a === mine.id || x.b === mine.id);
     const won = mineIn && x.winner === mine.id;
@@ -207,10 +207,14 @@ pages.results = function () {
     const title = mineIn ? "vs " + escapeHTML(teamName(opp)) : escapeHTML(teamShort(x.a)) + " vs " + escapeHTML(teamShort(x.b));
     const score = mineIn ? (x.a === mine.id ? x.score[0] + ":" + x.score[1] : x.score[1] + ":" + x.score[0]) : x.score[0] + ":" + x.score[1];
     return '<div class="res-item' + (key === resultsKey ? " sel" : "") + '" data-rsel="' + key + '">' +
-      '<div class="muted small">' + x.week + "주 · " + escapeHTML(x.label) + "</div>" +
+      '<div class="muted small">' + x.week + "주 · " + escapeHTML(x.label.indexOf(gTitle + " ") === 0 ? x.label.slice(gTitle.length + 1) : x.label) + "</div>" + // 298: 대회 이름은 소제목에 있으니 줄에서는 라운드만
       "<div>" + (mineIn ? '<span class="rep-tag ' + (won ? "win" : "lose") + '">' + (won ? "승" : "패") + "</span> " : '<span class="rep-tag train">결승</span> ') +
         title + " <b>" + score + "</b></div>" +
     "</div>";
+  };
+  // 298: 대회별 소제목 (최근 대회 먼저, 우리 팀 승패)
+  const items = matchGroups(list).map(function (g) {
+    return '<div class="res-grp">' + escapeHTML(g.title) + ' <span class="muted small">' + matchGroupRecord(g) + "</span></div>" + g.items.map(function (x) { return itemOf(x, g.title); }).join("");
   }).join("");
 
   const tabs = ['<button data-rtab="sum"' + (resultsTab === "sum" ? ' class="primary"' : "") + ">경기 요약</button>"].concat(m.detail.sets.map(function (s, i) {

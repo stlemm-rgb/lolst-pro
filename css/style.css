@@ -2293,3 +2293,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 table.tlog tr.tlog-when th { text-align: left; padding-top: 12px; font-size: 14px; color: var(--accent); border-bottom: 1px solid var(--border); }
 table.tlog tr.tlog-team td { padding-top: 8px; font-weight: 700; }
 table.tlog tr.tlog-team.me td { color: var(--gold); }
+
+/* 298 경기 결과 목록 · 우리 팀 경기 표의 대회별 소제목 (js/matchsim.js matchGroups) */
+.res-grp { font-size: 13px; font-weight: 700; color: var(--accent); margin: 12px 4px 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+.res-grp:first-of-type { margin-top: 4px; }
+table.matches tr.ms-grp th { text-align: left; padding-top: 12px; font-size: 14px; color: var(--accent); border-bottom: 1px solid var(--border); }

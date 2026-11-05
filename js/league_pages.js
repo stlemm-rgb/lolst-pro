@@ -325,10 +325,15 @@ function bracketHTML(def) {
 // 시즌 일정 화면 아래에 붙는 "우리 팀 경기" 표
 function userScheduleHTML() {
   const list = userMatches().slice().sort(function (x, y) { return x.week - y.week; });
+  // 298: 대회별 소제목 줄, 지금(최근) 대회가 맨 위 · 대회 안은 주차 순
+  const groups = matchGroups(list).reverse();
   return (
     '<div class="card"><h2>우리 팀 경기 <span class="muted small">' + escapeHTML(myTeam().name) + "</span></h2>" +
       (list.length
-        ? '<table class="matches">' + list.map(function (m) { return matchRowHTML(m, true); }).join("") + "</table>"
+        ? '<table class="matches">' + groups.map(function (g) {
+            return '<tr class="ms-grp"><th colspan="6">' + escapeHTML(g.title) + ' <span class="muted small">' + matchGroupRecord(g) + "</span></th></tr>" +
+              g.items.map(function (m) { return matchRowHTML(m, true); }).join("");
+          }).join("") + "</table>"
         : '<p class="muted small">아직 잡힌 경기가 없어요. 경기 일정은 각 대회가 시작될 때 정해져요.</p>') +
     "</div>"
   );

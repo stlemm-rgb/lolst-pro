@@ -325,6 +325,9 @@ const NEWS_GROUP_TEXT = {
   allstar: ["포지션", "팀 블루", "팀 레드"], // 298 올스타전 소식 (js/news.js msgTextHTML)
   era: ["항목", "지금"],                      // 298 2012 리그 소개 기사 (eraIntro)
   mineMark: "★ ",
+  // 298 경기 목록 대회별 묶음 (js/matchsim.js matchGroups): 이름은 경기 이름 끝의 '1라운드·4강·결승·A조'를 떼서 만들고, 여기 있는 대회는 이 이름으로
+  compTitle: { worlds_group: "월드 조별 리그", worlds_ko: "월드 토너먼트" },
+  compRecord: "{w}승 {l}패",
 };
 
 // ===== 후반 '위기감' 기사 (281, Codex 4번 아이디어 · 사용자 A안) — 코드: js/news.js crisisNewsWeek =====
