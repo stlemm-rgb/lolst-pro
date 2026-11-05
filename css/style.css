@@ -2209,3 +2209,18 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 #to-top { position: fixed; right: 16px; bottom: 24px; z-index: 65; width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 16px; opacity: 0; pointer-events: none; transition: opacity 0.2s; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45); }
 #to-top.show { opacity: 0.9; pointer-events: auto; }
 @media (max-width: 760px) { #to-top { right: 12px; bottom: calc(150px + env(safe-area-inset-bottom)); } }
+
+/* 289 경기 재생 중계 연출 A (js/replay.js): ② 캐스터 자막 · ① 승부처 큰 글씨 · ⑩ POG 카드 */
+.rp-cast { display: flex; align-items: center; gap: 8px; min-height: 34px; margin: 8px 0 0; padding: 6px 10px; border-radius: var(--r-s); background: var(--panel-2); border: 1px solid var(--border); font-size: 13.5px; font-weight: 600; }
+.rp-cast .rp-mic { flex: none; }
+.rp-cast.pop { animation: rpCastPop 0.45s ease-out; }
+@keyframes rpCastPop { from { background: rgba(var(--accent-rgb), 0.28); } to { background: var(--panel-2); } }
+.rp-call { position: absolute; left: 50%; top: 50%; z-index: 6; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 4px; max-width: 86%; padding: 10px 16px; border-radius: 14px; background: rgba(8, 8, 16, 0.84); border: 2px solid var(--side-a); box-shadow: 0 0 24px rgba(0, 0, 0, 0.6); pointer-events: none; text-align: center; animation: rpCall var(--rp-call-ms, 1700ms) ease-out both; }
+.rp-call.b { border-color: var(--side-b); }
+.rp-call.me { border-color: var(--gold); }
+.rp-call b { font-size: 20px; line-height: 1.25; color: #fff; word-break: keep-all; }
+.rp-call span { font-size: 12px; color: var(--muted); }
+@keyframes rpCall { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); } 12% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); } 22% { transform: translate(-50%, -50%) scale(1); } 82% { opacity: 1; } 100% { opacity: 0; } }
+.rp-pog { display: flex; align-items: center; gap: 12px; margin: 8px 0; padding: 10px 12px; border-radius: var(--r-s); background: rgba(var(--gold-rgb), 0.08); border: 1px solid rgba(var(--gold-rgb), 0.5); text-align: left; }
+.rp-pog .rp-pog-h { color: var(--gold); margin-bottom: 2px; }
+@media (max-width: 760px) { .rp-call b { font-size: 17px; } .rp-cast { font-size: 13px; } }

@@ -76,6 +76,7 @@ function replayShellHTML(m) {
     '<div class="rp-setbar" id="rp-setbar"></div>' +
     '<div class="rp-stage"><div>' +
       '<div class="rp-map" id="rp-map"></div>' +
+      '<div class="rp-cast" id="rp-cast"><span class="rp-mic">🎙️</span><span id="rp-cast-t"></span></div>' + // 289 ② 캐스터 자막
       '<div class="rp-mom"><div class="rp-mom-bar"><i id="rp-mom"></i><b></b></div><div class="rp-mom-lbl"><span>' + escapeHTML(teamShort(m.a)) + '</span><span>경기 흐름</span><span>' + escapeHTML(teamShort(m.b)) + "</span></div></div>" +
       '<div class="rp-tl" id="rp-tl"><div class="rp-fill" id="rp-fill"></div><div class="rp-head" id="rp-head"></div></div>' +
       '<div class="rp-ctrl"><button class="primary" data-rpplay="1" id="rp-play">▶ 재생</button>' + speeds + '<button data-rpskip="1">⏭ 결과 보기</button></div>' +
@@ -135,8 +136,16 @@ function drawReplay(reset) {
   }
   const evs = rpEvents(s), done = evs.filter(function (e) { return e.t <= RP.t; });
   if (RP.shown > done.length) { document.getElementById("rp-map").innerHTML = REPLAY_MAP_SVG; document.getElementById("rp-feed").innerHTML = ""; rpResetMeCount(); RP.shown = 0; }
+  const added = done.length - RP.shown;
   for (let i = RP.shown; i < done.length; i++) rpAddEvent(m, done[i], i);
   RP.shown = done.length;
+  // 289 ①② 중계: 새 장면이 나오면 그 장면 한 줄 + (재생 중이고 한꺼번에 많이 건너뛴 게 아니면) 승부처 큰 글씨, 한동안 없으면 시간대 중계
+  if (reset) { RP.castT = 0; rpCast(rpIdleLine(0)); }
+  if (added > 0) {
+    const li = done.length - 1;
+    rpCast(rpCasterLine(m, done[li], li)); RP.castT = RP.t;
+    if (RP.playing && added <= 2) rpCallout(m, done[li]);
+  } else if (RP.playing && RP.t - (RP.castT || 0) >= REPLAY_SHOW.idleMin) { rpCast(rpIdleLine(RP.t)); RP.castT = RP.t; }
   let mom = 0;
   done.forEach(function (e) { mom += e.s === 0 ? e.x : -e.x; });
   document.getElementById("rp-mom").style.width = (50 + Math.max(-1, Math.min(1, mom / REPLAY_RULES.momentumScale)) * 50) + "%";
@@ -203,6 +212,7 @@ function replayJumpTo(e, i) {
   hideReplayBanner();
   RP.t = e.t;
   drawReplay();
+  rpCast(rpCasterLine(rpMatch(), e, i)); // 289: 고른 장면의 중계 한 줄
   const pb = document.getElementById("rp-play");
   if (pb) pb.textContent = "▶ 재생";
   const map = document.getElementById("rp-map");
@@ -266,7 +276,7 @@ function replayFinal() {
   const more = RP.qi < RP.queue.length - 1;
   const hi = Math.max(m.score[0], m.score[1]), lo = Math.min(m.score[0], m.score[1]);
   replayEndBar('<div class="rp-endres">' + (mineIn ? (won ? '<b class="up">승리!</b>' : '<b class="down">패배</b>') : "<b>경기 종료</b>") + " · " + rpUni(uniformOfTeam(m.winner)) + " " + escapeHTML(teamName(m.winner)) + " " + hi + " : " + lo +
-    (m.pogName ? ' <span class="muted">· 🏅 POG ' + escapeHTML(m.pogName) + "</span>" : "") + "</div>" +
+    (m.pogName ? ' <span class="muted">· 🏅 POG ' + escapeHTML(m.pogName) + "</span>" : "") + "</div>" + rpPogCardHTML(m) + // 289 ⑩
     '<div class="rp-ctrl">' + (more ? '<button class="primary" data-rpnext="1">다음 경기 ▶</button>' : "") + '<button data-rpclose="1">닫기</button></div>', won ? "win" : "",
     function () { RP.qi++; startReplayMatch(); });
   if (won) replayConfetti(uniformOfTeam(m.winner));
@@ -340,6 +350,63 @@ function bindReplay() {
     RP.t = Math.max(0, Math.min(min, (e.clientX - r.left) / r.width * min));
     drawReplay();
   };
+}
+// ----- 289 중계 연출 A (글: data/replay.js REPLAY_CASTER·REPLAY_IDLE·REPLAY_CALL·REPLAY_POG) — 무작위 없이 세트·장면 번호로 고름 -----
+function rpCast(text) {
+  const t = document.getElementById("rp-cast-t"), box = document.getElementById("rp-cast");
+  if (!t || !box) return;
+  t.textContent = text;
+  box.classList.remove("pop"); void box.offsetWidth; box.classList.add("pop"); // 바뀔 때마다 살짝 반짝
+}
+function rpPick(list, n) { return list[((n % list.length) + list.length) % list.length]; }
+function rpIdleLine(t) {
+  const P = REPLAY_SHOW.phase, key = t < P[0] ? "lane" : t < P[1] ? "mid" : "late";
+  return rpPick(REPLAY_IDLE[key], (RP ? RP.setIdx * 5 : 0) + Math.floor(t / REPLAY_SHOW.idleMin));
+}
+function rpCasterLine(m, e, i) {
+  const info = matchEventInfo(e) || {};
+  const cat = e.e === "solo" ? "lane" : e.e.indexOf("fin:") === 0 ? "fin" : info.cat;
+  const g = REPLAY_CASTER[cat] || REPLAY_CASTER.play;
+  const kind = e.k === "psych" ? (info.psy ? (info.psy.mood > 0 ? "good" : "bad") : "psych") : e.k;
+  const list = g[kind] || g.good;
+  const who = function (id, side, pos) { return id ? playerName(id) : teamShort(side ? m.b : m.a) + " " + (pos ? findPosition(pos).name : ""); };
+  return rpPick(list, RP.setIdx * 31 + i * 7).split("{p}").join(who(e.p, e.s, e.pp)).split("{v}").join(e.v || e.vp ? who(e.v, 1 - e.s, e.vp) : "상대")
+    .split("{team}").join(teamShort(e.s ? m.b : m.a));
+}
+// ① 승부처 큰 글씨: 크기 '대' 사건, 내 선수의 '중' 이상 좋은 장면, 마무리 장면
+function rpCallout(m, e) {
+  const info = matchEventInfo(e) || {};
+  const fin = e.e.indexOf("fin:") === 0;
+  if (!(info.size === "l" || fin || (e.p === USER_ID && e.k === "good" && info.size === "m"))) return;
+  const map = document.getElementById("rp-map");
+  if (!map) return;
+  map.querySelectorAll(".rp-call").forEach(function (x) { x.remove(); });
+  const side = e.k === "bad" ? 1 - e.s : e.s;
+  const el = document.createElement("div");
+  el.className = "rp-call " + (side ? "b" : "a") + (e.p === USER_ID ? " me" : "");
+  el.style.setProperty("--rp-call-ms", REPLAY_SHOW.callMs + "ms");
+  el.innerHTML = (e.p ? portraitImg(e.p, { face: true, size: 44 }) : "") + "<b>" + (info.icon || "") + " " + escapeHTML(info.name || "") + (fin ? REPLAY_CALL.fin : e.k === "bad" ? REPLAY_CALL.bad : REPLAY_CALL.good) + "</b>" +
+    (e.p ? "<span>" + escapeHTML(playerName(e.p)) + " · " + escapeHTML(teamShort(e.s ? m.b : m.a)) + "</span>" : "");
+  map.appendChild(el);
+  setTimeout(function () { el.remove(); }, REPLAY_SHOW.callMs);
+}
+// ⑩ 경기 끝 POG 카드: 도트 얼굴 · 경기 합계 K/D/A · 대표 장면(POG의 가장 큰 좋은 장면)
+function rpPogCardHTML(m) {
+  const id = m.pog;
+  if (!id) return "";
+  let k = 0, d = 0, a = 0, side = 0, best = null, bestSet = 0;
+  m.detail.sets.forEach(function (s, si) {
+    (s.lanes || []).forEach(function (l, i) {
+      const b = l.a === id ? s.box.a[i] : l.b === id ? s.box.b[i] : null;
+      if (b) { k += b.k; d += b.d; a += b.a; side = l.a === id ? 0 : 1; }
+    });
+    rpEvents(s).forEach(function (e) { if (e.p === id && e.k === "good" && (!best || Math.abs(e.x) > Math.abs(best.x))) { best = e; bestSet = si; } });
+  });
+  const scene = best ? ((matchEventInfo(best) || {}).icon || "") + " " + (bestSet + 1) + "세트 " + best.t + "분 · " + matchEventText(best, rpName(m)) : "";
+  return '<div class="rp-pog"><span class="pf-frame">' + portraitImg(id, { scale: 2, teamId: side ? m.b : m.a }) + "</span><div>" +
+    '<div class="rp-pog-h">' + REPLAY_POG.title + " · <b>" + escapeHTML(playerName(id)) + '</b> <span class="muted small">' + escapeHTML(teamShort(side ? m.b : m.a)) + "</span></div>" +
+    '<div class="small">' + REPLAY_POG.kda + " <b>" + k + " / " + d + " / " + a + "</b></div>" +
+    (scene ? '<div class="small">' + REPLAY_POG.scene + ": " + scene + "</div>" : "") + "</div></div>";
 }
 // [설정] 화면 줄
 function replaySettingsHTML() {
