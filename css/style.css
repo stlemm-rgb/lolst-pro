@@ -2275,6 +2275,9 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .rp-dr-row .rp-dr-ch { grid-column: 3; font-size: 12px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .rp-dr-row.me b { color: var(--gold); }
 .rp-dr-ban { font-size: 13px; color: var(--bad); }
+.ban-why { display: inline-block; font-size: 11px; font-weight: 600; padding: 0 6px; border-radius: 99px; border: 1px solid var(--border); color: var(--muted); white-space: nowrap; } /* 305 밴 이유 */
+.ban-why.f { color: var(--bad); border-color: rgba(var(--side-b-rgb), 0.5); }
+.ban-why.s, .ban-why.o { color: var(--gold); border-color: rgba(var(--gold-rgb), 0.5); }
 @keyframes rpDrIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @media (max-width: 560px) { .rp-dr { gap: 6px; } .rp-dr-col { padding: 6px; } .rp-dr-row { grid-template-columns: 24px 22px minmax(0, 1fr); column-gap: 4px; font-size: 12px; } .rp-dr-row .rp-dr-ch { font-size: 11px; } }
 

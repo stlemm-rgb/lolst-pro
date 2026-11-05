@@ -527,6 +527,15 @@ function rpDraftFirst() {
   if (REPLAY_DRAFT.autoMs > 0) RP.drTimer = setTimeout(function () { if (RP && RP.onNext === go) go(); }, REPLAY_DRAFT.autoMs);
   return true;
 }
+// 305: 밴된 챔피언 + 이유 꼬리표 (예전 기록은 이유 없이 이름만)
+function banWhyTagHTML(code) {
+  if (!code) return "";
+  const W = REPLAY_BAN_WHY, k = code.charAt(0), text = k === "r" ? W.r.replace("{n}", code.slice(1)) : W[k];
+  return text ? ' <span class="ban-why ' + k + '" title="' + escapeHTML(W.tip) + '">' + escapeHTML(text) + "</span>" : "";
+}
+function banWhyListHTML(s) {
+  return s.banned.map(function (n, i) { return "<b>" + escapeHTML(n) + "</b>" + banWhyTagHTML(s.banWhy ? s.banWhy[i] : null); }).join(" · ");
+}
 function replayDraftHTML(m, s) {
   const D = REPLAY_DRAFT;
   const col = function (side) {
@@ -538,7 +547,7 @@ function replayDraftHTML(m, s) {
           (id ? portraitImg(id, { face: true, size: 22 }) : "") + "<b>" + escapeHTML(id ? playerName(id) : "") + '</b><span class="rp-dr-ch">' + escapeHTML(bx.c || "") + "</span></div>";
       }).join("") + "</div>";
   };
-  const ban = s.banned && s.banned.length ? '<div class="rp-dr-ban">' + escapeHTML(D.ban.replace("{me}", state.player.name)) + ": " + s.banned.map(escapeHTML).join(" · ") + "</div>" : "";
+  const ban = s.banned && s.banned.length ? '<div class="rp-dr-ban">' + escapeHTML(D.ban.replace("{me}", state.player.name)) + ": " + banWhyListHTML(s) + "</div>" : "";
   return '<span class="rp-tag">' + escapeHTML(D.title.replace("{n}", RP.setIdx + 1)) + "</span>" + ban +
     '<div class="rp-dr" style="--step:' + D.stepS + 's">' + col(0) + col(1) + "</div>" +
     '<button class="primary" data-rpnext="1">' + D.go + "</button>" + '<div class="muted small">' + escapeHTML(D.hint) + "</div>";

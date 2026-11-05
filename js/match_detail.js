@@ -248,7 +248,7 @@ function matchHeaderHTML(m) {
         (d.sets.some(function (s) { return s.pick; })
           ? " · 내 픽 " + d.sets.map(function (s, i) {
               return (i + 1) + "세트 <b>" + escapeHTML(s.pick || "-") + "</b>" + (s.joker ? ' <span class="joker-tag">🃏</span>' : "") +
-                (s.banned && s.banned.length ? ' <span class="muted small">(밴: ' + s.banned.map(escapeHTML).join(", ") + ")</span>" : "");
+                (s.banned && s.banned.length ? ' <span class="muted small">(밴: ' + banWhyListHTML(s) + ")</span>" : ""); // 305 이유 꼬리표
             }).join(" · ")
           : d.pick ? " · 내 픽 <b>" + escapeHTML(d.pick) + "</b>" + (d.joker ? ' <span class="joker-tag">🃏 조커픽</span>' : "") : "") + "</div>" +
       '<div class="muted small">피어리스 밴픽' + helpBtnHTML(HELP_TIPS.fearless) + "</div>" +

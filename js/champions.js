@@ -324,10 +324,19 @@ function rollBans(exclude) {
   const banned = opForceBan(ranked, rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0), state.player.position); // 301 사고 챔피언은 먼저 밴되기 쉬움
   // 시그니처 픽: 메타와 상관없이 일정 확률로 먼저 밴 (밴 수는 최대 3)
   const sig = state.signature;
+  let sigAdded = false;
   if (sig && ranked.indexOf(sig) !== -1 && banned.indexOf(sig) === -1 && Math.random() < sigValue("banChance")) {
     banned.unshift(sig);
     if (banned.length > 3) banned.pop();
+    sigAdded = true;
   }
+  // 305: 밴 이유 (화면용, 난수 안 씀) — s 시그니처 · o 사기 챔피언(SS·SSS) · f 견제(숙련도 1위 메타) · r1~r5 상대가 경계하는 순위
+  banned.why = banned.map(function (n) {
+    if (sigAdded && n === sig) return "s";
+    if (opLiveTier(n, state.player.position)) return "o";
+    if (banned.focus === n) return "f";
+    return "r" + (ranked.indexOf(n) + 1);
+  });
   return banned;
 }
 
@@ -348,6 +357,7 @@ function rollBanList(ranked, topMeta, topMastery) {
   const banned = [];
   if (topMeta && Math.random() < focusBanChance(topMastery)) {
     banned.push(topMeta);
+    banned.focus = topMeta; // 305 밴 이유: 견제 밴 (화면용)
     count = Math.max(count, 1);
   }
   const pool = ranked.filter(function (n) { return banned.indexOf(n) === -1; }).slice(0, MATCH.banWeights.length);
