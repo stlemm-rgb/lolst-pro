@@ -27,9 +27,19 @@ function nameIndex() {
   const names = Object.keys(map).filter(function (n) { return n.length >= 2; })
     .sort(function (a, b) { return b.length - a.length; });
   if (!names.length) return null;
-  // 앞뒤가 영문·숫자면 다른 단어의 일부라서 제외 (한글 조사는 OK: "Ego가")
-  const re = new RegExp("(?<![A-Za-z0-9])(" + names.map(escapeRegExp).join("|") + ")(?![A-Za-z0-9])", "g");
+  // 앞뒤가 영문·숫자면 다른 단어의 일부라서 제외 (한글 조사는 OK: "Ego가") — 뒤는 정규식, 앞은 nextNameMatch에서
+  // 283: 예전엔 앞쪽도 정규식 (?<!…)로 봤는데 iOS 16.3 이하 Safari가 이 문법을 몰라 화면마다 오류 → 직접 확인으로 바꿈 (결과는 같음)
+  const re = new RegExp("(" + names.map(escapeRegExp).join("|") + ")(?![A-Za-z0-9])", "g");
   return { map: map, re: re };
+}
+// 다음 이름 찾기: 바로 앞 글자가 영문·숫자면 건너뛰고 한 글자 뒤부터 다시 (= 예전 (?<![A-Za-z0-9]) 와 같은 결과)
+function nextNameMatch(re, text) {
+  let m;
+  while ((m = re.exec(text))) {
+    if (m.index === 0 || !/[A-Za-z0-9]/.test(text.charAt(m.index - 1))) return m;
+    re.lastIndex = m.index + 1;
+  }
+  return null;
 }
 
 function linkifyNames(root) {
@@ -48,11 +58,11 @@ function linkifyNames(root) {
   nodes.forEach(function (node) {
     const text = node.nodeValue;
     idx.re.lastIndex = 0;
-    if (!idx.re.test(text)) return;
+    if (!nextNameMatch(idx.re, text)) return;
     idx.re.lastIndex = 0;
     const frag = document.createDocumentFragment();
     let last = 0, m;
-    while ((m = idx.re.exec(text))) {
+    while ((m = nextNameMatch(idx.re, text))) {
       if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
       const hit = idx.map[m[1]];
       const a = document.createElement("span");
