@@ -90,12 +90,12 @@ pages.awards = function () {
     const t = st.team && findTeam(st.team);
     return t && t.tier === awardsTier && (id === USER_ID || findPlayer(id));
   });
-  const race = function (title, list, valueFn, fmt, note) {
+  const race = function (title, list, valueFn, fmt, note, help) { // help: 계산법 ⓘ (280)
     const rows = list.slice(0, 5).map(function (id, i) {
       return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + rankBadgeHTML(i + 1) + "</td>" + faceTd(id) + "<td>" + escapeHTML(playerName(id)) +
         ' <span class="muted small">' + findPosition(playerPos(id)).name + " · " + escapeHTML(teamName(stats[id].team)) + '</span></td><td class="r"><b>' + fmt(valueFn(id)) + "</b></td></tr>";
     }).join("");
-    return '<div class="card"><h2>' + title + ' <span class="muted small">' + note + "</span></h2>" +
+    return '<div class="card"><h2>' + title + (note ? ' <span class="muted small">' + note + "</span>" : "") + (help ? helpBtnHTML(help) : "") + "</h2>" +
       (rows ? '<table class="mini">' + rows + "</table>" : emptyBoxHTML("🌱", "아직 기록이 없어요.")) + "</div>";
   };
   const minMvp = RECORDS.minSets.mvp;
@@ -145,7 +145,7 @@ pages.awards = function () {
     "<h1>개인 시상</h1>" +
     '<div class="card"><div class="buttons">' + tabs + '</div><p class="muted small">' + state.year + " 시즌 레이스 · " + myLine + "</p></div>" +
     '<div class="grid">' +
-      race("MVP 레이스", mvpList, function (id) { return mvpScore(id); }, function (v) { return v.toFixed(2); }, "평균 평점 + POG×" + RECORDS.pogWeight + ", 정규 시즌 " + minMvp + "세트 이상") +
+      race("MVP 레이스", mvpList, function (id) { return mvpScore(id); }, function (v) { return v.toFixed(2); }, "", HELP_TIPS.mvpRace.replace("{pog}", RECORDS.pogWeight).replace("{min}", minMvp)) +
       race("POG 순위", pogList, function (id) { return stats[id].pog; }, function (v) { return v + "회"; }, "모든 대회") +
       race("솔로킬 순위", soloList, function (id) { return stats[id].solo; }, function (v) { return v + "회"; }, "모든 대회") +
       race("신인왕 레이스", rookieList, function (id) { return avgRating(id, true); }, function (v) { return v.toFixed(2); }, RECORDS.rookieMaxAge + "세 이하") +

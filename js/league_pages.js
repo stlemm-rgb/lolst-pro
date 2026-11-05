@@ -141,7 +141,7 @@ pages.standings = function () {
     body = '<p class="muted small">그룹 배틀 전체 성적 상위 6팀이 LCK 컵 플레이오프에 진출해요.</p>' +
       standingsTableHTML(standings("cup", tier1Ids()), ["플레이오프", "플레이오프", "플레이오프", "플레이오프", "플레이오프", "플레이오프"]);
   } else if (standingsTab === "tier2") {
-    body = franchiseActive() ? '<p class="muted small">전반기 + 후반기 합산. 1부 10개 구단의 2군 리그예요 — 승강전은 없고, 1군 주전보다 강해지면 1군으로 콜업돼요.</p>' +
+    body = franchiseActive() ? '<p class="muted small">전반기 + 후반기 합산' + helpBtnHTML(HELP_TIPS.tier2Fr) + "</p>" +
       standingsTableHTML(standings(["tier2", "tier2b"], tier2Ids()), []) : '<p class="muted small">전반기 + 후반기 합산. 1·2위는 승강전에 나가요.</p>' +
       standingsTableHTML(standings(["tier2", "tier2b"], tier2Ids()), ["승강전", "승강전"]);
   } else {

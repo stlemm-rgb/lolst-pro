@@ -101,7 +101,7 @@ pages.search = function () {
         '<select id="s-origin">' + originOpts + "</select>" +
         '<select id="s-sort">' + sortOpts + "</select>" +
       "</div>" +
-      '<p class="muted small">' + total + "명" + (total > 80 ? " 중 80명 표시" : "") + " · 줄을 누르면 상세 스탯이 나와요.</p>" +
+      '<p class="muted small">' + total + "명" + (total > 80 ? " 중 80명 표시" : "") + helpBtnHTML(HELP_TIPS.search) + "</p>" + // 280: 인원은 그대로, 안내는 ⓘ
       (selectedPlayer && (selectedPlayer === USER_ID || findPlayer(selectedPlayer)) ? playerDetailHTML(selectedPlayer) : "") +
       '<table class="roster"><tr><th></th><th>이름</th><th>포지션</th><th>출신</th><th>소속</th><th>주력 챔피언</th><th class="r">나이</th><th class="r">스탯 점수</th><th class="r">연봉</th><th class="r">계약 만료</th></tr>' + rows + "</table>" +
     "</div>"
@@ -197,7 +197,7 @@ pages.clubs = function () {
       );
     }).join("") + "</div>";
   }).join("");
-  return "<h1>구단 탐색</h1>" + '<div class="card"><p class="muted small">구단을 누르면 선수단이 나와요. 순서는 리그 안 전력 순위예요.</p>' + cards + "</div>";
+  return "<h1>구단 탐색</h1>" + '<div class="card"><p class="muted small">리그 안 전력 순위 순' + helpBtnHTML(HELP_TIPS.clubs) + "</p>" + cards + "</div>"; // 280: 안내는 ⓘ (탭 화면이라 제목 줄은 지워짐 → 카드 안에)
 };
 
 function clubRosterHTML(teamId) {
@@ -245,12 +245,11 @@ function transferLogCardHTML() {
   list.forEach(function (e) { count[e.kind] = (count[e.kind] || 0) + 1; });
   const summary = Object.keys(TLOG_KIND).filter(function (k) { return count[k]; }).map(function (k) { return TLOG_KIND[k] + " " + count[k]; }).join(" · ");
   const btn = function (attr, val, cur, text) { return '<button class="small-btn' + (cur === val ? " primary" : "") + '" data-' + attr + '="' + val + '">' + text + "</button>"; };
-  return '<div class="card"><h2>📋 이적 목록 <span class="muted small">' + year + "년 · " + list.length + "건" + (summary ? " (" + summary + ")" : "") + "</span></h2>" +
+  return '<div class="card"><h2>📋 이적 목록 <span class="muted small">' + year + "년 · " + list.length + "건" + (summary ? " (" + summary + ")" : "") + "</span>" + helpBtnHTML(HELP_TIPS.tlog) + "</h2>" +
     '<div class="radar-ctrl">' + btn("tlog-year", 0, tlogYear, "올해") + " " + btn("tlog-year", 1, tlogYear, "작년") + " &nbsp; " +
       btn("tlog-filter", "all", tlogFilter, "전체") + " " + btn("tlog-filter", "t1", tlogFilter, "1부 관련") + " " + btn("tlog-filter", "mine", tlogFilter, "우리 팀") + "</div>" +
     (rows ? '<div class="table-wrap"><table class="roster tlog"><tr><th>시기</th><th>종류</th><th>선수</th><th>출신</th><th class="r">스탯 점수</th><th>이동</th><th class="r">이적료</th></tr>' + rows + "</table></div>"
       : '<p class="muted">' + year + "년 이적 기록이 없어요. 이적은 비시즌(새 시즌 시작)과 여름(" + SUMMER_MARKET.applyWeek + "주)에 일어나요.</p>") +
-    '<p class="muted small">💥 주전 이적: 돈 많은 1부 팀이 다른 1부 팀 주전을 비싸게 데려감 · 🧩 경쟁 후보: 주전과 실력이 비슷한 후보를 데려와 주전 경쟁 · 🎓 은퇴: 은퇴한 자리는 신인이 채움 · 스탯 점수는 이적할 때 기준</p>' +
     "</div>";
 }
 

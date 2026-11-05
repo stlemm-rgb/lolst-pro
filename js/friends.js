@@ -710,7 +710,7 @@ pages.friends = function () {
   for (let i = 0; i < R.bestMax; i++) {
     const id = best[i];
     if (!id) {
-      slots += '<div class="friend-slot empty"><div class="muted">빈 칸</div><div class="muted small">관계 ' + R.bestFrom + " 이상이 되면 절친이 돼요</div></div>";
+      slots += '<div class="friend-slot empty"><div class="muted">빈 칸</div></div>'; // 280: '관계 N 이상이면 절친'은 위 친구 활동 ⓘ와 겹쳐서 뺌
       continue;
     }
     const m = F.met[id] || {};
@@ -747,9 +747,10 @@ pages.friends = function () {
   }).join("");
 
   return "<h1>친구</h1>" +
-    '<div class="card"><h2>🤝 친구 활동 <span class="muted small">1년에 4번 (' + Object.keys(R.quarters).join("·") + "주)</span></h2>" +
+    '<div class="card"><h2>🤝 친구 활동 <span class="muted small">1년에 4번 (' + Object.keys(R.quarters).join("·") + "주)</span>" +
+      helpBtnHTML(HELP_TIPS.friends.replace("{friend}", R.friendFrom).replace("{best}", R.bestFrom).replace("{max}", R.bestMax)) + "</h2>" + // 280: 친구 규칙은 ⓘ
       "<p>다음 친구 활동: <b>" + (nx.year !== state.year ? nx.year + "년 " : "") + nx.week + "주</b> (" + R.quarterNames[R.quarters[nx.week]] + ")</p>" +
-      '<p class="muted small">받은 연락으로 후보 3명과 활동이 와요. 같이 시간을 보낼수록 친해져요. 관계 ' + R.friendFrom + " 이상 = 친구, " + R.bestFrom + " 이상 = 절친 (최대 " + R.bestMax + "명). 같은 팀 주전 절친은 내 경기력 +0.5%, 다른 팀 친구는 이적 소식을 알려 주기도 해요.</p></div>" +
+      "</div>" +
     coachCardHTML() + // 친구 코치·감독 (js/retirement.js)
     '<div class="card"><h2>💙 절친 <span class="muted small">' + best.length + " / " + R.bestMax + '</span></h2><div class="friend-slots">' + slots + "</div></div>" +
     '<div class="grid">' +

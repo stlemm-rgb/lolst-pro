@@ -43,12 +43,8 @@ pages.sns = function () {
 
   return (
     "<h1>SNS</h1>" +
-    '<div class="card"><div class="buttons sns-tabs">' + tabHTML + readAll + "</div>" +
-      '<p class="muted small">' +
-        (snsTab === "inbox" ? "" // 209: 안내는 휴대폰 머리의 ⓘ
-          : snsTab === "news" ? "한 주에 신문 한 부. 위 날짜를 눌러 지난 호를 볼 수 있어요."
-          : "선수와 팬들의 글이에요. 🎮 선수 = 리그 프로 선수의 글, 📣 = 내 선수를 언급한 글 (보면 읽음 처리).") +
-      "</p>" +
+    '<div class="card"><div class="buttons sns-tabs">' + tabHTML + readAll + // 280: 탭 안내는 탭 줄 끝 ⓘ (받은 연락은 휴대폰 머리의 ⓘ, 209)
+        (snsTab === "news" ? helpBtnHTML(HELP_TIPS.snsNews) : snsTab === "inbox" ? "" : helpBtnHTML(HELP_TIPS.snsSocial)) + "</div>" +
       '<div class="messages">' + body + "</div>" +
     "</div>"
   );

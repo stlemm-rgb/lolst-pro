@@ -240,7 +240,7 @@ function matchHeaderHTML(m) {
                 (s.banned && s.banned.length ? ' <span class="muted small">(밴: ' + s.banned.map(escapeHTML).join(", ") + ")</span>" : "");
             }).join(" · ")
           : d.pick ? " · 내 픽 <b>" + escapeHTML(d.pick) + "</b>" + (d.joker ? ' <span class="joker-tag">🃏 조커픽</span>' : "") : "") + "</div>" +
-      '<div class="muted small">피어리스 밴픽: 한 번 나온 챔피언은 같은 경기 뒤 세트에서 누구도 고를 수 없어요.</div>' +
+      '<div class="muted small">피어리스 밴픽' + helpBtnHTML(HELP_TIPS.fearless) + "</div>" +
       '<div class="chips">' + sets + "</div>" +
     "</div>"
   );
@@ -301,9 +301,8 @@ function seriesSummaryHTML(m) {
   return (
     (focusHTML ? '<div class="card"><h2>집중 견제 <span class="muted small">S급 특성을 가진 선수는 상대가 집중해서 막아요 (나와 다른 선수 모두)</span></h2>' + focusHTML + "</div>" : "") +
     keyHTML +
-    '<div class="card"><h2>' + teamLabel(m.a) + ' <span class="muted small">시리즈 합계 (CS/분·비중·점수·평점은 평균)</span></h2><div class="table-wrap"><table class="roster box">' + head + rows("a", m.a) + "</table></div></div>" +
-    '<div class="card"><h2>' + teamLabel(m.b) + '</h2><div class="table-wrap"><table class="roster box">' + head + rows("b", m.b) + "</table></div></div>" +
-    '<p class="muted small">라인·운영·한타 점수는 0~100 (70 이상 초록, 40 미만 빨강). 평점은 세트 평점 평균(1~10). 경기 기록은 판정 결과에 맞춰 만들어진 값이에요.</p>'
+    '<div class="card"><h2>' + teamLabel(m.a) + ' <span class="muted small">시리즈 합계 (CS/분·비중·점수·평점은 평균)</span>' + helpBtnHTML(HELP_TIPS.boxScore) + '</h2><div class="table-wrap"><table class="roster box">' + head + rows("a", m.a) + "</table></div></div>" +
+    '<div class="card"><h2>' + teamLabel(m.b) + '</h2><div class="table-wrap"><table class="roster box">' + head + rows("b", m.b) + "</table></div></div>"
   );
 }
 

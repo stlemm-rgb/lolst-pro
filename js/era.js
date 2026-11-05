@@ -450,8 +450,7 @@ pages.world = function () {
   const domestic = domesticBase();
   return "<h1>해외 리그</h1>" +
     '<div class="card"><p class="muted small">국제대회(월드' + (msiOn() ? " · MSI" : "") + (firstStandOn() ? " · First Stand" : "") + ")에 나오는 해외 지역과 팀이에요. 전력 = 주전 5명 종합 능력 평균 (우리 리그 1부 평균 " + domestic.toFixed(1) +
-      "). 선수들도 해마다 성장·노화·은퇴해요. 순위는 이번 시즌 지역 순위예요 (전력 + 운).</p>" +
-      '<p class="muted small">지역 수준은 3단계: 우리 리그가 가장 강하고, 중국·북미·유럽이 그다음(약 94%), 나머지 지역이 가장 아래(약 86%)예요. 국제대회에서는 해외 팀도 실제 선수 5명이 뛰어서 경기 결과에 이름·평점·POG가 나와요. 수준은 선수의 <b>출신 리그</b> 기준이라, 해외로 간 우리 리그 선수(KR 표시)는 실력이 그대로예요. 이름에 마우스를 올리면 출신·모국어가 보여요.</p>' +
+      "). 선수들도 해마다 성장·노화·은퇴해요. 순위는 이번 시즌 지역 순위예요 (전력 + 운)." + helpBtnHTML(HELP_TIPS.worldLevel) + "</p>" + // 280: 지역 수준 설명은 ⓘ
       (future.length ? '<p class="muted small">앞으로 참가할 지역: ' + future.map(function (r) { return r.name + "(" + r.from + ")"; }).join(", ") + "</p>" : "") +
       '<p class="muted small">MSI ' + ERA.msiFrom + "년부터 · First Stand " + ERA.firstStandFrom + "년부터</p></div>" + cards;
 };

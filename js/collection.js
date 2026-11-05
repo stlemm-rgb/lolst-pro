@@ -251,9 +251,8 @@ pages.achievements = function () {
     return '<div class="card"><h2>' + cat.name + ' <span class="muted small">' + got + "/" + list.length + "</span></h2>" + '<div class="ach-list">' + items + "</div></div>";
   }).join("");
   return "<h1>업적 도감</h1>" +
-    '<div class="card"><h2>달성 ' + done + " / " + total + ' <span class="muted small">(' + pct + "%)</span></h2>" +
-      '<div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div>' +
-      '<p class="muted small">매주 자동으로 확인해요. 동 · 은 · 금은 난이도예요 (보상은 없어요).</p></div>' +
+    '<div class="card"><h2>달성 ' + done + " / " + total + ' <span class="muted small">(' + pct + "%)</span>" + helpBtnHTML(HELP_TIPS.achieve) + "</h2>" +
+      '<div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div></div>' +
     titlePickerHTML() + // 칭호 고르기 (196, js/dash_plus.js)
     '<div class="grid">' + cards + "</div>";
 };
@@ -280,7 +279,7 @@ pages.collection = function () {
     sigCard = '<div class="card"><h2>✒️ 시그니처 픽 <span class="muted small">' + escapeHTML(state.signature) + "</span></h2>" +
       '<div class="sig-stars">' + starText(star) + "</div>" +
       '<div class="bar"><div class="bar-fill gold" style="width:' + pct + '%"></div></div>' +
-      '<p class="muted small">경험치 ' + g.xp + (next === undefined ? " (최고 단계)" : " / " + next + " (다음 별까지 " + (next - g.xp) + ")") + " · 시그니처로 뛴 세트 " + g.sets + " (승 " + g.wins + ") · 세트마다 +" + SIGNATURE_GROWTH.xp.set + ", 이기면 +" + SIGNATURE_GROWTH.xp.win + "</p>" +
+      '<p class="muted small">경험치 ' + g.xp + (next === undefined ? " (최고 단계)" : " / " + next + " (다음 별까지 " + (next - g.xp) + ")") + " · 시그니처로 뛴 세트 " + g.sets + " (승 " + g.wins + ")" + helpBtnHTML(HELP_TIPS.sigXp.replace("{set}", SIGNATURE_GROWTH.xp.set).replace("{win}", SIGNATURE_GROWTH.xp.win)) + "</p>" +
       '<table class="mini"><tr><th>단계</th><th class="r">경험치</th><th class="r">고를 때 가치</th><th class="r">경기력</th><th class="r">상대 선밴</th></tr>' + rows + "</table>" +
       '<p class="muted small">별이 오를수록 강해지지만 상대도 더 자주 먼저 밴해요. 고른 세트에서는 좋은 장면 1번 보장 · 대격변 패치에도 그대로.</p></div>';
   }

@@ -208,8 +208,7 @@ pages.schedule = function () {
   }).join("");
   return (
     "<h1>시즌 일정</h1>" +
-    '<div class="card"><h2>' + state.year + "년 시즌 · " + state.week + "주차</h2>" +
-      '<p class="muted small">실제 한국 1부 리그(2025년) 일정을 바탕으로 한 52주 달력이에요. 국제대회: First Stand(10~11주) · MSI(25~28주) · 월드(42~46주).</p>' +
+    '<div class="card"><h2>' + state.year + "년 시즌 · " + state.week + "주차" + helpBtnHTML(HELP_TIPS.schedule) + "</h2>" + // 280: 달력 설명은 ⓘ
       '<table class="schedule">' + rows + "</table>" +
     "</div>" +
     userScheduleHTML() +
