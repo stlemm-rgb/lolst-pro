@@ -127,7 +127,7 @@ function msgDeckHTML(deck) {
   if (!m && deck.length === 1) m = deck[0];
   const listView = !lastOk && !m && deck.length > 1;
   const shown = lastOk ? last : m; // 앱 머리에 나오는 연락
-  const tipText = MSG_DECK.later + " · " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. " + MSG_DECK.legend;
+  const tipText = MSG_DECK.later + " · " + EVENT_RULES.ignoreAfterWeeks + "주 안에 답하지 않으면 그냥 지나가요. " + MSG_DECK.legend + (phoneOpen ? " · " + PHONE_APPS.swipeHint : "");
   const avHTML = function (x) { return '<span class="ph-av">' + msgAvatar(x).icon + "</span>"; };
   const offers = deck.filter(function (x) { return x.kind === "offer" && x.offer && x.choices; });
   const leftWeeks = function (x) { return Math.max(0, EVENT_RULES.ignoreAfterWeeks - ((state.year - x.year) * CREATION.weeksPerSeason + state.week - x.week)); };
@@ -378,12 +378,43 @@ function renderPhoneOverlay(opening) { // opening: 처음 열 때만 떠오르�
     el.id = "phone-overlay";
     document.body.appendChild(el);
     el.addEventListener("click", function (e) { if (e.target === el || e.target.closest("[data-phoneclose]")) closePhone(); });
+    el.addEventListener("touchstart", phoneSwipeStart, { passive: true }); // 275: 옆으로 밀어 앱 바꾸기
+    el.addEventListener("touchend", phoneSwipeEnd);
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && phoneOpen) closePhone(); });
   }
-  el.innerHTML = '<div class="po-wrap' + (opening ? " po-anim" : "") + '"><button class="po-close" data-phoneclose="1" title="닫기 (Esc)">✕</button>' + phoneScreenHTML(deckMessages()) + "</div>";
+  el.innerHTML = '<div class="po-wrap' + (opening ? " po-anim" : phoneSlide ? " po-slide-" + phoneSlide : "") + '"><button class="po-close" data-phoneclose="1" title="닫기 (Esc)">✕</button>' + phoneScreenHTML(deckMessages()) + "</div>";
   el.hidden = false;
+  phoneSlide = "";
   bindPhoneDeck(el);
   linkifyNames(el);
+}
+
+// ----- 휴대폰 창 옆으로 밀기 (275, 사용자 요청): 💬 메시지에서 왼쪽으로 밀면 📸 SNS, SNS에서 오른쪽으로 밀면 메시지 (프로필은 SNS로) -----
+// 위아래 스크롤로 보이는 밀기(세로가 더 긴 것)와, 옆으로 넘기는 줄(SNS 얼굴 줄·비교표) 안에서 민 것은 무시. 앱 바 버튼과 같은 일만 함
+let phoneTouch = null;
+let phoneSlide = ""; // 다음에 그릴 때 한 번만 미끄러지는 움직임 ("l" 왼쪽으로 밀었음 · "r" 오른쪽)
+function inSideScroll(el) {
+  for (; el && el.id !== "phone-overlay"; el = el.parentElement) {
+    const o = getComputedStyle(el).overflowX;
+    if ((o === "auto" || o === "scroll") && el.scrollWidth > el.clientWidth + 1) return true;
+  }
+  return false;
+}
+function phoneSwipeStart(e) {
+  if (e.touches.length !== 1) { phoneTouch = null; return; }
+  const t = e.touches[0];
+  phoneTouch = { x: t.clientX, y: t.clientY, skip: inSideScroll(e.target) };
+}
+function phoneSwipeEnd(e) {
+  const s = phoneTouch; phoneTouch = null;
+  if (!s || s.skip || !phoneOpen || !e.changedTouches.length) return;
+  const t = e.changedTouches[0], dx = t.clientX - s.x, dy = t.clientY - s.y;
+  if (Math.abs(dx) < PHONE_APPS.swipeMin || Math.abs(dy) > Math.abs(dx) * 0.6) return;
+  const to = dx < 0 ? (phoneApp === "msg" ? "sns" : null) : (phoneApp === "me" ? "sns" : phoneApp === "sns" ? "msg" : null);
+  if (!to) return;
+  phoneSlide = dx < 0 ? "l" : "r";
+  phoneApp = to; phoneFeedPages = 1; phoneSnsFilter = "all"; deckOpenId = null; deckLastId = null;
+  phoneRerender(false);
 }
 
 // ===== 휴대폰 앱 (231, 시안 24): 아래 앱 바 💬 메시지 · 📸 SNS, SNS 머리의 내 캐릭터 = 내 프로필 =====

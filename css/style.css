@@ -1563,6 +1563,10 @@ table.standings th, table.standings td { white-space: nowrap; }
 #phone-overlay { position: fixed; inset: 0; z-index: 1040; background: rgba(4, 4, 10, 0.72); display: flex; align-items: center; justify-content: center; padding: 16px; }
 #phone-overlay[hidden] { display: none; }
 .po-wrap { position: relative; width: 380px; max-width: 100%; } .po-wrap.po-anim { animation: coachIn 0.22s ease-out both; }
+/* 275: 옆으로 밀어 앱을 바꾸면 민 쪽으로 살짝 미끄러져 들어옴 (움직임 끄기면 없음) */
+.po-wrap.po-slide-l .phone { animation: phSlideL 0.2s ease-out both; } .po-wrap.po-slide-r .phone { animation: phSlideR 0.2s ease-out both; }
+@keyframes phSlideL { from { transform: translateX(28px); opacity: 0.5; } to { transform: none; opacity: 1; } }
+@keyframes phSlideR { from { transform: translateX(-28px); opacity: 0.5; } to { transform: none; opacity: 1; } }
 .po-wrap .phone { position: relative; top: auto; }
 .po-wrap .ph-scr { height: min(760px, calc(100vh - 54px)); max-height: none; min-height: 0; }
 .po-close { position: absolute; right: -48px; top: 6px; width: 36px; height: 36px; border-radius: 50%; padding: 0; font-size: 15px; z-index: 3; }
