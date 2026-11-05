@@ -2237,3 +2237,10 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .rp-fl-tip { position: absolute; top: 50%; transform: translateY(-50%); padding: 2px 8px; border-radius: 8px; background: rgba(8, 8, 16, 0.9); border: 1px solid var(--border); font-size: 12px; color: var(--text); white-space: nowrap; pointer-events: none; }
 .rp-slowtag { color: var(--gold); font-weight: 700; }
 .rp-hltag { color: var(--gold); font-weight: 700; }
+
+/* 293 경기 재생 연출 C ⑨ 오브젝트 안내 (js/replay.js drawReplayObjects) */
+.rp-objs { position: absolute; left: 0; right: 0; top: 6px; z-index: 4; display: flex; justify-content: center; gap: 6px; pointer-events: none; }
+.rp-objn { padding: 3px 10px; border-radius: 99px; background: rgba(8, 8, 16, 0.82); border: 1px solid var(--gold); color: var(--gold); font-size: 12px; font-weight: 700; animation: rpObjIn 0.35s ease-out; }
+@keyframes rpObjIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.rp-obj-spot { transition: opacity 0.3s; opacity: 0.45; }
+.rp-obj-spot.up { opacity: 1; stroke: var(--gold); stroke-width: 1; }

@@ -41,6 +41,13 @@ function activeTraits(id, teamId, setCtx, laneWon) {
 }
 
 // 한 세트 기록 만들기 (playMatch에서 부름)
+// 사건 시간(분) → 화면 시간: 초반(인베이드만, earlyOnly.until분까지)은 그대로, 그 뒤는 경기 길이 end분에 맞게 줄임 (round: 정수로)
+function evShownT(t, end, exact) {
+  const maxT = MATCH_EVENT_RULES.timeRange[1], E = MATCH_EVENT_RULES.earlyOnly ? MATCH_EVENT_RULES.earlyOnly.until : 0;
+  if (t <= E || end - 1 >= maxT) return t;
+  const v = E + 1 + (t - E - 1) * (end - 2 - E) / (maxT - E - 1);
+  return Math.max(E + 1, exact ? v : Math.round(v));
+}
 function setDetail(set, setCtx, m, userPick) {
   const team = function (t) { return { avg: round1(t.avg), lane: round1(t.lane), play: round1(t.play), macro: round1(t.macro || 0), fight: round1(t.fight || 0), comp: round1(t.comp || 0), ev: round1(t.ev || 0), luck: round1(t.luck), mood: round1(t.mood), lang: t.lang ? round1(t.lang) : undefined }; };
   const comp = function (c) { return c ? { main: c.main, n: c.n, plan: c.plan, target: c.target, match: c.match, syn: c.syn, bonus: round1(c.bonus) } : null; };
@@ -49,9 +56,8 @@ function setDetail(set, setCtx, m, userPick) {
   // 경기 흐름 사건: 경기 시간 안으로 (마무리·세트 뒤 심리 변화는 마지막 분)
   //   사건 시간(최대 MATCH_EVENT_RULES.timeRange[1]분)을 실제 경기 시간 비율로 줄임
   //   288: 초반(earlyOnly.until분까지 = 인베이드만)은 그대로 두고, 그 뒤 사건만 줄임 → 화면에서도 3분 안에는 인베이드만 보임
-  const maxT = MATCH_EVENT_RULES.timeRange[1], E = MATCH_EVENT_RULES.earlyOnly ? MATCH_EVENT_RULES.earlyOnly.until : 0;
   const ev = (set.events || []).map(function (e) {
-    const t = e.t >= 99 ? end : e.t <= E ? e.t : end - 1 < maxT ? Math.max(E + 1, E + 1 + Math.round((e.t - E - 1) * (end - 2 - E) / (maxT - E - 1))) : e.t;
+    const t = e.t >= 99 ? end : evShownT(e.t, end); // 293: 경기 재생 오브젝트 등장 시간도 같은 계산 (js/replay.js)
     return Object.assign({}, e, { t: t });
   }).sort(function (x, y) { return x.t - y.t; });
   return {

@@ -96,7 +96,7 @@ const REPLAY_MAP_SVG = '<svg viewBox="0 0 100 100"><rect width="100" height="100
   '<path d="M0 100 L100 0" stroke="#163b55" stroke-width="16" opacity=".55"/>' +
   '<path d="M10 92 L10 10 L92 10" stroke="#3b4a3a" stroke-width="5" fill="none"/><path d="M8 90 L90 8" stroke="#3b4a3a" stroke-width="5"/><path d="M10 90 L90 90 L90 10" stroke="#3b4a3a" stroke-width="5" fill="none"/>' +
   [[62, 23], [23, 62], [77, 38], [38, 77]].map(function (p) { return '<g transform="translate(' + p[0] + " " + p[1] + ')"><circle r="3.2" fill="#2d3b26" stroke="#8fbf6a" stroke-width=".8"/><circle cx="-1" cy="-.6" r=".7" fill="#cfe8a8"/><circle cx="1" cy="-.6" r=".7" fill="#cfe8a8"/></g>'; }).join("") +
-  '<circle cx="34" cy="31" r="4" fill="#4a2b6b"/><circle cx="67" cy="70" r="4" fill="#5a3a1a"/>' +
+  '<circle class="rp-obj-spot baron" cx="34" cy="31" r="4" fill="#4a2b6b"/><circle class="rp-obj-spot dragon" cx="67" cy="70" r="4" fill="#5a3a1a"/>' + // 293 ⑨ 살아 있으면 빛남
   '<rect class="rp-base sa" x="2" y="84" width="14" height="14" rx="3"/><rect class="rp-base sb" x="84" y="2" width="14" height="14" rx="3"/>' + // 219: 색은 css (--side-a/--side-b)
   [[10, 60, 0], [10, 35, 1], [40, 10, 1], [65, 10, 1], [30, 70, 0], [70, 30, 1], [40, 90, 0], [65, 90, 0], [90, 60, 1], [90, 35, 1]].map(function (p) { return '<circle class="rp-tw ' + (p[2] ? "sb" : "sa") + '" cx="' + p[0] + '" cy="' + p[1] + '" r="1.8"/>'; }).join("") +
   '<text x="34" y="25" font-size="4" fill="#b98bff" text-anchor="middle">바론</text><text x="67" y="79" font-size="4" fill="#ffb26b" text-anchor="middle">용</text></svg>';
@@ -150,6 +150,7 @@ function drawReplay(reset) {
     if (RP.playing && added <= 2) rpCallout(m, done[li]);
   } else if (RP.playing && RP.t - (RP.castT || 0) >= REPLAY_SHOW.idleMin) { rpCast(rpIdleLine(RP.t)); RP.castT = RP.t; }
   drawReplayFlow(s, done, min); // 290 ⑤
+  drawReplayObjects(s, min); // 293 ⑨
   const pct = Math.min(100, RP.t / min * 100);
   document.getElementById("rp-fill").style.width = pct + "%";
   document.getElementById("rp-head").style.left = pct + "%";
@@ -508,6 +509,41 @@ function rpHlNext() {
   H.end = h.t + L.tail;
   drawReplay();
   if (!RP.playing) replayPlay(true); else requestAnimationFrame(replayTick);
+}
+// ----- 293 C ⑨ 오브젝트 안내 (data/replay.js REPLAY_OBJ) — 등장 알림 + 미니맵 자리 빛남 (잡은 사건 뒤엔 다시 등장까지 어둡게) -----
+function rpObjState(s, o, t, min) {
+  // 등장·다시 등장 시간도 사건처럼 경기 길이에 맞게 줄임 (evShownT, js/match_detail.js) — 안 줄이면 바론 사건이 바론 등장 전에 나옴
+  const end = Math.floor(min), spawn = evShownT(o.spawn, end, true), respawn = evShownT(o.spawn + o.respawn, end, true) - spawn;
+  // 잡힌 시각들: 그 오브젝트 사건(성공·실패 상관없이 그 자리에서 싸운 것) — 다시 등장 전에 또 생기면 무시
+  const taken = [];
+  rpEvents(s).forEach(function (e) {
+    if (!o.match.test(e.e) || e.t < spawn - 1) return;
+    const last = taken[taken.length - 1];
+    if (last === undefined || e.t >= last + respawn) taken.push(e.t);
+  });
+  let up = t >= spawn, note = null;
+  if (t >= spawn && t < spawn + REPLAY_OBJ_TEXT.show && !(taken[0] !== undefined && taken[0] <= t)) note = REPLAY_OBJ_TEXT.up;
+  taken.forEach(function (k) {
+    if (t >= k && t < k + respawn) up = false;
+    const back = k + respawn;
+    if (back < min && t >= back && t < back + REPLAY_OBJ_TEXT.show) note = REPLAY_OBJ_TEXT.again;
+  });
+  return { up: up, note: note ? note.replace("{icon}", o.icon).replace("{name}", o.name) : null };
+}
+function drawReplayObjects(s, min) {
+  const map = document.getElementById("rp-map");
+  if (!map) return;
+  let box = map.querySelector(".rp-objs");
+  if (!box) { box = document.createElement("div"); box.className = "rp-objs"; map.appendChild(box); }
+  const notes = [];
+  REPLAY_OBJ.forEach(function (o) {
+    const st = rpObjState(s, o, Math.min(RP.t, min), min);
+    const spot = map.querySelector(".rp-obj-spot." + o.id);
+    if (spot) spot.classList.toggle("up", st.up);
+    if (st.note) notes.push(st.note);
+  });
+  const html = notes.map(function (n) { return '<span class="rp-objn">' + escapeHTML(n) + "</span>"; }).join("");
+  if (box.innerHTML !== html) box.innerHTML = html;
 }
 // [설정] 화면 줄
 function replaySettingsHTML() {

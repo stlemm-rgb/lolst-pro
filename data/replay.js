@@ -37,6 +37,13 @@ const REPLAY_SHOW = {
   hl: { lead: 1.2, tail: 0.9 },                  // ⑧ 하이라이트: 장면마다 1.2분 전부터 0.9분 뒤까지
   flowMin: 30,                                   // ⑤ 흐름 그래프 높이 최소 기준 (사건 점수 합, 이보다 작게 오간 세트도 이 높이로)
 };
+// ----- C (293) ⑨ 오브젝트 안내: 등장 시각(경기 분)·다시 등장까지·그 오브젝트를 잡은 사건 id에 들어가는 글자 -----
+// 화면용 규칙 (실제 경기 기록에는 오브젝트 처치 시각이 따로 없어서 사건으로 근사, Codex 주의)
+const REPLAY_OBJ = [
+  { id: "dragon", icon: "🐲", name: "드래곤", spawn: 5, respawn: 5, match: /dragon|elder/ },
+  { id: "baron", icon: "🐉", name: "바론", spawn: 20, respawn: 6, match: /baron/ },
+];
+const REPLAY_OBJ_TEXT = { up: "{icon} {name} 등장", again: "{icon} {name} 다시 등장", show: 1.5 }; // show: 알림이 떠 있는 시간(경기 분)
 const REPLAY_B_TEXT = {
   slowTag: "🎬 승부처",
   hlBtn: "⭐ 하이라이트",
