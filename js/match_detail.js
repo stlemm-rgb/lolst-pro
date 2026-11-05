@@ -48,9 +48,10 @@ function setDetail(set, setCtx, m, userPick) {
   const end = Math.floor(box.min);
   // 경기 흐름 사건: 경기 시간 안으로 (마무리·세트 뒤 심리 변화는 마지막 분)
   //   사건 시간(최대 MATCH_EVENT_RULES.timeRange[1]분)을 실제 경기 시간 비율로 줄임
-  const maxT = MATCH_EVENT_RULES.timeRange[1];
+  //   288: 초반(earlyOnly.until분까지 = 인베이드만)은 그대로 두고, 그 뒤 사건만 줄임 → 화면에서도 3분 안에는 인베이드만 보임
+  const maxT = MATCH_EVENT_RULES.timeRange[1], E = MATCH_EVENT_RULES.earlyOnly ? MATCH_EVENT_RULES.earlyOnly.until : 0;
   const ev = (set.events || []).map(function (e) {
-    const t = e.t >= 99 ? end : end - 1 < maxT ? Math.max(1, Math.round(e.t * (end - 1) / maxT)) : e.t;
+    const t = e.t >= 99 ? end : e.t <= E ? e.t : end - 1 < maxT ? Math.max(E + 1, E + 1 + Math.round((e.t - E - 1) * (end - 2 - E) / (maxT - E - 1))) : e.t;
     return Object.assign({}, e, { t: t });
   }).sort(function (x, y) { return x.t - y.t; });
   return {

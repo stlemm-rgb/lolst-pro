@@ -42,7 +42,8 @@ function sigGuaranteedPlay(out, sides, R) {
   if (s === 0) out.a += x; else out.b += x;
   addRate(out.rate, USER_ID, R.rating[ev.size]);
   if (victim) addRate(out.rate, victim.id, -R.victimRating);
-  out.list.push({ t: randInt(ev.t[0], ev.t[1]), e: ev.id, s: s, p: USER_ID, pp: p.pos, v: victim ? victim.id : null, vp: victim ? victim.pos : null, x: x, k: "good", sg: true });
+  const EO = R.earlyOnly, lo = EO && EO.ids.indexOf(ev.id) === -1 ? Math.max(ev.t[0], EO.until + 1) : ev.t[0]; // 288: 초반엔 인베이드만
+  out.list.push({ t: randInt(lo, Math.max(lo, ev.t[1])), e: ev.id, s: s, p: USER_ID, pp: p.pos, v: victim ? victim.id : null, vp: victim ? victim.pos : null, x: x, k: "good", sg: true });
 }
 
 // ━━━━━ (예전 js/collection.js) ━━━━━

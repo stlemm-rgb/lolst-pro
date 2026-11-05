@@ -224,11 +224,14 @@ function rollSetEvents(la, lb, teamA, teamB, laneResults, series, ctx) {
   times.sort(function (x, y) { return x - y; });
 
   times.forEach(function (t) {
-    const kinds = Object.keys(R.kindWeight);
+    // 288: 초반(earlyOnly.until분까지)은 인베이드만 — 그 사건이 있는 종류(good·bad)만 골라서 사건 수는 그대로
+    const early = R.earlyOnly && t <= R.earlyOnly.until;
+    const okEv = function (e) { return t >= e.t[0] && t <= e.t[1] && (!early || R.earlyOnly.ids.indexOf(e.id) !== -1); };
+    const kinds = Object.keys(R.kindWeight).filter(function (k) { return !early || MATCH_EVENTS.some(function (e) { return e.kind === k && okEv(e); }); });
     let ev = null;
     for (let tries = 0; tries < 4 && !ev; tries++) {
       const kind = weightedPick(kinds, function (k) { return R.kindWeight[k]; });
-      const pool = MATCH_EVENTS.filter(function (e) { return e.kind === kind && t >= e.t[0] && t <= e.t[1]; });
+      const pool = MATCH_EVENTS.filter(function (e) { return e.kind === kind && okEv(e); });
       ev = weightedPick(pool, function (e) { return e.w * shakeupEvMult(e.cat); }); // 대격변 오브젝트·아이템 개편 (js/shakeup.js)
     }
     if (!ev) return;
