@@ -1156,6 +1156,8 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
   .rp-close { grid-column: 1 / -1; justify-self: end; order: -1; }
   .rp-nm { font-size: 14px; } .rp-big { font-size: 24px; }
   .rp-feed { height: 220px; }
+  /* 291: 재생 화면이 길어서(1천 px 넘음) 가운데 놓으면 [경기 시작 ▶]이 화면 밖으로 나가 다른 버튼까지 덮인 채 못 누름 → 위쪽에 */
+  .rp-banner { justify-content: flex-start; padding-top: 96px; }
 }
 
 /* ===== 디자인 D4 뒤집는 카드 (178, js/ui.js) ===== */

@@ -157,12 +157,19 @@ function drawReplay(reset) {
   document.getElementById("rp-score").textContent = w[0] + " : " + w[1];
   const k = Math.min(1, RP.t / min), kills = [Math.round(s.box.kills[0] * k), Math.round(s.box.kills[1] * k)];
   const mm = Math.floor(RP.t), ss = Math.floor((RP.t - mm) * 60), tm = Math.floor(min), ts = Math.round((min - tm) * 60);
-  document.getElementById("rp-setbar").innerHTML = m.detail.sets.map(function (x, i) {
+  // 291: 세트 탭은 내용이 바뀔 때만 다시 그림 (매 순간 새로 그리면 휴대폰에서 손가락을 떼기 전에 버튼이 바뀌어 탭을 놓침), 시계만 매번
+  const bar = document.getElementById("rp-setbar");
+  const tabsHTML = m.detail.sets.map(function (x, i) {
     const fin = i < RP.setIdx || (i === RP.setIdx && RP.t >= x.box.min);
     return '<span class="rp-st' + (i === RP.setIdx ? " on" : "") + '" data-rpset="' + i + '">' + (i + 1) + "세트" + (fin ? " · " + escapeHTML(teamShort(x.w === 0 ? m.a : m.b)) + " 승" : "") + "</span>";
-  }).join("") + '<span class="rp-clock">' + (RP.hl ? '<span class="rp-hltag">' + REPLAY_B_TEXT.hlTag.replace("{k}", RP.hl.k + 1).replace("{n}", RP.hl.list.length) + "</span> " : "") + (RP.slow ? '<span class="rp-slowtag">' + REPLAY_B_TEXT.slowTag + "</span> " : "") + // 290 ⑥⑧
-    "⏱ " + mm + ":" + String(ss).padStart(2, "0") + " / " + tm + ":" + String(ts).padStart(2, "0") + ' · ⚔ <b>' + kills[0] + " : " + kills[1] + "</b></span>";
-  document.querySelectorAll("[data-rpset]").forEach(function (el) { el.onclick = function () { RP.hl = null; replayPlay(false); RP.setIdx = Number(el.getAttribute("data-rpset")); RP.t = 0; hideReplayBanner(); hideReplayEndBar(); drawReplay(true); }; });
+  }).join("");
+  if (RP.tabsHTML !== tabsHTML || !document.getElementById("rp-clock")) {
+    RP.tabsHTML = tabsHTML;
+    bar.innerHTML = tabsHTML + '<span class="rp-clock" id="rp-clock"></span>';
+    document.querySelectorAll("[data-rpset]").forEach(function (el) { el.onclick = function () { RP.hl = null; replayPlay(false); RP.setIdx = Number(el.getAttribute("data-rpset")); RP.t = 0; hideReplayBanner(); hideReplayEndBar(); drawReplay(true); }; });
+  }
+  document.getElementById("rp-clock").innerHTML = (RP.hl ? '<span class="rp-hltag">' + REPLAY_B_TEXT.hlTag.replace("{k}", RP.hl.k + 1).replace("{n}", RP.hl.list.length) + "</span> " : "") + (RP.slow ? '<span class="rp-slowtag">' + REPLAY_B_TEXT.slowTag + "</span> " : "") + // 290 ⑥⑧
+    "⏱ " + mm + ":" + String(ss).padStart(2, "0") + " / " + tm + ":" + String(ts).padStart(2, "0") + ' · ⚔ <b>' + kills[0] + " : " + kills[1] + "</b>";
   drawReplayLanes(m, s);
 }
 function drawReplayLanes(m, s) {
