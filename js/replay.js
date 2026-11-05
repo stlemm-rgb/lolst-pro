@@ -520,9 +520,11 @@ function rpDraftFirst() {
   const key = RP.qi + ":" + RP.setIdx;
   if (RP.drSeen[key]) return false;
   RP.drSeen[key] = true;
-  const go = function () { clearTimeout(RP.drTimer); hideReplayBanner(); replayPlay(true); };
+  const go = function () { RP.onNext = null; clearTimeout(RP.drTimer); hideReplayBanner(); replayPlay(true); }; // 304: 버튼·창 클릭이 겹쳐도 한 번만
   replayBanner(replayDraftHTML(rpMatch(), rpSet()), "draft", go);
-  RP.drTimer = setTimeout(function () { if (RP && RP.onNext === go) go(); }, REPLAY_DRAFT.autoMs);
+  const b = document.getElementById("rp-banner");
+  if (b) b.onclick = function () { if (RP && RP.onNext === go) go(); }; // 304: 창 아무 곳이나 누르면 시작 (버튼도 같음)
+  if (REPLAY_DRAFT.autoMs > 0) RP.drTimer = setTimeout(function () { if (RP && RP.onNext === go) go(); }, REPLAY_DRAFT.autoMs);
   return true;
 }
 function replayDraftHTML(m, s) {
@@ -539,7 +541,7 @@ function replayDraftHTML(m, s) {
   const ban = s.banned && s.banned.length ? '<div class="rp-dr-ban">' + escapeHTML(D.ban.replace("{me}", state.player.name)) + ": " + s.banned.map(escapeHTML).join(" · ") + "</div>" : "";
   return '<span class="rp-tag">' + escapeHTML(D.title.replace("{n}", RP.setIdx + 1)) + "</span>" + ban +
     '<div class="rp-dr" style="--step:' + D.stepS + 's">' + col(0) + col(1) + "</div>" +
-    '<button class="primary" data-rpnext="1">' + D.go + "</button>";
+    '<button class="primary" data-rpnext="1">' + D.go + "</button>" + '<div class="muted small">' + escapeHTML(D.hint) + "</div>";
 }
 // ----- 295 C ③ 움직이는 미니맵: 선수 10명 도트 얼굴 (data/replay.js REPLAY_DOTS) -----
 // 300: 걸어서 움직이게 — 위치는 경기 시각 t만으로 계산 (되감기·하이라이트·세트 클릭에도 같은 자리, 게임 난수 안 씀)
