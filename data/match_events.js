@@ -129,7 +129,7 @@ const MATCH_EVENTS = [
   { id: "duel_1v2",        cat: "play", icon: "⭐", name: "1대2 승리", kind: "good", size: "m", w: 0.8, t: [6, 32], pos: { top: 2, mid: 2, adc: 1, jungle: 1 }, stats: ["reaction", "accuracy"], text: "{p}, 1대2 승리!" },
   { id: "survive_1v3",     cat: "play", icon: "⭐", name: "1대3 생존", kind: "good", size: "s", w: 0.8, t: [10, 38], stats: ["reaction", "spacing"], text: "{p}, 1대3에서 살아나감" },
   { id: "escape",          cat: "play", icon: "🏃", name: "도주 성공", kind: "good", size: "s", w: 1, t: [5, 38], stats: ["reaction"], text: "{p}, 아슬아슬하게 도주 성공" },
-  { id: "super_save",      cat: "play", icon: "🛟", name: "슈퍼 세이브", kind: "good", size: "m", w: 1, t: [12, 40], pos: { support: 4, jungle: 1, top: 1 }, stats: ["reaction", "teamfight"], text: "{p}의 슈퍼 세이브" },
+  { id: "super_save",      cat: "play", icon: "🙌", name: "슈퍼 세이브", kind: "good", size: "m", w: 1, t: [12, 40], pos: { support: 4, jungle: 1, top: 1 }, stats: ["reaction", "teamfight"], text: "{p}의 슈퍼 세이브" },
   { id: "dying_kill",      cat: "play", icon: "⭐", name: "죽기 직전 딜러 처치", kind: "good", size: "s", w: 0.8, t: [15, 40], stats: ["teamfight", "focus"], vs: "carry", text: "{p}, 쓰러지기 직전 {v} 처치" },
   { id: "dodge_ult",       cat: "play", icon: "⭐", name: "궁극기 회피", kind: "good", size: "s", w: 1, t: [8, 40], stats: ["reaction"], vs: "any", text: "{p}, {v}의 궁극기를 피함" },
   { id: "cleanse",         cat: "play", icon: "⭐", name: "CC 해제", kind: "good", size: "s", w: 0.8, t: [12, 40], pos: { adc: 3, mid: 2 }, stats: ["reaction", "focus"], text: "{p}, 결정적인 CC를 정화로 해제" },
