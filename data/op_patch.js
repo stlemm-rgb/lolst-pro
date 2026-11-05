@@ -1,5 +1,5 @@
 // ===== 301 패치 사고 '사기 챔피언' SS·SSS (로직: js/op_patch.js) — 사용자 결정 2026-11-06 =====
-// 경기력·픽 가치는 data/match.js MATCH.metaPowerBonus·metaPickBonus 의 SS·SSS (SS +23%·+35, SSS +32%·+45)
+// 경기력·픽 가치는 data/match.js MATCH.metaPowerBonus·metaPickBonus 의 SS·SSS (303: SS +40%·+35, SSS +60%·+45 — 뽑은 세트 승률 약 59~60%, 원래 S급 약 51%)
 const OP_PATCH_RULES = {
   lastYear: 2026,          // 이 해까지만 (2027년 이후 가짜 역사 금지 규칙)
   chance: 0.3,             // 시즌마다 사고가 날 확률 (시즌에 최대 1번)
