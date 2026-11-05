@@ -153,11 +153,18 @@ function dashWeekCardPcHTML(w) {
     ladderResetNoticeHTML() + // 패치 전 주: 솔로 랭크 초기화 예고 — 휴식 주·다음 주로 진행은 위쪽 막대에 (240)
   "</div>";
 }
-// PC 바로가기 6칸 (240): 📱 휴대폰 · 🏋️ 훈련 · ⚔️ 챔피언 연습 · 🛌 휴식 주 · 🏠 집·고용 · 📰 지난 신문 (data/ui.js QUICK_ACTIONS.pcIcons)
+// PC 바로가기 6칸 (240·271): 📱 휴대폰 · 🏋️ 훈련 · ⚔️ 챔피언 연습 · 📋 퀘스트 · 🎬 지난 경기 · 🏠 집·고용 (data/ui.js QUICK_ACTIONS.pcIcons)
+// 지난 경기 = 다시 볼 수 있는 내 경기 중 가장 최근 (없으면 흐리게)
+function lastReplayKey() {
+  const m = userMatches().filter(function (x) { return x.winner && x.detail && x.detail.sets && x.detail.sets.length; }).pop();
+  return m ? matchKey(m) : null;
+}
 function dashPcBarHTML() {
-  const n = { phone: deckMessages().length + unreadCount("social"), train: state.plan ? 0 : "!", rest: state.stamina < TIRED_LIMIT ? "!" : 0, paper: unreadCount("news") };
+  const n = { phone: deckMessages().length + unreadCount("social"), train: state.plan ? 0 : "!", quest: (state.quests || []).length };
+  const noReplay = !lastReplayKey();
   return '<div class="dq-bar">' + QUICK_ACTIONS.pcIcons.map(function (x) {
-    return '<button class="dq" data-pcq="' + x[0] + '"><span class="i">' + x[1] + "</span>" + x[2] + (n[x[0]] ? "<em>" + n[x[0]] + "</em>" : "") + "</button>";
+    const off = x[0] === "replay" && noReplay;
+    return '<button class="dq' + (off ? ' off" disabled title="' + QUICK_ACTIONS.replayNone : "") + '" data-pcq="' + x[0] + '"><span class="i">' + x[1] + "</span>" + x[2] + (n[x[0]] ? "<em>" + n[x[0]] + "</em>" : "") + "</button>";
   }).join("") + "</div>";
 }
 // 유형 스탯 칸 (240): 스탯 12개는 이번 주 칸 미니 스탯에 있어서 PC 아래쪽은 유형 스탯만
@@ -256,10 +263,9 @@ function bindDashLayout(page) {
     b.onclick = function () {
       const k = b.getAttribute("data-pcq");
       if (k === "phone") openPhone();
-      else if (k === "train" || k === "champ") openQuick(k);
-      else if (k === "rest") advanceWeek(true);
+      else if (k === "train" || k === "champ" || k === "quest") openQuick(k);
+      else if (k === "replay") { const key = lastReplayKey(); if (key) openReplay(key); }
       else if (k === "home") { shopTab = "home"; selectMenu("shop"); }
-      else if (k === "paper") { snsTab = "news"; openMsgId = null; selectMenu("sns"); }
     };
   });
   page.querySelectorAll("[data-ptabgo]").forEach(function (b) { // 미니 스탯 → [선수 정보] 능력 탭 (data-go보다 먼저)
