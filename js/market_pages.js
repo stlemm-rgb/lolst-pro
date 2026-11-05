@@ -235,12 +235,33 @@ function transferLogCardHTML() {
     return true;
   }).sort(function (a, b) { return (a.w - b.w) || (b.fee - a.fee); });
   const when = function (e) { return e.w >= SUMMER_MARKET.start && e.w < CONTRACT.windowStart ? "여름" : "비시즌"; };
-  const rows = list.map(function (e) {
+  const rowOf = function (e) {
     const mineRow = e.team === mine.id || e.from === mine.id;
-    return "<tr" + (mineRow ? ' class="me"' : "") + "><td>" + when(e) + "</td><td>" + TLOG_KIND[e.kind] + "</td><td><b>" + escapeHTML(e.name) + '</b> <span class="muted small">' + findPosition(e.pos).name + " · " + e.age + "세</span>" +
+    return "<tr" + (mineRow ? ' class="me"' : "") + "><td>" + TLOG_KIND[e.kind] + "</td><td><b>" + escapeHTML(e.name) + '</b> <span class="muted small">' + findPosition(e.pos).name + " · " + e.age + "세</span>" +
       (e.tag && TLOG_TAG[e.tag] ? ' <span class="joker-tag tip" data-tip="' + escapeHTML(TLOG_TAG[e.tag].tip) + '">' + TLOG_TAG[e.tag].name + "</span>" : "") + "</td>" +
       "<td>" + originCellHTML({ id: e.id, origin: e.origin || (findPlayer(e.id) && originOf(findPlayer(e.id))) || HOME_ORIGIN.id }) + "</td>" + '<td class="r">' + e.score.toFixed(1) + "</td><td>" + escapeHTML(e.fromName || teamName(e.from)) + " → <b>" + (e.kind === "retire" ? "은퇴" : e.kind === "leave" || (e.kind === "return" && !e.to) ? "FA" : e.kind === "return" ? escapeHTML(e.to) : e.kind === "abroad" ? escapeHTML(e.to || "해외") : escapeHTML(teamName(e.team))) + '</b></td><td class="r">' + (e.fee ? moneyText(e.fee) : "-") + "</td></tr>";
-  }).join("");
+  };
+  // 298: 시기(비시즌·여름) 제목 줄 → 팀별 소제목 줄(우리 팀 맨 위 ★, 나머지는 건수 많은 순, 같으면 처음 나온 순) → 그 팀 이적들
+  //   팀 = 들어간 팀, 은퇴·방출·해외 진출·복귀처럼 떠난 건 원래 팀
+  const teamOf = function (e) { return ["retire", "leave", "abroad", "return"].indexOf(e.kind) !== -1 || !e.team ? e.from : e.team; };
+  let rows = "";
+  ["비시즌", "여름"].forEach(function (w) {
+    const es = list.filter(function (e) { return when(e) === w; });
+    if (!es.length) return;
+    rows += '<tr class="tlog-when"><th colspan="6">' + w + " · " + es.length + "건</th></tr>";
+    const groups = [];
+    es.forEach(function (e) {
+      const k = teamOf(e) || "";
+      let g = groups.find(function (x) { return x.k === k; });
+      if (!g) { g = { k: k, items: [], at: groups.length }; groups.push(g); }
+      g.items.push(e);
+    });
+    groups.sort(function (a, b) { return (b.k === mine.id) - (a.k === mine.id) || b.items.length - a.items.length || a.at - b.at; });
+    groups.forEach(function (g) {
+      rows += '<tr class="tlog-team' + (g.k === mine.id ? " me" : "") + '"><td colspan="6">' + (g.k === mine.id ? "★ " : "") + escapeHTML(teamName(g.k)) + ' <span class="muted small">' + g.items.length + "건</span></td></tr>" +
+        g.items.map(rowOf).join("");
+    });
+  });
   const count = {};
   list.forEach(function (e) { count[e.kind] = (count[e.kind] || 0) + 1; });
   const summary = Object.keys(TLOG_KIND).filter(function (k) { return count[k]; }).map(function (k) { return TLOG_KIND[k] + " " + count[k]; }).join(" · ");
@@ -248,7 +269,7 @@ function transferLogCardHTML() {
   return '<div class="card"><h2>📋 이적 목록 <span class="muted small">' + year + "년 · " + list.length + "건" + (summary ? " (" + summary + ")" : "") + "</span>" + helpBtnHTML(HELP_TIPS.tlog) + "</h2>" +
     '<div class="radar-ctrl">' + btn("tlog-year", 0, tlogYear, "올해") + " " + btn("tlog-year", 1, tlogYear, "작년") + " &nbsp; " +
       btn("tlog-filter", "all", tlogFilter, "전체") + " " + btn("tlog-filter", "t1", tlogFilter, "1부 관련") + " " + btn("tlog-filter", "mine", tlogFilter, "우리 팀") + "</div>" +
-    (rows ? '<div class="table-wrap"><table class="roster tlog"><tr><th>시기</th><th>종류</th><th>선수</th><th>출신</th><th class="r">스탯 점수</th><th>이동</th><th class="r">이적료</th></tr>' + rows + "</table></div>"
+    (rows ? '<div class="table-wrap"><table class="roster tlog"><tr><th>종류</th><th>선수</th><th>출신</th><th class="r">스탯 점수</th><th>이동</th><th class="r">이적료</th></tr>' + rows + "</table></div>"
       : '<p class="muted">' + year + "년 이적 기록이 없어요. 이적은 비시즌(새 시즌 시작)과 여름(" + SUMMER_MARKET.applyWeek + "주)에 일어나요.</p>") +
     "</div>";
 }

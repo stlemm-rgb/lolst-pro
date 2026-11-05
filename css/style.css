@@ -2288,3 +2288,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 .npt-body { font-size: 17px; line-height: 1.7; white-space: pre-line; }
 .msg-text .np-tbl, .npt-brief .np-tbl, .npt-body .np-tbl { white-space: normal; margin: 4px 0; }
 .rep-list { display: inline-block; vertical-align: top; } /* 298: 지난주 결과의 퀘스트·투자 묶음 */
+
+/* 298 이적 목록: 시기 제목 줄 · 팀 소제목 줄 (js/market_pages.js transferLogCardHTML) */
+table.tlog tr.tlog-when th { text-align: left; padding-top: 12px; font-size: 14px; color: var(--accent); border-bottom: 1px solid var(--border); }
+table.tlog tr.tlog-team td { padding-top: 8px; font-weight: 700; }
+table.tlog tr.tlog-team.me td { color: var(--gold); }
