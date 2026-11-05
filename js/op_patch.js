@@ -1,7 +1,8 @@
 // ===== 301 패치 사고 '사기 챔피언' SS·SSS (규칙·글: data/op_patch.js OP_PATCH_RULES·OP_PATCH_TEXT) =====
-// 시즌마다 OP_PATCH_RULES.chance 확률로 한 번: 챔피언 하나가 한 포지션에서 SS(4주) 또는 SSS(2주 → 사과 → 절반은 대회 사용 금지 1주)
+// 시즌마다 OP_PATCH_RULES.chance 확률로 한 번: 챔피언 하나가 한 포지션에서 SS 또는 SSS — 게임사가 바로 안 고쳐서 다음 정기 패치까지 (302)
+// SSS는 2주 뒤 사과 인터뷰, 절반은 그 주에 대회 사용 금지 1주 → 다시 SSS
 // 저장 칸 state.opPatch = { seed, planYear, plan: { week, tier } | null, cur: 사고 | null, history: [] }
-//   cur = { id, champ, pos, tier, s, live, ban, end, picks, wins, bans, pub: { 단계: true } } — s·live·ban·end는 absWeek
+//   cur = { id, champ, pos, tier, s, live, apo, ban, end, picks, wins, bans, pub: { 단계: true } } — s·live(=다음 정기 패치)·apo(사과)·ban·end는 absWeek
 // 사고를 정하는 추첨은 저장되는 전용 씨앗으로 (게임 난수 Math.random을 쓰지 않음 → 사고가 없는 시즌은 결과가 그대로)
 // 효과: metaTier가 사고 챔피언을 SS·SSS로 돌려줌 (js/champions.js) · 밴 확률 올림 opForceBan · 사용 금지 주엔 경기마다 처음부터 '이미 쓴 챔피언'에 넣음 opBannedChamps
 
@@ -24,7 +25,7 @@ function opLiveTier(name, pos) {
   const c = opCur();
   if (!c || c.champ !== name || c.pos !== pos) return null;
   const now = absWeek();
-  return now >= c.s && now < c.live ? c.tier : null;
+  return now >= c.s && now < c.live && now !== c.ban ? c.tier : null; // 사용 금지 주는 못 씀
 }
 function opIsBanned(name) { const c = opCur(); return !!(c && c.ban !== null && c.champ === name && absWeek() === c.ban); }
 function opBannedChamps() { const c = opCur(); return c && c.ban !== null && absWeek() === c.ban ? [c.champ] : []; }
@@ -68,7 +69,7 @@ function opPatchWeek() {
   const c = O.cur;
   if (!c) return;
   if (now === c.s + R.statsAfter) opNews(c, "stats");
-  if (c.tier === "SSS" && now === c.live) { opNews(c, "apology"); if (c.ban !== null) opNews(c, "ban"); }
+  if (c.apo !== null && now === c.apo) { opNews(c, "apology"); if (c.ban !== null) opNews(c, "ban"); }
   if (now >= c.end) { opNews(c, "end"); O.history.push({ year: state.year, week: state.week, champ: c.champ, pos: c.pos, tier: c.tier, picks: c.picks, wins: c.wins, bans: c.bans, banned: c.ban !== null }); O.cur = null; O.plan = null; }
 }
 function opStart(O, plan) {
@@ -78,11 +79,18 @@ function opStart(O, plan) {
   const pool = releasedChampions(state.year, state.week).filter(function (ch) { return ch.positions.indexOf(pos) !== -1 && ch.name !== sNow; });
   if (!pool.length) { O.plan = null; return; }
   const champ = pool[Math.floor(rnd() * pool.length)].name, tier = plan.tier;
-  const live = now + R.weeks[tier];
-  const ban = tier === "SSS" && rnd() < R.banShare ? live : null;
-  O.cur = { id: state.year + "-" + state.week + "-" + champ, champ: champ, pos: pos, tier: tier, s: now, live: live, ban: ban, end: ban !== null ? ban + R.banWeeks : live, picks: 0, wins: 0, bans: 0, pub: {}, n: Math.floor(rnd() * 1e6) };
+  const live = opNextPatchAbs(); // 302: 다음 정기 패치까지
+  const apo = tier === "SSS" ? now + R.apologyAfter : null;
+  const ban = apo !== null && rnd() < R.banShare ? apo : null;
+  O.cur = { id: state.year + "-" + state.week + "-" + champ, champ: champ, pos: pos, tier: tier, s: now, live: live, apo: apo, ban: ban, end: live, picks: 0, wins: 0, bans: 0, pub: {}, n: Math.floor(rnd() * 1e6) };
   opNews(O.cur, "start");
   if (state.player && state.player.position === pos) opCoach(O.cur);
+}
+
+// 다음 정기 패치 주 (absWeek): 올해 남은 패치 주, 없으면 다음 해 첫 패치 주
+function opNextPatchAbs() {
+  const later = MASTERY.patchWeeks.filter(function (w) { return w > state.week; });
+  return later.length ? absWeek(state.year, later[0]) : absWeek(state.year + 1, MASTERY.patchWeeks[0]);
 }
 
 // ----- 글 (고르는 것도 사고 번호 n으로 — 게임 난수 안 씀) -----
@@ -90,7 +98,7 @@ function opPick(list, c, k) { return list && list.length ? list[(c.n + k * 7) % 
 function opFill(text, c) {
   const mine = myTeam();
   const v = {
-    champ: c.champ, pos: findPosition(c.pos).name, tier: c.tier, weeks: Math.max(0, c.live - absWeek()) || OP_PATCH_RULES.weeks[c.tier],
+    champ: c.champ, pos: findPosition(c.pos).name, tier: c.tier, weeks: Math.max(0, c.live - absWeek()),
     picks: c.picks, wins: c.wins, rate: c.picks ? Math.round(c.wins / c.picks * 100) : 0, bans: c.bans,
     me: state.player ? state.player.name : "", myTeam: mine ? mine.name : "", mastery: state.mastery ? (state.mastery[c.champ] || 0) : 0,
   };
