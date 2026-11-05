@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>챌린저 로드 — 배경 음악 시안 2</title>
+<style>
+  :root { --bg: #0b0b14; --panel: #151527; --border: #2a2a44; --text: #e8e8f4; --muted: #8b8ba8; --a: #3ad0ff; --b: #b98bff; --c: #ff5c9a; --gold: #ffd84a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px; background: var(--bg); color: var(--text); font-family: system-ui, "Malgun Gothic", sans-serif; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  p.lead { color: var(--muted); margin: 0 0 16px; font-size: 14px; line-height: 1.6; }
+  .bar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; padding: 10px 14px; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .col { background: var(--panel); border: 2px solid var(--border); border-radius: 14px; padding: 16px; }
+  .col.A { border-color: var(--a); } .col.B { border-color: var(--b); } .col.C { border-color: var(--c); }
+  .col h2 { margin: 0; font-size: 17px; }
+  .col.A h2 { color: var(--a); } .col.B h2 { color: var(--b); } .col.C h2 { color: var(--c); }
+  .desc { color: var(--muted); font-size: 13px; margin: 6px 0 12px; line-height: 1.6; }
+  button { font: inherit; color: var(--text); background: #22223a; border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; cursor: pointer; min-height: 40px; }
+  button.play { width: 100%; font-weight: 700; font-size: 15px; }
+  button.play.on { background: linear-gradient(90deg, #7c4dff, #1aa3d9); border-color: transparent; }
+  .eq { display: flex; gap: 3px; height: 26px; align-items: flex-end; margin-top: 12px; }
+  .eq i { flex: 1; background: var(--border); border-radius: 2px; height: 3px; transition: height 0.08s; }
+  .col.A .eq i.hit { background: var(--a); } .col.B .eq i.hit { background: var(--b); } .col.C .eq i.hit { background: var(--c); }
+  h3 { font-size: 15px; margin: 22px 0 8px; }
+  .sfx { display: flex; gap: 8px; flex-wrap: wrap; }
+  .note { margin-top: 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+</style>
+</head>
+<body>
+<h1>🎵 배경 음악 시안 2 — 레트로 게임기 소리</h1>
+<p class="lead">효과음과 같은 옛날 게임기 소리(펄스파·삼각파 베이스·잡음 드럼)로 만든 반복 곡이에요. 모두 새로 만든 곡이고, 한 바퀴는 15~25초예요.<br>[▶ 재생]을 누르면 계속 반복돼요. 다른 곡을 누르면 바뀌어요.</p>
+<div class="bar">
+  <label>음악 크기 <input type="range" id="vol" min="0" max="100" value="35"></label> <span id="volv">35</span>
+  <span style="color:var(--muted);font-size:13px">· 효과음보다 작게 시작 (게임에서도 음악·효과음 크기 따로)</span>
+</div>
+<div class="grid" id="grid"></div>
+
+<h3>🏆 새 우승 팡파레 (효과음 '다'에 넣을 것 — 예전 것은 유명한 게임 음악과 비슷해서 바꿈)</h3>
+<div class="sfx"><button id="trophy">▶ 새 우승 팡파레</button><button id="setwin">▶ 세트 승리</button></div>
+
+<div class="note">
+  게임에 넣을 때 생각할 것: 어느 화면에서 어떤 곡을 틀지 (예: 평소 = 고른 곡, 경기 재생 중 = 곡을 낮추거나 경기용 곡), 음악 크기는 효과음과 따로, 처음엔 켜짐(작게).
+</div>
+<script>
+// ===== 엔진 (시안 1과 같음) =====
+let AC = null, MASTER = null, MUSIC = null;
+function ac() {
+  if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); MASTER = AC.createGain(); MASTER.gain.value = 0.5; MASTER.connect(AC.destination); MUSIC = AC.createGain(); MUSIC.connect(AC.destination); setVol(); }
+  if (AC.state === "suspended") AC.resume();
+  return AC;
+}
+function setVol() { if (MUSIC) MUSIC.gain.value = (document.getElementById("vol").value / 100) * 0.5; }
+const PULSE = {};
+function pulseWave(duty) {
+  if (PULSE[duty]) return PULSE[duty];
+  const n = 64, re = new Float32Array(n), im = new Float32Array(n);
+  for (let k = 1; k < n; k++) re[k] = (2 / (k * Math.PI)) * Math.sin(k * Math.PI * duty);
+  return (PULSE[duty] = ac().createPeriodicWave(re, im));
+}
+function tone(o) {
+  const c = ac(), t0 = o.t !== undefined ? o.t : c.currentTime + (o.at || 0), d = o.dur || 0.1;
+  const osc = c.createOscillator(), g = c.createGain();
+  if (o.duty) osc.setPeriodicWave(pulseWave(o.duty)); else osc.type = o.type || "square";
+  osc.frequency.setValueAtTime(o.f, t0);
+  if (o.to) osc.frequency.exponentialRampToValueAtTime(o.to, t0 + d);
+  const v = o.vol || 0.3;
+  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(v, t0 + 0.005);
+  g.gain.setValueAtTime(v, t0 + d * 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+  osc.connect(g); g.connect(o.bus || MASTER); osc.start(t0); osc.stop(t0 + d + 0.02);
+}
+let NOISE = null;
+function noise(o) {
+  const c = ac(), t0 = o.t !== undefined ? o.t : c.currentTime + (o.at || 0), d = o.dur || 0.1;
+  if (!NOISE) { const len = c.sampleRate; NOISE = c.createBuffer(1, len, c.sampleRate); const ch = NOISE.getChannelData(0); let s = 12345; for (let i = 0; i < len; i++) { s = (s * 16807) % 2147483647; ch[i] = s / 1073741823.5 - 1; } }
+  const src = c.createBufferSource(); src.buffer = NOISE;
+  const f = c.createBiquadFilter(); f.type = o.hp ? "highpass" : "lowpass"; f.frequency.value = o.hp || o.lp || 2000;
+  const g = c.createGain(); g.gain.setValueAtTime(o.vol || 0.3, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+  src.connect(f); f.connect(g); g.connect(o.bus || MASTER); src.start(t0); src.stop(t0 + d + 0.02);
+}
+function N(name) {
+  const m = /^([A-G])(#?)(\d)$/.exec(name), idx = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] + (m[2] ? 1 : 0);
+  return 440 * Math.pow(2, (idx - 9) / 12 + (Number(m[3]) - 4));
+}
+
+// ===== 곡 (한 마디 = 8칸, '-' = 앞 음 이어서, '.' = 쉼) — 모두 새로 만든 곡 =====
+// drum: k 쿵 · s 탁 · h 칙 · o 열린 칙 · . 쉼
+const SONGS = {
+  A: { name: "가. 설레는 출발", desc: "밝고 빠른 장조 (128 BPM). '오늘도 한 주 시작!' 느낌. 대시보드 기본 곡으로 무난.", bpm: 128,
+    lead: [
+      "E5 - G5 C6 - B5 G5 -", "D5 - G5 B5 - A5 G5 -", "C5 - E5 A5 - G5 E5 -", "F5 - A5 C6 - D6 C6 -",
+      "E6 - D6 C6 - G5 E5 -", "D6 - C6 B5 - G5 D5 -", "C6 - B5 A5 - E5 C5 -", "A5 - C6 F5 . G5 B5 D6" ],
+    bass: ["C3 C4 C3 C4 C3 C4 C3 C4", "G2 G3 G2 G3 G2 G3 G2 G3", "A2 A3 A2 A3 A2 A3 A2 A3", "F2 F3 F2 F3 F2 F3 G2 G3"],
+    chords: [["C5", "E5", "G5"], ["B4", "D5", "G5"], ["C5", "E5", "A5"], ["C5", "F5", "A5"]],
+    drum: ["k.h.s.h.", "k.h.s.hk", "k.h.s.h.", "k.hks.so"] },
+  B: { name: "나. 차분한 숙소", desc: "느긋한 단조 칠화음 (92 BPM). 숙소에서 쉬는 밤 느낌. 오래 틀어 둬도 덜 질림.", bpm: 92,
+    lead: [
+      "E5 - - - C5 - D5 -", "F5 - - - E5 - C5 -", "D5 - - - B4 - G4 -", "E5 - - - - - . .",
+      "A5 - - G5 E5 - - -", "F5 - - E5 D5 - - -", "G5 - F5 - D5 - B4 -", "C5 - - - - - . ." ],
+    bass: ["A2 - - - A2 - E3 -", "D3 - - - D3 - A2 -", "G2 - - - G2 - D3 -", "C3 - - - C3 - G2 -"],
+    chords: [["C5", "E5", "G5"], ["C5", "F5", "A5"], ["B4", "D5", "F5"], ["B4", "E5", "G5"]],
+    drum: ["k...s...", "k.h.s.h.", "k...s...", "k.h.s.hh"] },
+  C: { name: "다. 결전의 무대", desc: "힘찬 단조 (140 BPM). 경기장·결승 느낌. 경기 재생이나 큰 경기 주에 어울림.", bpm: 140,
+    lead: [
+      "E5 E5 G5 E5 B5 - A5 G5", "E5 E5 G5 E5 C6 - B5 G5", "F#5 F#5 A5 F#5 D6 - C6 A5", "B5 - A5 G5 F#5 - E5 -",
+      "G5 - B5 - E6 - D6 B5", "C6 - B5 - G5 - E5 G5", "A5 - F#5 - D5 - F#5 A5", "B5 - - - B4 . B4 ." ],
+    bass: ["E2 E3 E2 E3 E2 E3 E2 E3", "C2 C3 C2 C3 C2 C3 C2 C3", "D2 D3 D2 D3 D2 D3 D2 D3", "B1 B2 B1 B2 B1 B2 B1 B2"],
+    chords: [["E5", "G5", "B5"], ["E5", "G5", "C6"], ["D5", "F#5", "A5"], ["D#5", "F#5", "B5"]],
+    drum: ["k.hsk.hs", "k.hsk.hs", "k.hsk.hs", "kkhsk.so"] },
+};
+let PLAY = null; // { key, step, next, timer }
+function scheduleStep(S, step, t) {
+  const sd = 60 / S.bpm / 2, bar = Math.floor(step / 8) % 8, i = step % 8;
+  const len = function (tokens, j) { let n = 1; while (tokens[j + n] === "-") n++; return n; };
+  const lead = S.lead[bar].split(" "), bass = S.bass[bar % 4].split(" ");
+  if (lead[i] !== "-" && lead[i] !== ".") tone({ t: t, f: N(lead[i]), dur: sd * len(lead, i) * 0.92, duty: 0.25, vol: 0.16, bus: MUSIC });
+  if (bass[i] !== "-" && bass[i] !== ".") tone({ t: t, f: N(bass[i]), dur: sd * len(bass, i) * 0.9, type: "triangle", vol: 0.32, bus: MUSIC });
+  const ch = S.chords[bar % 4]; tone({ t: t, f: N(ch[i % 3]), dur: sd * 0.45, duty: 0.125, vol: 0.05, bus: MUSIC }); // 작은 아르페지오
+  const d = S.drum[bar % 4][i];
+  if (d === "k") tone({ t: t, f: 150, to: 45, dur: 0.12, type: "sine", vol: 0.5, bus: MUSIC });
+  if (d === "s") noise({ t: t, dur: 0.1, lp: 3500, vol: 0.22, bus: MUSIC });
+  if (d === "h") noise({ t: t, dur: 0.03, hp: 7000, vol: 0.08, bus: MUSIC });
+  if (d === "o") noise({ t: t, dur: 0.12, hp: 6000, vol: 0.09, bus: MUSIC });
+  return i;
+}
+function play(key) {
+  stop();
+  const c = ac(), S = SONGS[key], sd = 60 / S.bpm / 2;
+  PLAY = { key: key, step: 0, next: c.currentTime + 0.08 };
+  PLAY.timer = setInterval(function () {
+    while (PLAY && PLAY.next < c.currentTime + 0.12) {
+      const i = scheduleStep(S, PLAY.step, PLAY.next);
+      const when = (PLAY.next - c.currentTime) * 1000, k = PLAY.key;
+      setTimeout(function () { eqHit(k, i); }, Math.max(0, when));
+      PLAY.step++; PLAY.next += sd;
+    }
+  }, 25);
+  draw();
+}
+function stop() { if (PLAY) clearInterval(PLAY.timer); PLAY = null; draw(); }
+function eqHit(k, i) { const bars = document.querySelectorAll(".col." + k + " .eq i"); bars.forEach(function (b, j) { b.classList.toggle("hit", j === i); b.style.height = (j === i ? 26 : 6) + "px"; }); }
+// 화면
+const grid = document.getElementById("grid");
+Object.keys(SONGS).forEach(function (k) {
+  const S = SONGS[k], col = document.createElement("div");
+  col.className = "col " + k;
+  col.innerHTML = "<h2>" + S.name + "</h2><div class=\"desc\">" + S.desc + "</div><button class=\"play\" data-k=\"" + k + "\">▶ 재생</button><div class=\"eq\">" + "<i></i>".repeat(8) + "</div>";
+  grid.appendChild(col);
+});
+function draw() { document.querySelectorAll("button.play").forEach(function (b) { const on = PLAY && PLAY.key === b.dataset.k; b.classList.toggle("on", on); b.textContent = on ? "⏸ 멈춤" : "▶ 재생"; }); }
+grid.addEventListener("click", function (e) { const b = e.target.closest("button.play"); if (!b) return; if (PLAY && PLAY.key === b.dataset.k) stop(); else play(b.dataset.k); });
+document.getElementById("vol").addEventListener("input", function () { document.getElementById("volv").textContent = this.value; setVol(); });
+// 새 우승 팡파레 (새로 만든 음 배열)
+function arp(notes, step, o) { notes.forEach(function (n, i) { tone(Object.assign({}, o, { at: (o.at || 0) + i * step, f: N(n) })); }); }
+document.getElementById("trophy").onclick = function () { ac();
+  arp(["G4", "C5", "E5", "G5"], 0.07, { dur: 0.1, duty: 0.25, vol: 0.17 });
+  arp(["E5", "G5", "C6"], 0.07, { at: 0.34, dur: 0.1, duty: 0.25, vol: 0.17 });
+  tone({ at: 0.58, f: N("D6"), dur: 0.16, duty: 0.25, vol: 0.17 }); tone({ at: 0.76, f: N("E6"), dur: 0.7, duty: 0.25, vol: 0.17 });
+  tone({ at: 0.76, f: N("C4"), dur: 0.7, type: "triangle", vol: 0.3 }); noise({ at: 0.76, dur: 0.5, hp: 5000, vol: 0.08 }); };
+document.getElementById("setwin").onclick = function () { ac();
+  arp(["C5", "E5", "G5"], 0.08, { dur: 0.1, duty: 0.25, vol: 0.18 }); tone({ at: 0.26, f: N("C6"), dur: 0.35, duty: 0.25, vol: 0.18 }); };
+</script>
+</body>
+</html>
