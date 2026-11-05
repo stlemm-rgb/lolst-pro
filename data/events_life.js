@@ -106,14 +106,14 @@ EVENTS.push(
     title: "🎉 {player} 선수의 생일",
     text: "오늘은 같은 팀 {player} 선수의 생일이다. 다른 팀원들이 몰래 파티를 준비하고 있다.",
     choices: [
-      { label: "깜짝 파티 준비에 앞장선다", effects: { relation: 15, teamRelation: 2, stamina: -3 }, result: "{player}가 문을 열자 폭죽이 터졌다. 그 표정, 평생 놀릴 거다." },
+      { label: "깜짝 파티 준비에 앞장선다", effects: { relation: 15, teamRelation: 2, stamina: -3 }, result: "{player}이(가) 문을 열자 폭죽이 터졌다. 그 표정, 평생 놀릴 거다." },
       { label: "작은 선물만 건넨다", effects: { relation: 6, money: -200000 }, result: "{player}: \"오, 센스 있는데?\"" },
     ],
   },
   {
     id: "friend_duo", tab: "inbox", trigger: "random", who: "friend",
     title: "🎮 {player}와(과) 합동 방송",
-    text: "친한 동료 {player}가 같이 합동 방송을 하자고 한다. \"우리 듀오 케미면 시청자 터진다.\"",
+    text: "친한 동료 {player}이(가) 같이 합동 방송을 하자고 한다. \"우리 듀오 케미면 시청자 터진다.\"",
     choices: [
       { label: "한다", effects: { popularity: 4, relation: 6, stamina: -4 }, result: "티격태격하는 둘의 대화가 클립으로 백만 뷰를 넘었다." },
       { label: "연습이 먼저다", effects: { relation: -2, focus: 1 } },
@@ -122,10 +122,10 @@ EVENTS.push(
   {
     id: "friend_advice", tab: "inbox", trigger: "random", who: "friend", need: { minWeek: 13 },
     title: "💬 {player}의 진지한 고민",
-    text: "연습이 끝난 뒤, 친한 동료 {player}가 숙소 옥상으로 불러냈다. \"나... 요즘 그만둘까 생각 중이야. 너한테 처음 말하는 거야.\"",
+    text: "연습이 끝난 뒤, 친한 동료 {player}이(가) 숙소 옥상으로 불러냈다. \"나... 요즘 그만둘까 생각 중이야. 너한테 처음 말하는 거야.\"",
     choices: [
       { label: "끝까지 이야기를 들어 준다", check: { stat: "mental", diff: 50 },
-        success: { effects: { relation: 20, teamRelation: 2, stamina: -6 }, result: "이야기가 끝날 무렵 {player}가 말했다. \"한 시즌만 더 해 볼게. 우승 한 번은 해 봐야지.\"" },
+        success: { effects: { relation: 20, teamRelation: 2, stamina: -6 }, result: "이야기가 끝날 무렵 {player}이(가) 말했다. \"한 시즌만 더 해 볼게. 우승 한 번은 해 봐야지.\"" },
         fail: { effects: { relation: 10, stamina: -8, condition: -3 }, result: "어떤 말을 해 줘야 할지 몰랐다. 그래도 끝까지 자리를 지켰다." } },
       { label: "감독님께 상담을 권한다", effects: { relation: 4 }, result: "{player}: \"...그래, 그게 맞겠다.\" 조금 서운한 눈치였다." },
     ],
@@ -133,7 +133,7 @@ EVENTS.push(
   {
     id: "foe_clash", tab: "inbox", trigger: "random", who: "foe",
     title: "💢 {player}와(과) SNS 설전",
-    text: "사이가 안 좋은 {pteam}의 {player}가 SNS에 나를 저격하는 듯한 글을 올렸다. 팬들이 캡처를 퍼 나르고 있다.",
+    text: "사이가 안 좋은 {pteam}의 {player}이(가) SNS에 나를 저격하는 듯한 글을 올렸다. 팬들이 캡처를 퍼 나르고 있다.",
     choices: [
       { label: "재치 있게 맞받아친다", check: { stat: "popularity", diff: 50 },
         success: { effects: { popularity: 5, reputation: -2, relation: -5 }, result: "한 줄 답글이 '역대급 받아치기'로 박제됐다." },
@@ -145,9 +145,9 @@ EVENTS.push(
   {
     id: "teammate_clutch", tab: "inbox", trigger: "afterWin", who: "teammate", chance: 0.12,
     title: "🙌 {player}의 슈퍼 세이브",
-    text: "오늘 경기, 내가 잡히기 직전에 {player}가 몸을 던져 살려 줬다. 그 덕에 이겼다. 경기 후 {player}가 하이파이브를 청했다.",
+    text: "오늘 경기, 내가 잡히기 직전에 {player}이(가) 몸을 던져 살려 줬다. 그 덕에 이겼다. 경기 후 {player}이(가) 하이파이브를 청했다.",
     choices: [
-      { label: "\"오늘 MVP는 너야\"라고 인터뷰한다", followUp: { event: "clutch_profile", weeks: [3, 6] }, effects: { relation: 15, reputation: 3 }, result: "{player}가 쑥스러운 듯 머리를 긁적였다." },
+      { label: "\"오늘 MVP는 너야\"라고 인터뷰한다", followUp: { event: "clutch_profile", weeks: [3, 6] }, effects: { relation: 15, reputation: 3 }, result: "{player}이(가) 쑥스러운 듯 머리를 긁적였다." },
       { label: "다음엔 내가 살려 주겠다고 한다", followUp: { event: "clutch_promise", weeks: [4, 8] }, effects: { relation: 8, teamfight: 1 }, result: "\"약속이다?\" 주먹을 맞댔다." },
     ],
   }

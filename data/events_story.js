@@ -129,7 +129,7 @@ EVENTS.push(
     title: "⚔️ {player} 선수가 왔다",
     text: "같은 포지션의 {player} 선수(스탯 점수 {score})가 팀에 합류했다. 첫 훈련 날, 연습실 문 앞에서 마주쳤다. 서로 어색하게 고개를 숙였다.\n(이 선수의 스탯 점수가 나보다 {gap} 이상 높아지면 2군으로 밀려요. 4주마다 판정)",
     choices: [
-      { label: "먼저 다가가 반갑게 맞는다", followUp: { event: "rival_practice", weeks: [5, 8] }, effects: { relation: 25, reputation: 3 }, result: "\"잘 부탁해. 서로 좋은 자극이 되자.\" {player}가 환하게 웃었다." },
+      { label: "먼저 다가가 반갑게 맞는다", followUp: { event: "rival_practice", weeks: [5, 8] }, effects: { relation: 25, reputation: 3 }, result: "\"잘 부탁해. 서로 좋은 자극이 되자.\" {player}이(가) 환하게 웃었다." },
       { label: "경쟁자로 선을 긋는다", followUp: [{ event: "rival_held", weeks: [8, 8] }, { event: "rival_close", weeks: [8, 8] }], check: { stat: "mental", diff: 55 },
         success: { effects: { relation: -15, laning: 2, focus: 1 }, result: "자리를 내줄 생각은 없다. 그날부터 연습량을 두 배로 늘렸다." },
         fail: { effects: { relation: -20, condition: -6 }, result: "신경이 쓰여 연습이 손에 안 잡힌다. {player}의 랭크 점수만 자꾸 확인하게 된다." } },
@@ -159,7 +159,7 @@ EVENTS.push(
   {
     id: "benched_now", tab: "inbox", trigger: "benchedNow", always: true,
     title: "📋 2군 통보",
-    text: "감독: \"다음 경기부터는 {player}가 나간다. 미안하지만 지금은 그게 팀에 맞다.\" 짧은 면담이 끝났다.",
+    text: "감독: \"다음 경기부터는 {player}이(가) 나간다. 미안하지만 지금은 그게 팀에 맞다.\" 짧은 면담이 끝났다.",
     choices: [
       { label: "받아들이고 이를 간다", effects: { mental: 2, laning: 1, condition: -4 }, result: "대기실 모니터 앞에서 노트를 폈다. 다시 돌아갈 자리를 위해." },
       { label: "감독에게 이유를 묻는다", check: { stat: "reputation", diff: 10 },
@@ -542,10 +542,10 @@ EVENTS.push(
   {
     id: "media_taunt_reply", tab: "inbox", trigger: "followUp", who: "rival",
     title: "🎙️ {player}의 답",
-    text: "미디어데이에서 내가 도발했던 일이 다시 화제다. {pteam}의 {player}가 인터뷰에서 웃으며 말했다. \"말은 들었습니다. 경기장에서 보죠.\"",
+    text: "미디어데이에서 내가 도발했던 일이 다시 화제다. {pteam}의 {player}이(가) 인터뷰에서 웃으며 말했다. \"말은 들었습니다. 경기장에서 보죠.\"",
     choices: [
       { label: "\"기대하겠습니다.\"", effects: { popularity: 2 }, result: "짧은 한마디에 팬들이 맞대결 날짜를 세기 시작했다." },
-      { label: "한 번 더 받아친다", effects: { popularity: 3, relation: -5 }, result: "기사 제목이 하나 더 늘었다. {player}는 이번엔 웃지 않았다." },
+      { label: "한 번 더 받아친다", effects: { popularity: 3, relation: -5 }, result: "기사 제목이 하나 더 늘었다. {player}은(는) 이번엔 웃지 않았다." },
       { label: "대꾸하지 않는다", effects: { condition: 2 }, result: "말은 한 번이면 충분하다." },
     ],
   },
@@ -599,7 +599,7 @@ EVENTS.push(
     title: "🍖 {player}의 메시지",
     text: "{player}: \"인터뷰 봤다. 팀원들 덕분이라며? 오늘 고기는 내가 산다.\"",
     choices: [
-      { label: "고맙게 얻어먹는다", effects: { relation: 4, condition: 2 }, result: "고기를 굽는 내내 {player}가 그 인터뷰 흉내를 냈다." },
+      { label: "고맙게 얻어먹는다", effects: { relation: 4, condition: 2 }, result: "고기를 굽는 내내 {player}이(가) 그 인터뷰 흉내를 냈다." },
       { label: "\"같이 복기나 하자\"", effects: { relation: 3, mental: 1 }, result: "밥 먹고 돌아와 둘이서 그 경기를 처음부터 다시 봤다." },
     ],
   },
@@ -609,9 +609,9 @@ EVENTS.push(
     title: "🧪 '{champ}' 어떻게 하는 거야?",
     text: "{player}: \"너 {champ} 먼저 팠다며. 그 콤보 나도 좀 알려 줘.\"",
     choices: [
-      { label: "콤보를 알려 준다", effects: { relation: 5, stamina: -2 }, result: "한 시간 넘게 붙잡고 알려 줬다. {player}가 처음으로 콤보를 성공하자 둘 다 소리를 질렀다." },
+      { label: "콤보를 알려 준다", effects: { relation: 5, stamina: -2 }, result: "한 시간 넘게 붙잡고 알려 줬다. {player}이(가) 처음으로 콤보를 성공하자 둘 다 소리를 질렀다." },
       { label: "같이 연습하자고 한다", effects: { relation: 3, masteryChamp: 5 }, result: "가르치다 보니 나도 몰랐던 틈이 보였다." },
-      { label: "\"이건 아직 비밀이야\"", effects: { condition: 2 }, result: "{player}가 웃으며 혀를 찼다. \"치사하다, 진짜.\"" },
+      { label: "\"이건 아직 비밀이야\"", effects: { condition: 2 }, result: "{player}이(가) 웃으며 혀를 찼다. \"치사하다, 진짜.\"" },
     ],
   },
   // 생일 → 다음 생일 언저리 / 가족
@@ -621,7 +621,7 @@ EVENTS.push(
     text: "오늘은 {player}의 생일이다. 내 생일에 다 같이 케이크를 잘랐던 게 생각난다. 그때 내 얼굴에 생크림을 묻힌 범인도 아직 기억난다.",
     choices: [
       { label: "생크림으로 갚아 준다", effects: { relation: 4, condition: 2 }, result: "연습실이 난장판이 됐다. 감독님도 웃으며 사진을 찍었다." },
-      { label: "작은 선물을 준비한다", effects: { money: -300000, relation: 6 }, result: "{player}가 선물을 한참 들여다보다가 \"이런 거 처음 받아 본다\"고 했다." },
+      { label: "작은 선물을 준비한다", effects: { money: -300000, relation: 6 }, result: "{player}이(가) 선물을 한참 들여다보다가 \"이런 거 처음 받아 본다\"고 했다." },
       { label: "축하 메시지만 보낸다", effects: { relation: 2 }, result: "\"생일 축하해. 오늘은 내가 서폿 해 줄게.\"" },
     ],
   },
@@ -660,27 +660,27 @@ EVENTS.push(
   {
     id: "rival_practice", tab: "inbox", trigger: "followUp", need: { mateHere: true },
     title: "⚔️ {player}의 부탁",
-    text: "같은 포지션의 {player}가 연습실에서 말을 걸었다. \"우리 둘이 라인전 연습 한 판 할래? 서로 약점 하나씩 말해 주기.\"",
+    text: "같은 포지션의 {player}이(가) 연습실에서 말을 걸었다. \"우리 둘이 라인전 연습 한 판 할래? 서로 약점 하나씩 말해 주기.\"",
     choices: [
       { label: "좋지, 한 판 하자", effects: { relation: 4, laning: 1, stamina: -3 }, result: "세 판을 내리 했다. 서로 \"그 타이밍은 반칙이지\"라며 웃었다." },
       { label: "내 약점부터 말해 달라고 한다", effects: { relation: 3, mental: 1 }, result: "{player}: \"너 2레벨 타이밍에 너무 정직해.\" 아프지만 맞는 말이었다." },
-      { label: "오늘은 쉬자고 한다", effects: { condition: 2 }, result: "\"다음에 꼭.\" {player}가 손을 흔들었다." },
+      { label: "오늘은 쉬자고 한다", effects: { condition: 2 }, result: "\"다음에 꼭.\" {player}이(가) 손을 흔들었다." },
     ],
   },
   // "경쟁자로 선을 긋는다" → 두 달 뒤 스탯 점수 비교
   {
     id: "rival_held", tab: "news", trigger: "followUp", need: { mateHere: true, pidAboveMe: false },
     title: "⚔️ 주전 자리는 그대로",
-    text: "{player}가 합류한 지 두 달. 주전 자리는 여전히 {name}의 것이다. 코치: \"둘 다 독기가 올라서 연습실 불이 꺼질 날이 없어.\"",
+    text: "{player}이(가) 합류한 지 두 달. 주전 자리는 여전히 {name}의 것이다. 코치: \"둘 다 독기가 올라서 연습실 불이 꺼질 날이 없어.\"",
     effects: { reputation: 2, mental: 1 },
   },
   {
     id: "rival_close", tab: "inbox", trigger: "followUp", need: { mateHere: true, pidAboveMe: true },
-    title: "⚔️ {player}가 바짝 쫓아왔다",
+    title: "⚔️ {player}이(가) 바짝 쫓아왔다",
     text: "{player}의 스탯 점수가 나를 넘어섰다. 감독이 둘의 연습 기록을 나란히 놓고 보고 있다. 선을 그었던 그날이 떠오른다.",
     choices: [
       { label: "연습 시간을 늘린다", effects: { focus: 1, stamina: -6 }, result: "마지막으로 연습실 불을 끄고 나왔다. 내일도 그럴 생각이다." },
-      { label: "{player}에게 비결을 묻는다", effects: { relation: 8, mental: 1 }, result: "{player}가 잠깐 놀라더니 자기 연습 노트를 보여 줬다." },
+      { label: "{player}에게 비결을 묻는다", effects: { relation: 8, mental: 1 }, result: "{player}이(가) 잠깐 놀라더니 자기 연습 노트를 보여 줬다." },
       { label: "내 할 일만 한다", effects: { condition: 3 }, result: "숫자는 숫자다. 경기장에서 보여 주면 된다." },
     ],
   },

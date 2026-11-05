@@ -25,7 +25,7 @@ NEWS_ARTICLES.biggame_preview = [
 ];
 NEWS_ARTICLES.biggame_result = [
   { who: "myWin", headline: "{icon} {derby}의 승자는 {myTeam}", body: "{myTeam}이(가) {label}에서 {opp}을(를) {score}로 꺾었다. 상대 전적은 {record}. {streakNote}" },
-  { who: "myWin", headline: "{myTeam}, {derby}서 {opp} 제압", body: "{derby}에서 웃은 쪽은 {myTeam}이었다. {score} 승리로 상대 전적 {record}. {streakNote}{me}도 팬들의 환호를 받았다." },
+  { who: "myWin", headline: "{myTeam}, {derby}서 {opp} 제압", body: "{derby}에서 웃은 건 {myTeam} 쪽이었다. {score} 승리로 상대 전적 {record}. {streakNote}{me}도 팬들의 환호를 받았다." },
   { who: "myWin", headline: "{icon} 라이벌을 눌렀다! {myTeam} {score} 승", body: "{myTeam}이(가) {opp}과(와)의 {derby}에서 {score}로 이겼다. 상대 전적 {record}. {streakNote}" },
   { who: "myLoss", headline: "{icon} {derby}, {opp}이(가) 웃었다", body: "{myTeam}이(가) {label}에서 {opp}에게 {score}로 졌다. 상대 전적은 {record}. {streakNote}다음 {derby}에서의 설욕을 다짐했다." },
   { who: "myLoss", headline: "{myTeam}, {derby}서 {opp}에 무릎", body: "자존심이 걸린 {derby}에서 {myTeam}이(가) {score}로 패했다. 상대 전적 {record}. {streakNote}팬들의 아쉬움이 크다." },

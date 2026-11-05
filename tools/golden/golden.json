@@ -3,7 +3,7 @@
   "name": "A 미드 2017 1부",
   "snaps": [
    {
-    "strict": "da05a8c8",
+    "strict": "d628e483",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -277,7 +277,7 @@
     }
    },
    {
-    "strict": "ae8e47a2",
+    "strict": "7c3d8fa6",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -380,7 +380,7 @@
     }
    },
    {
-    "strict": "7b7f7db8",
+    "strict": "a81f3a1b",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -489,7 +489,7 @@
     }
    },
    {
-    "strict": "76f9fe21",
+    "strict": "44920580",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -604,7 +604,7 @@
     }
    },
    {
-    "strict": "2792a220",
+    "strict": "89a14ea0",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -852,7 +852,7 @@
     }
    },
    {
-    "strict": "bd8ee10a",
+    "strict": "ebfdd1fa",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -985,7 +985,7 @@
     }
    },
    {
-    "strict": "80a0cee3",
+    "strict": "c0a70f83",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -1130,7 +1130,7 @@
   "name": "B 탑 2012 1부 강팀 무작위 답",
   "snaps": [
    {
-    "strict": "83952e8d",
+    "strict": "779f5d3a",
     "summary": {
      "year": 2013,
      "week": 1,
@@ -1214,7 +1214,7 @@
     }
    },
    {
-    "strict": "a54ff615",
+    "strict": "26f968fe",
     "summary": {
      "year": 2014,
      "week": 1,
@@ -1402,7 +1402,7 @@
     }
    },
    {
-    "strict": "e960e5c2",
+    "strict": "f6a5a9a",
     "summary": {
      "year": 2016,
      "week": 1,
@@ -1506,7 +1506,7 @@
     }
    },
    {
-    "strict": "a41ce83d",
+    "strict": "d23d29f7",
     "summary": {
      "year": 2017,
      "week": 1,
@@ -1616,7 +1616,7 @@
     }
    },
    {
-    "strict": "a338aec0",
+    "strict": "a323596",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -1732,7 +1732,7 @@
     }
    },
    {
-    "strict": "15fee0ad",
+    "strict": "ab1506f9",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -1854,7 +1854,7 @@
     }
    },
    {
-    "strict": "2a2be3",
+    "strict": "5a2dc109",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -1982,7 +1982,7 @@
     }
    },
    {
-    "strict": "171243a4",
+    "strict": "601202bf",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -2116,7 +2116,7 @@
     }
    },
    {
-    "strict": "1b7c72f0",
+    "strict": "249bfbc2",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -2263,7 +2263,7 @@
   "name": "C 원딜 2022 2부",
   "snaps": [
    {
-    "strict": "b1a213",
+    "strict": "68eb6279",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -2349,7 +2349,7 @@
     }
    },
    {
-    "strict": "777f79fe",
+    "strict": "2cb96fc1",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -2440,7 +2440,7 @@
     }
    },
    {
-    "strict": "9d846ff6",
+    "strict": "7c151a96",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -2538,7 +2538,7 @@
     }
    },
    {
-    "strict": "e776094a",
+    "strict": "bcb51e6d",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -2642,7 +2642,7 @@
     }
    },
    {
-    "strict": "75ea562e",
+    "strict": "da5cf148",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -2752,7 +2752,7 @@
     }
    },
    {
-    "strict": "9e8ed147",
+    "strict": "fc65b48b",
     "summary": {
      "year": 2028,
      "week": 1,
@@ -2868,7 +2868,7 @@
     }
    },
    {
-    "strict": "ec5e5892",
+    "strict": "1e92dc50",
     "summary": {
      "year": 2029,
      "week": 1,
@@ -2990,7 +2990,7 @@
     }
    },
    {
-    "strict": "5401a0b4",
+    "strict": "3eac783e",
     "summary": {
      "year": 2030,
      "week": 1,
@@ -3118,7 +3118,7 @@
     }
    },
    {
-    "strict": "c97e3bd9",
+    "strict": "d0a55cf5",
     "summary": {
      "year": 2031,
      "week": 1,
@@ -3253,7 +3253,7 @@
     }
    },
    {
-    "strict": "f9c13807",
+    "strict": "32451fd1",
     "summary": {
      "year": 2032,
      "week": 1,
@@ -3402,7 +3402,7 @@
   "name": "D 정글 2017 제안 수락",
   "snaps": [
    {
-    "strict": "23d96ad6",
+    "strict": "d1cbf14e",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -3488,7 +3488,7 @@
     }
    },
    {
-    "strict": "6b434138",
+    "strict": "9edf5b63",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -3579,7 +3579,7 @@
     }
    },
    {
-    "strict": "2139fe8d",
+    "strict": "2fe3c63b",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -3677,7 +3677,7 @@
     }
    },
    {
-    "strict": "ef1dea1e",
+    "strict": "430ee739",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -3782,7 +3782,7 @@
     }
    },
    {
-    "strict": "16a9a583",
+    "strict": "2b389594",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -3893,7 +3893,7 @@
     }
    },
    {
-    "strict": "a1bb1c8a",
+    "strict": "6c745a3f",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -4133,7 +4133,7 @@
     }
    },
    {
-    "strict": "b1ff4c24",
+    "strict": "d164f004",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -4398,7 +4398,7 @@
     }
    },
    {
-    "strict": "162760c9",
+    "strict": "d18e59c3",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -4545,7 +4545,7 @@
   "name": "E 서포트 2012",
   "snaps": [
    {
-    "strict": "9736bcef",
+    "strict": "e8f7e45f",
     "summary": {
      "year": 2013,
      "week": 1,
@@ -4720,7 +4720,7 @@
     }
    },
    {
-    "strict": "ecafb375",
+    "strict": "a3668eea",
     "summary": {
      "year": 2015,
      "week": 1,
@@ -4817,7 +4817,7 @@
     }
    },
    {
-    "strict": "9b05a43",
+    "strict": "990156a8",
     "summary": {
      "year": 2016,
      "week": 1,
@@ -4920,7 +4920,7 @@
     }
    },
    {
-    "strict": "ac9d645c",
+    "strict": "ac240354",
     "summary": {
      "year": 2017,
      "week": 1,
@@ -5029,7 +5029,7 @@
     }
    },
    {
-    "strict": "a8cb6473",
+    "strict": "81d480db",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -5144,7 +5144,7 @@
     }
    },
    {
-    "strict": "398ba426",
+    "strict": "48db05aa",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -5266,7 +5266,7 @@
     }
    },
    {
-    "strict": "d9642e60",
+    "strict": "7043002c",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -5395,7 +5395,7 @@
     }
    },
    {
-    "strict": "2907ee53",
+    "strict": "d4cb69bf",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -5530,7 +5530,7 @@
     }
    },
    {
-    "strict": "e3ee8bf0",
+    "strict": "faa8f9",
     "summary": {
      "year": 2022,
      "week": 1,

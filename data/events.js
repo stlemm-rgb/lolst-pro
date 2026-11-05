@@ -137,7 +137,7 @@ const EVENTS = [
   {
     id: "solo_praise", tab: "news", trigger: "soloKills",
     title: "커뮤니티: \"{name} 라인전 미쳤다\"",
-    text: "이번 주 경기에서 나온 솔로킬 장면이 커뮤니티 인기 글에 올랐다. \"{pos} 라인전은 {name}이 리그 최고\"라는 반응.",
+    text: "이번 주 경기에서 나온 솔로킬 장면이 커뮤니티 인기 글에 올랐다. \"{pos} 라인전은 {name}이(가) 리그 최고\"라는 반응.",
     effects: { popularity: 3 },
   },
   {
@@ -567,7 +567,7 @@ const EVENTS = [
   {
     id: "ad_gear", tab: "inbox", trigger: "random", need: { minPopularity: 60, maxPopularity: 79 }, cooldown: 16,
     title: "광고 모델 제의",
-    text: "게이밍 기어 브랜드에서 {name}을(를) 신제품 광고 모델로 쓰고 싶어 한다. \"요즘 가장 뜨는 {pos}잖아요.\"",
+    text: "게이밍 기어 브랜드에서 {name}을(를) 신제품 광고 모델로 쓰고 싶어 한다. \"요즘 가장 뜨는 {pos} 선수잖아요.\"",
     choices: [
       { label: "모델이 된다", effects: { money: 10000000, stamina: -8, popularity: 3 }, result: "내 이름이 박힌 마우스패드가 나왔다. 하나는 숙소 책상에." },
       { label: "정중히 거절한다", effects: { reputation: 1 } },
@@ -692,8 +692,8 @@ const EVENTS = [
     choices: [
       { label: "웃으며 악수를 청한다", effects: { reputation: 5, relation: 20, unflag: "rivalStory" }, result: "{player}도 피식 웃었다. \"코트 밖에서는 친구로 하죠.\" 훈훈한 장면이 하이라이트로 돌았다." },
       { label: "끝까지 눈을 피하지 않는다", check: { stat: "mental", diff: 60 },
-        success: { effects: { popularity: 6, matchBoost: 0.06, relation: -10 }, result: "먼저 눈을 피한 쪽은 {player}였다. 커뮤니티: \"기 싸움 승리\"" },
-        fail: { effects: { popularity: 2, condition: -5, relation: -10 }, result: "{player}가 여유롭게 웃었다. 괜히 내가 긴장했다." } },
+        success: { effects: { popularity: 6, matchBoost: 0.06, relation: -10 }, result: "먼저 눈을 피한 건 {player} 쪽이었다. 커뮤니티: \"기 싸움 승리\"" },
+        fail: { effects: { popularity: 2, condition: -5, relation: -10 }, result: "{player}이(가) 여유롭게 웃었다. 괜히 내가 긴장했다." } },
     ],
   },
   {
