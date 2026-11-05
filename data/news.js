@@ -322,6 +322,7 @@ const NEWS_GROUP_TEXT = {
   move: "🔁 이적 {n}건", moveCols: ["팀", "선수", "어디서", "이적료"], fa: "FA",
   rookie: "🌟 신인 입단 {n}명", rookieCols: ["선수", "포지션", "팀"], rookieKind: { 대형: "대형", 레전드: "레전드" },
   world: ["지역", "우승", "MVP"], mvp: ["지역", "MVP", "팀"],
+  allstar: ["포지션", "팀 블루", "팀 레드"], // 298 올스타전 소식 (js/news.js msgTextHTML)
   mineMark: "★ ",
 };
 

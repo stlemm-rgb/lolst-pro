@@ -139,12 +139,35 @@ function articleBodyHTML(a) {
   const html = a.key === "newyear" ? newYearBodyHTML(body) : a.key === "worldStory" ? worldStoryBodyHTML(body) : a.key === "worlds_preview" ? worldsPreviewBodyHTML(body) : null;
   return html || "<p>" + escapeHTML(body) + "</p>";
 }
+// 298 받은 소식 글: 올스타전처럼 '포지션: A / B' 줄이 3개 넘게 이어지면 표로 (나머지 글은 그대로)
+function msgTextHTML(text) {
+  const lines = String(text || "").split("\n"), out = [], G = NEWS_GROUP_TEXT, me = state.player ? state.player.name : "";
+  const posNames = POSITION_IDS.map(function (p) { return findPosition(p).name; });
+  const re = /^(.+?): (.+) \/ (.+)$/;
+  let i = 0;
+  while (i < lines.length) {
+    let j = i;
+    while (j < lines.length) { const m = re.exec(lines[j]); if (!m || posNames.indexOf(m[1]) === -1) break; j++; }
+    if (j - i >= 3) {
+      const rows = lines.slice(i, j).map(function (ln) { const m = re.exec(ln); return { cells: [m[1], m[2], m[3]], mine: !!me && (m[2].indexOf(me + " (") === 0 || m[3].indexOf(me + " (") === 0) }; });
+      out.push({ html: newsTableHTML("", G.allstar, rows, true) });
+      i = j;
+    } else { out.push({ text: lines[i] }); i++; }
+  }
+  if (!out.some(function (o) { return o.html; })) return escapeHTML(text);
+  // 글 줄은 이어 붙이고 표는 사이에 (줄바꿈은 pre-line이 보여 줌)
+  let html = "", buf = [];
+  const flush = function () { if (buf.length) { html += escapeHTML(buf.join("\n")); buf = []; } };
+  out.forEach(function (o) { if (o.html) { flush(); html += o.html; } else buf.push(o.text); });
+  flush();
+  return html;
+}
 function newsMyTeamName() { const t = state.player && myTeam(); return t ? t.name : ""; }
 // 표 하나: rows = [{ cells: [...글자], mine: 우리 팀 줄 }] → 우리 팀 줄 맨 위 + ★ (같은 묶음 안에서 원래 순서 유지)
-function newsTableHTML(title, cols, rows) {
+function newsTableHTML(title, cols, rows, keepOrder) {
   if (!rows.length) return "";
   const G = NEWS_GROUP_TEXT;
-  const sorted = rows.filter(function (r) { return r.mine; }).concat(rows.filter(function (r) { return !r.mine; }));
+  const sorted = keepOrder ? rows : rows.filter(function (r) { return r.mine; }).concat(rows.filter(function (r) { return !r.mine; })); // keepOrder: 포지션 순서처럼 순서가 뜻이 있으면 그대로
   return '<div class="np-grp"><div class="np-grp-h">' + escapeHTML(title.replace("{n}", rows.length)) + '</div><table class="np-tbl"><tr>' +
     cols.map(function (c) { return "<th>" + escapeHTML(c) + "</th>"; }).join("") + "</tr>" +
     sorted.map(function (r) {
@@ -427,7 +450,7 @@ function newsPaperHTML(list) {
     }).join("");
   } else if (mine.length) {
     const m = mine.shift();
-    lead = '<article class="npt-art lead mine' + (m.read ? "" : " new") + '"><h3>' + escapeHTML(m.title) + "</h3><p>" + escapeHTML(m.text) + "</p>" + newsChangesHTML(m) + "</article>";
+    lead = '<article class="npt-art lead mine' + (m.read ? "" : " new") + '"><h3>' + escapeHTML(m.title) + '</h3><div class="npt-body">' + msgTextHTML(m.text) + "</div>" + newsChangesHTML(m) + "</article>"; // 298
   }
   // 단신: 분야별 (나·우리 팀 이야기가 있는 분야 먼저)
   const groups = [];
@@ -449,7 +472,7 @@ function newsPaperHTML(list) {
   let secs = "";
   if (mine.length) {
     secs += '<div class="npt-sec"><h4><span>' + NEWS_PAPER.mineTitle + "</span><small>" + mine.length + "건</small></h4>" + mine.map(function (m) {
-      return '<div class="npt-brief' + (m.read ? "" : " new") + '"><b>' + escapeHTML(m.title) + '</b><span class="d">' + escapeHTML(m.text) + "</span>" + newsChangesHTML(m) + "</div>";
+      return '<div class="npt-brief' + (m.read ? "" : " new") + '"><b>' + escapeHTML(m.title) + '</b><div class="d">' + msgTextHTML(m.text) + "</div>" + newsChangesHTML(m) + "</div>"; // 298
     }).join("") + "</div>";
   }
   secs += groups.map(function (g) {

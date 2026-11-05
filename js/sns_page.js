@@ -71,7 +71,7 @@ function messageHTML(m) {
   if (open) {
     // 계약 제안: 기본은 계약·연봉만, 연봉 계산 내역은 접는 칸 (js/contracts.js)
     const text = m.kind === "offer" && m.offer ? offerText(m.offer) : m.text;
-    inner += '<div class="msg-text">' + escapeHTML(text) + "</div>";
+    inner += '<div class="msg-text">' + (m.kind === "offer" ? escapeHTML(text) : msgTextHTML(text)) + "</div>"; // 298 올스타전 같은 줄 목록은 표 (js/news.js)
     if (m.kind === "offer" && m.offer) inner += '<div class="msg-text">' + offerBreakdownHTML(m.offer) + "</div>";
     if (waiting && m.kind === "staffPick" && m.staffPick) inner += staffPickDeckHTML(m); // 인사 후보 카드 뒤집기 (js/ui.js)
     else if (waiting) {
