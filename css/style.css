@@ -586,6 +586,9 @@ td.pf-cell { width: 44px; padding-top: 3px; padding-bottom: 3px; padding-right: 
 /* 메타 등급 */
 .meta-tag.tier-S, .chip.tier-S { border-color: #f97316; color: #f97316; }
 .chip.tier-S { background: rgba(249, 115, 22, 0.12); font-weight: bold; }
+.meta-tag.tier-SS, .chip.tier-SS { border-color: var(--bad); color: var(--bad); font-weight: bold; } /* 301 패치 사고 */
+.meta-tag.tier-SSS, .chip.tier-SSS { border-color: var(--gold); color: var(--gold); font-weight: 800; background: rgba(var(--gold-rgb), 0.14); }
+.meta-tag.tier-ban, .chip.tier-ban { border-color: var(--muted); color: var(--muted); text-decoration: line-through; }
 .tier-badge { font-weight: bold; }
 
 /* 퀘스트 */

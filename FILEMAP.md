@@ -10,7 +10,7 @@
 | `data/player.js` | 16 | 내 선수 기본 규칙: 스탯·성장 곡선·포지션·유형·커리어 | stats.js, growth.js, positions.js, archetypes.js, career.js |
 | `data/traits.js` | 28 | 특성 목록 |  |
 | `data/champions.js` | 9 | 챔피언 목록 (리그 오브 레전드 실제 챔피언, 2026년 6월 기준 173명) |  |
-| `data/match.js` | 9 | 경기력 계산 규칙 (밴픽 + 메타 페널티) |  |
+| `data/match.js` | 10 | 경기력 계산 규칙 (밴픽 + 메타 페널티) |  |
 | `data/match_events.js` | 23 | 경기 이벤트 (세트마다 일어나는 사건: 스틸·슈퍼플레이·실수·심리) — js/match_events.js |  |
 | `data/schedule.js` | 5 | 한 시즌(52주) 일정표 |  |
 | `data/league.js` | 7 | 리그 규칙 (3단계) |  |
@@ -27,18 +27,19 @@
 | `data/mishaps.js` | 13 | 웃긴 해프닝 (2026-11-02) — 게임 결과와 관계없는 우스꽝스러운 사건사고 |  |
 | `data/contracts.js` | 13 | 연봉·계약·이적 규칙 (5단계) |  |
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
-| `data/news.js` | 46 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
+| `data/news.js` | 47 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
 | `data/ui.js` | 22 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/room.js` | 14 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/health.js` | 3 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |
-| `data/replay.js` | 2 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
+| `data/replay.js` | 11 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 코드는 js/replay.js |  |
 | `data/position_voice.js` | 15 | ④ 포지션 경험 1단계 (259): 경기 재생에서 내 장면 아래 '포지션다운 해설' 한 줄 — 코드는 js/position_voice.js |  |
 | `data/training.js` | 9 | 훈련: 퀘스트·훈련 | quests.js, training.js |
 | `data/boxscore.js` | 1 | 경기 기록(박스 스코어) 만들기 규칙 |  |
 | `data/comps.js` | 7 | 챔피언 조합 성향 (밴픽 상성·시너지) |  |
 | `data/era.js` | 24 | 시대: 대격변 패치·시대·해외 리그·시대별 경기 환경 | shakeup.js, era.js, era_match.js |
+| `data/op_patch.js` | 11 | 301 패치 사고 '사기 챔피언' SS·SSS (로직: js/op_patch.js) — 사용자 결정 2026-11-06 |  |
 | `data/fame.js` | 9 | 인기도 · 평판 (js/fame.js) — 2026-10-07 |  |
 | `data/collection.js` | 9 | 수집·강화 (js/collection.js) — 2026-10-08 |  |
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
@@ -51,18 +52,18 @@
 | `js/league.js` | 33 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
-| `js/matchsim.js` | 46 | 경기 판정과 주간 일정 진행 |  |
+| `js/matchsim.js` | 47 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 12 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 57 | 게임 상태 |  |
+| `js/main.js` | 58 | 게임 상태 |  |
 | `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 20 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 42 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
-| `js/sns_page.js` | 41 | SNS 화면 |  |
+| `js/sns_page.js` | 42 | SNS 화면 |  |
 | `js/contracts.js` | 33 | 연봉 · 계약 · 2군행 · 이적 |  |
 | `js/club_market.js` | 29 | 구단 이적 시장·여름 이적 | club_market.js, summer_market.js |
-| `js/market_pages.js` | 26 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
+| `js/market_pages.js` | 28 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
 | `js/links.js` | 4 | 선수·구단 이름 링크: 어느 화면이든 이름을 누르면 [선수 검색] / [구단 탐색]의 그 선수·구단으로 |  |
-| `js/news.js` | 26 | 뉴스: 소식·신문 팝업·월즈 특집·역사 뉴스 | news.js, news_popup.js, worlds_news.js, historical_news.js |
+| `js/news.js` | 33 | 뉴스: 소식·신문 팝업·월즈 특집·역사 뉴스 | news.js, news_popup.js, worlds_news.js, historical_news.js |
 | `js/dashboard.js` | 35 | 대시보드 위쪽: 지난주 결과, 커리어 요약, 솔로 랭크 |  |
 | `js/records.js` | 10 | 기록: 세트 평점, POG, 시즌 기록, 시상, 커리어 시즌 기록 |  |
 | `js/quests.js` | 18 | 퀘스트: 코치·감독 과제 |  |
@@ -74,9 +75,10 @@
 | `js/straits.js` | 14 | S급 특성: 얻는 조건 확인과 지급 (나와 다른 선수 모두) |  |
 | `js/boxscore.js` | 5 | 경기 기록(박스 스코어): 픽, 킬/데스/어시스트, CS, 피해량, 시야, 라인·운영·한타 점수 |  |
 | `js/comps.js` | 8 | 조합 성향: 메타 조합 · 조합 전략 · 밴픽 · 상성 · 시너지 |  |
-| `js/match_detail.js` | 23 | [경기 결과] 화면: 경기 요약 · 세트별 분석 · 선수 기록 |  |
+| `js/match_detail.js` | 24 | [경기 결과] 화면: 경기 요약 · 세트별 분석 · 선수 기록 |  |
 | `js/history_pages.js` | 15 | 역사관·리그 생태계·트로피 진열장 | history_pages.js, trophies.js |
 | `js/shakeup.js` | 7 | 대격변 패치 (값: data/era.js) |  |
+| `js/op_patch.js` | 8 | 301 패치 사고 '사기 챔피언' SS·SSS (규칙·글: data/op_patch.js OP_PATCH_RULES·OP_PATCH_TEXT) |  |
 | `js/era.js` | 28 | 시대·해외 리그·시대별 경기 환경 | era.js, era_match.js |
 | `js/fame.js` | 14 | 인기도 · 평판 (값: data/fame.js) |  |
 | `js/collection.js` | 21 | 시그니처 픽·업적·컬렉션 | signature.js, collection.js |
@@ -89,7 +91,7 @@
 | `js/rivals.js` | 17 | 맞대결 전적·구단별 빅게임 | h2h.js, biggame.js |
 | `js/staff.js` | 17 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
 | `js/portrait.js` | 11 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
-| `js/replay.js` | 24 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
+| `js/replay.js` | 50 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
 | `js/position_voice.js` | 13 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
 | `js/duo.js` | 8 | ④ 3단계 (261): 영혼의 듀오 — 규칙·글: data/duo.js |  |
 | `js/ui.js` | 14 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
@@ -97,7 +99,7 @@
 | `js/health.js` | 4 | 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js |  |
 | `js/franchise.js` | 8 | 프랜차이즈 (253, ② P5 · 사용자 결정 2026-11-03) — 실제 LCK처럼 2021년부터 |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
-| `js/dash_plus.js` | 24 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
+| `js/dash_plus.js` | 25 | 대시보드·진행 개선 (196, 시안 10 — 「풋볼 에이전시」 참고) |  |
 | `js/room.js` | 23 | 이번 주 행동 그림 (시안 24, 2026-11-02) — 데이터는 data/room.js |  |
 | `js/dash_layout.js` | 20 | 대시보드 PC · 휴대폰 따로 (232, 시안 24 ② · Codex 토론) |  |
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |

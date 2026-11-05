@@ -102,6 +102,7 @@ function metaPos(pos) {
 function isMeta(name, pos) {
   if (!state.meta) return false;
   const p = metaPos(pos);
+  if (p && opLiveTier(name, p)) return true; // 301 패치 사고 SS·SSS (js/op_patch.js)
   if (!p) return POSITION_IDS.some(function (x) { return state.meta.champs[x].indexOf(name) !== -1; });
   return state.meta.champs[p].indexOf(name) !== -1;
 }
@@ -110,6 +111,8 @@ function isMeta(name, pos) {
 function metaTier(name, pos) {
   if (!isMeta(name, pos)) return null;
   const p = metaPos(pos);
+  const op = p ? opLiveTier(name, p) : null; // 301 패치 사고: SS·SSS
+  if (op) return op;
   const s = state.meta.s || {};
   const s2 = state.meta.s2 || {};
   if (!p) return POSITION_IDS.some(function (x) { return (s[x] || state.meta.champs[x][0]) === name || s2[x] === name; }) ? "S" : "A";
@@ -122,10 +125,13 @@ function mySMeta() {
   return (state.meta.s && state.meta.s[pos]) || state.meta.champs[pos][0];
 }
 
+// 등급 순서 (301: SS·SSS 추가) — 정렬·가중치용
+function metaRank(t) { return t === "SSS" ? 4 : t === "SS" ? 3 : t === "S" ? 2 : t === "A" ? 1 : 0; }
+
 // 화면용 등급 표시
 function metaTagHTML(name, pos) {
   const t = metaTier(name, pos);
-  return t ? ' <span class="meta-tag tier-' + t + '">' + t + "</span>" : "";
+  return (t ? ' <span class="meta-tag tier-' + t + '">' + t + "</span>" : "") + opBanTagHTML(name); // 301 사용 금지 배지
 }
 
 // 내 포지션 챔피언 (출시된 것만), 메타 → 숙련도 높은 순
@@ -134,7 +140,7 @@ function myPositionChampions() {
   const list = Object.keys(state.mastery)
     .filter(function (name) { const c = findChampion(name); return c && c.positions.indexOf(pos) !== -1; });
   const rank = new Map();
-  list.forEach(function (n) { const t = metaTier(n); rank.set(n, t === "S" ? 2 : t === "A" ? 1 : 0); }); // R6: 한 번씩만 계산
+  list.forEach(function (n) { rank.set(n, metaRank(metaTier(n))); }); // R6: 한 번씩만 계산
   return list.sort(function (a, b) {
       const ma = rank.get(a), mb = rank.get(b);
       if (ma !== mb) return mb - ma;
@@ -289,7 +295,7 @@ function metaPenaltyInfo() {
   const names = state.meta.champs[state.player.position];
   let sum = 0, weight = 0;
   names.forEach(function (n) {
-    const w = metaTier(n) === "S" ? MATCH.metaSWeight : 1; // S급은 더 중요
+    const w = metaRank(metaTier(n)) >= 2 ? MATCH.metaSWeight : 1; // S급(SS·SSS 포함)은 더 중요
     sum += (state.mastery[n] || MASTERY.min) * w;
     weight += w;
   });
@@ -315,7 +321,7 @@ function rollBans(exclude) {
   exclude = exclude || [];
   const ranked = sortDescBy(myPositionChampions().filter(function (n) { return exclude.indexOf(n) === -1; }), banValue);
   const topMeta = ranked.filter(function (n) { return isMeta(n); }).sort(function (a, b) { return state.mastery[b] - state.mastery[a]; })[0];
-  const banned = rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0);
+  const banned = opForceBan(ranked, rollBanList(ranked, topMeta, topMeta ? state.mastery[topMeta] : 0), state.player.position); // 301 사고 챔피언은 먼저 밴되기 쉬움
   // 시그니처 픽: 메타와 상관없이 일정 확률로 먼저 밴 (밴 수는 최대 3)
   const sig = state.signature;
   if (sig && ranked.indexOf(sig) !== -1 && banned.indexOf(sig) === -1 && Math.random() < sigValue("banChance")) {

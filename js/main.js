@@ -879,6 +879,7 @@ function nextWeek(restWeek) {
     // 숙련도 1위 챔피언이 메타였다가 빠졌을 때만 "너프" 소식 후보 (원래 메타가 아니었으면 너프가 아님)
     if (myTop && topWasMeta && !isMeta(myTop)) state.weekCtx.nerfChamp = myTop;
   }
+  opPatchWeek(); // 301 패치 사고 '사기 챔피언' (js/op_patch.js)
 
   // 패치 바로 전 주(28주·52주): 솔로 랭크 초기화 예고
   if (isPrePatchWeek(state.week)) {

@@ -285,7 +285,7 @@ function playMatch(m) {
   // 조합 전략 (경기마다): 메타 따라가기 / 메타 카운터 / 자유 (js/comps.js)
   const plans = { a: scoutedPlan(m, m.a) || teamCompPlan(m.a), b: scoutedPlan(m, m.b) || teamCompPlan(m.b) }; // 분석 리포트로 미리 정한 상대 계획 (js/staff.js)
   const myTarget = userIn ? (m.a === mine.id ? plans.a : plans.b).target : null;
-  const seriesUsed = []; // 피어리스: 이번 경기에서 한 번 나온 챔피언은 뒤 세트에서 아무도 못 고름
+  const seriesUsed = opBannedChamps(); // 피어리스: 이번 경기에서 한 번 나온 챔피언은 뒤 세트에서 아무도 못 고름 (301: 대회 사용 금지 챔피언은 처음부터)
   const userPicks = [];
   let userCtx = null;
   const need = Math.ceil(m.bo / 2);
@@ -318,6 +318,7 @@ function playMatch(m) {
     }
     const set = playSet(m.a, m.b, userCtx, setCtx);
     set.comps.a.picks.concat(set.comps.b.picks).forEach(function (n) { if (seriesUsed.indexOf(n) === -1) seriesUsed.push(n); });
+    opCountSet(set.comps.a.picks, set.comps.b.picks, set.winner === m.a); // 301 사고 챔피언 픽·승 (기사용)
     m.score[set.winner === m.a ? 0 : 1]++;
     if (set.userLane) lanes.push(set.userLane);
     // 월드 결승: 세트마다 픽을 남김 → 우승 스킨 후보 (js/collection.js recordWorldsSkins)

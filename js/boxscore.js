@@ -43,7 +43,7 @@ function makeBoxScore(set, m, userPick) {
   const kills = aWon ? [winK, loseK] : [loseK, winK];
 
   // 픽: 세트 판정 때 정한 밴픽 그대로 (js/comps.js). 없으면 새로 고름
-  const used = userPick ? [userPick] : [];
+  const used = (userPick ? [userPick] : []).concat(opBannedChamps()); // 301 사용 금지 챔피언 제외
   const sides = [set.la, set.lb].map(function (list, s) {
     const picks = set.comps ? set.comps[s === 0 ? "a" : "b"].picks : null;
     return list.map(function (p, i) {

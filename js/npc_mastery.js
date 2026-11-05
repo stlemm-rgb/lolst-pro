@@ -87,7 +87,7 @@ function npcPickValue(p, name, target) {
 function npcBans(p, exclude) {
   const ranked = sortDescBy(Object.keys(p.mastery).filter(function (n) { return exclude.indexOf(n) === -1; }), function (n) { return npcBanValue(p, n); });
   const topMeta = ranked.filter(function (n) { return isMeta(n, p.pos); }).sort(function (a, b) { return p.mastery[b] - p.mastery[a]; })[0];
-  return rollBanList(ranked, topMeta, topMeta ? p.mastery[topMeta] : 0); // 견제 밴 포함 (js/champions.js)
+  return opForceBan(ranked, rollBanList(ranked, topMeta, topMeta ? p.mastery[topMeta] : 0), p.pos); // 견제 밴 포함 (js/champions.js), 301 사고 챔피언 밴
 }
 
 // 이 라인업 자리(lane pos)에서 숙련도를 쓰는 선수인가? (자기 포지션에 섰을 때만)
@@ -120,7 +120,7 @@ function npcChampMult(p, name) {
 function npcMetaAvg(p) {
   let sum = 0, weight = 0;
   (state.meta.champs[p.pos] || []).forEach(function (n) {
-    const w = metaTier(n, p.pos) === "S" ? MATCH.metaSWeight : 1;
+    const w = metaRank(metaTier(n, p.pos)) >= 2 ? MATCH.metaSWeight : 1;
     sum += (p.mastery[n] || MASTERY.min) * w;
     weight += w;
   });

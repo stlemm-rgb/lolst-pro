@@ -321,13 +321,14 @@ function homeLineHTML() {
 // ----- 오른쪽: 챔피언 (이번 패치 메타 + 내 숙련도 상위 5) -----
 function championCardHTML() {
   const myPos = state.player.position;
-  const myMeta = state.meta.champs[myPos].slice().sort(function (a, b) { return (metaTier(b) === "S") - (metaTier(a) === "S"); }).map(function (name) {
+  const myMeta = opMetaList(myPos).sort(function (a, b) { return metaRank(metaTier(b)) - metaRank(metaTier(a)); }).map(function (name) { // 301: 패치 사고 챔피언도 (SSS·SS 맨 앞)
     const v = state.mastery[name] || 1;
-    const t = metaTier(name);
-    return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + t + "</span> " + name + " <b>" + v + "</b>" + champComps(name).map(function (id) { return " " + findComp(id).icon; }).join("") + "</span>";
+    const t = opIsBanned(name) ? "ban" : metaTier(name);
+    const badge = t === "ban" ? escapeHTML(OP_PATCH_TEXT.tag.banned) : t;
+    return '<span class="chip meta tier-' + t + '"><span class="tier-badge">' + badge + "</span> " + name + " <b>" + v + "</b>" + champComps(name).map(function (id) { return " " + findComp(id).icon; }).join("") + "</span>";
   }).join("");
   const others = POSITION_IDS.filter(function (p) { return p !== myPos; }).map(function (p) {
-    return "<div>" + findPosition(p).name + ": " + state.meta.champs[p].map(function (n) { return metaTier(n, p) === "S" ? n + "(S)" : n; }).join(", ") + "</div>";
+    return "<div>" + findPosition(p).name + ": " + opMetaList(p).map(function (n) { return opIsBanned(n) ? n + "(" + OP_PATCH_TEXT.tag.banned + ")" : metaRank(metaTier(n, p)) >= 2 ? n + "(" + metaTier(n, p) + ")" : n; }).join(", ") + "</div>";
   }).join("");
   const top5 = myPositionChampions().slice().sort(function (a, b) { return state.mastery[b] - state.mastery[a]; }).slice(0, 5);
   return (
