@@ -144,6 +144,19 @@ const MSG_DECK = {
   legend: "⚠️ 낮은 확률로 나쁜 특성 · 💚 나쁜 특성 극복 · ✨ 좋은 특성 · 🎲 능력치로 성공·실패가 갈림", // 205: 카드 ⓘ 안내
 };
 
+// ----- 설정 화면 '이 게임에 대해' (282, 사용자 요청: 공개 배포 전 안내) — js/main.js pages.settings -----
+const ABOUT_NOTICE = {
+  title: "ℹ️ 이 게임에 대해",
+  lines: [
+    "「챌린저 로드」는 개인이 취미로 한 달 동안 만든 비공식 팬 게임이에요. 무료이고, 광고·후원·결제 같은 수익은 전혀 없어요.",
+    "라이엇 게임즈, LCK, 각 구단·선수와는 관계가 없고, 승인이나 후원을 받지 않았어요. 게임 속 경기·이적·기사·인물의 이야기는 모두 지어낸 것이에요.",
+    "앞으로 추가 업데이트는 없어요.",
+    "라이엇 게임즈 등 권리자의 공식 요청이 오면 바로 공개를 내려요.",
+    "2026 월드 챔피언십이 끝나면 공개를 멈출 예정이에요. 사이트가 내려가면 더 플레이할 수 없어요.",
+  ],
+  legal: "Riot Games does not endorse or sponsor this project. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc.",
+};
+
 // ----- ⓘ 설명 창 (274): 대시보드에 늘 보이던 고정 설명을 제목 옆 ⓘ로 (js/ui.js helpBtnHTML). 줄바꿈 = \n -----
 const HELP_TIPS = {
   label: "설명 보기",

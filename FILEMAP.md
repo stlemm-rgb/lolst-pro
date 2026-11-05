@@ -29,7 +29,7 @@
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
 | `data/news.js` | 46 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
 | `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
-| `data/ui.js` | 21 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
+| `data/ui.js` | 22 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/room.js` | 14 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/health.js` | 3 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |

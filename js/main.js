@@ -307,6 +307,10 @@ pages.settings = function () {
     '<div class="card"><h2>새 게임</h2>' +
       '<p class="placeholder">캐릭터 생성부터 다시 시작합니다. 커리어를 시작하기 전까지는 기존 저장이 남아 있어요.</p>' +
       '<button class="danger" data-action="new-game">새 게임 시작</button>' +
+    "</div>" +
+    '<div class="card about-card no-link"><h2>' + ABOUT_NOTICE.title + "</h2>" + // 282: 비공식·비상업·업데이트 없음·요청 시 내림·월즈 뒤 중단 (data/ui.js), no-link = 'Riot' 같은 글자가 선수 이름 링크로 바뀌지 않게
+      ABOUT_NOTICE.lines.map(function (t) { return "<p>" + escapeHTML(t) + "</p>"; }).join("") +
+      '<p class="muted small" lang="en">' + escapeHTML(ABOUT_NOTICE.legal) + "</p>" +
     "</div>"
   );
 };
