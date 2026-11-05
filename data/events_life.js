@@ -147,8 +147,8 @@ EVENTS.push(
     title: "🙌 {player}의 슈퍼 세이브",
     text: "오늘 경기, 내가 잡히기 직전에 {player}가 몸을 던져 살려 줬다. 그 덕에 이겼다. 경기 후 {player}가 하이파이브를 청했다.",
     choices: [
-      { label: "\"오늘 MVP는 너야\"라고 인터뷰한다", effects: { relation: 15, reputation: 3 }, result: "{player}가 쑥스러운 듯 머리를 긁적였다." },
-      { label: "다음엔 내가 살려 주겠다고 한다", effects: { relation: 8, teamfight: 1 }, result: "\"약속이다?\" 주먹을 맞댔다." },
+      { label: "\"오늘 MVP는 너야\"라고 인터뷰한다", followUp: { event: "clutch_profile", weeks: [3, 6] }, effects: { relation: 15, reputation: 3 }, result: "{player}가 쑥스러운 듯 머리를 긁적였다." },
+      { label: "다음엔 내가 살려 주겠다고 한다", followUp: { event: "clutch_promise", weeks: [4, 8] }, effects: { relation: 8, teamfight: 1 }, result: "\"약속이다?\" 주먹을 맞댔다." },
     ],
   }
 );

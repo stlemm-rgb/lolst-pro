@@ -97,7 +97,7 @@ function stateFromSave(save) {
   if (s.career && typeof s.career === "object") {
     fresh.career.finalsWon = Number(s.career.finalsWon) || 0;
     fresh.career.gainTried = s.career.gainTried || {};
-    ["seasonGames", "games", "wins", "seasonWins", "questsDone", "questsGiven", "earned", "repSum", "repWeeks", "allstars", "allStarYear"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
+    ["seasonGames", "games", "wins", "seasonWins", "questsDone", "questsGiven", "earned", "repSum", "repWeeks", "allstars", "allStarYear", "allStarPickYear"].forEach(function (k) { fresh.career[k] = Number(s.career[k]) || 0; });
     if (Array.isArray(s.career.seasons)) fresh.career.seasons = s.career.seasons;
     if (Array.isArray(s.career.awards)) fresh.career.awards = s.career.awards;
     if (Array.isArray(s.career.deepRuns)) fresh.career.deepRuns = s.career.deepRuns; // 팀 내 입지 경력 (js/standing.js)

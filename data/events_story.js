@@ -77,9 +77,9 @@ EVENTS.push(
     title: "⭐ 올스타 팬 투표 마감 직전",
     text: "다음 주 올스타전 팬 투표가 곧 마감된다. 구단 SNS 담당자가 투표 독려 글을 올려 달라고 부탁했다.",
     choices: [
-      { label: "직접 투표 독려 영상을 찍는다", effects: { popularity: 4, stamina: -3 }, result: "\"한 표만 주세요!\" 어색한 하트 포즈가 밈이 됐다." },
-      { label: "\"투표는 팬분들 몫이죠.\"", effects: { reputation: 3 }, result: "담담한 한마디에 오히려 팬들이 더 열심히 투표했다는 후문." },
-      { label: "팬 감사 라이브 방송을 켠다", check: { stat: "popularity", diff: 50 },
+      { label: "직접 투표 독려 영상을 찍는다", followUp: [{ event: "allstar_picked_after", weeks: [2, 2] }, { event: "allstar_missed_after", weeks: [2, 2] }], effects: { popularity: 4, stamina: -3 }, result: "\"한 표만 주세요!\" 어색한 하트 포즈가 밈이 됐다." },
+      { label: "\"투표는 팬분들 몫이죠.\"", followUp: [{ event: "allstar_picked_after", weeks: [2, 2] }, { event: "allstar_missed_after", weeks: [2, 2] }], effects: { reputation: 3 }, result: "담담한 한마디에 오히려 팬들이 더 열심히 투표했다는 후문." },
+      { label: "팬 감사 라이브 방송을 켠다", followUp: [{ event: "allstar_picked_after", weeks: [2, 2] }, { event: "allstar_missed_after", weeks: [2, 2] }], check: { stat: "popularity", diff: 50 },
         success: { effects: { popularity: 6, condition: 4 }, result: "동시 시청자 3만 명. 채팅창이 응원으로 가득 찼다." },
         fail: { effects: { popularity: 2, stamina: -4 }, result: "시청자가 생각보다 적었다. 그래도 와 준 팬들과 오래 이야기했다." } },
     ],
@@ -129,8 +129,8 @@ EVENTS.push(
     title: "⚔️ {player} 선수가 왔다",
     text: "같은 포지션의 {player} 선수(스탯 점수 {score})가 팀에 합류했다. 첫 훈련 날, 연습실 문 앞에서 마주쳤다. 서로 어색하게 고개를 숙였다.\n(이 선수의 스탯 점수가 나보다 {gap} 이상 높아지면 2군으로 밀려요. 4주마다 판정)",
     choices: [
-      { label: "먼저 다가가 반갑게 맞는다", effects: { relation: 25, reputation: 3 }, result: "\"잘 부탁해. 서로 좋은 자극이 되자.\" {player}가 환하게 웃었다." },
-      { label: "경쟁자로 선을 긋는다", check: { stat: "mental", diff: 55 },
+      { label: "먼저 다가가 반갑게 맞는다", followUp: { event: "rival_practice", weeks: [5, 8] }, effects: { relation: 25, reputation: 3 }, result: "\"잘 부탁해. 서로 좋은 자극이 되자.\" {player}가 환하게 웃었다." },
+      { label: "경쟁자로 선을 긋는다", followUp: [{ event: "rival_held", weeks: [8, 8] }, { event: "rival_close", weeks: [8, 8] }], check: { stat: "mental", diff: 55 },
         success: { effects: { relation: -15, laning: 2, focus: 1 }, result: "자리를 내줄 생각은 없다. 그날부터 연습량을 두 배로 늘렸다." },
         fail: { effects: { relation: -20, condition: -6 }, result: "신경이 쓰여 연습이 손에 안 잡힌다. {player}의 랭크 점수만 자꾸 확인하게 된다." } },
       { label: "신경 쓰지 않는다", effects: { condition: 2 }, result: "내가 할 일만 하면 된다." },
@@ -629,6 +629,102 @@ EVENTS.push(
     id: "birthday_family_after", tab: "news", trigger: "followUp",
     title: "📱 아버지의 문자",
     text: "생일에 가족과 저녁을 먹은 뒤로, 아버지가 경기가 끝날 때마다 짧은 문자를 보낸다. 오늘은 \"잘했다\" 세 글자였다.",
+    effects: { condition: 3 },
+  },
+);
+
+// ===== ④-2 3단계 (269): 남은 후속 4개 — 슈퍼 세이브·경쟁자 합류·올스타·손목 통증 =====
+// need.mateHere: 처음 연락의 선수(ctx.pid)가 아직 같은 팀 / pidAboveMe: 그 선수 스탯 점수가 나보다 높음(true)·낮음(false)
+// need.allStarPicked: 올해 올스타에 뽑힘(true)·못 뽑힘(false) / maxStamina·minStamina: 지금 체력 (js/friends.js storyNeedOk)
+// 짝(경쟁자·올스타·손목)은 같은 주에 둘 다 예약하고 조건이 맞는 하나만 옴
+EVENTS.push(
+  // 동료 슈퍼 세이브 "오늘 MVP는 너야" → 그 동료의 프로필 사진
+  {
+    id: "clutch_profile", tab: "news", trigger: "followUp", need: { mateHere: true },
+    title: "📸 {player}의 새 프로필 사진",
+    text: "{player}의 SNS 프로필 사진이 바뀌었다. 내가 \"오늘 MVP는 너야\"라고 말하던 인터뷰 캡처다. 팬들이 \"본인이 제일 좋아함\"이라며 놀리고 있다.",
+    effects: { relation: 3, condition: 2 },
+  },
+  // "다음엔 내가 살려 줄게" → 약속을 기억하는 동료
+  {
+    id: "clutch_promise", tab: "inbox", trigger: "followUp", need: { mateHere: true },
+    title: "🤝 {player}: \"약속 기억하지?\"",
+    text: "{player}: \"저번에 다음엔 네가 살려 준다며. 이번 주 한타 때 내 쪽도 좀 봐 줘. 나 요즘 자꾸 먼저 잡힌다.\"",
+    choices: [
+      { label: "한타 콜을 같이 맞춰 본다", effects: { relation: 3, teamfight: 1, stamina: -3 }, result: "리플레이를 돌려 가며 누가 먼저 들어갈지 정했다. 연습 판에서 둘 다 살아 나왔다." },
+      { label: "\"걱정 마, 약속은 지킨다\"", effects: { relation: 4 }, result: "{player}: \"말만 하지 말고.\" 웃으면서 주먹을 내밀었다." },
+      { label: "\"이번엔 네가 알아서 살아\"", effects: { relation: 2, condition: 2 }, result: "{player}: \"치사하다 진짜.\" 단톡방에 내 말이 박제됐다." },
+    ],
+  },
+  // 경쟁자 합류 "반갑게 맞는다" → 같이 연습하자는 부탁
+  {
+    id: "rival_practice", tab: "inbox", trigger: "followUp", need: { mateHere: true },
+    title: "⚔️ {player}의 부탁",
+    text: "같은 포지션의 {player}가 연습실에서 말을 걸었다. \"우리 둘이 라인전 연습 한 판 할래? 서로 약점 하나씩 말해 주기.\"",
+    choices: [
+      { label: "좋지, 한 판 하자", effects: { relation: 4, laning: 1, stamina: -3 }, result: "세 판을 내리 했다. 서로 \"그 타이밍은 반칙이지\"라며 웃었다." },
+      { label: "내 약점부터 말해 달라고 한다", effects: { relation: 3, mental: 1 }, result: "{player}: \"너 2레벨 타이밍에 너무 정직해.\" 아프지만 맞는 말이었다." },
+      { label: "오늘은 쉬자고 한다", effects: { condition: 2 }, result: "\"다음에 꼭.\" {player}가 손을 흔들었다." },
+    ],
+  },
+  // "경쟁자로 선을 긋는다" → 두 달 뒤 스탯 점수 비교
+  {
+    id: "rival_held", tab: "news", trigger: "followUp", need: { mateHere: true, pidAboveMe: false },
+    title: "⚔️ 주전 자리는 그대로",
+    text: "{player}가 합류한 지 두 달. 주전 자리는 여전히 {name}의 것이다. 코치: \"둘 다 독기가 올라서 연습실 불이 꺼질 날이 없어.\"",
+    effects: { reputation: 2, mental: 1 },
+  },
+  {
+    id: "rival_close", tab: "inbox", trigger: "followUp", need: { mateHere: true, pidAboveMe: true },
+    title: "⚔️ {player}가 바짝 쫓아왔다",
+    text: "{player}의 스탯 점수가 나를 넘어섰다. 감독이 둘의 연습 기록을 나란히 놓고 보고 있다. 선을 그었던 그날이 떠오른다.",
+    choices: [
+      { label: "연습 시간을 늘린다", effects: { focus: 1, stamina: -6 }, result: "마지막으로 연습실 불을 끄고 나왔다. 내일도 그럴 생각이다." },
+      { label: "{player}에게 비결을 묻는다", effects: { relation: 8, mental: 1 }, result: "{player}가 잠깐 놀라더니 자기 연습 노트를 보여 줬다." },
+      { label: "내 할 일만 한다", effects: { condition: 3 }, result: "숫자는 숫자다. 경기장에서 보여 주면 된다." },
+    ],
+  },
+  // 올스타 투표 (답 상관없이) → 뽑힘 / 못 뽑힘
+  {
+    id: "allstar_picked_after", tab: "news", trigger: "followUp", need: { allStarPicked: true },
+    title: "⭐ \"우리가 보냈다\"",
+    text: "올스타전이 끝나자 팬 카페에 투표 인증 글이 줄을 이었다. \"하루에 세 번씩 투표했음\", \"{name} 올스타 만든 사람 손.\" 댓글마다 손이 올라가 있다.",
+    effects: { popularity: 2, condition: 2 },
+  },
+  {
+    id: "allstar_missed_after", tab: "inbox", trigger: "followUp", need: { allStarPicked: false },
+    title: "⭐ \"내년엔 우리가 보낸다\"",
+    text: "올스타에 뽑히지 못했다. 팬 카페에 공지가 하나 올라왔다. \"내년 투표는 지금부터 준비합니다. {name} 올스타 보내기 모임.\"",
+    choices: [
+      { label: "고맙다는 댓글을 남긴다", effects: { reputation: 2 }, result: "\"모임 회원 1호로 가입합니다.\" 댓글에 좋아요가 수백 개 달렸다." },
+      { label: "내년 목표로 적어 둔다", effects: { mental: 1 }, result: "연습실 화이트보드 구석에 작게 적었다. '올스타'." },
+      { label: "웃고 넘긴다", effects: { condition: 2 }, result: "올스타보다 다음 시즌이 먼저다. 그래도 기분은 좋았다." },
+    ],
+  },
+  // 손목 통증 "병원에 간다" → 트레이너의 관리 루틴
+  {
+    id: "wrist_routine", tab: "inbox", trigger: "followUp",
+    title: "🩹 트레이너의 손목 루틴",
+    text: "병원에 다녀온 뒤로 트레이너가 손목을 매일 체크한다. \"다시 아프기 전에 루틴을 만들자. 경기 전 10분이면 돼.\"",
+    choices: [
+      { label: "루틴을 따라 한다", effects: { stamina: 6 }, result: "손목 돌리기, 손가락 펴기, 따뜻한 물. 경기 전 의식이 하나 늘었다." },
+      { label: "\"이제 괜찮아요\"", effects: { condition: 2 }, result: "트레이너: \"아프면 바로 말해.\" 고개를 끄덕였다." },
+    ],
+  },
+  // "테이핑하고 계속한다" → 4주 뒤 체력에 따라
+  {
+    id: "wrist_back", tab: "inbox", trigger: "followUp", need: { maxStamina: 30 },
+    title: "🩹 손목이 다시 욱신거린다",
+    text: "테이핑으로 버티던 손목이 다시 찌릿하다. 요즘 쉬지 못한 탓이다. 트레이너가 테이프를 보더니 한숨을 쉬었다.",
+    choices: [
+      { label: "이번엔 쉬겠다고 말한다", effects: { stamina: 10, skipTraining: true }, note: "다음 주 훈련 없음", result: "트레이너: \"잘 생각했다.\" 일주일 동안 마우스를 내려놓았다." },
+      { label: "테이핑을 더 단단히 감는다", effects: { condition: -2, mental: 1 }, result: "이를 악물었다. 대신 오늘 연습은 평소보다 일찍 끝냈다." },
+    ],
+  },
+  {
+    id: "wrist_fine", tab: "news", trigger: "followUp", need: { minStamina: 31 },
+    title: "🩹 테이핑 졸업",
+    text: "트레이너가 손목을 이리저리 돌려 보더니 테이프를 떼 줬다. \"이제 괜찮다. 대신 무리하면 또 온다.\"",
     effects: { condition: 3 },
   },
 );

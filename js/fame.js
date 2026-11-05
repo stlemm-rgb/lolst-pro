@@ -230,6 +230,7 @@ function runAllStar() {
   const notes = [];
   if (me) {
     state.career.allstars = (state.career.allstars || 0) + 1;
+    state.career.allStarPickYear = state.year; // 올스타 후속 연락 조건 (269, js/friends.js storyNeedOk)
     const S = ALL_STAR.selected;
     addPopularity(S.popularity);
     state.reputation = Math.min(100, state.reputation + S.reputation);

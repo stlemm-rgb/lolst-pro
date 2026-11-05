@@ -313,8 +313,8 @@ const EVENTS = [
     title: "손목 통증",
     text: "무리한 탓인지 손목이 욱신거린다. 마우스를 잡을 때마다 찌릿하다.",
     choices: [
-      { label: "병원에 간다", effects: { stamina: 15, skipTraining: true }, note: "다음 주 훈련 없음", result: "의사: \"초기라 다행이에요. 일주일만 쉬세요.\"" },
-      { label: "테이핑하고 계속한다", check: { stat: "stamina", diff: 15 },
+      { label: "병원에 간다", followUp: { event: "wrist_routine", weeks: [4, 6] }, effects: { stamina: 15, skipTraining: true }, note: "다음 주 훈련 없음", result: "의사: \"초기라 다행이에요. 일주일만 쉬세요.\"" },
+      { label: "테이핑하고 계속한다", followUp: [{ event: "wrist_back", weeks: [4, 4] }, { event: "wrist_fine", weeks: [4, 4] }], check: { stat: "stamina", diff: 15 },
         success: { effects: { condition: -3 }, result: "테이핑이 생각보다 효과가 있다. 통증이 가라앉았다." },
         fail: { effects: { reaction: -3, stamina: -5 }, result: "참을수록 심해진다. 결국 반응속도가 떨어졌다.", risk: { trait: "injury_prone", chance: 0.05 } } },
     ],

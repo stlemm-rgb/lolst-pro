@@ -48,7 +48,7 @@ function titleThisYear() {
   const ch = (state.league.season && state.league.season.champions) || {};
   return !!t && Object.keys(ch).some(function (k) { return ch[k] === t.id; });
 }
-function storyNeedOk(need) {
+function storyNeedOk(need, ctx) {
   const t = myTeam();
   if (need.minScore !== undefined && playerScore(USER_ID) < need.minScore) return false;
   if (need.maxScore !== undefined && playerScore(USER_ID) > need.maxScore) return false;
@@ -61,6 +61,16 @@ function storyNeedOk(need) {
   if (need.topRank !== undefined && !(myLeagueRank() >= 1 && myLeagueRank() <= need.topRank)) return false; // 우리 팀 리그 순위 n위 안 (④-2 3단계)
   if (need.lowRank !== undefined && myLeagueRank() < need.lowRank) return false; // 우리 팀 리그 순위 n위 아래
   if (need.minSalary !== undefined && (!state.contract || state.contract.salary < need.minSalary * eraMoney())) return false;
+  if (need.maxStamina !== undefined && state.stamina > need.maxStamina) return false; // 지금 체력 n 이하 (269)
+  if (need.minStamina !== undefined && state.stamina < need.minStamina) return false;
+  if (need.allStarPicked !== undefined) { // 올해 올스타가 열렸고 내가 뽑혔나 (269, js/fame.js runAllStar)
+    if (state.career.allStarYear !== state.year) return false;
+    if ((state.career.allStarPickYear === state.year) !== need.allStarPicked) return false;
+  }
+  // 후속 연락의 처음 연락에 나온 선수(ctx.pid) 조건 (269): 아직 같은 팀 / 그 선수 스탯 점수가 나보다 높음·낮음
+  const pid = ctx && ctx.pid, pp = pid && state.league.players[pid];
+  if (need.mateHere && !(pp && t && pid !== USER_ID && t.roster.indexOf(pid) !== -1)) return false;
+  if (need.pidAboveMe !== undefined && !(pp && (playerScore(pid) > playerScore(USER_ID)) === need.pidAboveMe)) return false;
   return true;
 }
 

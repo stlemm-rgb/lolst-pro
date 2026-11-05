@@ -333,7 +333,7 @@ function eventReady(ev) {
 }
 
 // 연락의 need 조건만 (쉬는 기간·시즌 개수 제한은 안 봄) — 후속 연락도 보낼 때 이것만 다시 확인 (④-2 3단계)
-function eventNeedOk(ev) {
+function eventNeedOk(ev, ctx) {
   const need = ev.need || {};
   if (need.minPopularity && state.popularity < need.minPopularity) return false;
   if (need.maxPopularity !== undefined && state.popularity > need.maxPopularity) return false;
@@ -343,7 +343,7 @@ function eventNeedOk(ev) {
   if (need.minWeek && state.week < need.minWeek) return false;
   if (need.trait && !hasTrait(need.trait)) return false;
   if (need.noTrait && hasTrait(need.noTrait)) return false;
-  if (!storyNeedOk(need)) return false; // 리뉴얼 조건 (js/friends.js)
+  if (!storyNeedOk(need, ctx)) return false; // 리뉴얼 조건 (js/friends.js), ctx = 후속 연락의 처음 연락 내용 (269)
   return true;
 }
 
@@ -740,7 +740,7 @@ function firePendingEvents() {
     if (p.at > now) return true;
     const ev = findEvent(p.event);
     // 방송 관련 후속은 방송을 그만뒀으면 안 옴. 조건(need)이 이제 안 맞으면 조용히 안 보냄 (④-2 3단계)
-    if (!ev || !eventNeedOk(ev) || (p.event.indexOf("stream_") === 0 && !hasActivity("stream"))) return false;
+    if (!ev || !eventNeedOk(ev, p.ctx) || (p.event.indexOf("stream_") === 0 && !hasActivity("stream"))) return false;
     // who가 있는데 처음 연락에 선수가 없으면 보낼 때 고름 (없으면 안 보냄). 친구 후속(fr_*)처럼 이미 있으면 그 사람 그대로
     const pickWho = ev.who && !(p.ctx && p.ctx.pid);
     const w = pickWho ? whoContext(ev.who) : null;
