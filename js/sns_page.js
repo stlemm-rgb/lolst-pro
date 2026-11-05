@@ -216,7 +216,23 @@ function inboxListHTML(rest) {
   }).join("");
   return '<div class="inbox-list"><div class="ib-hd"><b>📂 ' + MSG_DECK.pastTitle + '</b> <span class="muted small">' + rest.length + "개" + (waitN ? ' · <span class="up">답장 대기 ' + waitN + "</span>" : "") + "</span></div>" +
     '<div class="ib-filters">' + chips + "</div>" +
-    (shown.length ? shown.map(messageHTML).join("") : '<p class="muted">해당하는 연락이 없어요.</p>') + "</div>";
+    (shown.length ? inboxGroupsHTML(shown) : '<p class="muted">해당하는 연락이 없어요.</p>') + "</div>";
+}
+// 298: 지난 연락을 소제목으로 묶음 — 답장 대기는 맨 위 한 덩어리, 나머지는 받은 주차별 (최근 먼저, 순서는 위 정렬 그대로)
+function inboxGroupsHTML(shown) {
+  let html = "", key = null, buf = [], title = "";
+  const flush = function () {
+    if (buf.length) html += '<div class="ib-grp">' + escapeHTML(title) + ' <span class="muted small">' + buf.length + "개</span></div>" + buf.map(messageHTML).join("");
+    buf = [];
+  };
+  shown.forEach(function (m) {
+    const wait = m.choices && m.answered === null;
+    const k = wait ? "wait" : m.year + ":" + m.week;
+    if (k !== key) { flush(); key = k; title = wait ? MSG_DECK.pastWait : MSG_DECK.pastWeek.replace("{y}", m.year).replace("{w}", m.week); }
+    buf.push(m);
+  });
+  flush();
+  return html;
 }
 
 // 선택 버튼 (카드·목록 같이 씀): 버튼 + 아래 작은 글씨(🎲 확률 · ⚠️ 위험 · 💚 극복 · 자금 부족)

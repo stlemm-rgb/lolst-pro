@@ -136,6 +136,8 @@ const MSG_DECK = {
   staffNote: "🧑‍💼 인사 후보 카드가 와 있어요. 여기를 눌러 골라요 ›", // 휴대폰 화면에서는 지난 연락이 아래에 있어서, 누르면 그 카드로 바로 이동
   title: "답장 대기",
   pastTitle: "지난 연락",
+  pastWait: "⏳ 답장 대기",      // 298 지난 연락 묶음 소제목 (js/sns_page.js inboxListHTML)
+  pastWeek: "{y}년 {w}주차",
   phoneTitle: "받은 연락",
   okLabel: "✓ 확인",           // 210: 선택지 없는 연락
   okAllLabel: "모두 확인",   // 209: 휴대폰 화면 머리
