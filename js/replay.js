@@ -35,7 +35,7 @@ function openReplay(keys) {
   startReplayMatch();
 }
 function closeReplay() {
-  if (RP) RP.playing = false;
+  if (RP) { RP.playing = false; clearTimeout(RP.drTimer); }
   RP = null;
   const el = document.getElementById("replay-overlay");
   if (el) { el.hidden = true; el.innerHTML = ""; }
@@ -247,6 +247,7 @@ function rpResetMeCount() { const mc = document.getElementById("rp-mecount"); if
 // ----- 재생 -----
 function replayPlay(on) {
   if (!RP) return;
+  if (on && rpDraftFirst()) return; // 296 ⑦ 세트 처음 재생이면 밴픽 소개부터
   if (on) document.querySelectorAll("#rp-map .rp-focus, #rp-feed .rp-fe.picked").forEach(function (x) { x.classList.contains("rp-focus") ? x.remove() : x.classList.remove("picked"); });
   if (on) hideReplayEndBar(); // 다시 재생하면 끝 안내는 접기 (200)
   RP.playing = on;
@@ -329,7 +330,7 @@ function replayEndBar(html, cls, onNext) {
   if (pb) pb.textContent = "↺ 다시 보기";
 }
 function hideReplayEndBar() { const b = document.getElementById("rp-endbar"); if (b) { b.hidden = true; b.innerHTML = ""; } }
-function hideReplayBanner() { const b = document.getElementById("rp-banner"); if (b) { b.hidden = true; b.innerHTML = ""; } }
+function hideReplayBanner() { if (RP) clearTimeout(RP.drTimer); const b = document.getElementById("rp-banner"); if (b) { b.hidden = true; b.innerHTML = ""; } } // 296: 밴픽 자동 시작 타이머도 같이 (다른 방법으로 닫은 뒤 늦게 실행되지 않게)
 function replayConfetti(u) {
   const box = document.querySelector("#replay-overlay .rp-box");
   if (!box || motionOff()) return; // 움직임 끄기면 꽃가루 없음 (디자인 D6)
@@ -511,6 +512,34 @@ function rpHlNext() {
   H.end = h.t + L.tail;
   drawReplay();
   if (!RP.playing) replayPlay(true); else requestAnimationFrame(replayTick);
+}
+// ----- 296 C ⑦ 밴픽·라인업 소개 (data/replay.js REPLAY_DRAFT) — 세트마다 처음 재생할 때 한 번 (하이라이트·중간부터는 안 나옴) -----
+function rpDraftFirst() {
+  if (RP.hl || RP.t > 0.01) return false;
+  RP.drSeen = RP.drSeen || {};
+  const key = RP.qi + ":" + RP.setIdx;
+  if (RP.drSeen[key]) return false;
+  RP.drSeen[key] = true;
+  const go = function () { clearTimeout(RP.drTimer); hideReplayBanner(); replayPlay(true); };
+  replayBanner(replayDraftHTML(rpMatch(), rpSet()), "draft", go);
+  RP.drTimer = setTimeout(function () { if (RP && RP.onNext === go) go(); }, REPLAY_DRAFT.autoMs);
+  return true;
+}
+function replayDraftHTML(m, s) {
+  const D = REPLAY_DRAFT;
+  const col = function (side) {
+    const team = side ? m.b : m.a;
+    return '<div class="rp-dr-col ' + (side ? "b" : "a") + '"><div class="rp-dr-tm">' + rpUni(uniformOfTeam(team)) + " " + escapeHTML(teamShort(team)) + "</div>" +
+      (s.lanes || []).map(function (l, i) {
+        const id = side ? l.b : l.a, bx = (side ? s.box.b : s.box.a)[i] || {};
+        return '<div class="rp-dr-row' + (id === USER_ID ? " me" : "") + '" style="--d:' + (i * 2 + side) + '"><span class="muted">' + findPosition(POSITION_IDS[i]).name + "</span>" +
+          (id ? portraitImg(id, { face: true, size: 22 }) : "") + "<b>" + escapeHTML(id ? playerName(id) : "") + '</b><span class="rp-dr-ch">' + escapeHTML(bx.c || "") + "</span></div>";
+      }).join("") + "</div>";
+  };
+  const ban = s.banned && s.banned.length ? '<div class="rp-dr-ban">' + escapeHTML(D.ban.replace("{me}", state.player.name)) + ": " + s.banned.map(escapeHTML).join(" · ") + "</div>" : "";
+  return '<span class="rp-tag">' + escapeHTML(D.title.replace("{n}", RP.setIdx + 1)) + "</span>" + ban +
+    '<div class="rp-dr" style="--step:' + D.stepS + 's">' + col(0) + col(1) + "</div>" +
+    '<button class="primary" data-rpnext="1">' + D.go + "</button>";
 }
 // ----- 295 C ③ 움직이는 미니맵: 선수 10명 도트 얼굴 (data/replay.js REPLAY_DOTS) — 평소 자리(시간대) + 장면 앞뒤엔 그 장소로 + 죽으면 흐려짐 -----
 function rpDotHome(side, i, t, set) {
