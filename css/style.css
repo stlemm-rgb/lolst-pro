@@ -95,10 +95,11 @@ body {
   color: var(--text);
 }
 
-/* 레이아웃 — 왼쪽 12% (최소 120px), 오른쪽 나머지 (2026-10-06 메뉴 너비 60%로 줄임: 20%·200px → 12%·120px) */
+/* 레이아웃 — 왼쪽 12% (최소 168px), 오른쪽 나머지 (2026-10-06 메뉴 너비 60%로 줄임: 20%·200px → 12%·120px)
+   270: 최소 120 → 168px (태블릿 폭에서 메뉴 이름이 '대시…'처럼 잘려서. 168 = 1400px 폭의 12%라 PC는 그대로) */
 .layout {
   display: grid;
-  grid-template-columns: minmax(120px, 12%) 1fr;
+  grid-template-columns: minmax(168px, 12%) 1fr;
   min-height: 100vh;
 }
 
@@ -617,6 +618,10 @@ td.pf-cell { width: 44px; padding-top: 3px; padding-bottom: 3px; padding-right: 
 .chip.s { border-color: var(--gold); color: var(--gold); font-weight: bold; background: rgba(var(--gold-rgb), 0.12); }
 .mini-chips { display: inline-flex; flex-wrap: wrap; gap: 3px; margin-left: 4px; vertical-align: middle; }
 .mini-chips .chip { font-size: 11px; padding: 1px 6px; }
+/* 270: 소속팀 선수단 표 — 이름 칸만 줄바꿈 (나이·포지션이 '23/세'처럼 꺾이지 않게), 좁으면 특성 칩은 이름 아래 줄 (휴대폰에서 나이 칸과 겹쳐서) */
+table.team-roster th, table.team-roster td { white-space: nowrap; }
+table.team-roster td.nm { white-space: normal; }
+@media (max-width: 1100px) { table.team-roster .mini-chips { display: flex; margin: 3px 0 0; } }
 
 /* ===== 경기 상세 ===== */
 .detail-mark { color: var(--accent); margin-left: 4px; }

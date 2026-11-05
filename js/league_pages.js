@@ -46,7 +46,7 @@ pages.team = function () {
     return (
       '<tr class="' + (me ? "me" : "") + '">' + faceTd(id) + // 얼굴 (js/portrait.js)
         "<td>" + findPosition(playerPos(id)).name + "</td>" +
-        "<td>" + escapeHTML(playerName(id)) + (me ? ' <span class="now-tag">나</span>' : "") + traitChipsMini(id) + "</td>" +
+        '<td class="nm">' + escapeHTML(playerName(id)) + (me ? ' <span class="now-tag">나</span>' : "") + traitChipsMini(id) + "</td>" +
         "<td>" + playerAge(id) + "세</td>" +
         '<td class="r"><b>' + playerScore(id).toFixed(1) + "</b></td>" +
         "<td>" + (isStarter ? "주전" : '<span class="muted">후보</span>') + "</td>" +
@@ -71,7 +71,7 @@ pages.team = function () {
     "</div>" + staffCardHTML(team.id) + // 구단 스태프 (js/staff.js)
     '<div class="card"><h2>선수단</h2>' +
       '<p class="muted small">주전은 포지션마다 스탯 점수가 가장 높은 선수예요. 내 선수는 항상 주전.</p>' +
-      '<table class="roster"><tr><th></th><th>포지션</th><th>이름</th><th>나이</th><th class="r">스탯 점수</th><th></th></tr>' + rows + "</table>" +
+      '<table class="roster team-roster"><tr><th></th><th>포지션</th><th>이름</th><th>나이</th><th class="r">스탯 점수</th><th></th></tr>' + rows + "</table>" +
     "</div>" + duoCardHTML() + relationsCardHTML() // 바텀 듀오 (js/duo.js) · 선수 관계 (js/friends.js)
   );
 };
