@@ -34,6 +34,16 @@
 `--set 경로=값` (여러 번 가능). 경로는 `data/*.js` 상수: `FOCUS_RULES.userPerS=0.2`, `SLUMP_RULES.chance=0.7`, `TRAIT_FIT.offMult=0.4`, `LEAGUE.veterans.chancePerTeam=1`
 값 후보 비교는 `--variant "이름:경로=값;경로=값"`를 여러 번 (measure_seasons). 틀린 경로면 바로 오류.
 
+## 0-1) 사기 챔피언 영향 — measure_op_patch.cjs (Node만, 약 9분, 308)
+
+사고 없음 / 내 포지션 SS / 내 포지션 SSS / 다른 포지션 SS (6주에 일부러, 29주까지) × 다섯 포지션 × 씨앗 → 사고 기간·시즌 세트 승률, 순위, 우승, 밴·내 픽·상대 픽과 그때 승률.
+
+```
+node tools/measure_op_patch.cjs              # 신인 (SEEDS=4 기본)
+SEEDS=8 VET=18 node tools/measure_op_patch.cjs   # 내 스탯 +18 = 5년차쯤
+POS=mid SEEDS=1 node tools/measure_op_patch.cjs  # 빠르게 하나만
+```
+
 ## 0) 체력·컨디션 — measure_health.cjs (Node만, 브라우저 없이 약 1.5분, 238)
 
 플레이 방식 3가지(기본 30↓ 휴식 / 안 쉼 솔랭만 / 관리 50↓ 휴식) × 상황 4개(2부 2012 · 2부 약팀 · 2부 꼴찌팀(동료 스탯 −15, 연패 재현) · 1부 2017, 미드) × 씨앗 3 × 2시즌 → 체력·컨디션(30↓ 최장 연속 포함)·부상·번아웃·성장·세트 승률. 상황 하나만: `SCN=꼴찌`, 식 그대로 바꾸기: `"js:findTraining('rest').effects.condition=[10,15]"`.
