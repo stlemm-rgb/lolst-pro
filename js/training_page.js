@@ -60,7 +60,11 @@ function trainingBadges() {
   // 퀘스트
   (state.quests || []).forEach(function (q) {
     const qp = questPlan(q);
-    if (qp) add(qp.plan, { text: "📋 퀘스트", tip: "퀘스트 '" + findQuest(q.id).title + "'을(를) 채우는 훈련" });
+    if (!qp) return;
+    const tip = "퀘스트 '" + findQuest(q.id).title + "'을(를) 채우는 훈련";
+    const had = (map[qp.plan] || []).filter(function (b) { return b.quest; })[0]; // 다듬기 P3: 같은 훈련 퀘스트가 여럿이면 꼬리표 하나 + 개수
+    if (had) { had.quest++; had.text = "📋 퀘스트 " + had.quest; had.tip += " · " + tip; }
+    else add(qp.plan, { text: "📋 퀘스트", tip: tip, quest: 1 });
   });
   // 약점: 후보(2군)면 주전 경쟁 상대보다 낮은 스탯, 아니면 내 낮은 스탯 3개 (상한선에 닿은 건 빼고)
   const rival = state.benched ? benchRival() : null;
@@ -115,7 +119,7 @@ function trainStatsPanelHTML(exp) {
     return '<div class="tstat" data-stat="' + s.id + '"><span class="tstat-name' + (isBonusStat(s.id) ? " bonus" : "") + '">' + (isBonusStat(s.id) ? "★" : "") + s.name + "</span>" +
       '<span class="bar"><span class="bar-fill' + (isBonusStat(s.id) ? " gold" : "") + '" style="width:' + v + '%"></span>' +
         (g ? '<span class="bar-gain" style="left:' + v + "%;width:" + Math.max(1.5, g) + '%"></span>' : "") + "</span>" +
-      '<span class="tstat-val">' + v + '<span class="muted">/' + cap + "</span>" + (g ? ' <span class="up">+' + fmt1(g) + "</span>" : "") + "</span></div>";
+      '<span class="tstat-val">' + v + '<span class="muted">/' + cap + "</span>" + '<span class="tstat-g up">' + (g ? "+" + fmt1(g) : "") + "</span></span></div>"; // 다듬기 P3: 오른 만큼 칸은 늘 같은 자리 (숫자 줄이 안 밀리게)
   }).join("");
   return '<div class="card tpanel"><h2>📊 내 스탯' + helpBtnHTML(HELP_TIPS.trainStats) + "</h2>" +
     '<div class="tstats">' + rows + "</div></div>";

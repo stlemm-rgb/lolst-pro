@@ -285,7 +285,7 @@ function weekGrowthHTML() {
   });
   const head = '<div class="muted small">이번 주 변화</div>' +
     (Math.abs(ds) >= 0.05 ? '<div>종합 능력 <b class="' + (ds > 0 ? "up" : "down") + '">' + (ds > 0 ? "+" : "") + ds.toFixed(1) + '</b> <span class="muted small">(' + b.score.toFixed(1) + "→" + playerScore(USER_ID).toFixed(1) + ")</span></div>" : "");
-  return '<div class="sum-sub week-growth">' + head + (parts.length ? "<div>" + parts.join(" · ") + "</div>" : '<div class="muted">능력·특성 변화 없음</div>') + "</div>";
+  return '<div class="sum-sub week-growth">' + head + (parts.length ? "<div>" + parts.join('<span class="wg-sep"> · </span>') + "</div>" : '<div class="muted">능력·특성 변화 없음</div>') + "</div>";
 }
 
 // 솔로 랭크 칸: 지난주 진행에서 한 랭크 게임 결과 (랭크 오른쪽)

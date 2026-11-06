@@ -222,7 +222,8 @@ function inboxListHTML(rest) {
 function inboxGroupsHTML(shown) {
   let html = "", key = null, buf = [], title = "";
   const flush = function () {
-    if (buf.length) html += '<div class="ib-grp">' + escapeHTML(title) + ' <span class="muted small">' + buf.length + "개</span></div>" + buf.map(messageHTML).join("");
+    if (buf.length) html += '<div class="ib-grp">' + escapeHTML(title) + ' <span class="muted small">' + buf.length + "개</span></div>" +
+      (key === "wait" ? buf.map(messageHTML).join("") : '<div class="ib-wk">' + buf.map(messageHTML).join("") + "</div>"); // 다듬기 P3: 주차 소제목 아래 줄은 날짜를 다시 안 씀
     buf = [];
   };
   shown.forEach(function (m) {
