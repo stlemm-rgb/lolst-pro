@@ -659,6 +659,7 @@ ul.focus-note { list-style: none; padding-left: 0; margin: 4px 0 8px; }
 .results-layout { display: grid; grid-template-columns: 240px 1fr; gap: 16px; align-items: start; }
 .res-list { max-height: calc(100vh - 160px); overflow-y: auto; padding: 12px; position: sticky; top: 76px; } /* 상단바 아래에 붙음 */
 .res-item { padding: 8px 10px; border-radius: var(--r-xs); cursor: pointer; border: 1px solid transparent; margin-bottom: 4px; font-size: 14px; }
+.res-line { display: flex; align-items: baseline; gap: 6px; } .res-line .res-vs { flex: 1; min-width: 0; } .res-line > b { white-space: nowrap; } /* 다듬기 P3 */
 .res-item:hover { background: rgba(255, 255, 255, 0.04); }
 .res-item.sel { border-color: var(--accent); background: rgba(var(--accent-rgb), 0.1); }
 .res-main { min-width: 0; }
@@ -2329,3 +2330,7 @@ table.roster tr.srch-pos th { text-align: left; padding-top: 12px; font-size: 14
 .xs-r { box-shadow: inset -16px 0 12px -10px rgba(var(--accent-rgb), 0.55); } /* 다듬기 P3: 옆으로 더 있음 (js/ui.js markScrollables) */
 .xs-l { box-shadow: inset 16px 0 12px -10px rgba(var(--accent-rgb), 0.55); }
 .xs-l.xs-r { box-shadow: inset -16px 0 12px -10px rgba(var(--accent-rgb), 0.55), inset 16px 0 12px -10px rgba(var(--accent-rgb), 0.55); }
+@media (min-width: 761px) { /* 다듬기 P3: 상위·하위 그룹 등 순위표 여러 개의 세로줄이 같은 자리에 (팀 칸만 남는 폭) */
+  table.standings th:nth-child(1) { width: 56px; } table.standings th:nth-child(3), table.standings th:nth-child(4) { width: 52px; } table.standings th:nth-child(5) { width: 84px; }
+  table.standings th:nth-child(6) { width: 120px; } table.standings th:nth-child(7) { width: 170px; } table.standings th:nth-child(8) { width: 110px; }
+}
