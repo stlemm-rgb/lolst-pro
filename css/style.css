@@ -2326,3 +2326,6 @@ table.roster tr.srch-pos th { text-align: left; padding-top: 12px; font-size: 14
 /* 299 휴대폰 경기 재생: 시계·킬 수가 글자 길이(26:30·16 : 10·🎬 승부처)에 따라 윗줄↔아랫줄로 오가며 화면이 흔들리던 것 → 늘 자기 줄, 줄바꿈 없음 */
 @media (max-width: 760px) { .rp-clock { flex-basis: 100%; text-align: right; overflow: hidden; text-overflow: ellipsis; } }
 #rp-play { min-width: 128px; } /* 299 재생 ↔ 일시정지 ↔ 다시 보기 글자가 바뀌어도 폭이 같게 (옆 1배·2배·3배 버튼이 좌우로 밀리던 것) */
+.xs-r { box-shadow: inset -16px 0 12px -10px rgba(var(--accent-rgb), 0.55); } /* 다듬기 P3: 옆으로 더 있음 (js/ui.js markScrollables) */
+.xs-l { box-shadow: inset 16px 0 12px -10px rgba(var(--accent-rgb), 0.55); }
+.xs-l.xs-r { box-shadow: inset -16px 0 12px -10px rgba(var(--accent-rgb), 0.55), inset 16px 0 12px -10px rgba(var(--accent-rgb), 0.55); }

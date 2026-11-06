@@ -645,6 +645,7 @@ function renderPage() {
   page.querySelectorAll("[data-rookieclose]").forEach(function (btn) { // 222: 대형 신인 카드 닫기
     btn.onclick = function () { state.league.rookieCards.closed = true; renderPage(); };
   });
+  markScrollables(page); // 다듬기 P3: 옆으로 밀 수 있는 표에 '더 있음' 빛 (js/ui.js)
   renderCoach(); // 코치 안내·팁 말풍선 (215, js/guide.js) — 화면을 다 그린 뒤 (가리킬 버튼이 있어야 해서)
   if (phoneOpen) renderPhoneOverlay(); // 221: 휴대폰 창이 열려 있으면 같이 새로 (js/sns_page.js)
 }

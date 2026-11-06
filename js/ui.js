@@ -175,6 +175,20 @@ function bindMotionSetting(page) {
 // 다시 누르기·바깥 누르기·Esc·스크롤·화면 다시 그리기로 닫힘. 마우스가 있으면 올리기만 해도 보임. 화면용만 (게임 값·난수 안 건드림)
 // 버튼 안에는 넣지 말 것 (설명을 보려다 버튼이 눌림) → 제목 줄 옆에만
 let helpFor = null, helpPinned = false, helpAt = 0, helpY = 0;
+// 다듬기 P3 (311): 넓은 표가 옆으로 밀리는 칸이면 가장자리에 빛 — 오른쪽 = 더 있음, 왼쪽 = 앞에 있음 (끝까지 밀면 꺼짐)
+function markScrollables(root) {
+  if (!root || !root.querySelectorAll) return;
+  root.querySelectorAll(".table-wrap, table.roster, table.tcompare").forEach(function (el) {
+    if (el.scrollWidth <= el.clientWidth + 4) { el.classList.remove("xs-r", "xs-l"); return; }
+    if (getComputedStyle(el).overflowX !== "auto") return;
+    const upd = function () {
+      el.classList.toggle("xs-r", el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+      el.classList.toggle("xs-l", el.scrollLeft > 4);
+    };
+    upd();
+    if (!el._xs) { el._xs = true; el.addEventListener("scroll", upd, { passive: true }); }
+  });
+}
 function helpBtnHTML(text) {
   return ' <button type="button" class="help-i" data-help="' + escapeHTML(text) + '" aria-label="' + HELP_TIPS.label + '">ⓘ</button>';
 }
