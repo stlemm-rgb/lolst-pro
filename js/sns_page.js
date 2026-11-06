@@ -370,7 +370,7 @@ function openStaffPick(id) {
 let phoneOpen = false;
 function openPhone(app) { // app: "msg"(기본) · "sns" · "noti"(= SNS의 📣 나를 언급) · "me" (231, 237)
   phoneOpen = true; deckOpenId = null; deckLastId = null;
-  phoneApp = typeof app === "string" && app ? app : "msg"; phoneFeedPages = 1; phoneSnsFilter = "all";
+  phoneApp = typeof app === "string" && app ? app : deckMessages().length ? "msg" : "sns"; phoneFeedPages = 1; phoneSnsFilter = "all"; // 311: 앱을 안 정했고 새 연락이 없으면 SNS부터
   if (phoneApp === "noti") { phoneApp = "sns"; phoneSnsFilter = "mention"; }
   renderPhoneOverlay(true);
 }
