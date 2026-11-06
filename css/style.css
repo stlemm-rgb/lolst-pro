@@ -2370,4 +2370,6 @@ table.mini td.nowrap { white-space: nowrap; }
 .awc.still * { animation: none !important; opacity: 1 !important; }
 .awc.still .awc-band i { transform: skewY(-9deg); }
 .awc.still .awc-t { border-right: 0; }
-
+/* 315 새 버전 알림 줄 (공개 사이트만, js/save.js showNewVersionBar) — 겹창보다 위 */
+#update-bar { position: fixed; left: 50%; top: 10px; transform: translateX(-50%); z-index: 3000; width: min(560px, calc(100% - 20px)); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-radius: var(--r-s); background: var(--panel-2); border: 1px solid var(--gold); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); font-size: 14px; }
+#update-bar span { flex: 1 1 220px; }

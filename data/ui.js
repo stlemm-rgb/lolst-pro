@@ -156,6 +156,14 @@ const NAV_TEXT = {
 };
 
 // ----- 설정 화면 '이 게임에 대해' (282, 사용자 요청: 공개 배포 전 안내) — js/main.js pages.settings -----
+// 315 새 버전 알림 (공개 사이트만, js/save.js checkNewVersion)
+const UPDATE_RULES = { everyMs: 10 * 60 * 1000 }; // 이만큼마다 + 다른 앱·탭에서 돌아올 때 확인
+const UPDATE_TEXT = {
+  msg: "🔧 새 버전이 나왔어요. 저장하고 새로고침해 주세요.",
+  btn: "저장하고 새로고침",
+  close: "나중에",
+};
+
 const ABOUT_NOTICE = {
   title: "ℹ️ 이 게임에 대해",
   lines: [

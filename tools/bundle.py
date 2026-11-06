@@ -8,6 +8,7 @@
 #   2) Challenger_Road.html의 <script> 줄들을 game.js 한 줄로 바꿔 index.html로 저장 (웹 주소는 그대로, ?v=내용 해시: 새 버전을 올리면 브라우저가 바로 새 파일을 받음)
 #   3) css/style.css 복사 (?v= 해시), .nojekyll
 #   4) index.html에 보안 규칙(CSP) 한 줄 (286, 공개 사이트에만)
+#   5) (315) 새 버전 알림: index.html에 <meta name="build">, 같은 번호를 version.json에 (게임이 10분마다 비교 → 다르면 '새로고침' 알림 줄)
 #   → 공개 사이트에는 게임에 필요한 파일만 올라감 (시안·문서·도구·updates 이미지는 저장소에만 남음)
 import hashlib, re, shutil, sys
 from pathlib import Path
@@ -40,11 +41,15 @@ def build(out):
     new_html = html[:line_start] + '  <script src="game.js?v=' + h(game) + '"></script>' + html[last:]
     new_html = new_html.replace('href="css/style.css"', 'href="css/style.css?v=' + h(css) + '"')
     # 286 보안: 공개 사이트에만 CSP — 우리 사이트 스크립트만 실행(글 속 onerror 같은 숨은 코드는 브라우저가 막음), 바깥 통신·끼워 넣기·양식 금지
+    # (315: 통신은 우리 사이트 파일만 — 새 버전 알림이 version.json을 읽음. 바깥 주소는 여전히 막힘)
     # (그림은 캔버스로 만든 data: 주소, 세이브 내보내기는 blob:, 모양은 style="" 속성을 씀 → 그것만 허용)
     csp = ("default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
-           "connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'")
+           "connect-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'")
     assert '<meta charset="UTF-8">' in new_html
     new_html = new_html.replace('<meta charset="UTF-8">', '<meta charset="UTF-8">\n  <meta http-equiv="Content-Security-Policy" content="' + csp + '">', 1)
+    build_id = h(game + css + new_html)  # 315: 게임·모양·화면이 하나라도 바뀌면 새 번호
+    new_html = new_html.replace('<meta charset="UTF-8">', '<meta charset="UTF-8">\n  <meta name="build" content="' + build_id + '">', 1)
+    (out / "version.json").write_text('{"v": "' + build_id + '"}\n', encoding="utf-8")
     (out / "index.html").write_text(new_html, encoding="utf-8")
     (out / ".nojekyll").write_text("", encoding="utf-8")
     print(f"묶음: 스크립트 {len(scripts)}개 → game.js ({len(game.encode('utf-8')) // 1024}KB) · {out}")

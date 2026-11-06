@@ -22,14 +22,15 @@ const scan = function (re) {
   });
   return out;
 };
+const verLine = (function () { const ls = fs.readFileSync(path.join(root, "js", "save.js"), "utf8").split(/\r?\n/); const i = ls.findIndex(function (l) { return /fetch\("version\.json\?t="/.test(l); }); return i === -1 ? null : "js/save.js:" + (i + 1); })(); // 315 새 버전 알림 (같은 사이트 파일)
 const inl = scan(/<[a-z][^>]*\son[a-z]{3,15}\s*=|['"]\s*on[a-z]{3,15}=["\\]/i);
 ok(!inl.length, "글 속 실행 코드(on…= 속성) 없음" + (inl.length ? " — " + inl.join(", ") : ""));
 const ev = scan(/\beval\s*\(|new Function\s*\(|setTimeout\s*\(\s*["'`]|setInterval\s*\(\s*["'`]/);
 ok(!ev.length, "eval·new Function·문자열 타이머 없음" + (ev.length ? " — " + ev.join(", ") : ""));
-const net = scan(/\bfetch\s*\(|XMLHttpRequest|WebSocket|<script[^>]+src=["']https?:/);
-ok(!net.length, "바깥 주소에서 불러오기 없음" + (net.length ? " — " + net.join(", ") : ""));
+const net = scan(/\bfetch\s*\(|XMLHttpRequest|WebSocket|<script[^>]+src=["']https?:/).filter(function (x) { return x !== verLine; });
+ok(!net.length, "바깥 주소에서 불러오기 없음 (315: 같은 사이트 version.json 읽기 한 곳만)" + (net.length ? " — " + net.join(", ") : ""));
 const bundle = fs.readFileSync(path.join(root, "tools", "bundle.py"), "utf8");
-ok(/Content-Security-Policy/.test(bundle) && /script-src 'self'/.test(bundle) && /connect-src 'none'/.test(bundle), "공개 사이트 묶음에 CSP (script-src 'self' · connect-src 'none')");
+ok(/Content-Security-Policy/.test(bundle) && /script-src 'self'/.test(bundle) && /connect-src 'self'/.test(bundle) && !/connect-src[^;]*(https?:|\*)/.test(bundle), "공개 사이트 묶음에 CSP (script-src 'self' · connect-src 'self' — 바깥 주소 없음)");
 
 const save = fs.readFileSync(path.join(root, "js", "save.js"), "utf8");
 const ctx = {}; vm.createContext(ctx);

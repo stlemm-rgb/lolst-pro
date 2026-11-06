@@ -423,3 +423,36 @@ function ensureStateReady() {
   if (!state.contract) initContracts(); // 예전 세이브: 계약이 없으면 만듦 (js/contracts.js)
   ensureCareerRecords(); // 데뷔 기록 등 (js/records.js)
 }
+
+// ===== 315 새 버전 알림 (공개 사이트만) =====
+// tools/bundle.py가 공개 사이트 index.html에 <meta name="build" content="번호">를 넣고 같은 번호를 version.json에 씀.
+// 웹 주소에서 열었을 때만(더블클릭 file://은 안 함) 10분마다·탭으로 돌아올 때 version.json을 읽어 번호가 다르면 위에 알림 줄.
+// 읽기만 하고 아무것도 보내지 않음 (같은 사이트 파일 하나, CSP connect-src 'self').
+let newVersionShown = false;
+function checkNewVersion() {
+  if (newVersionShown || typeof location === "undefined" || !/^https?:$/.test(location.protocol || "")) return;
+  const meta = document.querySelector && document.querySelector('meta[name="build"]');
+  if (!meta || !meta.content || typeof fetch !== "function") return;
+  fetch("version.json?t=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.v && j.v !== meta.content) showNewVersionBar(); })
+    .catch(function () { /* 인터넷이 끊겨도 게임은 그대로 */ });
+}
+function showNewVersionBar() {
+  if (newVersionShown || !document.body) return;
+  newVersionShown = true;
+  const T = UPDATE_TEXT, el = document.createElement("div");
+  el.id = "update-bar";
+  el.setAttribute("role", "status");
+  el.innerHTML = "<span>" + escapeHTML(T.msg) + '</span><button class="primary" data-upd-go="1">' + escapeHTML(T.btn) + '</button><button data-upd-x="1">' + escapeHTML(T.close) + "</button>";
+  document.body.appendChild(el);
+  el.querySelector("[data-upd-go]").onclick = function () {
+    try { if (state && state.player && !state.retired) saveGame(); } catch (e) { /* 저장이 안 돼도 새로고침 */ }
+    location.reload();
+  };
+  el.querySelector("[data-upd-x]").onclick = function () { el.remove(); };
+}
+if (typeof document !== "undefined" && document.addEventListener && typeof setInterval === "function") {
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) checkNewVersion(); });
+  setInterval(checkNewVersion, UPDATE_RULES.everyMs);
+}
