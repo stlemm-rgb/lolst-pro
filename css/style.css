@@ -2337,3 +2337,4 @@ table.roster tr.srch-pos th { text-align: left; padding-top: 12px; font-size: 14
   table.standings th:nth-child(6) { width: 120px; } table.standings th:nth-child(7) { width: 170px; } table.standings th:nth-child(8) { width: 110px; }
 }
 table.matches td.nowrap, table.matches td.c { white-space: nowrap; } /* 다듬기 P3: 우리 팀 경기 표 주차·점수 안 꺾이게 */
+table.mini td.nowrap { white-space: nowrap; }

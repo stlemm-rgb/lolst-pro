@@ -93,7 +93,7 @@ pages.awards = function () {
   const race = function (title, list, valueFn, fmt, note, help) { // help: 계산법 ⓘ (280)
     const rows = list.slice(0, 5).map(function (id, i) {
       return '<tr class="' + (id === USER_ID ? "me" : "") + '"><td>' + rankBadgeHTML(i + 1) + "</td>" + faceTd(id) + "<td>" + escapeHTML(playerName(id)) +
-        ' <span class="muted small">' + findPosition(playerPos(id)).name + " · " + escapeHTML(teamName(stats[id].team)) + '</span></td><td class="r"><b>' + fmt(valueFn(id)) + "</b></td></tr>";
+        ' <span class="muted small">' + findPosition(playerPos(id)).name + " · " + escapeHTML(teamName(stats[id].team)) + '</span></td><td class="r nowrap"><b>' + fmt(valueFn(id)) + "</b></td></tr>"; // 다듬기 P3: '49회'가 안 꺾이게
     }).join("");
     return '<div class="card"><h2>' + title + (note ? ' <span class="muted small">' + note + "</span>" : "") + (help ? helpBtnHTML(help) : "") + "</h2>" +
       (rows ? '<table class="mini">' + rows + "</table>" : emptyBoxHTML("🌱", "아직 기록이 없어요.")) + "</div>";
