@@ -78,7 +78,7 @@ function weekSummaryHTML(r, kind) {
     sp.push([a.icon, "업적 달성 · 「" + escapeHTML(a.name) + "」", escapeHTML(a.desc) + (titleAuto() && titleAuto().id === a.id ? " · 새 칭호가 이름 아래 붙었어요" : "")]);
   } else if (achv.length > 1) {
     const newTitle = achv.some(function (a) { return titleAuto() && titleAuto().id === a.id; });
-    sp.push([achv[0].icon, "업적 달성 " + achv.length + "개 · " + achv.map(function (a) { return "「" + escapeHTML(a.name) + "」"; }).join(" · "), newTitle ? "새 칭호가 이름 아래 붙었어요" : ""]);
+    sp.push([achv[0].icon, "업적 달성 " + achv.length + "개 · " + achv.map(function (a) { return '<span class="ws-ach">「' + escapeHTML(a.name) + "」</span>"; }).join(" · "), newTitle ? "새 칭호가 이름 아래 붙었어요" : ""]);
   }
   const special = sp.map(function (x) { return '<div class="ws-special"><span class="ic">' + x[0] + "</span><div>" + x[1] + (x[2] ? '<div class="muted small">' + x[2] + "</div>" : "") + "</div></div>"; }).join("");
   const btn = replayQueue().length ? W.replayBtn : W.okBtn;

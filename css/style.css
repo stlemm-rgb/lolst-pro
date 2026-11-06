@@ -1475,6 +1475,8 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ws-special { display: flex; gap: 10px; align-items: center; margin-top: 8px; padding: 10px 12px; border-radius: 12px; border: 1px solid #fff; background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04)); font-weight: 800; font-size: 15px; }
 .ws-special .ic { font-size: 22px; }
 .ws-special .muted { font-weight: 400; margin-top: 2px; }
+.ws-special > div { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; } /* 다듬기 P2: 업적 이름이 '왕/조'처럼 단어 가운데서 꺾이지 않게 */
+.ws-special .ws-ach { white-space: nowrap; }
 .ws-role { margin: 4px 0 10px; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(0, 224, 255, 0.35); background: rgba(0, 224, 255, 0.06); font-size: 12.5px; } /* 260 이번 주 내 역할 (js/position_voice.js) · 265: 아래 간격, 더 작게 (PC에서 체력 줄과 붙어 보임) */
 .ws-role-h { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: space-between; font-weight: 800; }
 .ws-role-st { display: flex; gap: 10px; font-weight: 400; color: var(--muted); }
