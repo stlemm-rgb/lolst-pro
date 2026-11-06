@@ -9,6 +9,10 @@ const SOUND_RULES = {
   reverb: 0.28,                 // 음악 울림
   minGapMs: 45,                 // 같은 효과음이 이 시간 안에 또 오면 건너뜀 (겹쳐서 시끄럽지 않게)
   storeKey: "progamer-sound",   // 설정은 세이브와 따로 (localStorage)
+  // 아이폰 지직거림 줄이기 (310): 음악을 이만큼(초) 앞까지 미리 예약 (화면이 바빠도 안 끊기게, 늦은 음은 건너뜀)
+  lookahead: 0.4,
+  latencyHint: "playback",      // 소리 장치를 '음악 재생용'으로 (휴대폰이 소리를 넉넉히 미리 준비)
+  limiter: { threshold: -3, knee: 0, ratio: 20, attack: 0.003, release: 0.25 }, // 마지막 크기 제한 (음악+효과음이 겹쳐도 안 찢어지게)
 };
 
 // 효과음: 소리 조각 목록. n 음 이름 / f 주파수 · at 시작(초) · dur 길이 · duty 펄스파(0.125·0.25·0.5) 또는 type 파형 · vol · to 끝 주파수 · noise: lp/hp 필터

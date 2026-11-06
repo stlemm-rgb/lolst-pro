@@ -22,11 +22,17 @@ function sndCtx() {
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return null;
   let ac;
-  try { ac = new AC(); } catch (e) { return null; }
   const R = SOUND_RULES;
+  try { ac = new AC({ latencyHint: R.latencyHint }); } catch (e) { try { ac = new AC(); } catch (e2) { return null; } } // 310: 옛 브라우저는 옵션 없이
   SND = { ac: ac, pulse: {}, last: {}, bgm: null, ducked: false };
-  SND.sfx = ac.createGain(); SND.sfx.connect(ac.destination);
-  SND.music = ac.createGain(); SND.music.connect(ac.destination);
+  let out = ac.destination;
+  if (ac.createDynamicsCompressor) { // 310: 마지막 크기 제한 (소리가 한계를 넘어 찢어지지 않게)
+    const L = R.limiter, lim = ac.createDynamicsCompressor();
+    lim.threshold.value = L.threshold; lim.knee.value = L.knee; lim.ratio.value = L.ratio; lim.attack.value = L.attack; lim.release.value = L.release;
+    lim.connect(ac.destination); out = lim;
+  }
+  SND.sfx = ac.createGain(); SND.sfx.connect(out);
+  SND.music = ac.createGain(); SND.music.connect(out);
   SND.dry = ac.createGain(); SND.dry.connect(SND.music);
   // 울림: 사라지는 잡음으로 만든 공간 (고정 씨앗 — 게임 난수 아님)
   const len = Math.floor(ac.sampleRate * 2.2), ir = ac.createBuffer(2, len, ac.sampleRate);
@@ -130,8 +136,9 @@ function sndBgmStart(key) {
   const b = SND.bgm = { key: key, step: 0, next: SND.ac.currentTime + 0.1 };
   b.timer = setInterval(function () {
     if (SND.bgm !== b || SND.ac.state !== "running") return;
-    while (b.next < SND.ac.currentTime + 0.15) {
-      try { sndBgmStep(S, b.step, b.next, sd); } catch (e) { /* 한 칸 실패해도 계속 */ }
+    const now = SND.ac.currentTime;
+    while (b.next < now + SOUND_RULES.lookahead) { // 310: 넉넉히 미리 예약
+      if (b.next >= now) { try { sndBgmStep(S, b.step, b.next, sd); } catch (e) { /* 한 칸 실패해도 계속 */ } } // 이미 지난 음은 건너뜀 (늦게 시작하면 '뚝' 소리)
       b.step++; b.next += sd;
     }
   }, 25);
