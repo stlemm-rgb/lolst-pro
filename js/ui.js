@@ -178,7 +178,7 @@ let helpFor = null, helpPinned = false, helpAt = 0, helpY = 0;
 // 다듬기 P3 (311): 넓은 표가 옆으로 밀리는 칸이면 가장자리에 빛 — 오른쪽 = 더 있음, 왼쪽 = 앞에 있음 (끝까지 밀면 꺼짐)
 function markScrollables(root) {
   if (!root || !root.querySelectorAll) return;
-  root.querySelectorAll(".table-wrap, table.roster, table.tcompare").forEach(function (el) {
+  root.querySelectorAll(".table-wrap, table.roster, table.tcompare, table.matches, .sh-cats, .sns-tabs").forEach(function (el) {
     if (el.scrollWidth <= el.clientWidth + 4) { el.classList.remove("xs-r", "xs-l"); return; }
     if (getComputedStyle(el).overflowX !== "auto") return;
     const upd = function () {

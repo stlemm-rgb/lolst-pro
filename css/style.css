@@ -2167,6 +2167,8 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
   table.roster.wrap1 td:first-child { white-space: normal; }
   table.team-roster td { padding-left: 4px; padding-right: 4px; }
   table.team-roster .mini-chips { flex-wrap: wrap; }
+  .change-table th, .change-table td:first-child { white-space: nowrap; } .change-table td, .change-table th { padding: 3px 4px; } /* 다듬기 P3: 휴대폰 '능력 변화' 스탯 이름 안 꺾이게 */
+  table.schedule tr { display: grid; grid-template-columns: 78px minmax(0, 1fr); border-bottom: 1px solid var(--border); } table.schedule td:nth-child(3) { grid-column: 2; padding-top: 0; } table.schedule td { border-bottom: 0; } /* 다듬기 P3: 휴대폰 시즌 일정 설명은 이름 아래 줄 */
   table.staff-tbl td { white-space: normal; word-break: keep-all; } table.staff-tbl td .small { min-width: 0; }
   table.team-roster .mini-chips .chip { white-space: nowrap; }
   .tcompare td:first-child, .tcompare th:first-child { position: sticky; left: 0; z-index: 1; background: var(--panel); }
@@ -2334,3 +2336,4 @@ table.roster tr.srch-pos th { text-align: left; padding-top: 12px; font-size: 14
   table.standings th:nth-child(1) { width: 56px; } table.standings th:nth-child(3), table.standings th:nth-child(4) { width: 52px; } table.standings th:nth-child(5) { width: 84px; }
   table.standings th:nth-child(6) { width: 120px; } table.standings th:nth-child(7) { width: 170px; } table.standings th:nth-child(8) { width: 110px; }
 }
+table.matches td.nowrap, table.matches td.c { white-space: nowrap; } /* 다듬기 P3: 우리 팀 경기 표 주차·점수 안 꺾이게 */

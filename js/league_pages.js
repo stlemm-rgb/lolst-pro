@@ -10,7 +10,7 @@ function teamLabel(id) {
 }
 
 // 경기 결과 한 줄 (내 팀 기준 승/패 색)
-function matchRowHTML(m, showWeek) {
+function matchRowHTML(m, showWeek, gTitle) { // gTitle: 대회 소제목 아래면 줄에서는 라운드만 (다듬기 P3, 경기 결과 목록과 같게)
   const mine = myTeam();
   let result = '<span class="muted">예정</span>';
   if (m.winner) {
@@ -24,8 +24,8 @@ function matchRowHTML(m, showWeek) {
   const key = m.detail ? matchKey(m) : "";
   return (
     "<tr" + (key ? ' class="click" data-mdetail="' + key + '" title="눌러서 [경기 결과]에서 자세히 보기"' : "") + ">" +
-      (showWeek ? '<td class="muted">' + m.week + "주</td>" : "") +
-      '<td class="muted">' + escapeHTML(m.label) + "</td>" +
+      (showWeek ? '<td class="muted nowrap">' + m.week + "주</td>" : "") +
+      '<td class="muted' + (gTitle ? " nowrap" : "") + '">' + escapeHTML(gTitle && m.label.indexOf(gTitle + " ") === 0 ? m.label.slice(gTitle.length + 1) : m.label) + "</td>" +
       '<td class="r">' + teamLabel(m.a) + "</td>" +
       '<td class="c">' + result + "</td>" +
       "<td>" + teamLabel(m.b) + "</td>" +
@@ -332,7 +332,7 @@ function userScheduleHTML() {
       (list.length
         ? '<table class="matches">' + groups.map(function (g) {
             return '<tr class="ms-grp"><th colspan="6">' + escapeHTML(g.title) + ' <span class="muted small">' + matchGroupRecord(g) + "</span></th></tr>" +
-              g.items.map(function (m) { return matchRowHTML(m, true); }).join("");
+              g.items.map(function (m) { return matchRowHTML(m, true, g.title); }).join("");
           }).join("") + "</table>"
         : '<p class="muted small">아직 잡힌 경기가 없어요. 경기 일정은 각 대회가 시작될 때 정해져요.</p>') +
     "</div>"

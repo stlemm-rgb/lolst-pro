@@ -50,7 +50,7 @@ const PAGE_HEADS = {
   training:     { icon: "🏋️", desc: "이번 주 할 훈련을 골라요. [다음 주로 진행]을 누르면 훈련해요" },
   sns:          { icon: "📱", desc: "받은 연락에 답하고, 기사와 선수들의 글을 봐요" },
   friends:      { icon: "🤝", desc: "친구와 함께하면 관계가 깊어지고, 절친은 경기에서 힘이 돼요" },
-  career:       { icon: "🧑‍💻", desc: "내 선수의 능력·특성·챔피언·기록을 한눈에" },
+  career:       { icon: "👤", desc: "내 선수의 능력·특성·챔피언·기록을 한눈에" },
   shop:         { icon: "🛍️", desc: "모은 돈으로 집·장비·개인 고용·투자" },
   team:         { icon: "🏠", desc: "팀 내 입지, 우리 팀 전력, 선수단과 스태프" },
   results:      { icon: "📺", desc: "지난 경기 기록과 다시 보기" },
