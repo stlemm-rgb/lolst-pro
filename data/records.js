@@ -146,6 +146,18 @@ const AWARD_NAMES = {
   msifmvp: "MSI 결승 MVP",
 };
 
+// 313 수상 카드 (상을 받은 주, 이번 주 요약 창을 닫으면 뜨는 금색 카드 — js/great.js showAwardCard)
+const AWARD_CARD = {
+  order: ["worldsfmvp", "mvp", "msifmvp", "fmvp", "fsfmvp", "rookie", "tier2mvp", "allpro", "cupfmvp"], // 카드 제목 = 이 순서로 가장 앞 상
+  big: ["worldsfmvp", "mvp", "msifmvp", "fmvp", "fsfmvp"],  // 더 화려하게 (햇살·금가루 더 많이)
+  icons: { worldsfmvp: "🌍", mvp: "🥇", msifmvp: "🏅", fmvp: "🏆", fsfmvp: "🏅", rookie: "🌱", tier2mvp: "🥈", allpro: "⭐", cupfmvp: "🏆" },
+  sub: "{year} 시즌 · {name}",
+  rating: "평균 평점 {v}",
+  bonus: "인기도 +{pop} · 평판 +{rep}",
+  pay: "다음 계약 연봉 +{pct}% (재계약·이적 제안 때 · 우승·평점과 합쳐 최대 +{max}%)",
+  ok: "좋아! ▶",
+};
+
 // 대회 안내 (대회 일정 화면): 주차와 진출 조건
 const COMPETITION_GUIDE = [
   { name: "LCK 컵", weeks: "2~9주", who: "1부 전체 (2012~2013년 8팀, 2014년부터 10팀)", how: "두 조의 그룹 배틀 후 전체 성적 상위 6팀 플레이오프" },

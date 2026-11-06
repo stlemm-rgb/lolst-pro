@@ -12,7 +12,9 @@ function weekSummaryOn() { return !state.settings || state.settings.weekSummary 
 let wsBusy = false; // 211: 진행 직후 요약 창이 뜰 차례면 신문 팝업은 요약 창을 닫은 뒤에 (겹쳐 뜨지 않게)
 function showWeekSummary(done) {
   const r = state.weekReport;
-  const finish = function (noReplay) { wsBusy = false; maybeShowNews(); if (done && !noReplay) done(); }; // 292: [닫기]면 경기 재생 건너뜀
+  const finish = function (noReplay) { // 292: [닫기]면 경기 재생 건너뜀 · 313: 그 전에 수상 카드 (js/great.js), 신문은 카드 다음
+    showAwardCard(function () { wsBusy = false; maybeShowNews(); if (done && !noReplay) done(); });
+  };
   if (!weekSummaryOn() || !r || !r.growthBase || r.summarySeen || state.retired) { finish(); return; }
   r.summarySeen = true;
   let el = document.getElementById("ws-overlay");

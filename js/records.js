@@ -84,6 +84,7 @@ function giveAward(key, id, value, extraTitle) {
     if (!state.career.awards) state.career.awards = [];
     state.career.awards.push({ year: state.year, title: title, key: key });
     addMoment("🏅", title + " 수상");
+    queueAwardCard(entry); // 313: 요약 창 다음에 수상 카드 (js/great.js, 저장 안 함)
     addPopularity(RECORDS.awardBonus.popularity);
     state.reputation = Math.min(100, state.reputation + RECORDS.awardBonus.reputation);
     postMessage("news", "🏆 수상: " + title, state.player.name + "이(가) " + state.year + " " + title + "을(를) 받았다!", {
