@@ -296,7 +296,7 @@ function replayFinal() {
   const more = RP.qi < RP.queue.length - 1;
   const hi = Math.max(m.score[0], m.score[1]), lo = Math.min(m.score[0], m.score[1]);
   replayEndBar('<div class="rp-endres">' + (mineIn ? (won ? '<b class="up">승리!</b>' : '<b class="down">패배</b>') : "<b>경기 종료</b>") + " · " + rpUni(uniformOfTeam(m.winner)) + " " + escapeHTML(teamName(m.winner)) + " " + hi + " : " + lo +
-    (m.pogName ? ' <span class="muted">· 🏅 POG ' + escapeHTML(m.pogName) + "</span>" : "") + "</div>" + rpPogCardHTML(m) + // 289 ⑩
+    (m.pogName && !m.pog ? ' <span class="muted">· 🏅 POG ' + escapeHTML(m.pogName) + "</span>" : "") + "</div>" + rpPogCardHTML(m) + // 289 ⑩
     '<div class="rp-ctrl">' + (more ? '<button class="primary" data-rpnext="1">다음 경기 ▶</button>' : "") + '<button data-rpclose="1">닫기</button></div>', won ? "win" : "",
     function () { RP.qi++; startReplayMatch(); });
   if (won) replayConfetti(uniformOfTeam(m.winner));
