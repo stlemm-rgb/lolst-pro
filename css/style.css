@@ -1132,7 +1132,7 @@ button.tselect.primary:hover:not(:disabled) { background: linear-gradient(180deg
 .rp-ping.me { color: var(--gold); font-size: 22px; z-index: 2; }
 .rp-ping.me .ring { width: 16px; height: 16px; margin: -8px 0 0 -8px; border-width: 3px; }
 .rp-ping.me.old { opacity: 0.6; }
-.rp-endbar { margin-top: 12px; padding: 10px 12px; border-radius: var(--r-s); border: 1px solid rgba(var(--accent-rgb), 0.45); background: rgba(var(--accent-rgb), 0.07); display: grid; gap: 6px; animation: rpFade 0.3s; }
+.rp-endbar { margin-bottom: 12px; padding: 10px 12px; border-radius: var(--r-s); border: 1px solid rgba(var(--accent-rgb), 0.45); background: rgba(var(--accent-rgb), 0.07); display: grid; gap: 6px; animation: rpFade 0.3s; }
 .rp-endbar[hidden] { display: none; }
 .rp-endbar.win { border-color: rgba(var(--gold-rgb), 0.6); background: rgba(var(--gold-rgb), 0.08); }
 .rp-endbar .rp-ctrl { margin-top: 0; }
@@ -1415,7 +1415,7 @@ table.standings th, table.standings td { white-space: nowrap; }
 #ws-overlay { position: fixed; inset: 0; z-index: 1050; background: rgba(4, 4, 10, 0.72); display: flex; align-items: center; justify-content: center; padding: 12px; }
 #ws-overlay[hidden] { display: none; }
 @keyframes ws-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
-.ws-box { position: relative; width: min(520px, 100%); max-height: calc(100vh - 24px); overflow-x: hidden; overflow-y: auto; background: linear-gradient(180deg, #1a1a2e, #12121f); border: 1px solid #34345a; border-radius: 18px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(var(--accent-rgb), 0.08); cursor: pointer; transform: scale(0.92); opacity: 0; }
+.ws-box { position: relative; width: min(520px, 100%); max-height: calc(100vh - 24px); display: flex; flex-direction: column; overflow: hidden; background: linear-gradient(180deg, #1a1a2e, #12121f); border: 1px solid #34345a; border-radius: 18px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(var(--accent-rgb), 0.08); cursor: pointer; transform: scale(0.92); opacity: 0; }
 .ws-box.open { transform: none; opacity: 1; transition: transform 0.2s cubic-bezier(0.2, 1.4, 0.4, 1), opacity 0.15s; }
 .ws-screen { position: relative; display: flex; justify-content: center; padding-top: 6px; background: radial-gradient(ellipse at 50% 60%, #1c1c34, #0d0d18 70%); border-radius: 18px 18px 0 0; }
 .ws-box.champ .ws-screen { padding-top: 40px; } /* 우승: CHAMPIONS 글자와 제목이 안 겹치게 */
@@ -1483,7 +1483,10 @@ table.standings th, table.standings td { white-space: nowrap; }
 .ws-role-st b { color: var(--text); }
 .ws-role-t { margin-top: 2px; line-height: 1.4; }
 .ws-role-ban { color: var(--muted); font-size: 12px; white-space: nowrap; }
-.ws-foot { margin-top: 12px; }
+/* 다듬기 P2: 위 내용(.ws-body)만 스크롤, 버튼(.ws-foot)은 창 아래에 늘 보이게 (.ws-box는 세로 flex) */
+.ws-body { flex: 1 1 auto; min-height: 0; overflow-x: hidden; overflow-y: auto; }
+.ws-foot { flex: none; padding: 12px 16px 14px; border-top: 1px solid var(--border); opacity: 0; transform: translateY(6px); }
+.ws-foot.in { opacity: 1; transform: none; transition: opacity 0.15s, transform 0.2s cubic-bezier(0.2, 1.5, 0.4, 1); }
 .ws-btn { display: block; width: 100%; padding: 11px; font-size: 15px; }
 .ws-btns { display: flex; gap: 8px; } .ws-btns .ws-btn { flex: 2; } .ws-btns .ws-noreplay { flex: 1; } /* 292: [경기 재생 보기] 옆 [닫기] */
 .ws-hint { text-align: center; margin-top: 6px; }
@@ -2230,7 +2233,7 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
 @media (max-width: 760px) { .rp-call b { font-size: 17px; } .rp-cast { font-size: 13px; } }
 
 /* 290 경기 재생 연출 B (js/replay.js): ⑤ 흐름 그래프 · ⑥ 승부처 표시 · ⑧ 하이라이트 표시 */
-.rp-flow { position: relative; height: 64px; margin-top: 10px; border-radius: var(--r-s); background: var(--panel-2); border: 1px solid var(--border); cursor: pointer; overflow: hidden; }
+.rp-flow { position: relative; box-sizing: border-box; height: 96px; padding: 16px 0; margin-top: 10px; border-radius: var(--r-s); background: var(--panel-2); border: 1px solid var(--border); cursor: pointer; overflow: hidden; }
 .rp-flow svg { display: block; width: 100%; height: 100%; }
 .rp-fl-mid { stroke: rgba(255, 255, 255, 0.18); stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 3 3; }
 .rp-fl-a { fill: var(--side-a-chart); opacity: 0.55; }

@@ -77,6 +77,7 @@ function replayShellHTML(m) {
       '<button class="rp-close" data-rpclose="1" title="닫기">✕</button></div>' +
     '<div class="rp-setbar" id="rp-setbar"></div>' +
     '<div class="rp-stage"><div>' +
+      '<div class="rp-endbar" id="rp-endbar" hidden></div>' + // 200: 세트·경기 끝 안내 (화면을 가리지 않음) · 다듬기 P1: 미니맵 위로 (끝나면 결과·버튼부터 보이게)
       '<div class="rp-map" id="rp-map"></div>' +
       '<div class="rp-cast" id="rp-cast"><span class="rp-mic">🎙️</span><span id="rp-cast-t"></span></div>' + // 289 ② 캐스터 자막
       '<div class="rp-mom rp-flow" id="rp-flow" title="' + escapeHTML(REPLAY_B_TEXT.flowTitle.replace("{a}", teamShort(m.a)).replace("{b}", teamShort(m.b))) + '">' + // 290 ⑤ 흐름 그래프 (예전 막대 자리)
@@ -85,7 +86,6 @@ function replayShellHTML(m) {
         '<span class="rp-fl-tip" id="rp-fl-tip" hidden></span></div>' +
       '<div class="rp-tl" id="rp-tl"><div class="rp-fill" id="rp-fill"></div><div class="rp-head" id="rp-head"></div></div>' +
       '<div class="rp-ctrl"><button class="primary" data-rpplay="1" id="rp-play">▶ 재생</button>' + speeds + '<button data-rpskip="1">⏭ 결과 보기</button><button data-rphl="1">' + REPLAY_B_TEXT.hlBtn + "</button></div>" + // 290 ⑧
-      '<div class="rp-endbar" id="rp-endbar" hidden></div>' + // 200: 세트·경기 끝 안내 (화면을 가리지 않음)
     '</div><div class="rp-side"><div class="rp-lanes" id="rp-lanes"></div>' +
       '<div class="rp-feedwrap"><div class="rp-feedhd"><span class="muted small">경기 기록 · 새 장면이 위로</span>' + (rpUserPlays(m) ? '<label class="small"><input type="checkbox" id="rp-onlyme"' + (RP.onlyMe ? " checked" : "") + "> " + REPLAY_TEXTS.onlyMe + ' <b id="rp-mecount">0</b></label>' : "") + "</div>" +
       '<div class="rp-feed' + (RP.onlyMe && rpUserPlays(m) ? " only-me" : "") + '" id="rp-feed" data-empty="' + REPLAY_TEXTS.noMine + '"></div></div></div></div>' +
@@ -326,6 +326,7 @@ function replayEndBar(html, cls, onNext) {
   b.className = "rp-endbar " + (cls || "");
   b.innerHTML = html + '<div class="muted small">' + REPLAY_TEXTS.endHint + "</div>";
   b.hidden = false;
+  if (b.scrollIntoView) b.scrollIntoView({ block: "nearest" }); // 다듬기 P1: 아래로 내려 보고 있었으면 안내가 보이게
   RP.onNext = onNext;
   b.querySelectorAll("[data-rpnext]").forEach(function (x) { x.onclick = function () { const f = RP.onNext; if (f) f(); }; });
   b.querySelectorAll("[data-rpskip]").forEach(function (x) { x.onclick = replaySkip; });

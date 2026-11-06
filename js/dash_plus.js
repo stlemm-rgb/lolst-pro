@@ -83,11 +83,11 @@ function weekSummaryHTML(r, kind) {
   const special = sp.map(function (x) { return '<div class="ws-special"><span class="ic">' + x[0] + "</span><div>" + x[1] + (x[2] ? '<div class="muted small">' + x[2] + "</div>" : "") + "</div></div>"; }).join("");
   const btn = replayQueue().length ? W.replayBtn : W.okBtn;
   return '<div class="ws-box' + (kind.indexOf("title") === 0 ? " champ" : "") + '" role="dialog" aria-label="이번 주 요약">' +
-    '<div class="ws-screen">' + pic + head + '<div class="ws-cap">' + escapeHTML(cap) + '</div><div class="ws-rows ws-ovl">' + chips + "</div></div>" +
-    '<div class="ws-rest ws-rows">' + rows + positionWeekHTML(r) + '<div class="ws-two"><div>' + bars + "</div>" + kvHTML + "</div>" + special +
+    '<div class="ws-body"><div class="ws-screen">' + pic + head + '<div class="ws-cap">' + escapeHTML(cap) + '</div><div class="ws-rows ws-ovl">' + chips + "</div></div>" +
+    '<div class="ws-rest ws-rows">' + rows + positionWeekHTML(r) + '<div class="ws-two"><div>' + bars + "</div>" + kvHTML + "</div>" + special + "</div></div>" + // 다듬기 P2: 위 내용만 스크롤, 버튼은 창 아래에 고정
     '<div class="ws-foot"><div class="ws-btns"><button class="primary ws-btn" data-ws-close="1">' + btn + "</button>" +
       (replayQueue().length ? '<button class="ws-btn ws-noreplay" data-ws-noreplay="1">' + W.noReplayBtn + "</button>" : "") + // 292
-      '</div><div class="muted small ws-hint">' + W.closeHint + "</div></div></div>" +
+      '</div><div class="muted small ws-hint">' + W.closeHint + "</div></div>" +
     '<div class="ws-flash"></div><span class="ws-skip">' + W.skipHint + "</span></div>";
 }
 function wsFill(text, v) { return String(text || "").replace(/\{(\w+)\}/g, function (all, k) { return v[k] !== undefined ? v[k] : all; }); }
