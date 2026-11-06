@@ -133,44 +133,6 @@ function gsSparks(el, n) {
     }
 }
 
-// ===== 313 수상 카드: 상을 받은 주, 이번 주 요약 창을 닫으면 금색 카드 (글·순서: data/records.js AWARD_CARD) =====
-let awardCardQueue = []; // 이번 주 내가 받은 상 — 화면 연출만이라 저장 안 함 (giveAward가 넣음)
-function queueAwardCard(entry) { awardCardQueue.push({ key: entry.key, title: entry.title, value: entry.value, year: entry.year }); }
-function showAwardCard(done) {
-  const list = awardCardQueue.splice(0);
-  if (!list.length || !state.player || state.retired) { if (done) done(); return; }
-  const C = AWARD_CARD, B = RECORDS.awardBonus, P = CONTRACT.premium.awards;
-  const rank = function (k) { const i = C.order.indexOf(k); return i === -1 ? 99 : i; };
-  list.sort(function (a, b) { return rank(a.key) - rank(b.key); });
-  const top = list[0], big = C.big.indexOf(top.key) !== -1;
-  const pay = Math.round(list.reduce(function (s, a) { return s + (P[a.key] || 0); }, 0) * 100);
-  const sub = C.sub.replace("{year}", top.year).replace("{name}", escapeHTML(state.player.name)) +
-    (typeof top.value === "number" ? " · " + C.rating.replace("{v}", top.value.toFixed(2)) : "");
-  const rows = list.map(function (a, i) {
-    return '<div class="gs-row" style="animation-delay:' + (0.55 + i * 0.22) + 's">' + (C.icons[a.key] || "🏅") + " " + escapeHTML(a.title) + "</div>";
-  }).join("");
-  const bonus = C.bonus.replace("{pop}", B.popularity * list.length).replace("{rep}", B.reputation * list.length);
-  let el = document.getElementById("gs-overlay");
-  if (!el) { el = document.createElement("div"); el.id = "gs-overlay"; document.body.appendChild(el); }
-  sfx("trophy");
-  el.innerHTML = '<div class="gs-flash"></div><div class="gs-box awc' + (big ? " big" : "") + '"><div class="gs-rays"></div>' +
-    '<div class="gs-title">' + escapeHTML(top.title) + "!</div><div class=\"gs-sub\">" + sub + "</div>" +
-    '<div class="gs-pf"><span class="gs-jumpy">' + portraitImg(USER_ID, { scale: 3, mood: "win" }) + '</span><span class="gs-flex">' + (C.icons[top.key] || "🏅") + "</span></div>" +
-    '<div class="gs-rows">' + rows + "</div>" +
-    '<div class="awc-eff">' + bonus + (pay ? "<br>" + escapeHTML(C.pay.replace("{pct}", pay).replace("{max}", Math.round(CONTRACT.premiumClamp[1] * 100))) : "") + "</div>" +
-    '<button class="primary gs-ok">' + C.ok + "</button></div>";
-  el.hidden = false;
-  const close = function () {
-    if (el.hidden) return;
-    el.hidden = true; el.innerHTML = "";
-    document.removeEventListener("keydown", onKey);
-    if (done) done();
-  };
-  const onKey = function (e) { if (e.key === "Escape" || e.key === "Enter" || e.code === "Space") { e.preventDefault(); close(); } };
-  document.addEventListener("keydown", onKey);
-  el.onclick = close;
-  if (!motionOff()) setTimeout(function () { gsSparks(el, big ? 60 : 30); }, 350);
-}
 // 대시보드 내 포트레잇: 대성공 주 처음 볼 때 크게 점프 (③)
 function greatDashJump(page) {
   const r = state.weekReport;
@@ -179,4 +141,53 @@ function greatDashJump(page) {
   if (!pf) return;
   r.great.jumped = true;
   setTimeout(function () { pf.classList.remove("gs-bigjump"); void pf.offsetWidth; pf.classList.add("gs-bigjump"); }, 300);
+}
+// ===== 313 수상 카드 · 314 시안 28 C '중계 화면 발표': 해설 자막 → 하늘색 띠 + 이름·큰 얼굴 → 시즌 기록 → 함께 받은 상 (글·순서: data/records.js AWARD_CARD) =====
+let awardCardQueue = []; // 이번 주 내가 받은 상 — 화면 연출만이라 저장 안 함 (giveAward가 넣음)
+function queueAwardCard(entry) { awardCardQueue.push({ key: entry.key, title: entry.title, value: entry.value, year: entry.year }); }
+function showAwardCard(done) {
+  const list = awardCardQueue.splice(0);
+  if (!list.length || !state.player || state.retired) { if (done) done(); return; }
+  const C = AWARD_CARD, B = RECORDS.awardBonus, P = CONTRACT.premium.awards;
+  const rank = function (k) { const i = C.order.indexOf(k); return i === -1 ? 99 : i; };
+  list.sort(function (a, b) { return rank(a.key) - rank(b.key); });
+  const top = list[0];
+  const name = function (a) { return AWARD_NAMES[a.key] || a.title; };
+  const extra = function (a) { const n = AWARD_NAMES[a.key]; return n && a.title.indexOf(n) === 0 ? a.title.slice(n.length).replace(/^\s*\(/, "").replace(/\)\s*$/, "").trim() : ""; };
+  const st = (state.league.season.playerStats || {})[USER_ID] || {};
+  const rating = typeof top.value === "number" ? top.value : st.g ? st.r / st.g : null;
+  const tick = [[C.rating, rating === null ? "-" : rating.toFixed(2)], [C.pog, st.pog || 0], [C.solo, st.solo || 0]];
+  const pay = Math.round(list.reduce(function (s, a) { return s + (P[a.key] || 0); }, 0) * 100);
+  const eff = escapeHTML(C.bonus.replace("{pop}", B.popularity * list.length).replace("{rep}", B.reputation * list.length)) +
+    (pay ? "<br>" + escapeHTML(C.pay.replace("{pct}", pay)) + '<small>' + escapeHTML(C.payNote.replace("{max}", Math.round(CONTRACT.premiumClamp[1] * 100))) + "</small>" : "");
+  const cast = C.cast.replace("{year}", top.year).replace("{award}", name(top));
+  let el = document.getElementById("gs-overlay");
+  if (!el) { el = document.createElement("div"); el.id = "gs-overlay"; document.body.appendChild(el); }
+  const still = motionOff();
+  el.innerHTML = '<div class="awc' + (still ? " still" : "") + '" role="dialog" aria-label="' + escapeHTML(name(top)) + '">' +
+    '<div class="awc-cast">🎙️ <span class="awc-t">' + (still ? escapeHTML(cast) : "") + "</span></div>" +
+    '<div class="awc-band"><i class="awc-b1"></i><i class="awc-b2"></i>' +
+      '<div class="awc-who"><small>' + escapeHTML(name(top)) + (extra(top) ? " (" + escapeHTML(extra(top)) + ")" : "") + "</small><b>" + escapeHTML(state.player.name) + "</b></div>" +
+      '<div class="awc-face">' + portraitImg(USER_ID, { scale: 6, mood: "win" }) + "</div></div>" +
+    '<div class="awc-tick">' + tick.map(function (x) { return "<div><small>" + escapeHTML(x[0]) + "</small><b>" + escapeHTML(String(x[1])) + "</b></div>"; }).join("") + "</div>" +
+    (list.length > 1 ? '<div class="awc-also">' + list.slice(1).map(function (a, i) {
+      return '<div style="--i:' + i + '">' + (C.icons[a.key] || "🏅") + " " + escapeHTML(name(a)) + (extra(a) ? "<span>" + escapeHTML(extra(a)) + "</span>" : "") + "</div>";
+    }).join("") + "</div>" : "") +
+    '<div class="awc-foot"><div class="awc-eff">' + eff + '</div><button class="primary awc-ok">' + escapeHTML(C.ok) + "</button></div></div>";
+  el.hidden = false;
+  const timers = [];
+  const close = function () {
+    if (el.hidden) return;
+    timers.forEach(clearTimeout);
+    el.hidden = true; el.innerHTML = "";
+    document.removeEventListener("keydown", onKey);
+    if (done) done();
+  };
+  const onKey = function (e) { if (e.key === "Escape" || e.key === "Enter" || e.code === "Space") { e.preventDefault(); close(); } };
+  document.addEventListener("keydown", onKey);
+  el.onclick = close;
+  if (still) { sfx("trophy"); return; }
+  const t = el.querySelector(".awc-t");
+  for (let i = 1; i <= cast.length; i++) timers.push(setTimeout(function () { if (t.isConnected) t.textContent = cast.slice(0, i); }, i * C.typeMs));
+  timers.push(setTimeout(function () { sfx("trophy"); }, C.revealMs)); // 이름이 들어올 때 소리
 }

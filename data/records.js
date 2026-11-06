@@ -146,16 +146,18 @@ const AWARD_NAMES = {
   msifmvp: "MSI 결승 MVP",
 };
 
-// 313 수상 카드 (상을 받은 주, 이번 주 요약 창을 닫으면 뜨는 금색 카드 — js/great.js showAwardCard)
+// 313 수상 카드 (상을 받은 주, 이번 주 요약 창을 닫으면 뜨는 창 — js/great.js showAwardCard) · 314 시안 28 C '중계 화면 발표'
 const AWARD_CARD = {
-  order: ["worldsfmvp", "mvp", "msifmvp", "fmvp", "fsfmvp", "rookie", "tier2mvp", "allpro", "cupfmvp"], // 카드 제목 = 이 순서로 가장 앞 상
-  big: ["worldsfmvp", "mvp", "msifmvp", "fmvp", "fsfmvp"],  // 더 화려하게 (햇살·금가루 더 많이)
+  order: ["worldsfmvp", "mvp", "msifmvp", "fmvp", "fsfmvp", "rookie", "tier2mvp", "allpro", "cupfmvp"], // 크게 발표할 상 = 이 순서로 가장 앞 상
   icons: { worldsfmvp: "🌍", mvp: "🥇", msifmvp: "🏅", fmvp: "🏆", fsfmvp: "🏅", rookie: "🌱", tier2mvp: "🥈", allpro: "⭐", cupfmvp: "🏆" },
-  sub: "{year} 시즌 · {name}",
-  rating: "평균 평점 {v}",
-  bonus: "인기도 +{pop} · 평판 +{rep}",
-  pay: "다음 계약 연봉 +{pct}% (재계약·이적 제안 때 · 우승·평점과 합쳐 최대 +{max}%)",
-  ok: "좋아! ▶",
+  cast: "{year} {award}, 그 주인공은…", // 해설 자막 (한 글자씩)
+  typeMs: 55,                              // 자막 한 글자 시간
+  revealMs: 1600,                          // 이름이 들어오는 때 (소리)
+  rating: "평균 평점", pog: "POG", solo: "솔로킬",
+  bonus: "인기도 +{pop}, 평판 +{rep}",
+  pay: "다음 계약 연봉 +{pct}%",
+  payNote: "재계약·이적 제안 때 반영, 우승·평점과 합쳐 최대 +{max}%",
+  ok: "좋아!",
 };
 
 // 대회 안내 (대회 일정 화면): 주차와 진출 조건
