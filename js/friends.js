@@ -127,7 +127,7 @@ function relationsCardHTML() {
       '<td class="r ' + (v >= 0 ? "up" : "down") + '">' + (v > 0 ? "+" : "") + v + "</td><td>" + L.name + "</td></tr>";
   }).join("");
   return '<div class="card"><h2>🤝 선수 관계 <span class="muted small">팀 케미 ' + (chem > 0 ? '<span class="up">+' : chem < 0 ? '<span class="down">' : "<span>") + (chem * 100).toFixed(1) + "%</span> (주전 동료 중 관계 " + EVENT_RULES.relation.friendFrom + " 이상 +0.5%, " + EVENT_RULES.relation.foeFrom + " 이하 −0.5%)</span></h2>" +
-    (rows ? '<div class="table-wrap"><table class="roster tlog">' + rows + "</table></div>"
+    (rows ? '<div class="table-wrap"><table class="roster tlog wrap1">' + rows + "</table></div>"
       : '<p class="muted">아직 특별한 관계가 없어요. 받은 연락에서 동료·다른 선수와 얽히는 선택을 하면 관계가 생겨요.</p>') + "</div>";
 }
 

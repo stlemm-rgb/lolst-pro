@@ -2161,6 +2161,13 @@ kbd { display: inline-block; min-width: 22px; text-align: center; font-family: i
   /* 표: 머리·칸은 한 줄, 넓어지면 옆으로 밀어서 보기 (설명 글은 줄바꿈 허용) */
   table.roster th, table.roster td, .tcompare th { white-space: nowrap; }
   table.roster td .small, table.roster td small { white-space: normal; display: inline-block; min-width: 120px; }
+  /* 다듬기 P3: 소속팀 표가 화면 안에 (입지·관계 막대 좁게 + 이름 칸 줄바꿈, 스태프 효과 줄바꿈, 선수단 특성 꼬리표 옆으로) */
+  table.roster .rel-bar-cell { width: 22%; min-width: 44px; }
+  table.roster.wrap1 td:first-child { white-space: normal; }
+  table.team-roster td { padding-left: 4px; padding-right: 4px; }
+  table.team-roster .mini-chips { flex-wrap: wrap; }
+  table.staff-tbl td { white-space: normal; word-break: keep-all; } table.staff-tbl td .small { min-width: 0; }
+  table.team-roster .mini-chips .chip { white-space: nowrap; }
   .tcompare td:first-child, .tcompare th:first-child { position: sticky; left: 0; z-index: 1; background: var(--panel); }
 }
 

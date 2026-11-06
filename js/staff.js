@@ -293,7 +293,7 @@ function staffCardHTML(teamId, title) {
   const log = t.staffLog && t.staffLog.year === state.year ? '<p class="muted small">올해 변화: ' + t.staffLog.lines.map(escapeHTML).join(" · ") + "</p>" : "";
   const mineCard = myTeam() && myTeam().id === teamId;
   const pickInfo = mineCard ? '<p class="muted small">팀 내 입지 ' + STAFF_RULES.pickStanding + " 이상 또는 이 팀 " + STAFF_RULES.pickTenure + "시즌 이상이면 비시즌(" + STAFF_RULES.pickWeek + "주)에 감독이 코치·분석관 후보를 보여 줘요 (입지 " + STAFF_RULES.pickManagerStanding + " 이상이면 감독도). 🎫 스카우트 티켓(상점)이 있으면 후보 1명은 A급 이상." + ((state.shop && state.shop.tickets) ? " 지금 티켓 " + state.shop.tickets + "장." : "") + "</p>" : "";
-  return '<div class="card"><h2>' + (title || "🧑‍💼 구단 스태프") + '</h2><table class="roster"><tr><th>자리</th><th>등급</th><th>이름</th><th>효과</th></tr>' + rows + "</table>" + log + pickInfo + "</div>";
+  return '<div class="card"><h2>' + (title || "🧑‍💼 구단 스태프") + '</h2><table class="roster staff-tbl"><tr><th>자리</th><th>등급</th><th>이름</th><th>효과</th></tr>' + rows + "</table>" + log + pickInfo + "</div>";
 }
 // 상점: 스카우트 티켓
 function staffShopCardHTML() {

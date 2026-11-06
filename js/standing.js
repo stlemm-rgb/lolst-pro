@@ -311,7 +311,7 @@ function standingCardHTML() {
     '<p><span class="standing-num">' + g.icon + " " + v + "</span> <b>" + g.name + "</b>" + (S.captain ? ' <span class="joker-tag">🎖️ 주장</span>' : "") +
     (next ? ' <span class="muted small">(' + next.name + "까지 " + (next.min - v) + ")</span>" : "") + "</p>" +
     '<div class="bar"><div class="bar-fill' + (v >= 80 ? " gold" : "") + '" style="width:' + v + '%"></div></div>' +
-    '<div class="table-wrap"><table class="roster tlog">' + rows + "</table></div>" +
+    '<div class="table-wrap"><table class="roster tlog wrap1">' + rows + "</table></div>" +
     '<p class="small">' + effects.join(" · ") + "</p>" +
     '<p class="muted small">기본 ' + R.base + "에 요소를 더해요. 팀을 옮기면 퀘스트·근속·주장은 처음부터예요.</p></div>";
 }
