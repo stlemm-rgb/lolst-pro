@@ -412,6 +412,7 @@ function cleanSaveNames(st) {
 }
 function ensureStateReady() {
   if (!state.league) makeLeague(); // 예전 세이브: 리그가 없으면 새로 만듦
+  msiFixOldSave(); // 316: 2015~2024 MSI 대진이 안 만들어진 채 25주(플레이인 직전)에 저장된 세이브 (js/intl.js)
   ensureNpcTraits(); // 예전 세이브·새로 들어온 선수: 다른 선수 특성 (js/league.js)
   ensureWorld(); // 해외 리그 (새 게임·예전 세이브, js/era.js)
   ensureWorldV11(); // 예전 세이브: 해외 선수 숙련도·지역 3단계 수준 (js/era.js)

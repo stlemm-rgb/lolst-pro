@@ -133,7 +133,8 @@ function roadToMsiWeek1() {
 
 function roadToMsiWeek2() {
   const s = seasonOf();
-  if (!rtmsiOn(s.year) || !s.rtmsiSeeds) return;
+  if (!rtmsiOn(s.year)) { if (s.msiTeams) setupMsi(); return; } // 316 버그: 2015~2024(Road to MSI 없는 해)는 23주에 출전 팀만 정하고 대진을 안 만들어 MSI가 안 열렸음
+  if (!s.rtmsiSeeds) return;
   const sd = rtmsiSeeds();
   const bo = INTL.roadToMsi.bo;
   const r2 = rtmsiMatch("2라운드");
@@ -147,6 +148,13 @@ function roadToMsiWeek2() {
   const mine = myTeam();
   queueHeadline("rtmsi_result", mine && s.msiTeams.indexOf(mine.id) !== -1 ? "myTeam" : "other", { seed1: teamName(r3.winner), seed2: teamName(r5.winner) }); // 화면 뉴스
   addNews("Road to MSI", "MSI 대표 확정: 1번 시드 " + teamName(r3.winner) + ", 2번 시드 " + teamName(r5.winner) + ".");
+  setupMsi();
+}
+
+// 316: 예전 세이브 — Road to MSI 없는 해에 24주가 지나 대진 없이 25주(플레이인 전)에 멈춰 있으면 지금 만듦 (26주부터는 그 해 MSI 건너뜀)
+function msiFixOldSave() {
+  const s = state.league && state.league.season;
+  if (!s || !s.msiTeams || s.msi || state.week !== 25 || rtmsiOn(state.year)) return;
   setupMsi();
 }
 
