@@ -45,6 +45,8 @@ function staffG(teamId, role) {
 function staffEff(teamId, role, key) { return STAFF_EFFECTS[role][key][staffG(teamId, role)]; }
 
 // ----- 효과 -----
+// 316: 안 떠나는 스태프 = 은퇴한 친구 코치·감독, 또는 내 추천으로 데려온 지 STAFF_RULES.pickKeep 시즌 안
+function staffLocked(s) { return !!(s && (s.friend || (s.keepUntil && state.year <= s.keepUntil))); }
 function staffPowerMult(teamId) { return findTeam(teamId) ? 1 + staffEff(teamId, "manager", "power") : 1; }
 function staffGrowthBonus(teamId) { return teamId && findTeam(teamId) ? staffEff(teamId, "coach", "growth") : 0; }
 function staffTrainingBonus() { const t = myTeam(); return t ? staffEff(t.id, "coach", "training") : 0; }
@@ -79,8 +81,8 @@ function staffNewSeason(news) {
       const champ = findTeam(champId);
       ["manager", "coach", "analyst"].forEach(function (role) {
         const s = champ.staff[role];
-        if (!s || s.g > 1 || s.friend || Math.random() >= R.poachChance) return;
-        const buyers = tierTeams(1).filter(function (t) { return t.id !== champId && t.staff[role].g > s.g && !t.staff[role].friend; });
+        if (!s || s.g > 1 || staffLocked(s) || Math.random() >= R.poachChance) return;
+        const buyers = tierTeams(1).filter(function (t) { return t.id !== champId && t.staff[role].g > s.g && !staffLocked(t.staff[role]); });
         if (!buyers.length) return;
         const to = pick(buyers);
         const back = to.staff[role];
@@ -103,7 +105,7 @@ function staffNewSeason(news) {
       if (cost) t.money = teamMoney(t.id) - cost;
     });
     if (teamMoney(t.id) < 0 && Math.random() < R.debtDownChance) {
-      const roles = STAFF_ROLES.filter(function (r) { return t.staff[r.id].g < 4 && !t.staff[r.id].friend; });
+      const roles = STAFF_ROLES.filter(function (r) { return t.staff[r.id].g < 4 && !staffLocked(t.staff[r.id]); });
       if (roles.length) {
         const r = pick(roles);
         t.staff[r.id] = newStaff(r.id, t.staff[r.id].g + 1);
@@ -114,7 +116,7 @@ function staffNewSeason(news) {
       const r = STAFF_ROLES.slice().sort(function (a, b) { return t.staff[b.id].g - t.staff[a.id].g; })[0];
       const g = t.staff[r.id].g;
       const cost = g > 0 ? Math.round(budget * R.upgradeCost[g - 1]) : 0;
-      if (g > 0 && !t.staff[r.id].friend && teamMoney(t.id) - cost >= budget * R.upgradeKeep) {
+      if (g > 0 && !staffLocked(t.staff[r.id]) && teamMoney(t.id) - cost >= budget * R.upgradeKeep) {
         t.money = teamMoney(t.id) - cost;
         t.staff[r.id] = newStaff(r.id, g - 1);
         report.push(r.icon + " " + r.name + " " + gradeName(g) + " → " + gradeName(g - 1) + " (투자 " + moneyText(cost) + ")");
@@ -122,7 +124,7 @@ function staffNewSeason(news) {
     }
     STAFF_ROLES.forEach(function (r) {
       const s = t.staff[r.id];
-      if (s.friend || Math.random() >= R.drift) return;
+      if (staffLocked(s) || Math.random() >= R.drift) return;
       const g = Math.max(0, Math.min(4, s.g + (Math.random() < 0.5 ? -1 : 1)));
       if (g === s.g) return;
       t.staff[r.id] = newStaff(r.id, g);
@@ -227,7 +229,7 @@ function postStaffPick() {
   if (!t || state.benched || state.retirePlanned || state.retired) return;
   const S = ensureStanding();
   if (S.staffPickYear === state.year) return;
-  const roles = staffPickRoles().filter(function (r) { return !t.staff[r].friend; });
+  const roles = staffPickRoles().filter(function (r) { return !staffLocked(t.staff[r]); });
   if (!roles.length) return;
   S.staffPickYear = state.year;
   const role = shuffled(roles).sort(function (a, b) { return t.staff[b].g - t.staff[a].g; })[0]; // 가장 낮은 칸
@@ -258,8 +260,9 @@ function answerStaffPick(msg, index) {
   const c = p && p.cands[index];
   let result;
   if (c && t) {
-    t.staff[p.role] = { name: c.name, g: c.g, since: state.year };
-    result = STAFF_TEXTS.hired.replace("{name}", c.name).replace("{grade}", gradeName(c.g));
+    const keep = STAFF_RULES.pickKeep;
+    t.staff[p.role] = { name: c.name, g: c.g, since: state.year, keepUntil: (msg.year || state.year) + keep }; // 316: 추천 계약 (staffLocked)
+    result = STAFF_TEXTS.hired.replace("{name}", c.name).replace("{grade}", gradeName(c.g)).replace("{keep}", keep);
     addNews("구단 스태프", "🧑‍💼 " + state.player.name + "의 추천으로 " + t.name + "이(가) " + gradeName(c.g) + "급 " + staffRole(p.role).name + " " + c.name + "을(를) 데려왔다.");
   } else result = STAFF_TEXTS.keep;
   msg.answered = index; msg.read = true; msg.result = result; msg.notes = []; msg.changes = {};
@@ -288,6 +291,7 @@ function staffCardHTML(teamId, title) {
   const rows = STAFF_ROLES.map(function (r) {
     const x = s[r.id];
     return "<tr><td>" + r.icon + " " + r.name + "</td><td>" + gradeTag(x.g) + "</td><td>" + (r.person ? escapeHTML(x.name) + (x.friend ? " 🤝" : "") + ' <span class="muted small">(' + x.since + "년~)</span>" : "") +
+      (!x.friend && x.keepUntil && state.year <= x.keepUntil ? ' <span class="muted small">' + escapeHTML(STAFF_TEXTS.keepTag.replace("{y}", x.keepUntil)) + "</span>" : "") +
       '</td><td class="small">' + staffEffectText(r.id, x.g) + "</td></tr>";
   }).join("");
   const log = t.staffLog && t.staffLog.year === state.year ? '<p class="muted small">올해 변화: ' + t.staffLog.lines.map(escapeHTML).join(" · ") + "</p>" : "";

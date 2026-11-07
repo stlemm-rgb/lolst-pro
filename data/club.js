@@ -75,6 +75,7 @@ const STAFF_RULES = {
   pickTenure: 3,          // 이 팀에서 이만큼 시즌을 보냈으면 (감독 칸은 입지 80 이상만)
   pickManagerStanding: 80,
   pickCount: 3,
+  pickKeep: 2,             // 316: 추천으로 데려온 스태프는 이만큼 시즌 동안 안 떠남 (빼 가기·자금난·무작위 변동·투자 교체에서 빠짐)
   candShift: [-1, 0, 0, 1, 1, 2],  // 후보 등급 = 지금 등급에서 이 중 무작위만큼 위로 (S 넘으면 S)
   ticket: { price: 8000000, sChance: 0.3 }, // 🎫 스카우트 티켓: 후보 1명 A급 이상 (S 30%), 한 번에 1장만 가짐
   personalAnalyst: 0.1,   // 상점 '개인 분석가' 고용 중이면 리포트 정확도 +10%p
@@ -85,6 +86,7 @@ const STAFF_TEXTS = {
   pickTitle: "👔 감독: 새 {role} 후보",
   pick: "감독: \"이번 비시즌에 {roleObj} 바꿔 볼까 한다. 지금은 {cur}. 네 생각도 듣고 싶다. 후보는 이 셋이다.\"",
   pickTicket: "(🎫 스카우트 티켓으로 데려온 후보가 한 명 있어요)",
-  hired: "감독: \"좋아, {name}({grade}급)을(를) 데려오지.\"",
+  hired: "감독: \"좋아, {name}({grade}급)을(를) 데려오지. {keep}시즌은 구단이 책임지고 붙잡아 두겠다.\"",
+  keepTag: "🤝 추천 계약 ~{y}년",
   keep: "감독: \"알겠다. 지금 체제로 간다.\"",
 };
