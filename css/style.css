@@ -2373,3 +2373,9 @@ table.mini td.nowrap { white-space: nowrap; }
 /* 315 새 버전 알림 줄 (공개 사이트만, js/save.js showNewVersionBar) — 겹창보다 위 */
 #update-bar { position: fixed; left: 50%; top: 10px; transform: translateX(-50%); z-index: 3000; width: min(560px, calc(100% - 20px)); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-radius: var(--r-s); background: var(--panel-2); border: 1px solid var(--gold); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); font-size: 14px; }
 #update-bar span { flex: 1 1 220px; }
+/* 317 업데이트 소식 창 (js/save.js showUpdateNews) */
+#upd-news { position: fixed; inset: 0; z-index: 3500; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.6); }
+.upd-box { width: min(380px, 100%); padding: 20px 20px 16px; border-radius: var(--r); background: var(--panel); border: 1px solid var(--gold); box-shadow: 0 16px 50px rgba(0, 0, 0, 0.6); }
+.upd-box h2 { margin: 0 0 10px; font-size: 18px; }
+.upd-box ul { margin: 0 0 16px; padding-left: 20px; line-height: 1.7; font-size: 14px; }
+.upd-box button { width: 100%; }

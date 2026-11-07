@@ -15,7 +15,7 @@
 | 방금 (2026-11-02) | 238 체력·컨디션 불이익(부상·번아웃·합숙 매주 컨디션 −2) → 239 컨디션 바닥 반등(30 아래면 매주 +4, 연패 문제) → 240 PC 대시보드 빈칸 정리(바로가기 6칸·미니 스탯·빈틈 없이 쌓기·중복 정리, 시안 26 A) |
 | 그다음 (사용자 결정 2026-11-03) | ① 네임드 선수 정리 → ② 실제 LoL 역사에 맞춘 진행 → ③ 시간 진행에 따른 이벤트 추가 → ④ 5개 포지션별 플레이 경험 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱 (7장). **내 선수 해외 진출은 사용자가 꺼낼 때까지 보류** |
 | 커밋 이메일 (2026-11-06) | 공개 저장소라 Gmail 대신 `339459301+stlemm-rgb@users.noreply.github.com` (JUNG PC 설정 끝). **다른 PC에서도** `git config --global user.email 339459301+stlemm-rgb@users.noreply.github.com` + 저장소 안에서 `git config --local user.email …` 한 번 |
-| 급한 업데이트 (315) | push하면 열어 둔 게임에 10분 안에(또는 탭으로 돌아올 때) '새 버전' 알림 줄이 뜸 → [저장하고 새로고침]. 공개 사이트만 (tools/bundle.py version.json, js/save.js checkNewVersion) |
+| 급한 업데이트 (315·317) | 패치 때 data/ui.js UPDATE_NOTES 맨 앞에 { ver, lines } + 로고 ver 올리기 → push하면 열어 둔 게임에 10분 안에(또는 탭으로 돌아올 때) '새 버전' 알림 줄이 뜸 → [저장하고 새로고침]. 공개 사이트만 (tools/bundle.py version.json, js/save.js checkNewVersion) |
 | 알려진 위험 | ✅ 283에서 고침: js/links.js 앞쪽 살피기 정규식(iOS 16.3 이하 Safari 오류). 새 정규식에 (?<= (?<! 쓰지 말 것 — node tools/test_old_safari.cjs가 잡음 |
 
 ## 1. 사용자와 작업 방식
@@ -298,4 +298,4 @@ PC에서 직접 작업하는 AI(Claude Code 등)는 해당 없음.
 1. **`git pull` 먼저** (다른 PC에서 올린 커밋 받기) → `git status --short`, `git log --oneline -10`으로 현재 상태 확인. 미커밋 변경은 보존.
    - 새 PC에서 측정·정답지 도구를 쓰려면: `python -m pip install playwright` → `python -m playwright install chromium` (Windows는 `python`, 출력 글자 때문에 `PYTHONIOENCODING=utf-8`). 브라우저 없이 빠른 체력·컨디션 측정은 `node tools/measure_health.cjs`.
 2. 새 사용자 요청 우선. 없으면 7장 순서대로: ① 네임드 선수 정리(대형 신인 측정부터) → ② 실제 LoL 역사 → ③ 시간 진행 이벤트 → ④ 포지션 차별화 → ④-2 받은 연락 선택지 효과 리뉴얼 → ⑤ 전체 페이지·휴대폰 폴리싱. 해외 진출은 보류.
-3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 317**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.
+3. 큰 변경 뒤에는 PROGRESS.md 맨 아래에 번호를 이어 기록(**다음 번호 318**)하고 이 파일도 갱신. Claude 프로젝트에도 올린다.

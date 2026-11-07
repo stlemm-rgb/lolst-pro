@@ -457,3 +457,25 @@ if (typeof document !== "undefined" && document.addEventListener && typeof setIn
   document.addEventListener("visibilitychange", function () { if (!document.hidden) checkNewVersion(); });
   setInterval(checkNewVersion, UPDATE_RULES.everyMs);
 }
+
+// ===== 317 업데이트 소식 창 =====
+// 이미 하던 플레이어(세이브가 있음)가 새 버전을 처음 열 때 한 번: data/ui.js UPDATE_NOTES 맨 앞 버전의 바뀐 것.
+// 본 버전은 세이브와 따로 localStorage에 (처음 하는 사람은 창 없이 지금 버전으로 기록만)
+function showUpdateNews() {
+  const note = UPDATE_NOTES[0], T = UPDATE_NEWS_TEXT;
+  if (!note || typeof localStorage === "undefined") return;
+  let seen = null;
+  try { seen = localStorage.getItem(T.storeKey); } catch (e) { return; }
+  if (seen === note.ver) return;
+  try { localStorage.setItem(T.storeKey, note.ver); } catch (e) { /* 기록 못 해도 이번엔 보여 줌 */ }
+  if (!state.player || !document.body) return; // 처음 하는 사람: 기록만
+  const el = document.createElement("div");
+  el.id = "upd-news";
+  el.innerHTML = '<div class="upd-box" role="dialog" aria-label="' + escapeHTML(T.title.replace("{ver}", note.ver)) + '"><h2>' + escapeHTML(T.title.replace("{ver}", note.ver)) + "</h2><ul>" +
+    note.lines.map(function (l) { return "<li>" + escapeHTML(l) + "</li>"; }).join("") + '</ul><button class="primary" data-upd-ok="1">' + escapeHTML(T.ok) + "</button></div>";
+  document.body.appendChild(el);
+  const close = function () { el.remove(); document.removeEventListener("keydown", onKey); };
+  const onKey = function (e) { if (e.key === "Escape" || e.key === "Enter") { e.preventDefault(); close(); } };
+  document.addEventListener("keydown", onKey);
+  el.onclick = function (e) { if (e.target === el || (e.target.closest && e.target.closest("[data-upd-ok]"))) close(); };
+}

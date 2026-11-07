@@ -164,6 +164,17 @@ const UPDATE_TEXT = {
   close: "나중에",
 };
 
+// 317 업데이트 소식 창 (js/save.js showUpdateNews): 이미 하던 플레이어가 새 버전을 처음 열 때 한 번. 맨 앞이 지금 버전
+//   새 패치 때: 맨 앞에 { ver, lines } 한 줄 추가 + Challenger_Road.html 로고 ver도 같이
+const UPDATE_NOTES = [
+  { ver: "1.3.1", lines: [
+    "MSI 경기가 제대로 열려요.",
+    "추천으로 데려온 감독·코치·분석관은 2시즌 동안 안 떠나요.",
+    "이적이 줄었어요. 주전이 덜 바뀌어요.",
+  ] },
+];
+const UPDATE_NEWS_TEXT = { title: "🔧 ver {ver} 업데이트", ok: "확인", storeKey: "progamer-seen-version" };
+
 const ABOUT_NOTICE = {
   title: "ℹ️ 이 게임에 대해",
   lines: [

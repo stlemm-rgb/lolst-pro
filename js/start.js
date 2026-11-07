@@ -4,3 +4,4 @@
 state = loadGame() || createNewState();
 navRestoreLast(); // 285: 마지막에 보던 화면부터 (js/nav.js)
 renderAll();
+showUpdateNews(); // 317: 새 버전을 처음 열면 바뀐 것 한 번 (js/save.js)
