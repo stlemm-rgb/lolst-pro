@@ -34,6 +34,15 @@
 `--set 경로=값` (여러 번 가능). 경로는 `data/*.js` 상수: `FOCUS_RULES.userPerS=0.2`, `SLUMP_RULES.chance=0.7`, `TRAIT_FIT.offMult=0.4`, `LEAGUE.veterans.chancePerTeam=1`
 값 후보 비교는 `--variant "이름:경로=값;경로=값"`를 여러 번 (measure_seasons). 틀린 경로면 바로 오류.
 
+## 0-2) 이적 — measure_transfers.cjs (Node만, 후보 하나 약 45초, 316)
+
+1부 주전이 1년에 얼마나 바뀌는지(33주끼리), 바뀐 이유(은퇴·다른 팀·2부·후보로), 이적 종류별 수, 마지막 해 1부 평균 전력. 후보는 파일 안 VARIANTS (data 상수 바꾸기).
+
+```
+VARIANT=지금 node tools/measure_transfers.cjs   # 지금 규칙만
+node tools/measure_transfers.cjs                # 후보 전부 (몇 분)
+```
+
 ## 0-1) 사기 챔피언 영향 — measure_op_patch.cjs (Node만, 약 9분, 308)
 
 사고 없음 / 내 포지션 SS / 내 포지션 SSS / 다른 포지션 SS (6주에 일부러, 29주까지) × 다섯 포지션 × 씨앗 → 사고 기간·시즌 세트 승률, 순위, 우승, 밴·내 픽·상대 픽과 그때 승률.

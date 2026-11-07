@@ -51,7 +51,7 @@ const CONTRACT = {
   benchPopularityLoss: 1,   // 후보일 때 4주마다 인기도 −1
 
   // 다른 선수(NPC) 계약
-  npcRenewChance: 0.7,      // 계약이 끝난 NPC가 같은 팀과 재계약할 확률
+  npcRenewChance: 0.95,     // 계약이 끝난 NPC가 같은 팀과 재계약할 확률 (316: 0.7 → 0.95, 핵심 주전도 30%로 떠나 이적이 너무 많았음 — 측정 tools/measure_transfers.cjs)
 };
 
 // 감독·구단 메시지 문장 ({name} 내 선수, {rival} 경쟁 선수, {team} 팀)
@@ -125,9 +125,9 @@ const CLUB_MARKET = {
   // 지난 시즌 순위 비율(0 = 1위, 1 = 꼴찌)이 이 값보다 작으면 그 줄 규칙
   //   buys: 비시즌 영입 최대 수, margin: 지금 주전보다 스탯 점수가 이만큼 높아야 영입
   rebuild: [
-    { need: 0.34, buys: 1, margin: 4 },  // 상위권
-    { need: 0.67, buys: 2, margin: 2 },  // 중위권
-    { need: 1.01, buys: 3, margin: 1 },  // 하위권: 3명까지, 조금만 나아도 영입
+    { need: 0.34, buys: 1, margin: 6 },  // 상위권 (316: margin 4 → 6)
+    { need: 0.67, buys: 1, margin: 4 },  // 중위권 (316: 2명·2 → 1명·4)
+    { need: 1.01, buys: 2, margin: 3 },  // 하위권 (316: 3명·1 → 2명·3, 확실히 나을 때만 영입)
   ],
   passes: 2,               // 영입 라운드 수 (선수를 판 팀이 받은 이적료로 다시 사 갈 수 있게)
   // 다른 선수 계약 성적 프리미엄: 지난 시즌 평점·개인상 (CONTRACT.premium 값 사용, 합계 premiumClamp 안으로)
@@ -136,7 +136,7 @@ const CLUB_MARKET = {
   // 1부 팀끼리 주전 이적 (비시즌, 일반 영입 전에): 돈 많은 1부 팀이 다른 1부 팀 주전을 비싼 이적료로 데려감
   //   판 팀은 그 돈으로 이어지는 영입 라운드에서 다시 보강해요. 내 선수는 대상이 아님
   star: {
-    maxMoves: 3,           // 비시즌마다 최대 이동 수
+    maxMoves: 1,           // 비시즌마다 최대 이동 수 (316: 3 → 1)
     chance: 0.6,           // 팀마다 시도할 확률 (돈 많은 팀부터)
     margin: 3,             // 지금 주전보다 스탯 점수가 이만큼 높아야
     feeMult: 1.5,          // 이적료 = 보통 이적료 × 1.5 (같은 리그 경쟁 팀에 파는 값)
