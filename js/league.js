@@ -598,6 +598,7 @@ function newSeasonLeague() {
     if (ov === "stay") return;
     const lg = legendRetireRule(p); // 레전드: 실제 은퇴 해까지 보호, 지나면 은퇴 (244)
     if (lg === "stay") return;
+    if (p.capKeep && state.year <= p.capKeep && ov !== "now") return; // 318: 주장 의견으로 데려온 선수 (js/standing.js)
     const retireAge = LEAGUE.retireFromAge + traitSumOf(tr, "agingDelay") + traitSumOf(tr, "maxAgeBonus");
     if (ov === "now" || lg === "now" || (p.age >= retireAge && Math.random() < (p.age - retireAge + 1) * LEAGUE.retireChancePerYear)) {
       retirePlayer(p);

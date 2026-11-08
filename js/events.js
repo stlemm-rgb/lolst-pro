@@ -612,6 +612,7 @@ function autoIgnore() {
       m.answered = "ignored";
       m.read = true;
       m.notes = ["답하지 않아서 그냥 지나갔다"];
+      if (m.kind === "staffPick") staffTicketBack(m); // 318: 인사 추천을 그냥 넘기면 스카우트 티켓 돌려줌 (js/staff.js)
     }
   });
 }

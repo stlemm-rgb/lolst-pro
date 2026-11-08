@@ -198,6 +198,7 @@ function sellable(id, buyer) {
   if (id === USER_ID) return false;
   const p = findPlayer(id);
   if (leftThisYear(p, buyer)) return false;   // 우승 뒤 연봉 문제로 떠난 선수는 그해 원래 팀이 다시 못 데려감 (js/dynasty.js)
+  if (p.capKeep && state.year <= p.capKeep && p.teamId) return false; // 318: 주장 의견으로 데려온 선수는 다음 시즌까지 다른 팀이 못 데려감 (js/standing.js)
   if (!foreignOk(id, buyer.id)) return false;  // 외국인 선수 수 제한 (js/world_moves.js)
   if (!p.teamId) return true;                 // FA
   if (p.teamId === buyer.id) return false;

@@ -440,7 +440,7 @@ function benchWanted(teamId) {
 // 선수단이 넘칠 때 내보낼 선수: ① 가장 강한 포지션 후보 ② 같은 포지션 두 번째 후보 ③ 그 밖의 후보 중 가장 약한 선수 (keepId는 빼고)
 function surplusPlayer(teamId, keepId) {
   const plan = benchPlan(teamId);
-  const bench = benchOf(teamId, plan).filter(function (id) { return id !== keepId; });
+  const bench = benchOf(teamId, plan).filter(function (id) { const q = findPlayer(id); return id !== keepId && !(q && q.capKeep && state.year <= q.capKeep); }); // 318: 주장 의견으로 데려온 선수는 내보내지 않음
   if (!bench.length) return weakestPlayer(teamId);
   const bestOfPos = {};
   benchOf(teamId, plan).forEach(function (id) {

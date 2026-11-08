@@ -267,6 +267,7 @@ function answerStanding(msg, index) {
       if (p && sellable(id, t) && canAfford(t, c)) {
         npcTransfer(id, t, c.fee, c.salary, "buy");
         p.contractEnd += 1; // 새해 전에 계약해서 1년 더 (js/club_market.js npcTransfer는 새해 기준)
+        p.capKeep = state.year + STANDING_RULES.captain.pickKeep; // 318 버그: 데려오자마자 새해 은퇴하던 것 — 다음 시즌까지 은퇴 안 함 (js/league.js)
         result = STANDING_TEXTS.pickDone.replace("{player}", p.name).replace("{from}", from);
         notes.push("🔁 " + t.name + ", " + from + "의 " + p.name + "(" + findPosition(p.pos).name + ") 영입" + (c.fee ? " · 이적료 " + moneyText(c.fee) : ""));
         addNews("이적 시장", "주장 " + state.player.name + "의 의견으로 " + t.name + "이(가) " + from + "의 " + p.name + "을(를) 영입했다.");

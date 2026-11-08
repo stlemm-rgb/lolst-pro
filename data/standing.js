@@ -13,7 +13,7 @@ const STANDING_RULES = {
   // 주장: 입지 askFrom 이상이면 감독이 주장 제안 (시즌 1번). loseBelow 아래로 떨어지면 주장 해제
   //   주장 효과: 경기 시작 때 팀 분위기 +teamMood, 입지 +bonus − 최근 recent경기 중 진 경기 × lossPenalty
   //   이적 시즌(47주, 성장 뒤): 우리 팀에 보강할 포지션이 있으면 감독이 영입 후보 3명을 물어봄
-  captain: { askFrom: 80, loseBelow: 60, teamMood: 1, bonus: 4, recent: 5, lossPenalty: 3, pickCount: 3 },
+  captain: { askFrom: 80, loseBelow: 60, teamMood: 1, bonus: 4, recent: 5, lossPenalty: 3, pickCount: 3, pickKeep: 1 }, // 318 pickKeep: 주장 의견으로 데려온 선수는 이만큼 시즌 동안 은퇴·다른 팀 이적·방출 안 함
   // 등급 (위에서부터). salary: 재계약 연봉 배율, renew: false면 재계약 제안 없음, early: 계약 마지막 해 30주에 조기 재계약
   grades: [
     { min: 80, icon: "👑", name: "팀의 중심",  salary: 0.15, early: true },

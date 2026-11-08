@@ -250,15 +250,34 @@ function postStaffPick() {
   const vars = { role: rr.name, roleObj: rr.name + ((last - 0xac00) % 28 ? "을" : "를"), cur: cur.name + " (" + gradeName(cur.g) + "급)" };
   const fill = function (s) { return s.replace(/\{(\w+)\}/g, function (a, k) { return vars[k] !== undefined ? vars[k] : a; }); };
   postMessage("inbox", fill(STAFF_TEXTS.pickTitle), fill(STAFF_TEXTS.pick) + (ticket ? "\n" + STAFF_TEXTS.pickTicket : ""), {
-    kind: "staffPick", staffPick: { role: role, cands: cands },
+    kind: "staffPick", staffPick: { role: role, cands: cands, ticket: ticket, teamId: t.id }, // 318: 티켓은 실제로 뽑을 때만 씀 (아니면 staffTicketBack)
     choices: cands.map(function (c) { return { label: c.name + " (" + gradeName(c.g) + "급 " + rr.name + ")", hint: staffEffectText(role, c.g) + " · 지금 " + gradeName(cur.g) + "급: " + staffEffectText(role, cur.g) }; })
       .concat([{ label: "지금 " + rr.name + " 그대로", hint: cur.name + " (" + gradeName(cur.g) + "급)" }]),
   });
 }
+// 318 버그: 티켓은 연락을 보낼 때 줄어서, 안 뽑으면(그대로·4주 지나감·팀이 바뀐 뒤) 티켓만 사라졌음 → 돌려줌 (한 연락에 한 번)
+function staffTicketBack(msg) {
+  const p = msg && msg.staffPick;
+  if (!p || msg.ticketBack || !(p.ticket || (p.cands || []).some(function (c) { return c.ticket; }))) return false;
+  const sh = shopState();
+  sh.tickets = (sh.tickets || 0) + 1;
+  msg.ticketBack = true;
+  (msg.notes = msg.notes || []).push(STAFF_TEXTS.ticketBack);
+  return true;
+}
+// 318: 예전 세이브 — 이미 그대로·지나감으로 끝난 티켓 연락은 불러올 때 한 번 돌려줌 (ensureStateReady)
+function staffTicketFixOldSave() {
+  (state.inbox || []).forEach(function (m) {
+    if (m.kind !== "staffPick" || !m.staffPick || m.ticketBack) return;
+    if (m.answered === "ignored" || m.answered === (m.staffPick.cands || []).length) staffTicketBack(m);
+  });
+}
 function answerStaffPick(msg, index) {
   const p = msg.staffPick, t = myTeam();
-  const c = p && p.cands[index];
+  const moved = !!(p && p.teamId && t && t.id !== p.teamId); // 318: 팀이 바뀐 뒤 답하면 없던 일로
+  const c = !moved && p && p.cands[index];
   let result;
+  if (moved) { result = STAFF_TEXTS.moved; msg.answered = index; msg.read = true; msg.result = result; msg.notes = []; msg.changes = {}; staffTicketBack(msg); return; }
   if (c && t) {
     const keep = STAFF_RULES.pickKeep;
     t.staff[p.role] = { name: c.name, g: c.g, since: state.year, keepUntil: (msg.year || state.year) + keep }; // 316: 추천 계약 (staffLocked)
@@ -266,6 +285,7 @@ function answerStaffPick(msg, index) {
     addNews("구단 스태프", "🧑‍💼 " + state.player.name + "의 추천으로 " + t.name + "이(가) " + gradeName(c.g) + "급 " + staffRole(p.role).name + " " + c.name + "을(를) 데려왔다.");
   } else result = STAFF_TEXTS.keep;
   msg.answered = index; msg.read = true; msg.result = result; msg.notes = []; msg.changes = {};
+  if (!c) staffTicketBack(msg); // 318: '그대로'면 티켓 돌려줌
 }
 
 // 효과 글
