@@ -29,6 +29,7 @@ function newDraft() {
     alloc: {},                          // 보너스 포인트를 어디에 몇 점 줬는지
     traits: [],                         // 직접 고른 좋은 특성 (유형별 개수까지)
     teams: makeTeamDefs(CREATION.startYears[0].year), // 이번 판 구단 이름 (구단 수는 시작 연도에 따라, data/era.js)
+    teamsYear: CREATION.startYears[0].year, // 319: 위 목록을 몇 년 기준으로 만들었나
     teamChoice: -1,                     // 고른 구단 번호 (-1 = 무작위)
     look: randomLook(),                 // 얼굴 (js/portrait.js, 175)
     error: "",
@@ -442,10 +443,13 @@ function continueSavedGame() {
 
 function renderCreation() {
   if (!draft) { draft = newDraft(); startScreenDone = false; creationStep = 0; creationSeenMax = 0; }
-  // 시작 연도가 바뀌어 구단 수가 달라지면 구단 목록 다시 만들기 (2012년 1부 8·2부 6 / 2017년 10·8)
+  // 시작 연도가 바뀌면 구단 목록 다시 만들기 (그 해 구단 수·이름, data/era.js)
+  // 319 버그: 예전엔 구단 수(eraTeams)로 비교 → 2021년~(2부 = 1부 10구단 2군 10팀, eraTeams는 8)은 화면을 그릴 때마다 목록을 새로 만들어
+  //   팀을 눌러도 무작위로 돌아가고 별(예상 전력)만 바뀜. 이제 목록을 만든 연도로 비교 (예전 draft는 구단 수가 다를 때만 — 측정 도구와 같은 결과)
   const need = eraTeams(draft.startYear);
   const have = { 1: draft.teams.filter(function (d) { return d.tier === 1; }).length, 2: draft.teams.filter(function (d) { return d.tier === 2; }).length };
-  if (need[1] !== have[1] || need[2] !== have[2]) { draft.teams = makeTeamDefs(draft.startYear); draft.teamChoice = -1; }
+  const stale = draft.teamsYear !== undefined ? draft.teamsYear !== draft.startYear : (need[1] !== have[1] || need[2] !== have[2]);
+  if (stale) { draft.teams = makeTeamDefs(draft.startYear); draft.teamsYear = draft.startYear; draft.teamChoice = -1; }
   if (!startScreenDone) { renderStartScreen(); return; } // 시작 화면 (구단 목록 맞추기 뒤에: 측정 도구가 연도만 바꾸고 부를 때도 같은 결과)
   const box = document.getElementById("creation");
   const scrollY = window.scrollY;
