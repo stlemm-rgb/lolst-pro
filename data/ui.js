@@ -61,7 +61,7 @@ const PAGE_HEADS = {
   world:        { icon: "🌏", desc: "해외 지역 리그 순위와 스타 선수" },
   achievements: { icon: "🎖️", desc: "커리어·우승·개인상·명장면 업적 모음" },
   collection:   { icon: "🎨", desc: "시그니처 픽과 월드 우승 스킨" },
-  market:       { icon: "💼", desc: "내 계약, 이적 요청, 선수 검색과 구단 탐색" },
+  market:       { icon: "💼", desc: "내 계약, 이적 요청, 선수 검색과 구단 탐색, 선수 이름 편집" },
   records:      { icon: "📚", desc: "개인 시상 레이스, 역사관, 리그 생태계" },
   howto:        { icon: "❓", desc: "게임 규칙과 화면 설명" },
   settings:     { icon: "⚙️", desc: "저장·불러오기와 게임 설정" },
@@ -167,6 +167,9 @@ const UPDATE_TEXT = {
 // 317 업데이트 소식 창 (js/save.js showUpdateNews): 이미 하던 플레이어가 새 버전을 처음 열 때 한 번. 맨 앞이 지금 버전
 //   새 패치 때: 맨 앞에 { ver, lines } 한 줄 추가 + Challenger_Road.html 로고 ver도 같이
 const UPDATE_NOTES = [
+  { ver: "1.3.4", lines: [
+    "다른 선수 이름을 바꿀 수 있어요. [이적 시장 → 이름 편집]에서 팀을 고르면 돼요. (해외 리그 선수도, 지난 기록에도 새 이름으로)",
+  ] },
   { ver: "1.3.3", lines: [
     "2022년으로 시작할 때 소속팀을 골라도 '무작위'로 돌아가던 문제를 고쳤어요.",
   ] },
@@ -228,6 +231,7 @@ const HELP_TIPS = {
   schedule: "실제 한국 1부 리그(2025년) 일정을 바탕으로 한 52주 달력이에요.\n국제대회: First Stand(10~11주) · MSI(25~28주) · 월드(42~46주).",
   clubs: "구단을 누르면 선수단이 나와요.",
   search: "줄을 누르면 상세 스탯이 나와요.",
+  names: "바꾼 이름은 경기·이적 기록·수상·역사관 같은 지난 기록에도 모두 나와요.\n이미 나온 신문 기사와 SNS 글은 그때 이름 그대로예요.\n다른 선수와 같은 이름은 쓸 수 없어요. 내 선수 이름은 [설정·저장]에서 바꿔요.",
   bracket: "숫자 = 시드 · 굵은 글씨 = 이긴 팀 · 파란 테두리 = 우리 팀.\n우리 팀 경기와 결승은 눌러서 경기 결과를 볼 수 있어요.",
 };
 
@@ -299,3 +303,27 @@ const CREATION_STEPS = [
 
 // 등록 완료 도장 연출 (214, js/creation.js playRegisterStamp): 도장이 닿는 때·전체 길이(ms)
 const REGISTER_FX = { stampText: "등록 완료", hitMs: 700, totalMs: 1650 };
+
+// ━━━━━ 선수 이름 편집 (320, js/name_edit.js, 시안 28 나) ━━━━━
+// [이적 시장 → 이름 편집] 탭. 설명(ⓘ)은 HELP_TIPS.names
+const NAME_EDIT = {
+  search: "선수 이름으로 찾기",
+  notFound: "찾는 이름이 없어요",
+  tabs: [["kr", "국내 리그"], ["world", "해외 리그"], ["fa", "소속 없음"]],
+  tier1Head: "1부 · 오른쪽 작은 칸은 그 구단의 2군",
+  tier1HeadPlain: "1부",
+  tier2Head: "2부",
+  faName: "소속 없는 선수",
+  pick: "왼쪽에서 팀을 고르면 선수 이름을 여기서 바꿀 수 있어요.",
+  was: "원래 이름 ",
+  mine: "내 선수 이름은 [설정·저장]에서 바꿔요",
+  undo: "원래 이름으로",
+  resetAll: "이 팀 전부 원래 이름으로",
+  save: "저장",
+  close: "닫기",
+  empty: "이 팀에는 선수가 없어요.",
+  saved: "이름 {n}개를 바꿨어요. 지난 기록에도 새 이름으로 나와요.",
+  noChange: "바뀐 이름이 없어요.",
+  dup: "'{name}'은(는) 이미 다른 선수가 쓰는 이름이에요.",
+  settingsBtn: "다른 선수 이름 편집",
+};

@@ -401,11 +401,11 @@ function cleanSaveNames(st) {
   const L = st.league, W = st.world;
   if (L) {
     (L.teams || []).concat(L.oldTeams || []).forEach(function (t) { fix(t, ["name", "short"]); });
-    Object.keys(L.players || {}).forEach(function (id) { fix(L.players[id], ["name"]); });
+    Object.keys(L.players || {}).forEach(function (id) { fix(L.players[id], ["name", "origName"]); }); // 320: origName = 이름 편집 전 이름
   }
   if (W) {
     (W.teams || []).forEach(function (t) { fix(t, ["name", "short"]); });
-    Object.keys(W.players || {}).forEach(function (id) { fix(W.players[id], ["name"]); });
+    Object.keys(W.players || {}).forEach(function (id) { fix(W.players[id], ["name", "origName"]); });
   }
   if (st.romance && st.romance.met) Object.keys(st.romance.met).forEach(function (k) { fix(st.romance.met[k], ["name"]); });
   if (st.friends && st.friends.retired) st.friends.retired.forEach(function (x) { fix(x, ["name"]); });

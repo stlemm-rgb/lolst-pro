@@ -4,7 +4,7 @@
 
 | 파일 | KB | 하는 일 | 합쳐진 예전 파일 |
 |---|---|---|---|
-| `data/menus.js` | 2 | 좌측 메뉴 (2026-10-06 정리: 묶음 4개 + 맨 아래 설정) |  |
+| `data/menus.js` | 3 | 좌측 메뉴 (2026-10-06 정리: 묶음 4개 + 맨 아래 설정) |  |
 | `data/shop.js` | 8 | 상점 ([상점] 메뉴) — 모은 돈을 쓰는 곳 |  |
 | `data/guide.js` | 25 | 초보자 도움 (js/guide.js) |  |
 | `data/player.js` | 16 | 내 선수 기본 규칙: 스탯·성장 곡선·포지션·유형·커리어 | stats.js, growth.js, positions.js, archetypes.js, career.js |
@@ -28,8 +28,8 @@
 | `data/contracts.js` | 13 | 연봉·계약·이적 규칙 (5단계) |  |
 | `data/records.js` | 10 | 기록: 왕조·맞대결·솔로 랭크·시상 | dynasty.js, h2h.js, ladder.js, awards.js |
 | `data/news.js` | 47 | 뉴스 기사: 신문 팝업·월즈 특집·역사 뉴스 | news_articles.js, worlds_news.js, historical_news.js |
-| `data/club.js` | 7 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
-| `data/ui.js` | 22 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
+| `data/club.js` | 8 | 구단: 빅게임 라이벌·구단 스태프 | biggame.js, staff.js |
+| `data/ui.js` | 25 | 화면: 도트 포트레잇·페이지 머리 | portrait.js, pagehead.js |
 | `data/room.js` | 14 | 이번 주 행동 그림 데이터 (시안 24, 2026-11-02) — 그리는 코드는 js/room.js |  |
 | `data/great.js` | 1 | 훈련 대성공 (182, 사용자 피드백 '도파민용 대성공') — 코드는 js/great.js |  |
 | `data/health.js` | 3 | 체력·컨디션 불이익: 부상 · 번아웃 (238, 사용자 결정 2026-10-31 — 측정은 HANDOFF 8장) |  |
@@ -40,7 +40,7 @@
 | `data/comps.js` | 7 | 챔피언 조합 성향 (밴픽 상성·시너지) |  |
 | `data/era.js` | 24 | 시대: 대격변 패치·시대·해외 리그·시대별 경기 환경 | shakeup.js, era.js, era_match.js |
 | `data/op_patch.js` | 11 | 301 패치 사고 '사기 챔피언' SS·SSS (로직: js/op_patch.js) — 사용자 결정 2026-11-06 |  |
-| `data/sound.js` | 3 | 307 사운드 (로직: js/sound.js) — 사용자 결정 2026-11-06 |  |
+| `data/sound.js` | 4 | 307 사운드 (로직: js/sound.js) — 사용자 결정 2026-11-06 |  |
 | `data/fame.js` | 9 | 인기도 · 평판 (js/fame.js) — 2026-10-07 |  |
 | `data/collection.js` | 9 | 수집·강화 (js/collection.js) — 2026-10-08 |  |
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
@@ -48,13 +48,13 @@
 | `data/romance.js` | 50 | 연애: 규칙·대상 | romance_rules.js, romance.js |
 | `js/player.js` | 10 | 선수 관련 계산 |  |
 | `js/champions.js` | 19 | 챔피언 · 숙련도 · 메타(패치) |  |
-| `js/creation.js` | 38 | 캐릭터 생성 |  |
-| `js/save.js` | 25 | 저장 / 불러오기 |  |
+| `js/creation.js` | 39 | 캐릭터 생성 |  |
+| `js/save.js` | 29 | 저장 / 불러오기 |  |
 | `js/league.js` | 33 | 리그: 구단·선수 생성, 순위 계산, 시즌 넘기기 |  |
 | `js/npc_mastery.js` | 10 | 다른 선수(NPC) 챔피언 숙련도: 만들기 · 매주 연습 · 밴픽 · 경기력 |  |
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
 | `js/matchsim.js` | 47 | 경기 판정과 주간 일정 진행 |  |
-| `js/intl.js` | 12 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
+| `js/intl.js` | 13 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
 | `js/main.js` | 58 | 게임 상태 |  |
 | `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 20 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
@@ -90,13 +90,13 @@
 | `js/dynasty.js` | 10 | 강팀 쏠림 막기 (v1.1): 왕조의 연봉 압박 · 해외 러브콜 · 분석 당하는 챔피언 |  |
 | `js/world_moves.js` | 12 | ③ 선수 오가기 + 외국인 수 제한 + 언어 소통 (v1.1) |  |
 | `js/rivals.js` | 17 | 맞대결 전적·구단별 빅게임 | h2h.js, biggame.js |
-| `js/staff.js` | 17 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
+| `js/staff.js` | 19 | 구단 스태프 (173, 로드맵 ④) — 값은 data/club.js |  |
 | `js/portrait.js` | 11 | 2D 도트 포트레잇 (175, 디자인 D1) — 값은 data/ui.js |  |
 | `js/replay.js` | 52 | 경기 다시 보기 · 자동 재생 (177, 디자인 D3) — 값은 data/replay.js |  |
 | `js/position_voice.js` | 13 | ④ 포지션 경험 1단계 (259): 내 장면의 포지션다운 해설 — 글: data/position_voice.js |  |
 | `js/duo.js` | 8 | ④ 3단계 (261): 영혼의 듀오 — 규칙·글: data/duo.js |  |
-| `js/ui.js` | 14 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
-| `js/great.js` | 7 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
+| `js/ui.js` | 15 | 화면 공통: 뒤집는 카드·페이지 머리·팀 배지·움직임 설정 | cards.js, pagehead.js |
+| `js/great.js` | 12 | 훈련 대성공 (182) — 규칙·문구는 data/great.js |  |
 | `js/health.js` | 4 | 체력·컨디션 불이익: 부상 · 번아웃 (238) — 규칙과 글은 data/health.js |  |
 | `js/franchise.js` | 8 | 프랜차이즈 (253, ② P5 · 사용자 결정 2026-11-03) — 실제 LCK처럼 2021년부터 |  |
 | `js/look_edit.js` | 4 | 내 캐릭터 얼굴 바꾸기 (184) — 대시보드 내 선수 그림 ✏️ · 설정 및 저장 |  |
@@ -106,7 +106,8 @@
 | `js/mobile_nav.js` | 4 | 휴대폰 아래 탭 + 진행 막대 (197, 시안 12 A1) |  |
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |
 | `js/nav.js` | 5 | 화면 이동 편의 (285, 사용자 선택 1·3·6·7) — 글: data/ui.js NAV_TEXT |  |
-| `js/sound.js` | 11 | 307 사운드 엔진 (값·소리·곡: data/sound.js) |  |
+| `js/sound.js` | 12 | 307 사운드 엔진 (값·소리·곡: data/sound.js) |  |
+| `js/name_edit.js` | 14 | 다른 선수 이름 편집 (320, 시안 28 나: 리그 목록 + 명단) |  |
 | `js/start.js` | 0 | 게임 시작 |  |
 
 - 데이터(숫자·문구)는 `data/`, 규칙·화면 코드는 `js/` (CLAUDE.md 규칙)

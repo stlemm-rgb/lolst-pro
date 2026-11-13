@@ -29,6 +29,7 @@ const MENU_GROUPS = [
       { id: "transfer", name: "이적 시장" },
       { id: "search",   name: "선수 검색" },
       { id: "clubs",    name: "구단 탐색" },
+      { id: "names",    name: "이름 편집" }, // 320: 다른 선수 이름 바꾸기 (js/name_edit.js)
     ] },
     { id: "collect", name: "수집", icon: "💎", tabs: [
       { id: "achievements", name: "업적 도감" },

@@ -75,7 +75,7 @@ function worldToLeague(wid) {
   const wt = findWorldTeam(worldTeamIdOf(wid));
   const p = { id: newPlayerId(), name: w.name, pos: w.pos, age: w.age, stats: Object.assign({}, w.stats), teamId: null,
     traits: (w.traits || []).slice(), style: w.style, origin: originOf(w), mastery: w.mastery ? Object.assign({}, w.mastery) : null, langs: w.langs ? Object.assign({}, w.langs) : undefined,
-    fromWorld: wt ? wt.name : null };
+    fromWorld: wt ? wt.name : null, origName: w.origName, prevIds: (w.prevIds || []).concat(wid).slice(-6) }; // 320: 바꾼 이름의 원래 이름 · 옛 id (js/name_edit.js)
   if (!p.mastery) npcMasteryInit(p);
   state.league.players[p.id] = p;
   state.league.freeAgents.push(p.id);
@@ -94,7 +94,8 @@ function leagueFAToWorld(id, wt) {
   W.seq = (W.seq || 0) + 1;
   const np = { id: "X" + W.seq, name: p.name, pos: p.pos, age: p.age, stats: Object.assign({}, p.stats),
     traits: (p.traits || []).filter(function (x) { const t = findTrait(x); return t && !t.rival; }), style: p.style,
-    origin: originOf(p) || HOME_ORIGIN.id, mastery: p.mastery, langs: p.langs, abroadYear: state.year, fromLeague: "FA" };
+    origin: originOf(p) || HOME_ORIGIN.id, mastery: p.mastery, langs: p.langs, abroadYear: state.year, fromLeague: "FA",
+    origName: p.origName, prevIds: (p.prevIds || []).concat(p.id).slice(-6) }; // 320 (js/name_edit.js)
   W.players[np.id] = np;
   if (W.names && W.names.indexOf(p.name) === -1) W.names.push(p.name);
   const same = wt.roster.filter(function (x) { return worldPlayer(x) && worldPlayer(x).pos === p.pos; })

@@ -3,7 +3,7 @@
   "name": "A 미드 2017 1부",
   "snaps": [
    {
-    "strict": "a30877f4",
+    "strict": "34c92a3b",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -89,7 +89,7 @@
     }
    },
    {
-    "strict": "35d2eae3",
+    "strict": "ff97f8c1",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -171,7 +171,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "dbedafe3"
+      "hash": "8187d442"
      },
      "news": {
       "articles": 24
@@ -180,7 +180,7 @@
     }
    },
    {
-    "strict": "bc7be451",
+    "strict": "f148b26e",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -268,7 +268,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "25dff8e"
+      "hash": "1c8f9263"
      },
      "news": {
       "articles": 37
@@ -277,7 +277,7 @@
     }
    },
    {
-    "strict": "58d238e8",
+    "strict": "8c9f0747",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -372,7 +372,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "fe366ff5"
+      "hash": "964bc161"
      },
      "news": {
       "articles": 50
@@ -381,7 +381,7 @@
     }
    },
    {
-    "strict": "f99773e1",
+    "strict": "91c850d6",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -482,7 +482,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "4e000b6f"
+      "hash": "26ec8a62"
      },
      "news": {
       "articles": 63
@@ -491,7 +491,7 @@
     }
    },
    {
-    "strict": "9a448bcd",
+    "strict": "2860a0a9",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -598,7 +598,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "8cad0acc"
+      "hash": "b080254c"
      },
      "news": {
       "articles": 74
@@ -607,7 +607,7 @@
     }
    },
    {
-    "strict": "fdeb8316",
+    "strict": "6b2810de",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -720,7 +720,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "9f389580"
+      "hash": "4fe4380b"
      },
      "news": {
       "articles": 89
@@ -729,7 +729,7 @@
     }
    },
    {
-    "strict": "71817102",
+    "strict": "3caea8fb",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -848,7 +848,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "53b0bb4c"
+      "hash": "71ad7ff"
      },
      "news": {
       "articles": 102
@@ -857,7 +857,7 @@
     }
    },
    {
-    "strict": "88230076",
+    "strict": "fb3c933b",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -983,7 +983,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "d9f63d14"
+      "hash": "7cb3cb6"
      },
      "news": {
       "articles": 116
@@ -992,7 +992,7 @@
     }
    },
    {
-    "strict": "6d6e0a7f",
+    "strict": "9188fc09",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -1124,7 +1124,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "9775b9e1"
+      "hash": "7db35fc0"
      },
      "news": {
       "articles": 135
@@ -1223,7 +1223,7 @@
     }
    },
    {
-    "strict": "29c0052e",
+    "strict": "6c3ec890",
     "summary": {
      "year": 2014,
      "week": 1,
@@ -1305,7 +1305,7 @@
      },
      "world": {
       "teams": 46,
-      "hash": "a9926f41"
+      "hash": "904b0cfc"
      },
      "news": {
       "articles": 35
@@ -1314,7 +1314,7 @@
     }
    },
    {
-    "strict": "1bbe69b9",
+    "strict": "23f8ba67",
     "summary": {
      "year": 2015,
      "week": 1,
@@ -1402,7 +1402,7 @@
      },
      "world": {
       "teams": 46,
-      "hash": "dc31b039"
+      "hash": "7169d5e0"
      },
      "news": {
       "articles": 54
@@ -1411,7 +1411,7 @@
     }
    },
    {
-    "strict": "59a1c7e3",
+    "strict": "c4d02ea",
     "summary": {
      "year": 2016,
      "week": 1,
@@ -1505,7 +1505,7 @@
      },
      "world": {
       "teams": 46,
-      "hash": "b67f3890"
+      "hash": "f7eec5da"
      },
      "news": {
       "articles": 74
@@ -1514,7 +1514,7 @@
     }
    },
    {
-    "strict": "608e6a0e",
+    "strict": "72bf9040",
     "summary": {
      "year": 2017,
      "week": 1,
@@ -1615,7 +1615,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "aadb09c2"
+      "hash": "2fb547c8"
      },
      "news": {
       "articles": 93
@@ -1624,7 +1624,7 @@
     }
    },
    {
-    "strict": "6bbcac37",
+    "strict": "66fc174d",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -1731,7 +1731,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "a9aaca23"
+      "hash": "d8021024"
      },
      "news": {
       "articles": 107
@@ -1740,7 +1740,7 @@
     }
    },
    {
-    "strict": "6c07f9eb",
+    "strict": "7693ad39",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -1853,7 +1853,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "a62bc32e"
+      "hash": "50aa0f89"
      },
      "news": {
       "articles": 133
@@ -1862,7 +1862,7 @@
     }
    },
    {
-    "strict": "97fadcca",
+    "strict": "6b7a5017",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -1981,7 +1981,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "26a8d29e"
+      "hash": "240a3dc1"
      },
      "news": {
       "articles": 160
@@ -1990,7 +1990,7 @@
     }
    },
    {
-    "strict": "296fb380",
+    "strict": "887aa42e",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -2116,7 +2116,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "3e0e748b"
+      "hash": "ef12825d"
      },
      "news": {
       "articles": 160
@@ -2125,7 +2125,7 @@
     }
    },
    {
-    "strict": "6d138cce",
+    "strict": "ef4537bf",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -2257,7 +2257,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "4b828c05"
+      "hash": "9aad2ddf"
      },
      "news": {
       "articles": 160
@@ -2272,7 +2272,7 @@
   "name": "C 원딜 2022 2부",
   "snaps": [
    {
-    "strict": "59eadc3b",
+    "strict": "85dac812",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -2350,7 +2350,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "5caab7d2"
+      "hash": "cc0dbcd0"
      },
      "news": {
       "articles": 13
@@ -2359,7 +2359,7 @@
     }
    },
    {
-    "strict": "9577d577",
+    "strict": "9ec3c765",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -2443,7 +2443,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "c4eb878c"
+      "hash": "b808941c"
      },
      "news": {
       "articles": 26
@@ -2452,7 +2452,7 @@
     }
    },
    {
-    "strict": "fe802d26",
+    "strict": "d36db21e",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -2542,7 +2542,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "be405369"
+      "hash": "1303f654"
      },
      "news": {
       "articles": 43
@@ -2551,7 +2551,7 @@
     }
    },
    {
-    "strict": "eb5df697",
+    "strict": "c8baea1f",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -2647,7 +2647,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "d338529b"
+      "hash": "e6851710"
      },
      "news": {
       "articles": 64
@@ -2656,7 +2656,7 @@
     }
    },
    {
-    "strict": "cf4965c1",
+    "strict": "3c89cd2f",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -2758,7 +2758,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "4f198fb6"
+      "hash": "6cb58cab"
      },
      "news": {
       "articles": 83
@@ -2767,7 +2767,7 @@
     }
    },
    {
-    "strict": "2396b209",
+    "strict": "bd1f5533",
     "summary": {
      "year": 2028,
      "week": 1,
@@ -2875,7 +2875,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "3cfa3937"
+      "hash": "9eefe259"
      },
      "news": {
       "articles": 109
@@ -2884,7 +2884,7 @@
     }
    },
    {
-    "strict": "1b5c2dda",
+    "strict": "66b95f54",
     "summary": {
      "year": 2029,
      "week": 1,
@@ -2998,7 +2998,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "3d95fc23"
+      "hash": "f1a86951"
      },
      "news": {
       "articles": 134
@@ -3007,7 +3007,7 @@
     }
    },
    {
-    "strict": "fba5440",
+    "strict": "f9a2c9cc",
     "summary": {
      "year": 2030,
      "week": 1,
@@ -3127,7 +3127,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "f454f987"
+      "hash": "725997d9"
      },
      "news": {
       "articles": 154
@@ -3136,7 +3136,7 @@
     }
    },
    {
-    "strict": "d74d2ab5",
+    "strict": "21baaf61",
     "summary": {
      "year": 2031,
      "week": 1,
@@ -3263,7 +3263,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "b4c250bb"
+      "hash": "e260e13c"
      },
      "news": {
       "articles": 160
@@ -3272,7 +3272,7 @@
     }
    },
    {
-    "strict": "e85a18ed",
+    "strict": "d8483dae",
     "summary": {
      "year": 2032,
      "week": 1,
@@ -3405,7 +3405,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "dba8d44f"
+      "hash": "721d5c0c"
      },
      "news": {
       "articles": 160
@@ -3420,7 +3420,7 @@
   "name": "D 정글 2017 제안 수락",
   "snaps": [
    {
-    "strict": "6da3f12c",
+    "strict": "37fac4c9",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -3498,7 +3498,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "526ef091"
+      "hash": "9febb445"
      },
      "news": {
       "articles": 13
@@ -3507,7 +3507,7 @@
     }
    },
    {
-    "strict": "c28360f5",
+    "strict": "1b369847",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -3590,7 +3590,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "9fc57a94"
+      "hash": "3d643fe0"
      },
      "news": {
       "articles": 25
@@ -3599,7 +3599,7 @@
     }
    },
    {
-    "strict": "831994e0",
+    "strict": "6963d06",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -3688,7 +3688,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "d958b25a"
+      "hash": "48f300e0"
      },
      "news": {
       "articles": 41
@@ -3697,7 +3697,7 @@
     }
    },
    {
-    "strict": "f920d70",
+    "strict": "e0eeb0c2",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -3792,7 +3792,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "b21b67a6"
+      "hash": "da60370"
      },
      "news": {
       "articles": 54
@@ -3801,7 +3801,7 @@
     }
    },
    {
-    "strict": "d51d9872",
+    "strict": "fd264c2f",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -3902,7 +3902,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "fa88185"
+      "hash": "7b89afb8"
      },
      "news": {
       "articles": 68
@@ -3911,7 +3911,7 @@
     }
    },
    {
-    "strict": "5c7d7c39",
+    "strict": "e1e0f58",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -4018,7 +4018,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "1a18d3c1"
+      "hash": "45418e2e"
      },
      "news": {
       "articles": 78
@@ -4027,7 +4027,7 @@
     }
    },
    {
-    "strict": "d6a89b58",
+    "strict": "c4ab87f4",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -4140,7 +4140,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "a5e9f916"
+      "hash": "abf1fc07"
      },
      "news": {
       "articles": 94
@@ -4149,7 +4149,7 @@
     }
    },
    {
-    "strict": "6ab02462",
+    "strict": "5ac54e57",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -4269,7 +4269,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "bbc11ac8"
+      "hash": "fbe46e12"
      },
      "news": {
       "articles": 108
@@ -4278,7 +4278,7 @@
     }
    },
    {
-    "strict": "6876391d",
+    "strict": "1b595242",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -4403,7 +4403,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "aea6c446"
+      "hash": "9eb4c55c"
      },
      "news": {
       "articles": 122
@@ -4412,7 +4412,7 @@
     }
    },
    {
-    "strict": "59877e0d",
+    "strict": "b1fedac0",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -4544,7 +4544,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "ea736013"
+      "hash": "13bd32dc"
      },
      "news": {
       "articles": 142
@@ -4559,7 +4559,7 @@
   "name": "E 서포트 2012",
   "snaps": [
    {
-    "strict": "dff9de32",
+    "strict": "b1857f5a",
     "summary": {
      "year": 2013,
      "week": 1,
@@ -4643,7 +4643,7 @@
     }
    },
    {
-    "strict": "2e7f41d8",
+    "strict": "4c950c00",
     "summary": {
      "year": 2014,
      "week": 1,
@@ -4734,7 +4734,7 @@
     }
    },
    {
-    "strict": "99599c10",
+    "strict": "317a63cb",
     "summary": {
      "year": 2015,
      "week": 1,
@@ -4822,7 +4822,7 @@
      },
      "world": {
       "teams": 46,
-      "hash": "a1e35f25"
+      "hash": "de80d6bc"
      },
      "news": {
       "articles": 52
@@ -4831,7 +4831,7 @@
     }
    },
    {
-    "strict": "4e0158d1",
+    "strict": "500c3e5e",
     "summary": {
      "year": 2016,
      "week": 1,
@@ -4925,7 +4925,7 @@
      },
      "world": {
       "teams": 46,
-      "hash": "546908ca"
+      "hash": "dba1b177"
      },
      "news": {
       "articles": 68
@@ -4934,7 +4934,7 @@
     }
    },
    {
-    "strict": "f03bbf5",
+    "strict": "aaf50179",
     "summary": {
      "year": 2017,
      "week": 1,
@@ -5034,7 +5034,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "3510473f"
+      "hash": "e7915fa2"
      },
      "news": {
       "articles": 88
@@ -5043,7 +5043,7 @@
     }
    },
    {
-    "strict": "3498a507",
+    "strict": "79dd7abe",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -5150,7 +5150,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "af1a9d6b"
+      "hash": "d8b29784"
      },
      "news": {
       "articles": 114
@@ -5159,7 +5159,7 @@
     }
    },
    {
-    "strict": "2561b134",
+    "strict": "d5e069d2",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -5272,7 +5272,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "bae42eec"
+      "hash": "df74a4fc"
      },
      "news": {
       "articles": 140
@@ -5281,7 +5281,7 @@
     }
    },
    {
-    "strict": "5c08a0b",
+    "strict": "fd08b59d",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -5401,7 +5401,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "d32f105d"
+      "hash": "ce86bfd2"
      },
      "news": {
       "articles": 160
@@ -5410,7 +5410,7 @@
     }
    },
    {
-    "strict": "5a310727",
+    "strict": "5bdfc33c",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -5536,7 +5536,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "7c9450f8"
+      "hash": "73153a51"
      },
      "news": {
       "articles": 160
@@ -5545,7 +5545,7 @@
     }
    },
    {
-    "strict": "af95bd4d",
+    "strict": "6db62555",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -5677,7 +5677,7 @@
      },
      "world": {
       "teams": 62,
-      "hash": "8af54f71"
+      "hash": "dc102dcf"
      },
      "news": {
       "articles": 160

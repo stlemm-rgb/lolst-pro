@@ -362,7 +362,7 @@ function placeLegends(mode) {
       team.roster.push(p.id);
     }
     // 같은 이름을 쓰던 다른 선수는 이름을 바꿔 줌
-    Object.keys(L.players).forEach(function (oid) { if (L.players[oid] !== p && L.players[oid].name === n.name) L.players[oid].name = takeName(); });
+    Object.keys(L.players).forEach(function (oid) { if (L.players[oid] !== p && L.players[oid].name === n.name && !L.players[oid].origName) L.players[oid].name = takeName(); }); // 320: 사용자가 지은 이름(origName 있음)은 그대로
     if (L.usedNames.indexOf(n.name) === -1) L.usedNames.push(n.name);
     p.name = n.name;
     p.named = true; // ⭐ 표시·인기도 (예전 네임드와 같은 칸)

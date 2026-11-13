@@ -291,6 +291,7 @@ pages.settings = function () {
         '<label for="player-name">선수 이름</label>' +
         '<input type="text" id="player-name" maxlength="20" value="' + escapeHTML(state.player.name) + '">' +
         '<button data-action="rename">이름 바꾸기</button>' +
+        '<button data-subtab="names">' + NAME_EDIT.settingsBtn + "</button>" + // 320: [이적 시장 → 이름 편집] (js/name_edit.js)
       "</div>" +
       '<div class="setting-row">' +
         '<label><input type="checkbox" id="auto-save"' + (state.settings.autoSave ? " checked" : "") + "> 자동 저장 (다음 주로 진행할 때마다 저장)</label>" +
@@ -578,6 +579,7 @@ function renderPage() {
   if (state.currentMenu === "settings") { bindSettings(page); bindSoundSettings(page); bindReplaySettings(page); bindMotionSetting(page); bindWeekSummarySetting(page); bindShortcutSetting(page); }
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
+  bindNameEdit(page); // 320: 다른 선수 이름 편집 (js/name_edit.js)
   bindRecords(page); // 개인 시상
   bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
   bindFlipCards(page); // 뒤집는 카드 (js/ui.js)

@@ -31,6 +31,7 @@
  *  33. 대시보드 PC · 휴대폰 따로 (232, js/dash_layout.js) · 긴 글자 한 줄 규칙
  *  34. 휴대폰 대시보드 바로가기 아이콘 · 빠른 선택 창 · 미니 스탯 · 위쪽 막대 한 줄 (235)
  *  35. PC 대시보드 바로가기 6칸 · 미니 스탯 4줄 · 빈틈 없이 쌓기 (240, 시안 26 A)
+ *  36. 선수 이름 편집 (320, js/name_edit.js, 시안 28 나) — 맨 아래
  *  25. 시작 화면 · 선수 등록증 (212, 시안 18 나) · 캐릭터 생성 단계 (213, 시안 19 가) — js/creation.js
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
@@ -2379,3 +2380,59 @@ table.mini td.nowrap { white-space: nowrap; }
 .upd-box h2 { margin: 0 0 10px; font-size: 18px; }
 .upd-box ul { margin: 0 0 16px; padding-left: 20px; line-height: 1.7; font-size: 14px; }
 .upd-box button { width: 100%; }
+
+/* ===== 36. 선수 이름 편집 (320, js/name_edit.js, 시안 28 나: 리그 목록 + 명단) ===== */
+.ne-split { display: grid; grid-template-columns: minmax(300px, 380px) minmax(0, 1fr); gap: 18px; align-items: start; }
+.ne-desc { margin: 0 0 10px; }
+.ne-find input { width: 100%; }
+.ne-found { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; margin: 8px 0 0; overflow: hidden; }
+.ne-found p { margin: 0; padding: 10px 12px; }
+.ne-found button { display: flex; width: 100%; gap: 6px; align-items: center; background: none; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; padding: 9px 12px; text-align: left; }
+.ne-found button:last-child { border-bottom: 0; }
+.ne-found button > .muted:last-child { margin-left: auto; }
+.ne-seg { display: flex; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 3px; gap: 2px; margin: 12px 0; }
+.ne-seg button { flex: 1; background: none; border: 0; border-radius: 9px; padding: 8px 4px; color: var(--muted); white-space: nowrap; font-size: 13px; }
+.ne-seg button.on { background: var(--panel-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--border); }
+.ne-seg small { color: var(--muted); margin-left: 3px; }
+.ne-lg { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 12px; }
+.ne-lg h4 { margin: 0; padding: 9px 14px; font-size: 12px; color: var(--muted); font-weight: 400; background: var(--panel-2); border-bottom: 1px solid var(--border); }
+.ne-row { display: flex; align-items: center; gap: 8px; padding-right: 10px; border-bottom: 1px solid var(--border); }
+.ne-row:last-child { border-bottom: 0; }
+.ne-row.on { background: rgba(var(--accent-rgb), 0.07); }
+.ne-t { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; background: none; border: 0; border-radius: 0; padding: 9px 12px; text-align: left; }
+.ne-t .tmark { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ne-row.on .ne-t b { color: var(--accent); }
+.ne-sub { flex-basis: 100%; padding-left: 20px; font-size: 12px; color: var(--muted); }
+.ne-me { background: var(--gold); color: #1a1400; font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 99px; }
+.ne-ed { color: var(--accent); font-size: 12px; }
+.ne-aca { flex: none; font-size: 12px; padding: 4px 8px; color: var(--muted); }
+.ne-aca.on { border-color: var(--accent); color: var(--accent); }
+.ne-rg { border-bottom: 1px solid var(--border); }
+.ne-rg:last-child { border-bottom: 0; }
+.ne-rg summary { padding: 11px 14px; cursor: pointer; display: flex; gap: 8px; }
+.ne-rg summary small { color: var(--muted); margin-left: auto; }
+.ne-rg .ne-row { border-top: 1px solid var(--border); border-bottom: 0; }
+.ne-pick { border: 1px dashed var(--border); border-radius: var(--r); padding: 40px 20px; text-align: center; color: var(--muted); }
+.ne-roster { padding: 0; overflow: hidden; scroll-margin-top: 80px; }
+.ne-head { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.ne-head .tmark i { width: 36px; height: 36px; border-radius: 10px; }
+.ne-sw { font-size: 26px; }
+.ne-head h2 { margin: 0; font-size: 17px; }
+.ne-head p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+.ne-close { margin-left: auto; display: none; }
+.ne-p { display: grid; grid-template-columns: 52px minmax(0, 1fr) 38px; gap: 10px; align-items: center; padding: 9px 16px; border-bottom: 1px solid var(--border); }
+.ne-pos { font-size: 12px; color: var(--muted); }
+.ne-pos b { display: block; color: var(--text); font-size: 13px; }
+.ne-p input { width: 100%; }
+.ne-p input.chg { border-color: var(--accent); }
+.ne-p.mine input { background: transparent; border-style: dashed; color: var(--muted); }
+.ne-was { display: block; font-size: 11px; color: var(--muted); margin-top: 3px; min-height: 14px; }
+.ne-undo { height: 34px; padding: 0; }
+.ne-undo:disabled { opacity: 0.25; }
+.ne-acts { display: flex; gap: 8px; padding: 12px 16px; justify-content: flex-end; flex-wrap: wrap; }
+@media (max-width: 860px) {
+  .ne-split { grid-template-columns: minmax(0, 1fr); }
+  .ne-split:not(.has-team) .ne-right { display: none; }
+  .ne-split.has-team .ne-right { order: -1; }
+  .ne-close { display: inline-block; }
+}
