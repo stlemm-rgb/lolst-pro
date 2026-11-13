@@ -45,6 +45,7 @@ function standingParts() {
   parts.form = form;
   parts.tenure = Math.min(R.tenure.max, Math.max(0, state.year - S.since) * R.tenure.perSeason);
   parts.romance = romanceStandingPenalty(); // 사내 연애 공개 (js/romance.js)
+  parts.stove = S.stovePen && state.year <= S.stovePen.y + 1 ? -S.stovePen.v : 0; // 스토브 리그 감독 건의 (js/stove.js, 다음 시즌까지)
   parts.captain = 0;
   if (S.captain) {
     const C = R.captain;
@@ -57,7 +58,7 @@ function standingParts() {
 
 function standingValue() {
   const p = standingParts();
-  const sum = STANDING_RULES.base + p.quest + p.trust + p.career + p.form + p.tenure + p.captain + p.romance;
+  const sum = STANDING_RULES.base + p.quest + p.trust + p.career + p.form + p.tenure + p.captain + p.romance + (p.stove || 0);
   return Math.round(Math.max(0, Math.min(100, sum)));
 }
 
@@ -302,6 +303,7 @@ function standingCardHTML() {
     standingBarRow("📈 이번 시즌 경기력", p.form, R.form.max) +
     standingBarRow("⏳ 근속 (" + S.since + "년~)", p.tenure, R.tenure.max) +
     (p.romance ? standingBarRow("💕 사내 연애 공개", p.romance, 10) : "") +
+    (p.stove ? standingBarRow("🗣️ 스토브 리그 건의", p.stove, 10) : "") +
     (S.captain ? standingBarRow("🎖️ 주장 (최근 패배만큼 −)", p.captain, R.captain.bonus + R.captain.lossPenalty * R.captain.recent) : "");
   const salary = g.salary ? "재계약 연봉 " + (g.salary > 0 ? "+" : "") + Math.round(g.salary * 100) + "%" : "재계약 연봉 그대로";
   const effects = [salary];

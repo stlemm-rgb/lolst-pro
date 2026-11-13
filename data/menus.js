@@ -32,6 +32,7 @@ const MENU_GROUPS = [
       { id: "clubs",    name: "구단 탐색" },
       { id: "names",    name: "이름 편집" }, // 320: 다른 선수 이름 바꾸기 (js/name_edit.js)
       { id: "rumors",   name: "🔥 찌라시", when: "stove" }, // 스토브 리그: 47~52주·새해 1~4주에만 보임 (js/stove.js stoveTabOpen)
+      { id: "stove",    name: "🕵️ 스토브 리그", when: "stoveAct" }, // 47~52주 행동 (js/stove.js stoveActOpen)
     ] },
     { id: "collect", name: "수집", icon: "💎", tabs: [
       { id: "achievements", name: "업적 도감" },

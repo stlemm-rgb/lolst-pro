@@ -46,7 +46,7 @@
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
 | `data/standing.js` | 3 | 팀 내 입지 (126) — 엔진 js/standing.js |  |
 | `data/romance.js` | 50 | 연애: 규칙·대상 | romance_rules.js, romance.js |
-| `data/stove.js` | 31 | 스토브 리그 규칙·글 (로직: js/stove.js, 화면: 시안 33) |  |
+| `data/stove.js` | 35 | 스토브 리그 규칙·글 (로직: js/stove.js, 화면: 시안 33) |  |
 | `js/player.js` | 10 | 선수 관련 계산 |  |
 | `js/champions.js` | 19 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 39 | 캐릭터 생성 |  |
@@ -108,7 +108,7 @@
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |
 | `js/nav.js` | 5 | 화면 이동 편의 (285, 사용자 선택 1·3·6·7) — 글: data/ui.js NAV_TEXT |  |
 | `js/sound.js` | 12 | 307 사운드 엔진 (값·소리·곡: data/sound.js) |  |
-| `js/stove.js` | 26 | 스토브 리그: 이적 예상 리스트(찌라시) · 새해에 찌라시 이적 먼저 실행 |  |
+| `js/stove.js` | 45 | 스토브 리그: 이적 예상 리스트(찌라시) · 새해에 찌라시 이적 먼저 실행 |  |
 | `js/name_edit.js` | 14 | 다른 선수 이름 편집 (320, 시안 28 나: 리그 목록 + 명단) |  |
 | `js/start.js` | 0 | 게임 시작 |  |
 

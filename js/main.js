@@ -471,7 +471,7 @@ function selectMenu(id) {
 
 // 합친 메뉴의 화면 위 탭 버튼 + 제목
 // 탭에 when이 있으면 그때만 보임 (data/menus.js)
-const TAB_WHEN = { stove: function () { return stoveTabOpen(); } };
+const TAB_WHEN = { stove: function () { return stoveTabOpen(); }, stoveAct: function () { return stoveActOpen(); } };
 function visibleTabs(parent) {
   return parent.tabs.filter(function (t) { return !t.when || t.id === state.currentMenu || (TAB_WHEN[t.when] && TAB_WHEN[t.when]()); });
 }
@@ -586,6 +586,7 @@ function renderPage() {
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindNameEdit(page); // 320: 다른 선수 이름 편집 (js/name_edit.js)
   bindStove(page); // 스토브 리그 찌라시 탭 (js/stove.js)
+  bindStoveAct(page); // 스토브 리그 행동 탭 (js/stove.js)
   bindRecords(page); // 개인 시상
   bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
   bindFlipCards(page); // 뒤집는 카드 (js/ui.js)
