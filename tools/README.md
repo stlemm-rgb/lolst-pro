@@ -43,6 +43,15 @@ VARIANT=지금 node tools/measure_transfers.cjs   # 지금 규칙만
 node tools/measure_transfers.cjs                # 후보 전부 (몇 분)
 ```
 
+## 0-3) 스토브 리그 — measure_stove.cjs (Node만, 약 8분, 스토브 리그 0단계)
+
+A. 47주 '움직일 만한 선수'(FA·계약 끝·2부 스타)와 단순 예상 행선지가 새해 실제 이적과 얼마나 맞는지. B. 52주에 우리 팀 약한 자리에 0·1·2명 영입(어디서든 / FA·계약 끝·2부만) → 다음 시즌 순위·우승률·1부 주전 변동. 게임 코드는 안 바꿈.
+
+```
+node tools/measure_stove.cjs                    # 씨앗 6 × 4시즌
+SEEDS=2 SEASONS=3 node tools/measure_stove.cjs  # 빠르게
+```
+
 ## 0-1) 사기 챔피언 영향 — measure_op_patch.cjs (Node만, 약 9분, 308)
 
 사고 없음 / 내 포지션 SS / 내 포지션 SSS / 다른 포지션 SS (6주에 일부러, 29주까지) × 다섯 포지션 × 씨앗 → 사고 기간·시즌 세트 승률, 순위, 우승, 밴·내 픽·상대 픽과 그때 승률.
