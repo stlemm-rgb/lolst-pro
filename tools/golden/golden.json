@@ -3,7 +3,7 @@
   "name": "A 미드 2017 1부",
   "snaps": [
    {
-    "strict": "16cb1832",
+    "strict": "1008e242",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -83,13 +83,13 @@
       "hash": "a9e5dc74"
      },
      "news": {
-      "articles": 13
+      "articles": 18
      },
      "inbox": 122
     }
    },
    {
-    "strict": "6cae139b",
+    "strict": "15bfa474",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -174,13 +174,13 @@
       "hash": "c6c7e962"
      },
      "news": {
-      "articles": 24
+      "articles": 31
      },
      "inbox": 122
     }
    },
    {
-    "strict": "a834cccf",
+    "strict": "ba46684d",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -272,13 +272,13 @@
       "hash": "30a177bf"
      },
      "news": {
-      "articles": 37
+      "articles": 48
      },
      "inbox": 122
     }
    },
    {
-    "strict": "c5a8262",
+    "strict": "74c83e4f",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -376,13 +376,13 @@
       "hash": "88984859"
      },
      "news": {
-      "articles": 49
+      "articles": 62
      },
      "inbox": 121
     }
    },
    {
-    "strict": "8726c62",
+    "strict": "fccafc33",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -486,13 +486,13 @@
       "hash": "2a87bd1"
      },
      "news": {
-      "articles": 64
+      "articles": 80
      },
      "inbox": 120
     }
    },
    {
-    "strict": "7e7bc5b2",
+    "strict": "1a8b3ae8",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -602,13 +602,13 @@
       "hash": "784f2899"
      },
      "news": {
-      "articles": 75
+      "articles": 94
      },
      "inbox": 121
     }
    },
    {
-    "strict": "7dd5721",
+    "strict": "8e612c75",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -724,13 +724,13 @@
       "hash": "226749f1"
      },
      "news": {
-      "articles": 91
+      "articles": 112
      },
      "inbox": 122
     }
    },
    {
-    "strict": "f48dd4fd",
+    "strict": "d6d27abb",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -852,13 +852,13 @@
       "hash": "1ec71406"
      },
      "news": {
-      "articles": 105
+      "articles": 131
      },
      "inbox": 121
     }
    },
    {
-    "strict": "d8a0159d",
+    "strict": "d594f573",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -987,13 +987,13 @@
       "hash": "e9b94ab8"
      },
      "news": {
-      "articles": 121
+      "articles": 150
      },
      "inbox": 122
     }
    },
    {
-    "strict": "96cbdaff",
+    "strict": "9c77201",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -1128,7 +1128,7 @@
       "hash": "f43646c1"
      },
      "news": {
-      "articles": 140
+      "articles": 160
      },
      "inbox": 121
     }
@@ -1140,7 +1140,7 @@
   "name": "B 탑 2012 1부 강팀 무작위 답",
   "snaps": [
    {
-    "strict": "35c0e500",
+    "strict": "65508d69",
     "summary": {
      "year": 2013,
      "week": 1,
@@ -1218,13 +1218,13 @@
       "hash": "af59454"
      },
      "news": {
-      "articles": 17
+      "articles": 19
      },
      "inbox": 122
     }
    },
    {
-    "strict": "69025aaa",
+    "strict": "6bd28e07",
     "summary": {
      "year": 2014,
      "week": 1,
@@ -1309,13 +1309,13 @@
       "hash": "96c908f1"
      },
      "news": {
-      "articles": 37
+      "articles": 42
      },
      "inbox": 124
     }
    },
    {
-    "strict": "5d97e418",
+    "strict": "9c2a7036",
     "summary": {
      "year": 2015,
      "week": 1,
@@ -1406,13 +1406,13 @@
       "hash": "70bbd6e3"
      },
      "news": {
-      "articles": 56
+      "articles": 65
      },
      "inbox": 122
     }
    },
    {
-    "strict": "40c791fb",
+    "strict": "232a2dfc",
     "summary": {
      "year": 2016,
      "week": 1,
@@ -1509,13 +1509,13 @@
       "hash": "f81bb617"
      },
      "news": {
-      "articles": 81
+      "articles": 95
      },
      "inbox": 121
     }
    },
    {
-    "strict": "16e17fad",
+    "strict": "f685d58b",
     "summary": {
      "year": 2017,
      "week": 1,
@@ -1618,13 +1618,13 @@
       "hash": "3ad772bf"
      },
      "news": {
-      "articles": 104
+      "articles": 121
      },
      "inbox": 121
     }
    },
    {
-    "strict": "a9241310",
+    "strict": "c12f77c4",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -1733,13 +1733,13 @@
       "hash": "1ba2124f"
      },
      "news": {
-      "articles": 123
+      "articles": 144
      },
      "inbox": 124
     }
    },
    {
-    "strict": "389d9a3d",
+    "strict": "5cf6c51c",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -1854,13 +1854,13 @@
       "hash": "e0400f97"
      },
      "news": {
-      "articles": 148
+      "articles": 160
      },
      "inbox": 121
     }
    },
    {
-    "strict": "1c4a603a",
+    "strict": "5820716f",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -1987,7 +1987,7 @@
     }
    },
    {
-    "strict": "f835c694",
+    "strict": "76e28637",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -2121,7 +2121,7 @@
     }
    },
    {
-    "strict": "9da4857b",
+    "strict": "a5790323",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -2267,7 +2267,7 @@
   "name": "C 원딜 2022 2부",
   "snaps": [
    {
-    "strict": "1072506b",
+    "strict": "bde7f442",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -2347,13 +2347,13 @@
       "hash": "595ad40e"
      },
      "news": {
-      "articles": 13
+      "articles": 15
      },
      "inbox": 121
     }
    },
    {
-    "strict": "b2cfe1a2",
+    "strict": "6f77927a",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -2438,13 +2438,13 @@
       "hash": "3beadf0"
      },
      "news": {
-      "articles": 25
+      "articles": 29
      },
      "inbox": 121
     }
    },
    {
-    "strict": "5596772b",
+    "strict": "68973b4f",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -2535,13 +2535,13 @@
       "hash": "66c3c4c1"
      },
      "news": {
-      "articles": 41
+      "articles": 49
      },
      "inbox": 120
     }
    },
    {
-    "strict": "d4bedde2",
+    "strict": "52021b61",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -2638,13 +2638,13 @@
       "hash": "44961d72"
      },
      "news": {
-      "articles": 68
+      "articles": 79
      },
      "inbox": 121
     }
    },
    {
-    "strict": "9df79080",
+    "strict": "8bb38c5a",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -2747,13 +2747,13 @@
       "hash": "1df93af3"
      },
      "news": {
-      "articles": 87
+      "articles": 100
      },
      "inbox": 124
     }
    },
    {
-    "strict": "7fe10d6d",
+    "strict": "616dce87",
     "summary": {
      "year": 2028,
      "week": 1,
@@ -2862,13 +2862,13 @@
       "hash": "c3fec231"
      },
      "news": {
-      "articles": 107
+      "articles": 123
      },
      "inbox": 121
     }
    },
    {
-    "strict": "67f825dc",
+    "strict": "6859a278",
     "summary": {
      "year": 2029,
      "week": 1,
@@ -2983,13 +2983,13 @@
       "hash": "c08161b3"
      },
      "news": {
-      "articles": 132
+      "articles": 153
      },
      "inbox": 122
     }
    },
    {
-    "strict": "4e8ccd90",
+    "strict": "35d19bf1",
     "summary": {
      "year": 2030,
      "week": 1,
@@ -3110,13 +3110,13 @@
       "hash": "67ddeee9"
      },
      "news": {
-      "articles": 158
+      "articles": 160
      },
      "inbox": 122
     }
    },
    {
-    "strict": "345329a8",
+    "strict": "e1126a8e",
     "summary": {
      "year": 2031,
      "week": 1,
@@ -3250,7 +3250,7 @@
     }
    },
    {
-    "strict": "fd5fc2ff",
+    "strict": "21561e0c",
     "summary": {
      "year": 2032,
      "week": 1,
@@ -3396,7 +3396,7 @@
   "name": "D 정글 2017 제안 수락",
   "snaps": [
    {
-    "strict": "d0f39dd0",
+    "strict": "79f9d5ab",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -3477,13 +3477,13 @@
       "hash": "8829e31"
      },
      "news": {
-      "articles": 13
+      "articles": 16
      },
      "inbox": 121
     }
    },
    {
-    "strict": "252e127d",
+    "strict": "6177aab4",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -3569,13 +3569,13 @@
       "hash": "7a53331d"
      },
      "news": {
-      "articles": 25
+      "articles": 32
      },
      "inbox": 122
     }
    },
    {
-    "strict": "2ef30027",
+    "strict": "1c5753db",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -3667,13 +3667,13 @@
       "hash": "8817382f"
      },
      "news": {
-      "articles": 37
+      "articles": 47
      },
      "inbox": 122
     }
    },
    {
-    "strict": "a05efa2",
+    "strict": "3b41cc9c",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -3771,13 +3771,13 @@
       "hash": "af6beac1"
      },
      "news": {
-      "articles": 49
+      "articles": 62
      },
      "inbox": 121
     }
    },
    {
-    "strict": "cc06bd53",
+    "strict": "d33a7a79",
     "summary": {
      "year": 2022,
      "week": 1,
@@ -3881,13 +3881,13 @@
       "hash": "f1243654"
      },
      "news": {
-      "articles": 72
+      "articles": 89
      },
      "inbox": 121
     }
    },
    {
-    "strict": "3549155c",
+    "strict": "ba980f49",
     "summary": {
      "year": 2023,
      "week": 1,
@@ -3997,13 +3997,13 @@
       "hash": "5148d1"
      },
      "news": {
-      "articles": 87
+      "articles": 107
      },
      "inbox": 121
     }
    },
    {
-    "strict": "2cbc91c3",
+    "strict": "54d6490b",
     "summary": {
      "year": 2024,
      "week": 1,
@@ -4120,13 +4120,13 @@
       "hash": "751333af"
      },
      "news": {
-      "articles": 102
+      "articles": 126
      },
      "inbox": 121
     }
    },
    {
-    "strict": "ff0291c9",
+    "strict": "d06bf6f7",
     "summary": {
      "year": 2025,
      "week": 1,
@@ -4249,13 +4249,13 @@
       "hash": "e0b82155"
      },
      "news": {
-      "articles": 124
+      "articles": 153
      },
      "inbox": 122
     }
    },
    {
-    "strict": "6a32b93f",
+    "strict": "1f3f35cc",
     "summary": {
      "year": 2026,
      "week": 1,
@@ -4383,13 +4383,13 @@
       "hash": "4569daf0"
      },
      "news": {
-      "articles": 142
+      "articles": 160
      },
      "inbox": 121
     }
    },
    {
-    "strict": "d2d78cae",
+    "strict": "7a110e74",
     "summary": {
      "year": 2027,
      "week": 1,
@@ -4536,7 +4536,7 @@
   "name": "E 서포트 2012",
   "snaps": [
    {
-    "strict": "6ca152af",
+    "strict": "192cd061",
     "summary": {
      "year": 2013,
      "week": 1,
@@ -4614,13 +4614,13 @@
       "hash": "b453b1f1"
      },
      "news": {
-      "articles": 19
+      "articles": 21
      },
      "inbox": 121
     }
    },
    {
-    "strict": "4e5465fb",
+    "strict": "6c3886bd",
     "summary": {
      "year": 2014,
      "week": 1,
@@ -4705,13 +4705,13 @@
       "hash": "c5fc44d"
      },
      "news": {
-      "articles": 34
+      "articles": 40
      },
      "inbox": 123
     }
    },
    {
-    "strict": "b9c350e8",
+    "strict": "2a4a696c",
     "summary": {
      "year": 2015,
      "week": 1,
@@ -4802,13 +4802,13 @@
       "hash": "2bc821d0"
      },
      "news": {
-      "articles": 50
+      "articles": 59
      },
      "inbox": 121
     }
    },
    {
-    "strict": "3b5636ed",
+    "strict": "f1e8e681",
     "summary": {
      "year": 2016,
      "week": 1,
@@ -4905,13 +4905,13 @@
       "hash": "56ad61d4"
      },
      "news": {
-      "articles": 70
+      "articles": 83
      },
      "inbox": 120
     }
    },
    {
-    "strict": "daa61ec4",
+    "strict": "eecf77f4",
     "summary": {
      "year": 2017,
      "week": 1,
@@ -5015,13 +5015,13 @@
       "hash": "d3e50157"
      },
      "news": {
-      "articles": 90
+      "articles": 106
      },
      "inbox": 122
     }
    },
    {
-    "strict": "92333d99",
+    "strict": "7ff7c220",
     "summary": {
      "year": 2018,
      "week": 1,
@@ -5131,13 +5131,13 @@
       "hash": "1df59f7f"
      },
      "news": {
-      "articles": 114
+      "articles": 133
      },
      "inbox": 122
     }
    },
    {
-    "strict": "886d0438",
+    "strict": "ed6998a5",
     "summary": {
      "year": 2019,
      "week": 1,
@@ -5253,13 +5253,13 @@
       "hash": "718b50a1"
      },
      "news": {
-      "articles": 140
+      "articles": 160
      },
      "inbox": 122
     }
    },
    {
-    "strict": "cb557a46",
+    "strict": "fdb7eaca",
     "summary": {
      "year": 2020,
      "week": 1,
@@ -5389,7 +5389,7 @@
     }
    },
    {
-    "strict": "f63d3d18",
+    "strict": "c1b10239",
     "summary": {
      "year": 2021,
      "week": 1,
@@ -5525,7 +5525,7 @@
     }
    },
    {
-    "strict": "d7c1e945",
+    "strict": "30d3e417",
     "summary": {
      "year": 2022,
      "week": 1,

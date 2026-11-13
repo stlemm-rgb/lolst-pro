@@ -106,6 +106,26 @@ function visibleTarget(list) {
 
 let coachScrolledStep = -1;
 let coachTarget = null; // 지금 가리키는 화면 요소 (말풍선·강조 테두리가 따라감)
+// ----- 스토브 리그 안내 (data/guide.js STOVE_TOUR): 처음 스토브 리그가 열린 주에 한 번 (t.stoveTour = 지금 단계, t.stoveDone = 끝)
+// 첫 코치 안내 중이면 기다림. 팁을 꺼 둔 사람도 한 번은 봄 (새 기능 설명, [안내 건너뛰기] 있음)
+function stoveTourNow() {
+  const t = tutorialState();
+  if (t.on || t.stoveDone || typeof stoveActOpen !== "function") return null;
+  if (t.stoveTour === undefined) {
+    if (!stoveActOpen()) return null;
+    t.stoveTour = 0;
+  }
+  while (t.stoveTour < STOVE_TOUR.length && STOVE_TOUR[t.stoveTour].wait && stoveTourStepDone(STOVE_TOUR[t.stoveTour].wait)) t.stoveTour++;
+  if (t.stoveTour >= STOVE_TOUR.length || !stoveActOpen()) { endStoveTour(); return null; }
+  return STOVE_TOUR[t.stoveTour];
+}
+function stoveTourStepDone(wait) {
+  if (wait === "onRumors") return state.currentMenu === "rumors";
+  if (wait === "onStove") return state.currentMenu === "stove";
+  return false;
+}
+function endStoveTour() { const t = tutorialState(); t.stoveDone = true; delete t.stoveTour; }
+
 function renderCoach() {
   let box = document.getElementById("coach-tip");
   let ring = document.getElementById("coach-ring");
@@ -113,7 +133,8 @@ function renderCoach() {
   coachTarget = null;
   const layout = document.getElementById("layout");
   const t = state.player && !state.retired && layout && !layout.hidden ? tutorialState() : null;
-  const tour = t && t.on ? COACH_TOUR[t.step] : null;
+  const stove = t && !t.on ? stoveTourNow() : null; // 스토브 리그 안내 (팁보다 먼저)
+  const tour = t && t.on ? COACH_TOUR[t.step] : stove;
   const tip = t && !tour ? coachTipNow() : null;
   if (!tour && !tip) { if (box) box.hidden = true; if (ring) ring.hidden = true; return; }
   if (!box) {
@@ -129,17 +150,28 @@ function renderCoach() {
     window.addEventListener("resize", placeCoach);
   }
   let buttons = "", head = "";
-  if (tour) {
+  if (tour && stove) { // 스토브 리그 안내
+    const wrong = stove.menu && state.currentMenu !== stove.menu;
+    head = '<span class="coach-step">🔥 ' + (t.stoveTour + 1) + " / " + STOVE_TOUR.length + "</span>";
+    buttons = (stove.go ? '<button class="primary" data-coach="sgo" data-go="' + stove.go + '">' + stove.goLabel + "</button>" : "") +
+      (wrong ? '<button data-coach="sgo" data-go="' + stove.menu + '">화면 열기</button>' : "") +
+      (stove.btn && !wrong ? '<button class="primary" data-coach="snext">' + stove.btn + "</button>" : "") +
+      '<button class="coach-skip" data-coach="sskip">안내 건너뛰기</button>';
+  }
+  if (tour && !stove) {
     const wrongPage = tour.menu && state.currentMenu !== tour.menu;
     head = '<span class="coach-step">' + (t.step + 1) + " / " + COACH_TOUR.length + "</span>";
     buttons = (wrongPage ? '<button data-coach="menu">대시보드 열기</button>' : "") +
       (tour.btn ? '<button class="primary" data-coach="next">' + tour.btn + "</button>" : "") +
       (t.step === COACH_TOUR.length - 1 ? "" : '<button class="coach-skip" data-coach="skip">안내 건너뛰기</button>');
+  }
+  if (tour) {
     coachTarget = visibleTarget(tour.targetM && window.innerWidth <= 760 ? tour.targetM : tour.target);
     if (coachTarget) {
       coachTarget.classList.add("coach-hl");
-      if (coachScrolledStep !== t.step) { // 단계가 바뀐 처음 한 번만: 가리키는 곳이 화면 밖이면 보이게
-        coachScrolledStep = t.step;
+      const sk = stove ? "s" + t.stoveTour : t.step; // 스토브 리그 안내는 따로 셈
+      if (coachScrolledStep !== sk) { // 단계가 바뀐 처음 한 번만: 가리키는 곳이 화면 밖이면 보이게
+        coachScrolledStep = sk;
         const r = coachTarget.getBoundingClientRect();
         if (r.top < 60 || r.bottom > window.innerHeight - 160) coachTarget.scrollIntoView({ block: "center", behavior: "auto" });
       }
@@ -199,6 +231,9 @@ function onCoachClick(e) {
     t.step++;
     if (t.step >= COACH_TOUR.length) endCoachTour();
   } else if (act === "skip") endCoachTour();
+  else if (act === "snext") { t.stoveTour++; if (t.stoveTour >= STOVE_TOUR.length) endStoveTour(); }
+  else if (act === "sskip") endStoveTour();
+  else if (act === "sgo") { selectMenu(btn.getAttribute("data-go")); return; }
   else if (act === "ok") t.tips[btn.getAttribute("data-tip")] = true;
   else if (act === "tipsoff") t.tipsOn = false;
   else if (act === "go") {

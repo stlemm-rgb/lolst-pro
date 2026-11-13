@@ -431,6 +431,7 @@ function renderMenu() {
   const addItem = function (item, extraClass) {
     const li = document.createElement("li");
     li.className = "mi" + (extraClass ? " " + extraClass : "");
+    li.setAttribute("data-mid", item.id); // 코치 안내가 가리킬 때 (data/guide.js STOVE_TOUR)
     const info = menuSideInfo(item.id);
     li.innerHTML = '<span class="mi-ic">' + (item.icon || "•") + '</span><span class="mi-nm">' + escapeHTML(item.name) + "</span>" +
       (info && info.badge ? '<span class="badge">' + info.badge + "</span>" : info && info.tag ? '<span class="mi-tag">' + info.tag + "</span>" : info && info.sub ? '<span class="mi-sub">' + info.sub + "</span>" : "");
@@ -917,6 +918,7 @@ function nextWeek(restWeek) {
     stoveStart(); // 스토브 리그: 이적 예상 리스트(찌라시) (js/stove.js)
   } else if (state.week > STOVE_RULES.startWeek && state.week <= STOVE_RULES.endWeek) {
     stoveWeek(); // 찌라시 가능성 변화 (js/stove.js)
+    stovePaperToSns(false); // 그 주 스토브 기사를 SNS 신문에도
   }
 
   // 이번 주 이벤트 (SNS), 퀘스트 기한·새 퀘스트

@@ -398,6 +398,19 @@ pages.rumors = function () {
   return "<h1>🔥 찌라시</h1>" + '<div class="sv">' + stoveMobileTopHTML(S, vw) + '<div class="sv-split"><div class="sv-main">' + chips + stovePaperHTML(S, vw) + stoveBoardHTML(S, vw) + "</div>" + stoveSideHTML(S, vw) + "</div></div>";
 };
 
+// SNS 신문(📰 소식)에도 같은 기사 (Codex 주의: 두 곳의 기사 내용이 같게 — stoveArticle 하나로)
+// 48~52주: 그 주 협상 기사 1개(우리 팀 관련 먼저) / 새해: 결산 + 우리 팀 관련 기사. 글만 실음 (게임 결과·난수 그대로)
+function stovePaperToSns(newYear) {
+  const S = newYear ? stoveOf(state.year - 1) : stoveOf(state.year);
+  if (!S) return;
+  let list = stoveNewsFor(S, newYear ? "new" : state.week);
+  list = newYear ? list.filter(function (n) { return n.kind === "result" || n.mine; }) : list.slice(0, 1);
+  list.forEach(function (n) {
+    const a = stoveArticle(n, S);
+    publishHeadline({ key: "stove", headline: "🔥 " + a.head, body: a.body.concat(a.quote ? [a.quote] : []).concat(["— " + a.outlet + " · 자세한 건 [이적 시장 → 🔥 찌라시]"]).join(String.fromCharCode(10)), mine: !!n.mine }, { variant: n.key });
+  });
+}
+
 // renderPage에서 (js/main.js)
 function bindStove(page) {
   const root = page.querySelector(".sv");

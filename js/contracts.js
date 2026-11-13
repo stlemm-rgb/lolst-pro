@@ -614,6 +614,7 @@ function contractsNewSeason() {
   fillRosters();
   faAbroadMoves(moves); // 팀을 못 구한 FA → 해외 팀 (js/world_moves.js)
   stoveFinalize(); // 찌라시 적중 판정은 이적이 다 끝난 뒤 (js/stove.js)
+  stovePaperToSns(true); // 새해 결산·우리 팀 기사를 SNS 신문에도
 
   // 5) FA가 너무 많으면 실력 낮은 순으로 은퇴 처리 (최대 40명 유지)
   const fa = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); });

@@ -17,6 +17,21 @@ const COACH_TOUR = [
     text: "지난주에 무슨 일이 있었는지는 여기서 봐요. 🎯 목표를 따라가면 돼요. 앞으로 처음 생기는 일은 그때그때 알려 줄게요." },
 ];
 
+// ----- 스토브 리그 안내 (사용자 요청): 처음 스토브 리그가 열린 주(47주)에 한 번. 코치 안내와 같은 방식 (js/guide.js stoveTourNow)
+// wait = 이 조건이 되면 저절로 다음 단계 (js/guide.js stoveTourStepDone), go = [버튼]으로 갈 화면, btn = 직접 넘기는 버튼
+const STOVE_TOUR = [
+  { target: ["#menu li[data-mid='market']"], go: "rumors", goLabel: "🔥 찌라시 보러 가기", wait: "onRumors", // 휴대폰은 메뉴가 숨어 있어 말풍선만
+    text: "비시즌 스토브 리그가 시작됐어요! 지금부터 52주까지 리그 전체의 이적 소문(찌라시)이 매주 올라와요. [이적 시장 → 🔥 찌라시]에서 봐요." },
+  { target: [".sv-paper"], menu: "rumors", btn: "다음",
+    text: "위의 크림색 종이는 신문 기사예요. 이적설이 '유력'이 되면 협상 기사가 나오고, 새해엔 결산·확정 기사가 나와요." },
+  { target: [".sv-board"], menu: "rumors", btn: "다음",
+    text: "아래는 커뮤니티 소문이에요. 꼬리표가 낭설 → 솔솔 → 유력 → 임박으로 갈수록 진짜일 가능성이 커요. 진짜는 꾸준히 오르고 가짜는 흔들리다 내려가요." },
+  { target: ["[data-subtab='stove']"], menu: "rumors", wait: "onStove",
+    text: "직접 판을 움직일 수도 있어요. [🕵️ 스토브 리그] 탭을 눌러요." },
+  { target: [".sa-status"], menu: "stove", btn: "알겠어요",
+    text: "한 주에 한 번, 데려오고 싶은 선수에게 커뮤니티 글·직접 연락·감독 건의를 하거나 떠날 동료를 붙잡을 수 있어요. 52주가 끝날 때 우리 팀행 이적설이 '유력' 이상이면 영입 확정 (최대 2명)!" },
+];
+
 // ----- 그때그때 팁 (215): 코치 안내가 끝난 뒤, 처음 생긴 일마다 한 번씩. 위에 있는 것이 먼저 (js/guide.js coachTipNow)
 // when = js/guide.js coachTipWhen 이름, go = [열기] 버튼으로 갈 메뉴 id (data/menus.js) 또는 "phone"(휴대폰 창)
 const COACH_TIPS = [
