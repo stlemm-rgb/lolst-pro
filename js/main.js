@@ -456,7 +456,7 @@ function renderMenu() {
 function selectMenu(id) {
   MENU_GROUPS.forEach(function (g) {
     g.items.forEach(function (item) {
-      if (item.id === id && item.tabs) id = lastMenuTab[item.id] || item.tabs[0].id;
+      if (item.id === id && item.tabs) { const lt = lastMenuTab[item.id]; id = lt && visibleTabs(item).some(function (t) { return t.id === lt; }) ? lt : item.tabs[0].id; } // 지난번 탭이 지금 숨은 탭(when)이면 첫 탭
     });
   });
   navRemember(state.currentMenu, id); // 285: 뒤로 가기용 이전 화면 + 마지막 화면 기억 (js/nav.js)
@@ -470,9 +470,14 @@ function selectMenu(id) {
 }
 
 // 합친 메뉴의 화면 위 탭 버튼 + 제목
+// 탭에 when이 있으면 그때만 보임 (data/menus.js)
+const TAB_WHEN = { stove: function () { return stoveTabOpen(); } };
+function visibleTabs(parent) {
+  return parent.tabs.filter(function (t) { return !t.when || t.id === state.currentMenu || (TAB_WHEN[t.when] && TAB_WHEN[t.when]()); });
+}
 function subTabsHTML(parent) {
   return "<h1>" + parent.name + "</h1>" +
-    '<div class="subtabs">' + parent.tabs.map(function (t) {
+    '<div class="subtabs">' + visibleTabs(parent).map(function (t) {
       return '<button data-subtab="' + t.id + '"' + (t.id === state.currentMenu ? ' class="primary"' : "") + ">" + t.name + "</button>";
     }).join("") + "</div>";
 }
@@ -580,6 +585,7 @@ function renderPage() {
   if (state.currentMenu === "sns") bindSns(page);
   bindMarket(page); // 선수 검색·구단 탐색·이적 시장
   bindNameEdit(page); // 320: 다른 선수 이름 편집 (js/name_edit.js)
+  bindStove(page); // 스토브 리그 찌라시 탭 (js/stove.js)
   bindRecords(page); // 개인 시상
   bindMatchDetail(page); // 경기 결과 화면 (js/match_detail.js)
   bindFlipCards(page); // 뒤집는 카드 (js/ui.js)
@@ -907,6 +913,9 @@ function nextWeek(restWeek) {
     settleSeasonClubs(); // 구단 스폰서 수입·저축/빚 정산·승강 지원금도 이적 시장 전에 (성장과 따로, 한 번만 — js/club_market.js)
     askRetirement(); // 29세부터 은퇴 권유 (js/retire.js)
     startTransferWindow();
+    stoveStart(); // 스토브 리그: 이적 예상 리스트(찌라시) (js/stove.js)
+  } else if (state.week > STOVE_RULES.startWeek && state.week <= STOVE_RULES.endWeek) {
+    stoveWeek(); // 찌라시 가능성 변화 (js/stove.js)
   }
 
   // 이번 주 이벤트 (SNS), 퀘스트 기한·새 퀘스트

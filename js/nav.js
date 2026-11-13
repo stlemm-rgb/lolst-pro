@@ -86,7 +86,7 @@ document.addEventListener("touchend", function (e) {
   if (Math.abs(dx) < PHONE_APPS.swipeMin || Math.abs(dy) > Math.abs(dx) * 0.6) return;
   const parent = navTabParent();
   if (!parent) return;
-  const ids = parent.tabs.map(function (x) { return x.id; }), i = ids.indexOf(state.currentMenu);
+  const ids = visibleTabs(parent).map(function (x) { return x.id; }), i = ids.indexOf(state.currentMenu); // 숨은 탭(when) 빼고 (js/main.js)
   const j = dx < 0 ? i + 1 : i - 1;
   if (j < 0 || j >= ids.length) return;
   selectMenu(ids[j]);

@@ -22,7 +22,9 @@ function create(seed) {
 
 // 후보: 이름 → data 상수 바꾸기 (식 그대로)
 const VARIANTS = {
-  "지금": "",   // 316 뒤 '지금' = 아래 '아' (data/contracts.js에 적용됨)
+  "지금": "",   // 316 뒤 '지금' = 아래 '아' (data/contracts.js에 적용됨) · 스토브 리그 진짜 찌라시 3건 포함
+  "스토브 0 (찌라시 실행 없음)": "STOVE_RULES.trueCount = 0;",
+  "스토브 2": "STOVE_RULES.trueCount = 2;",
   "가 영입 1바퀴": "CLUB_MARKET.passes = 1;",
   "나 기준 올리기": "CLUB_MARKET.rebuild = [{ need: 0.34, buys: 1, margin: 6 }, { need: 0.67, buys: 1, margin: 4 }, { need: 1.01, buys: 2, margin: 3 }];",
   "다 가+나": "CLUB_MARKET.passes = 1; CLUB_MARKET.rebuild = [{ need: 0.34, buys: 1, margin: 6 }, { need: 0.67, buys: 1, margin: 4 }, { need: 1.01, buys: 2, margin: 3 }];",

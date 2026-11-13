@@ -61,7 +61,7 @@ const PAGE_HEADS = {
   world:        { icon: "🌏", desc: "해외 지역 리그 순위와 스타 선수" },
   achievements: { icon: "🎖️", desc: "커리어·우승·개인상·명장면 업적 모음" },
   collection:   { icon: "🎨", desc: "시그니처 픽과 월드 우승 스킨" },
-  market:       { icon: "💼", desc: "내 계약, 이적 요청, 선수 검색과 구단 탐색, 선수 이름 편집" },
+  market:       { icon: "💼", desc: "내 계약, 이적 요청, 선수 검색과 구단 탐색, 선수 이름 편집, 비시즌 찌라시" },
   records:      { icon: "📚", desc: "개인 시상 레이스, 역사관, 리그 생태계" },
   howto:        { icon: "❓", desc: "게임 규칙과 화면 설명" },
   settings:     { icon: "⚙️", desc: "저장·불러오기와 게임 설정" },

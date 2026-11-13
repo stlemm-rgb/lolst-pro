@@ -46,6 +46,7 @@
 | `data/retire_stories.js` | 14 | 은퇴 이야기 (메타 적응 은퇴 인터뷰·기사 · 은퇴 상담 연락 · 코치/감독 소식) — 엔진 js/retirement.js |  |
 | `data/standing.js` | 3 | 팀 내 입지 (126) — 엔진 js/standing.js |  |
 | `data/romance.js` | 50 | 연애: 규칙·대상 | romance_rules.js, romance.js |
+| `data/stove.js` | 31 | 스토브 리그 규칙·글 (로직: js/stove.js, 화면: 시안 33) |  |
 | `js/player.js` | 10 | 선수 관련 계산 |  |
 | `js/champions.js` | 19 | 챔피언 · 숙련도 · 메타(패치) |  |
 | `js/creation.js` | 39 | 캐릭터 생성 |  |
@@ -55,13 +56,13 @@
 | `js/match_events.js` | 18 | 경기 이벤트: 세트마다 사건(스틸·슈퍼플레이·실수·심리)이 일어나 팀 점수를 흔듦 |  |
 | `js/matchsim.js` | 47 | 경기 판정과 주간 일정 진행 |  |
 | `js/intl.js` | 13 | 국제대회: First Stand · Road to MSI · MSI (규칙: data/schedule.js INTL) |  |
-| `js/main.js` | 58 | 게임 상태 |  |
+| `js/main.js` | 59 | 게임 상태 |  |
 | `js/training_page.js` | 21 | 훈련 화면 (pages.training) |  |
 | `js/league_pages.js` | 20 | 리그 화면: 소속팀, 리그 순위, 대회 일정, 대시보드 경기 카드 |  |
 | `js/events.js` | 42 | 이벤트 처리: 조건 감지 → SNS 메시지 → 선택 → 효과 |  |
 | `js/sns_page.js` | 42 | SNS 화면 |  |
 | `js/contracts.js` | 33 | 연봉 · 계약 · 2군행 · 이적 |  |
-| `js/club_market.js` | 29 | 구단 이적 시장·여름 이적 | club_market.js, summer_market.js |
+| `js/club_market.js` | 30 | 구단 이적 시장·여름 이적 | club_market.js, summer_market.js |
 | `js/market_pages.js` | 28 | 선수 검색 · 구단 탐색 · 이적 시장 화면 |  |
 | `js/links.js` | 4 | 선수·구단 이름 링크: 어느 화면이든 이름을 누르면 [선수 검색] / [구단 탐색]의 그 선수·구단으로 |  |
 | `js/news.js` | 33 | 뉴스: 소식·신문 팝업·월즈 특집·역사 뉴스 | news.js, news_popup.js, worlds_news.js, historical_news.js |
@@ -107,6 +108,7 @@
 | `js/shortcuts.js` | 4 | 단축키 (198) |  |
 | `js/nav.js` | 5 | 화면 이동 편의 (285, 사용자 선택 1·3·6·7) — 글: data/ui.js NAV_TEXT |  |
 | `js/sound.js` | 12 | 307 사운드 엔진 (값·소리·곡: data/sound.js) |  |
+| `js/stove.js` | 26 | 스토브 리그: 이적 예상 리스트(찌라시) · 새해에 찌라시 이적 먼저 실행 |  |
 | `js/name_edit.js` | 14 | 다른 선수 이름 편집 (320, 시안 28 나: 리그 목록 + 명단) |  |
 | `js/start.js` | 0 | 게임 시작 |  |
 

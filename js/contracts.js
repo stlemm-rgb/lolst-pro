@@ -607,11 +607,13 @@ function contractsNewSeason() {
   });
 
   // 3) 리빌딩: 지난 시즌 하위 팀부터 FA·2부 스타·다른 팀 후보를 영입 (이적료·빚 50%까지, js/club_market.js)
+  const stoveMoved = stoveNewSeason(moves); // 스토브 리그: 찌라시 이적 먼저 (js/stove.js)
   importMoves({}, moves); // 국내 구단의 해외 선수 영입 (외국인 1명까지, js/world_moves.js)
-  offseasonRebuild(moves);
+  offseasonRebuild(moves, stoveMoved);
   // 4) 빈 포지션 채우기, 선수단 인원 맞추기
   fillRosters();
   faAbroadMoves(moves); // 팀을 못 구한 FA → 해외 팀 (js/world_moves.js)
+  stoveFinalize(); // 찌라시 적중 판정은 이적이 다 끝난 뒤 (js/stove.js)
 
   // 5) FA가 너무 많으면 실력 낮은 순으로 은퇴 처리 (최대 40명 유지)
   const fa = state.league.freeAgents.slice().sort(function (a, b) { return playerScore(b) - playerScore(a); });

@@ -1,6 +1,7 @@
 // 좌측 메뉴 (2026-10-06 정리: 묶음 4개 + 맨 아래 설정)
 // - id: 코드에서 쓰는 이름 (영어, 바꾸지 마세요)
 // - name: 화면에 보이는 이름 (자유롭게 바꿔도 됩니다)
+// - when: 탭이 보이는 때 (js/main.js TAB_WHEN — 예: "stove" = 비시즌 찌라시 기간만)
 // - tabs: 화면 여러 개를 합친 메뉴. 누르면 첫 탭(또는 마지막에 본 탭)이 열리고, 화면 위에 탭 버튼이 생겨요
 // 224 (시안 21 가): 칸마다 icon, 묶음마다 color(css 변수 이름). 해외 리그는 '순위' 탭, 업적·컬렉션은 '수집' 탭 (17칸 → 13칸)
 const MENU_GROUPS = [
@@ -30,6 +31,7 @@ const MENU_GROUPS = [
       { id: "search",   name: "선수 검색" },
       { id: "clubs",    name: "구단 탐색" },
       { id: "names",    name: "이름 편집" }, // 320: 다른 선수 이름 바꾸기 (js/name_edit.js)
+      { id: "rumors",   name: "🔥 찌라시", when: "stove" }, // 스토브 리그: 47~52주·새해 1~4주에만 보임 (js/stove.js stoveTabOpen)
     ] },
     { id: "collect", name: "수집", icon: "💎", tabs: [
       { id: "achievements", name: "업적 도감" },

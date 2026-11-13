@@ -31,7 +31,8 @@
  *  33. 대시보드 PC · 휴대폰 따로 (232, js/dash_layout.js) · 긴 글자 한 줄 규칙
  *  34. 휴대폰 대시보드 바로가기 아이콘 · 빠른 선택 창 · 미니 스탯 · 위쪽 막대 한 줄 (235)
  *  35. PC 대시보드 바로가기 6칸 · 미니 스탯 4줄 · 빈틈 없이 쌓기 (240, 시안 26 A)
- *  36. 선수 이름 편집 (320, js/name_edit.js, 시안 28 나) — 맨 아래
+ *  36. 선수 이름 편집 (320, js/name_edit.js, 시안 28 나)
+ *  37. 스토브 리그 찌라시 (js/stove.js, 시안 33) — 맨 아래
  *  25. 시작 화면 · 선수 등록증 (212, 시안 18 나) · 캐릭터 생성 단계 (213, 시안 19 가) — js/creation.js
  *  휴대폰·좁은 화면 설정(@media)은 각 부분 끝에 같이 있음 (부분끼리 덮어쓰는 순서가 있어서 한곳에 모으지 않음)
  *  같은 선택자를 두 번 쓰지 말 것 (R4에서 10개 합침) · 안 쓰는 클래스는 R1에서 정리
@@ -2435,4 +2436,110 @@ table.mini td.nowrap { white-space: nowrap; }
   .ne-split:not(.has-team) .ne-right { display: none; }
   .ne-split.has-team .ne-right { order: -1; }
   .ne-close { display: inline-block; }
+}
+
+/* ===== 37. 스토브 리그 찌라시 (js/stove.js, 시안 33: 주차 → 신문 띠(종이) → 커뮤니티 게시판) ===== */
+.sv-split { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 18px; align-items: start; }
+.sv-weeks { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.sv-weeks button { font-size: 13px; padding: 6px 12px; border-radius: 99px; white-space: nowrap; }
+.sv-weeks button.on { border-color: var(--accent); color: var(--accent); background: rgba(var(--accent-rgb), 0.12); font-weight: 700; }
+.sv-tag { display: inline-block; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 99px; color: #0b0b14; white-space: nowrap; line-height: 1.5; }
+.sv-tag.s0 { background: #7a7a96; } .sv-tag.s1 { background: var(--accent2); } .sv-tag.s2 { background: var(--accent); } .sv-tag.s3 { background: var(--gold); } .sv-tag.sum { background: var(--accent2); }
+.sv-tag.dim { background: transparent; box-shadow: inset 0 0 0 1px currentColor; }
+.sv-tag.dim.s0 { color: #9a9ab4; } .sv-tag.dim.s1 { color: var(--accent2); } .sv-tag.dim.s2 { color: var(--accent); } .sv-tag.dim.s3 { color: var(--gold); }
+.sv-mt { margin-left: 6px; font-size: 11px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+.sv-up { color: var(--good); font-size: 11px; margin-left: 4px; } .sv-down { color: var(--bad); font-size: 11px; margin-left: 4px; }
+.sv-sc { color: var(--accent); font-weight: 700; margin-left: 2px; }
+/* 신문 띠: SNS 신문과 같은 종이 */
+.sv-paper { background: var(--paper); color: var(--ink); border-radius: var(--r-xs, 8px); padding: 12px 16px; margin-bottom: 14px; font-family: Georgia, "Batang", serif; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35); }
+.sv-mast { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 3px double var(--ink); padding-bottom: 5px; margin-bottom: 8px; font-weight: bold; font-size: 15px; }
+.sv-mast .d { font-weight: 400; font-size: 12px; color: #5d574a; white-space: nowrap; }
+.sv-pgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.sv-pitem { display: flex; flex-direction: column; gap: 5px; text-align: left; background: none; border: 0; border-radius: 0; color: inherit; font-family: inherit; padding: 8px 12px 8px 0; margin-right: 12px; border-right: 1px solid #cfc6b1; }
+.sv-pitem:last-child { border-right: 0; margin-right: 0; }
+.sv-pitem:hover .ph { text-decoration: underline; }
+.sv-pitem .pt { display: flex; gap: 6px; align-items: center; }
+.sv-ptag { font-family: sans-serif; font-size: 11px; font-weight: 800; padding: 1px 7px; border: 1.5px solid currentColor; border-radius: 3px; }
+.sv-ptag.k-talks { color: #1d4f91; } .sv-ptag.k-official { color: #1f6b3a; } .sv-ptag.k-fail { color: #a3262f; } .sv-ptag.k-result { color: #6b3fa0; }
+.sv-pitem .pm { font-family: sans-serif; font-size: 11px; font-weight: 800; color: #b45309; }
+.sv-pitem .ph { font-size: 16px; font-weight: bold; line-height: 1.35; }
+.sv-pitem .pf { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #5d574a; font-family: sans-serif; }
+.sv-pitem .go { color: #1d4f91; font-weight: 700; white-space: nowrap; }
+.sv-paper .none { margin: 2px 0 0; font-size: 13px; color: #5d574a; font-family: sans-serif; }
+.sv-more { margin-top: 6px; width: 100%; background: transparent; border: 1px solid #cfc6b1; color: #1d4f91; font-weight: 700; font-size: 13px; }
+/* 커뮤니티 게시판 */
+.sv-board { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.sv-board .bh { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 16px; font-weight: 700; background: var(--panel-2); border-bottom: 1px solid var(--border); }
+.sv-board .bh .muted { font-weight: 400; font-size: 12px; margin-left: 4px; }
+.sv-mine { font-size: 12px; padding: 4px 10px; border-radius: 99px; font-weight: 400; }
+.sv-mine.on { border-color: var(--gold); color: var(--gold); }
+.sv-row { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--border); border-radius: 0; padding: 11px 16px; }
+.sv-row:last-child { border-bottom: 0; }
+.sv-row:hover { background: rgba(255, 255, 255, 0.025); }
+.sv-row > span { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.sv-row .l1 .ttl { font-weight: 700; font-size: 15px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; margin-left: 2px; }
+.sv-row .l1 .cm { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.sv-row .l2 { display: block; margin-top: 4px; color: #c4c4d6; font-size: 13px; }
+.sv-row .l3 { margin-top: 6px; font-size: 13px; }
+.sv-row .l3 .who { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.sv-row .l3 .see { color: var(--accent); white-space: nowrap; padding-left: 10px; }
+.sv-empty { color: var(--muted); padding: 18px 16px; margin: 0; }
+/* 오른쪽 · 휴대폰 위 접기 */
+.sv-box { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 14px; margin-bottom: 12px; }
+.sv-box h3 { margin: 0 0 8px; font-size: 14px; }
+.sv-mrow { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.sv-stc { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13px; }
+.sv-stc i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+.sv-stc i.s0 { background: #7a7a96; } .sv-stc i.s1 { background: var(--accent2); } .sv-stc i.s2 { background: var(--accent); } .sv-stc i.s3 { background: var(--gold); }
+.sv-help summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+.sv-help p { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 8px 0 0; }
+.sv-mtop { display: none; background: var(--panel); border: 1px solid rgba(255, 210, 63, 0.35); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; }
+.sv-mtop summary { cursor: pointer; }
+.sv-mtop .sv-mrow:first-of-type { margin-top: 8px; }
+/* 상세 */
+.sv-dwrap { max-width: 760px; }
+.sv-detail { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r); padding: 16px 20px 6px; }
+.sv-back { font-size: 12px; padding: 5px 10px; margin-bottom: 12px; display: block; }
+.sv-detail h2 { margin: 8px 0 4px; font-size: 20px; line-height: 1.35; }
+.sv-detail .by { font-size: 12px; color: var(--muted); }
+.sv-detail .body { margin: 14px 0; line-height: 1.75; }
+.sv-detail .body p { margin: 0 0 8px; }
+.sv-items { margin: 8px 0; padding-left: 20px; line-height: 2; }
+table.sv-info { width: 100%; border-collapse: collapse; margin: 14px 0 6px; font-size: 13px; background: var(--bg); border: 1px solid var(--border); }
+table.sv-info caption { text-align: left; padding: 0 0 8px; font-size: 14px; }
+table.sv-info th { text-align: left; color: var(--muted); font-weight: 400; padding: 7px 12px; width: 18%; border-top: 1px solid var(--border); }
+table.sv-info td { padding: 7px 12px; border-top: 1px solid var(--border); }
+.sv-cmts { border-top: 1px solid var(--border); margin: 0 -20px; }
+.sv-cmts h3 { margin: 0; padding: 12px 20px 4px; font-size: 13px; color: var(--muted); font-weight: 400; }
+.sv-cmt { position: relative; padding: 9px 20px; border-top: 1px solid var(--border); }
+.sv-cmt .cw { font-size: 12px; display: flex; gap: 6px; align-items: center; }
+.sv-cmt .fan { font-size: 11px; padding: 0 6px; border-radius: 99px; border: 1px solid var(--border); color: var(--muted); }
+.sv-cmt .bst { font-size: 11px; color: var(--gold); }
+.sv-cmt p { margin: 3px 0 0; font-size: 14px; padding-right: 60px; }
+.sv-cmt .lk { position: absolute; right: 20px; bottom: 9px; font-size: 12px; color: var(--muted); }
+.sv-cmt.best { background: rgba(255, 210, 63, 0.05); }
+.sv-paperd { background: var(--paper); color: var(--ink); border-color: #cfc6b1; font-family: Georgia, "Batang", serif; }
+.sv-paperd .sv-back { background: #e8e1d0; border-color: #cfc6b1; color: var(--ink); font-family: sans-serif; }
+.sv-paperd .outlet { color: #5d574a; font-weight: 800; border-bottom: 3px double var(--ink); padding-bottom: 5px; margin-bottom: 8px; }
+.sv-paperd h2 { color: var(--ink); font-size: 23px; }
+.sv-paperd .by, .sv-paperd .muted { color: #5d574a; }
+.sv-paperd .body { font-size: 15px; color: #2a2720; }
+.sv-paperd blockquote { margin: 12px 0; padding: 6px 14px; border-left: 3px solid var(--ink); }
+.sv-paperd table.sv-info { background: #ebe4d3; border-color: #cfc6b1; font-family: sans-serif; }
+.sv-paperd table.sv-info th, .sv-paperd table.sv-info td { border-top-color: #d8cfba; color: #2a2720; }
+.sv-paperd .sv-sc { color: #1d4f91; }
+.sv-paperd .tmark { color: #2a2720; }
+.sv-paperd .sv-tag.dim { filter: brightness(0.6); }
+@media (max-width: 860px) {
+  .sv-split { grid-template-columns: minmax(0, 1fr); }
+  .sv-side { display: none; }
+  .sv-mtop { display: block; }
+  .sv-weeks { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .sv-weeks button { flex: none; }
+  .sv-pgrid { grid-template-columns: minmax(0, 1fr); }
+  .sv-pitem { border-right: 0; margin-right: 0; border-bottom: 1px solid #cfc6b1; padding: 9px 0; }
+  .sv-pitem:last-child { border-bottom: 0; }
+  .sv-row .l1 { flex-wrap: wrap; }
+  .sv-row .l1 .ttl { white-space: normal; flex-basis: 100%; order: 3; margin-left: 0; }
+  .sv-row .l1 .cm { margin-left: auto; }
 }

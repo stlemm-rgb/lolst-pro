@@ -270,13 +270,13 @@ function fireSale(t) {
 }
 
 // 하위 팀부터: 약한 포지션에 더 나은 선수(FA·2부 스타·다른 팀 후보)를 데려옴
-function offseasonRebuild(news) {
+function offseasonRebuild(news, already) {
   const snap = state.league.marketSnap || { need: {} };
   const needOf = function (t) { return snap.need[t.id] !== undefined ? snap.need[t.id] : 0.5; };
   const order = state.league.teams.slice().sort(function (a, b) { return (needOf(b) - needOf(a)) || (a.tier - b.tier); });
-  const moved = {};
+  const moved = Object.assign({}, already || {}); // 찌라시로 이미 옮긴 선수는 다시 안 옮김 (js/stove.js)
   const buysLeft = {};
-  order.forEach(function (t) { buysLeft[t.id] = rebuildRule(needOf(t)).buys; fireSale(t); });
+  order.forEach(function (t) { buysLeft[t.id] = Math.max(0, rebuildRule(needOf(t)).buys - stoveUsed(t.id)); fireSale(t); }); // 찌라시로 쓴 영입 수만큼 뺌
 
   // 1부 팀끼리 주전 이적 (판 팀은 아래 영입 라운드에서 받은 이적료로 다시 보강)
   starTransfers(moved, news);
